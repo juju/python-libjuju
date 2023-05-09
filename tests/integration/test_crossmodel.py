@@ -102,8 +102,7 @@ async def test_relate_with_offer(event_loop):
         application = await model_1.deploy(
             'postgresql',
             application_name='postgresql',
-            series='focal',
-            channel='stable',
+            channel='14/stable',
         )
         assert 'postgresql' in model_1.applications
         await model_1.wait_for_idle(status="active")

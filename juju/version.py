@@ -5,7 +5,7 @@ DEFAULT_ARCHITECTURE = 'amd64'
 
 # Juju server version we target. Depending on this value, the Juju server
 # may stop the connecting considering us not compatible.
-TARGET_JUJU_VERSION = '3.1.1'
+TARGET_JUJU_VERSION = '3.1.2'
 
 # Used by connector to determine if we are compatible with the juju server
 SUPPORTED_MAJOR_VERSION = '3'

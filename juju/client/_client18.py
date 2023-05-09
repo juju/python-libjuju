@@ -2383,18 +2383,18 @@ class UniterFacade(Type):
                                                                        'type': 'array'}},
                                             'required': ['results'],
                                             'type': 'object'},
-                     'OpenMachinePortRangesByEndpointResult': {'additionalProperties': False,
-                                                               'properties': {'error': {'$ref': '#/definitions/Error'},
-                                                                              'unit-port-ranges': {'patternProperties': {'.*': {'items': {'$ref': '#/definitions/OpenUnitPortRangesByEndpoint'},
-                                                                                                                                'type': 'array'}},
-                                                                                                   'type': 'object'}},
-                                                               'required': ['unit-port-ranges'],
-                                                               'type': 'object'},
-                     'OpenMachinePortRangesByEndpointResults': {'additionalProperties': False,
-                                                                'properties': {'results': {'items': {'$ref': '#/definitions/OpenMachinePortRangesByEndpointResult'},
-                                                                                           'type': 'array'}},
-                                                                'required': ['results'],
-                                                                'type': 'object'},
+                     'OpenPortRangesByEndpointResult': {'additionalProperties': False,
+                                                        'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                       'unit-port-ranges': {'patternProperties': {'.*': {'items': {'$ref': '#/definitions/OpenUnitPortRangesByEndpoint'},
+                                                                                                                         'type': 'array'}},
+                                                                                            'type': 'object'}},
+                                                        'required': ['unit-port-ranges'],
+                                                        'type': 'object'},
+                     'OpenPortRangesByEndpointResults': {'additionalProperties': False,
+                                                         'properties': {'results': {'items': {'$ref': '#/definitions/OpenPortRangesByEndpointResult'},
+                                                                                    'type': 'array'}},
+                                                         'required': ['results'],
+                                                         'type': 'object'},
                      'OpenUnitPortRangesByEndpoint': {'additionalProperties': False,
                                                       'properties': {'endpoint': {'type': 'string'},
                                                                      'port-ranges': {'items': {'$ref': '#/definitions/PortRange'},
@@ -2536,11 +2536,6 @@ class UniterFacade(Type):
                                                                         'type': 'array'}},
                                              'required': ['results'],
                                              'type': 'object'},
-                     'SecretBackendArgs': {'additionalProperties': False,
-                                           'properties': {'backend-ids': {'items': {'type': 'string'},
-                                                                          'type': 'array'}},
-                                           'required': ['backend-ids'],
-                                           'type': 'object'},
                      'SecretBackendConfig': {'additionalProperties': False,
                                              'properties': {'params': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                                     'type': 'object'}},
@@ -2548,22 +2543,17 @@ class UniterFacade(Type):
                                                             'type': {'type': 'string'}},
                                              'required': ['type'],
                                              'type': 'object'},
-                     'SecretBackendConfigResult': {'additionalProperties': False,
-                                                   'properties': {'config': {'$ref': '#/definitions/SecretBackendConfig'},
-                                                                  'draining': {'type': 'boolean'},
-                                                                  'model-controller': {'type': 'string'},
-                                                                  'model-name': {'type': 'string'},
-                                                                  'model-uuid': {'type': 'string'}},
-                                                   'required': ['model-controller',
-                                                                'model-uuid',
-                                                                'model-name',
-                                                                'draining'],
-                                                   'type': 'object'},
                      'SecretBackendConfigResults': {'additionalProperties': False,
                                                     'properties': {'active-id': {'type': 'string'},
-                                                                   'results': {'patternProperties': {'.*': {'$ref': '#/definitions/SecretBackendConfigResult'}},
-                                                                               'type': 'object'}},
-                                                    'required': ['active-id'],
+                                                                   'configs': {'patternProperties': {'.*': {'$ref': '#/definitions/SecretBackendConfig'}},
+                                                                               'type': 'object'},
+                                                                   'model-controller': {'type': 'string'},
+                                                                   'model-name': {'type': 'string'},
+                                                                   'model-uuid': {'type': 'string'}},
+                                                    'required': ['model-controller',
+                                                                 'model-uuid',
+                                                                 'model-name',
+                                                                 'active-id'],
                                                     'type': 'object'},
                      'SecretConsumerInfoResult': {'additionalProperties': False,
                                                   'properties': {'error': {'$ref': '#/definitions/Error'},
@@ -2582,10 +2572,8 @@ class UniterFacade(Type):
                                                             'value-ref': {'$ref': '#/definitions/SecretValueRef'}},
                                              'type': 'object'},
                      'SecretContentResult': {'additionalProperties': False,
-                                             'properties': {'backend-config': {'$ref': '#/definitions/SecretBackendConfigResult'},
-                                                            'content': {'$ref': '#/definitions/SecretContentParams'},
-                                                            'error': {'$ref': '#/definitions/Error'},
-                                                            'latest-revision': {'type': 'integer'}},
+                                             'properties': {'content': {'$ref': '#/definitions/SecretContentParams'},
+                                                            'error': {'$ref': '#/definitions/Error'}},
                                              'required': ['content'],
                                              'type': 'object'},
                      'SecretContentResults': {'additionalProperties': False,
@@ -3094,7 +3082,21 @@ class UniterFacade(Type):
                                                                       'revisions '
                                                                       'for the '
                                                                       'specified '
-                                                                      'secrets.',
+                                                                      'secrets.\n'
+                                                                      'This facade '
+                                                                      'method is '
+                                                                      'used for '
+                                                                      'remote '
+                                                                      'watcher to '
+                                                                      'get the '
+                                                                      'latest '
+                                                                      'secret '
+                                                                      'revisions '
+                                                                      'and labels '
+                                                                      'for a '
+                                                                      'secret '
+                                                                      'changed '
+                                                                      'hook.',
                                                        'properties': {'Params': {'$ref': '#/definitions/GetSecretConsumerInfoArgs'},
                                                                       'Result': {'$ref': '#/definitions/SecretConsumerInfoResults'}},
                                                        'type': 'object'},
@@ -3125,8 +3127,7 @@ class UniterFacade(Type):
                                                               'needed to create a '
                                                               'client to secret '
                                                               'backends.',
-                                               'properties': {'Params': {'$ref': '#/definitions/SecretBackendArgs'},
-                                                              'Result': {'$ref': '#/definitions/SecretBackendConfigResults'}},
+                                               'properties': {'Result': {'$ref': '#/definitions/SecretBackendConfigResults'}},
                                                'type': 'object'},
                     'GetSecretContentInfo': {'description': 'GetSecretContentInfo '
                                                             'returns the secret '
@@ -3146,17 +3147,18 @@ class UniterFacade(Type):
                                                                     'for the '
                                                                     'specified '
                                                                     'secret '
-                                                                    'revisions.\n'
-                                                                    'Used when '
-                                                                    'deleting a '
-                                                                    'secret; only '
-                                                                    'returns '
-                                                                    'external '
-                                                                    'revision '
-                                                                    'info.',
+                                                                    'revisions.',
                                                      'properties': {'Params': {'$ref': '#/definitions/SecretRevisionArg'},
                                                                     'Result': {'$ref': '#/definitions/SecretContentResults'}},
                                                      'type': 'object'},
+                    'GetSecretStoreConfig': {'description': 'GetSecretStoreConfig '
+                                                            'is for 3.0.x agents.\n'
+                                                            'TODO(wallyworld) - '
+                                                            'remove when we auto '
+                                                            'upgrade migrated '
+                                                            'models.',
+                                             'properties': {'Result': {'$ref': '#/definitions/SecretBackendConfig'}},
+                                             'type': 'object'},
                     'GoalStates': {'description': 'GoalStates returns information '
                                                   'of charm units and relations.',
                                    'properties': {'Params': {'$ref': '#/definitions/Entities'},
@@ -3238,12 +3240,8 @@ class UniterFacade(Type):
                                                                              'ranges '
                                                                              'opened '
                                                                              'by '
-                                                                             'each\n'
-                                                                             'application '
-                                                                             'grouped '
-                                                                             'by '
-                                                                             'application '
-                                                                             'endpoint.',
+                                                                             'each '
+                                                                             'application.',
                                                               'properties': {'Params': {'$ref': '#/definitions/Entity'},
                                                                              'Result': {'$ref': '#/definitions/ApplicationOpenedPortsResults'}},
                                                               'type': 'object'},
@@ -3262,8 +3260,15 @@ class UniterFacade(Type):
                                                                          'application '
                                                                          'endpoint.',
                                                           'properties': {'Params': {'$ref': '#/definitions/Entities'},
-                                                                         'Result': {'$ref': '#/definitions/OpenMachinePortRangesByEndpointResults'}},
+                                                                         'Result': {'$ref': '#/definitions/OpenPortRangesByEndpointResults'}},
                                                           'type': 'object'},
+                    'OpenedPortRangesByEndpoint': {'description': 'OpenedPortRangesByEndpoint '
+                                                                  'returns the '
+                                                                  'port ranges '
+                                                                  'opened by the '
+                                                                  'unit.',
+                                                   'properties': {'Result': {'$ref': '#/definitions/OpenPortRangesByEndpointResults'}},
+                                                   'type': 'object'},
                     'PrivateAddress': {'description': 'PrivateAddress returns the '
                                                       'private address for each '
                                                       'given unit, if set.',
@@ -4469,6 +4474,7 @@ class UniterFacade(Type):
     async def GetConsumerSecretsRevisionInfo(self, consumer_tag=None, uris=None):
         '''
         GetConsumerSecretsRevisionInfo returns the latest secret revisions for the specified secrets.
+        This facade method is used for remote watcher to get the latest secret revisions and labels for a secret changed hook.
 
         consumer_tag : str
         uris : typing.Sequence[str]
@@ -4585,15 +4591,13 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(SecretBackendConfigResults)
-    async def GetSecretBackendConfig(self, backend_ids=None):
+    async def GetSecretBackendConfig(self):
         '''
         GetSecretBackendConfig gets the config needed to create a client to secret backends.
 
-        backend_ids : typing.Sequence[str]
+
         Returns -> SecretBackendConfigResults
         '''
-        if backend_ids is not None and not isinstance(backend_ids, (bytes, str, list)):
-            raise Exception("Expected backend_ids to be a Sequence, received: {}".format(type(backend_ids)))
 
         # map input types to rpc msg
         _params = dict()
@@ -4601,7 +4605,7 @@ class UniterFacade(Type):
                    request='GetSecretBackendConfig',
                    version=18,
                    params=_params)
-        _params['backend-ids'] = backend_ids
+
         reply = await self.rpc(msg)
         return reply
 
@@ -4655,7 +4659,6 @@ class UniterFacade(Type):
     async def GetSecretRevisionContentInfo(self, pending_delete=None, revisions=None, uri=None):
         '''
         GetSecretRevisionContentInfo returns the secret values for the specified secret revisions.
-        Used when deleting a secret; only returns external revision info.
 
         pending_delete : bool
         revisions : typing.Sequence[int]
@@ -4680,6 +4683,28 @@ class UniterFacade(Type):
         _params['pending-delete'] = pending_delete
         _params['revisions'] = revisions
         _params['uri'] = uri
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SecretBackendConfig)
+    async def GetSecretStoreConfig(self):
+        '''
+        GetSecretStoreConfig is for 3.0.x agents.
+        TODO(wallyworld) - remove when we auto upgrade migrated models.
+
+
+        Returns -> SecretBackendConfig
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='GetSecretStoreConfig',
+                   version=18,
+                   params=_params)
+
         reply = await self.rpc(msg)
         return reply
 
@@ -4953,8 +4978,7 @@ class UniterFacade(Type):
     @ReturnMapping(ApplicationOpenedPortsResults)
     async def OpenedApplicationPortRangesByEndpoint(self, tag=None):
         '''
-        OpenedApplicationPortRangesByEndpoint returns the port ranges opened by each
-        application grouped by application endpoint.
+        OpenedApplicationPortRangesByEndpoint returns the port ranges opened by each application.
 
         tag : str
         Returns -> ApplicationOpenedPortsResults
@@ -4974,14 +4998,14 @@ class UniterFacade(Type):
 
 
 
-    @ReturnMapping(OpenMachinePortRangesByEndpointResults)
+    @ReturnMapping(OpenPortRangesByEndpointResults)
     async def OpenedMachinePortRangesByEndpoint(self, entities=None):
         '''
         OpenedMachinePortRangesByEndpoint returns the port ranges opened by each
         unit on the provided machines grouped by application endpoint.
 
         entities : typing.Sequence[~Entity]
-        Returns -> OpenMachinePortRangesByEndpointResults
+        Returns -> OpenPortRangesByEndpointResults
         '''
         if entities is not None and not isinstance(entities, (bytes, str, list)):
             raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
@@ -4993,6 +5017,27 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(OpenPortRangesByEndpointResults)
+    async def OpenedPortRangesByEndpoint(self):
+        '''
+        OpenedPortRangesByEndpoint returns the port ranges opened by the unit.
+
+
+        Returns -> OpenPortRangesByEndpointResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='OpenedPortRangesByEndpoint',
+                   version=18,
+                   params=_params)
+
         reply = await self.rpc(msg)
         return reply
 
