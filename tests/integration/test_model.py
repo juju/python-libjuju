@@ -151,6 +151,18 @@ async def test_deploy_local_charm(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_deploy_local_charm_channel(event_loop):
+    charm_path = TESTS_DIR / 'charm'
+
+    async with base.CleanModel() as model:
+        await model.deploy(str(charm_path), channel='stable')
+        assert 'charm' in model.applications
+        await model.wait_for_idle(status="active")
+        assert model.units['charm/0'].workload_status == 'active'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_wait_local_charm_blocked(event_loop):
     charm_path = TESTS_DIR / 'charm'
 
@@ -181,9 +193,10 @@ async def test_wait_local_charm_waiting_timeout(event_loop):
 @pytest.mark.asyncio
 async def test_deploy_bundle(event_loop):
     async with base.CleanModel() as model:
-        await model.deploy('canonical-livepatch-onprem', channel='edge', trust=True)
+        await model.deploy('anbox-cloud-core', channel='stable',
+                           trust=True)
 
-        for app in ('haproxy', 'livepatch', 'postgresql', 'ubuntu-advantage'):
+        for app in ('ams', 'etcd', 'ams-node-controller', 'etcd-ca', 'lxd'):
             assert app in model.applications
 
 
@@ -269,10 +282,11 @@ async def test_deploy_local_charm_folder_symlink(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_deploy_trusted_bundle(event_loop):
+    pytest.skip("skip until we have a deployable bundle available. Right now the landscape-dense fails because postgresql is broken")
     async with base.CleanModel() as model:
-        await model.deploy('canonical-livepatch-onprem', channel='stable', trust=True)
+        await model.deploy('landscape-dense', channel='stable', trust=True)
 
-        for app in ('haproxy', 'livepatch', 'postgresql', 'ubuntu-advantage'):
+        for app in ('haproxy', 'landscape-server', 'postgresql', 'rabbit-mq-server'):
             assert app in model.applications
 
         haproxy_app = model.applications['haproxy']

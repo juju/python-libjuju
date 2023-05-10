@@ -1682,13 +1682,11 @@ class Model:
                 # We have a local charm dir that needs to be uploaded
                 charm_dir = os.path.abspath(os.path.expanduser(identifier))
                 charm_origin = res.origin
-                base = None
 
                 metadata = utils.get_local_charm_metadata(charm_dir)
                 charm_series = charm_series or await get_charm_series(metadata,
                                                                       self)
-                base = utils.get_local_charm_base(
-                    charm_series, channel, metadata, charm_dir, client.Base)
+                base = utils.get_local_charm_base(charm_series, charm_dir, client.Base)
                 charm_origin.base = base
                 if not application_name:
                     application_name = metadata['name']
