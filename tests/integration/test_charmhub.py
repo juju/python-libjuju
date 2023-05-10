@@ -103,5 +103,5 @@ async def test_subordinate_charm_zero_units(event_loop):
 @pytest.mark.asyncio
 async def test_list_resources(event_loop):
     async with base.CleanModel() as model:
-        resources = await model.charmhub.list_resources('postgresql')
+        resources = await model.charmhub.list_resources('hello-kubecon')
         assert type(resources) == list and len(resources) > 0
