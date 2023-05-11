@@ -1,25 +1,40 @@
 Changelog
 ---------
 
+2.9.42.2
+^^^^^^^^
+
+Thursday May 11 2023
+
+## What's Changed
+
+* [JUJU-3253] add missing force in bundle deployment by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/815
+* [JUJU-3348] Fix assumes parsing by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/820
+* [JUJU-3404] Pass series info into origin for ResolveCharm by @cderici in https://github.com/juju/python-libjuju/pull/825
+* Fix _resolve_charm errors by @cderici in https://github.com/juju/python-libjuju/pull/834
+* [JUJU-3583] wait_for_idle to not block when enough units are ready by @cderici in https://github.com/juju/python-libjuju/pull/840
+* [JUJU-3565] Expect and handle exceptions from the AllWatcher task by @cderici in https://github.com/juju/python-libjuju/pull/833
+* Fixes to pass the CI problems regarding missing postgresql charm. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/847
+* [JUJU-3641] Fix local charm base channel discovery by @cderici in https://github.com/juju/python-libjuju/pull/846
+
 2.9.42.1
 ^^^^^^^^
 
+Wednesday March 8 2023
+
 This is an scheduled release to support Juju 2.9.42.
 
-## What's Changed
 * [JUJU-2935] update juju 2942 by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/809
-
-
-**Full Changelog**: https://github.com/juju/python-libjuju/compare/2.9.38...2.9.42.1
 
 2.9.38.1
 ^^^^^^^^
+
+Wednesday January 18 2023
 
 The 2.9.38.1 version breaks the existing python-libjuju release versioning policy.
 Initially, the version number matches the juju version this release is intended
 to support and has been tested against.
 
-## What's Changed
 * Merge 2.9.11 by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/713
 * add support for ipv6 by @jdkandersson in https://github.com/juju/python-libjuju/pull/726
 * [JUJU-1979] Backport upgrade-charm fixes onto `2.9` by @cderici in https://github.com/juju/python-libjuju/pull/744
@@ -28,17 +43,10 @@ to support and has been tested against.
 * [JUJU-2485] Added nightly built checks. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/787
 * [JUJU-2381] Facade updated to 2.9.38 by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/788
 
-## New Contributors
-* @jdkandersson made their first contribution in https://github.com/juju/python-libjuju/pull/726
-
-**Full Changelog**: https://github.com/juju/python-libjuju/compare/2.9.11...2.9.38
-
 2.9.11
 ^^^^^^
 
 Monday July 11 2022
-
-## What's Changed
 
 * Add REPL quickstart subsection by @sed-i in https://github.com/juju/python-libjuju/pull/676
 * Revision of test onos.charm by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/686
