@@ -91,10 +91,15 @@ class Application(model.ModelEntity):
         """
         status = self.safe_data['status']['current']
         if status == "unset":
-            unit_status = []
+            known_statuses = []
             for unit in self.units:
-                unit_status.append(unit.workload_status)
-            return derive_status(unit_status)
+                known_statuses.append(unit.workload_status)
+            # If the self.get_status() is called (i.e. the status
+            # is received by FullStatus from the API) then add
+            # that into this computation as it might be more up
+            # to date (and more severe).
+            known_statuses.append(self._status)
+            return derive_status(known_statuses)
         return status
 
     @property
@@ -444,6 +449,23 @@ class Application(model.ModelEntity):
         if not schema:
             actions = {k: v.description for k, v in actions.items()}
         return actions
+
+    async def get_status(self):
+        """Get the application status using info from the FullStatus
+        as well, because it might be more up to date than our model
+
+        :return: str status
+        """
+
+        client_facade = client.ClientFacade.from_connection(self.connection)
+
+        full_status = await client_facade.FullStatus(patterns=None)
+        _app = full_status.applications.get(self.name, None)
+        if not _app:
+            raise JujuError(f"application is not in FullStatus : {self.name}")
+
+        self._status = derive_status([self.status, _app.status.status])
+        return self._status
 
     def attach_resource(self, resource_name, file_name, file_obj):
         """Updates the resource for an application by uploading file from
