@@ -13,6 +13,8 @@ from juju.application import Application
 from juju import jasyncio
 from juju.errors import JujuConnectionError, JujuError
 
+from .. import base
+
 
 def _make_delta(entity, type_, data=None):
     from juju.client.client import Delta
@@ -294,7 +296,7 @@ class TestModelWaitForIdle(asynctest.TestCase):
     async def test_wait_for_active_status(self):
         # create a custom apps mock
         from types import SimpleNamespace
-        apps = {"dummy_app": SimpleNamespace(
+        app = SimpleNamespace(
             status="active",
             units=[SimpleNamespace(
                 name="mockunit/0",
@@ -303,7 +305,14 @@ class TestModelWaitForIdle(asynctest.TestCase):
                 machine=None,
                 agent_status="idle",
             )],
-        )}
+        )
+        # This is a small hack to act like we're getting 'unknown'
+        # from the api (the get_status() call), which shouldn't
+        # change the semantics of this test, as the 'unknown'
+        # has the lowest severity (so the app's 'active' status
+        # will overrule it)
+        app.get_status = base.AsyncMock(return_value='unknown')
+        apps = {"dummy_app": app}
 
         with patch.object(Model, 'applications', new_callable=PropertyMock) as mock_apps:
             mock_apps.return_value = apps
