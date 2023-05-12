@@ -264,6 +264,7 @@ class ModelEntity:
         self._history_index = history_index
         self.connected = connected
         self.connection = model.connection()
+        self._status = 'unknown'
 
     def __repr__(self):
         return '<{} entity_id="{}">'.format(type(self).__name__,
@@ -2516,9 +2517,10 @@ class Model:
                     busy.append(app_name + " (missing)")
                     continue
                 app = self.applications[app_name]
-                if raise_on_error and app.status == "error":
+                app_status = await app.get_status()
+                if raise_on_error and app_status == "error":
                     errors.setdefault("App", []).append(app.name)
-                if raise_on_blocked and app.status == "blocked":
+                if raise_on_blocked and app_status == "blocked":
                     blocks.setdefault("App", []).append(app.name)
                 # Check if wait_for_exact_units flag is used
                 if wait_for_exact_units > 0:
