@@ -292,6 +292,8 @@ HIRSUTE = "hirsute"
 IMPISH = "impish"
 JAMMY = "jammy"
 KINETIC = "kinetic"
+LUNAR = "lunar"
+MANTIC = "mantic"
 
 UBUNTU_SERIES = {
     PRECISE: "12.04",
@@ -316,6 +318,8 @@ UBUNTU_SERIES = {
     IMPISH: "21.10",
     JAMMY: "22.04",
     KINETIC: "22.10",
+    LUNAR: "23.04",
+    MANTIC: "23.10",
 }
 
 
