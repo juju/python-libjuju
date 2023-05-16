@@ -689,7 +689,7 @@ class Type:
                             cls.splitEntries(v, d)
                 else:
                     # this is a simple entry
-                    cls.splitEntries(v, d)
+                    cls.splitEntries(entry, d)
             return cls(**d)
         return None
 
