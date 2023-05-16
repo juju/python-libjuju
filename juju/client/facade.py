@@ -685,8 +685,8 @@ class Type:
                     value = entry[i:].strip()
                     d[key] = value
                 else:
-                    # something like k8s-api
-                    d[entry] = ''
+                    # this is a simple entry
+                    cls.splitEntries(entry, d)
             return cls(**d)
         return None
 
