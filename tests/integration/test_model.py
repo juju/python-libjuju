@@ -151,6 +151,13 @@ async def test_deploy_local_charm(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_deploy_charm_assumes(event_loop):
+    async with base.CleanModel() as model:
+        await model.deploy('postgresql', channel='14/edge')
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_deploy_local_charm_channel(event_loop):
     charm_path = TESTS_DIR / 'charm'
 
