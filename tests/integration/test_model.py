@@ -341,6 +341,7 @@ async def test_deploy_from_ch_channel_revision_success(event_loop):
         await model.deploy("postgresql", application_name="test2", channel='latest/stable', revision=290)
 
 
+@base.bootstrapped
 @pytest.mark.asyncio
 async def test_deploy_trusted_bundle(event_loop):
     async with base.CleanModel() as model:
