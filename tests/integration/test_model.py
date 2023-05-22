@@ -337,8 +337,8 @@ async def test_deploy_from_ch_channel_revision_success(event_loop):
         # Ensure we're able to resolve charm these with channel and revision,
         # or channel without revision (note that revision requires channel,
         # but not vice versa)
-        await model.deploy("postgresql", application_name="test1", channel='latest/stable')
-        await model.deploy("postgresql", application_name="test2", channel='latest/stable', revision=290)
+        await model.deploy("postgresql", application_name="test1", channel='14/stable', base='ubuntu@22.04')
+        await model.deploy("postgresql", application_name="test2", channel='14/stable', revision=288)
 
 
 @base.bootstrapped
@@ -1268,7 +1268,7 @@ async def test_detach_storage(event_loop):
 @pytest.mark.asyncio
 async def test_add_and_list_storage(event_loop):
     async with base.CleanModel() as model:
-        app = await model.deploy('postgresql', channel="latest/stable")
+        app = await model.deploy('postgresql', base='ubuntu@22.04')
         await model.wait_for_idle(status="active", timeout=900)
         unit = app.units[0]
         await unit.add_storage("pgdata", size=512)
