@@ -1,6 +1,16 @@
 Changelog
 ---------
 
+2.9.42.3
+^^^^^^^^
+
+Wednesday May 24 2023
+
+## What's Changed
+* [JUJU-1467] Application status from API by @cderici in https://github.com/juju/python-libjuju/pull/849
+* [JUJU-3750] Fix bug in Type.from_json() parsing simple entries by @cderici in https://github.com/juju/python-libjuju/pull/854
+
+
 2.9.42.2
 ^^^^^^^^
 
