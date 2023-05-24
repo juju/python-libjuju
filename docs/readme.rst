@@ -15,7 +15,6 @@ This version may support old versions of Juju. However, it has been
 tested with the following requirements.
 
 * Python 3.8/3.9/3.10
-* Juju 2.9.38
 
 
 Design Notes
