@@ -694,7 +694,7 @@ class Connection:
 
         """
         endpoint = self.endpoint
-        host, remainder = endpoint.split(':', 1)
+        host, remainder = endpoint.rsplit(':', 1)
         port = remainder
         if '/' in remainder:
             port, _ = remainder.split('/', 1)
