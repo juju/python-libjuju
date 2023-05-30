@@ -322,11 +322,18 @@ UBUNTU_SERIES = {
     MANTIC: "23.10",
 }
 
+KUBERNETES = "kubernetes"
+KUBERNETES_SERIES = {
+    KUBERNETES: "kubernetes"
+}
+
+ALL_SERIES_VERSIONS = {**UBUNTU_SERIES, **KUBERNETES_SERIES}
+
 
 def get_series_version(series_name):
-    if series_name not in UBUNTU_SERIES:
+    if series_name not in ALL_SERIES_VERSIONS:
         raise errors.JujuError("Unknown series : %s", series_name)
-    return UBUNTU_SERIES[series_name]
+    return ALL_SERIES_VERSIONS[series_name]
 
 
 def get_version_series(version):
@@ -380,7 +387,10 @@ def get_local_charm_base(series, channel_from_arg, charm_metadata,
             # we currently only support ubuntu series (statically)
             # TODO (cderici) : go juju/core/series/supported.go and get the
             #  others here too
-            os_name_for_base = 'ubuntu'
+            if series in KUBERNETES_SERIES:
+                os_name_for_base = 'kubernetes'
+            else:
+                os_name_for_base = 'ubuntu'
 
     # Check the charm manifest
     if channel_for_base == '':
