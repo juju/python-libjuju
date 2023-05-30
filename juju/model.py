@@ -52,6 +52,7 @@ class _Observer:
     callable so that it's only called for changes that meet the criteria.
 
     """
+
     def __init__(self, callable_, entity_type, action, entity_id, predicate):
         self.callable_ = callable_
         self.entity_type = entity_type
@@ -117,6 +118,7 @@ class ModelState:
     entities in the model.
 
     """
+
     def __init__(self, model):
         self.model = model
         self.state = dict()
@@ -573,6 +575,7 @@ class Model:
     """
     The main API for interacting with a Juju model.
     """
+
     def __init__(
         self,
         max_frame_size=None,
@@ -1756,7 +1759,7 @@ class Model:
                 'series': origin.series,
                 'source': source,
                 'architecture': origin.architecture,
-                'track': origin.track,
+                'track': 'latest' if origin.track == '' else origin.track,
                 'risk': origin.risk,
             }
         }])
@@ -2641,6 +2644,7 @@ class CharmArchiveGenerator:
     This is used automatically by
     `Model.add_local_charm_dir <#juju.model.Model.add_local_charm_dir>`_.
     """
+
     def __init__(self, path):
         self.path = os.path.abspath(os.path.expanduser(path))
 
