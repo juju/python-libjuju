@@ -2497,7 +2497,7 @@ class Model:
 
     async def wait_for_idle(self, apps=None, raise_on_error=True, raise_on_blocked=False,
                             wait_for_active=False, timeout=10 * 60, idle_period=15, check_freq=0.5,
-                            status=None, wait_for_units=None, wait_for_exact_units=-1):
+                            status=None, wait_for_units=None, wait_for_exact_units=None):
         """Wait for applications in the model to settle into an idle state.
 
         :param apps (list[str]): Optional list of specific app names to wait on.
@@ -2580,7 +2580,7 @@ class Model:
                 ))
 
         if wait_for_exact_units is not None:
-            assert type(wait_for_exact_units) == int and wait_for_exact_units >= 0, \
+            assert type(wait_for_exact_units) == int and wait_for_exact_units < 0, \
                 'Invalid value for wait_for_exact_units : %s' % wait_for_exact_units
 
         while True:
@@ -2601,7 +2601,7 @@ class Model:
                     blocks.setdefault("App", []).append(app.name)
 
                 # Check if wait_for_exact_units flag is used
-                if wait_for_exact_units is not None and wait_for_exact_units > 0:
+                if wait_for_exact_units is not None:
                     if len(app.units) != wait_for_exact_units:
                         busy.append(app.name + " (waiting for exactly %s units, current : %s)" %
                                     (wait_for_exact_units, len(app.units)))
