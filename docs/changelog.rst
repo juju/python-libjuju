@@ -1,6 +1,16 @@
 Changelog
 ---------
 
+2.9.42.4
+^^^^^^^^
+
+Wednesday May 31 2023
+
+## What's Changed
+* [JUJU-3886] Kubernetes series version by @cderici in https://github.com/juju/python-libjuju/pull/868
+* [JUJU-3887] Avoid removing the track if set to latest in channel normalization by @cderici in https://github.com/juju/python-libjuju/pull/867
+
+
 2.9.42.3
 ^^^^^^^^
 
