@@ -686,7 +686,7 @@ class Type:
                     d[key] = value
                 else:
                     # this is a simple entry
-                    cls.splitEntries(entry, d)
+                    d[entry] = ''
             return cls(**d)
         return None
 
