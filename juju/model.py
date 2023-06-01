@@ -2580,7 +2580,7 @@ class Model:
                 ))
 
         if wait_for_exact_units is not None:
-            assert type(wait_for_exact_units) == int and wait_for_exact_units < 0, \
+            assert type(wait_for_exact_units) == int and wait_for_exact_units >= 0, \
                 'Invalid value for wait_for_exact_units : %s' % wait_for_exact_units
 
         while True:
