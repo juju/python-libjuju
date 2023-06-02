@@ -385,6 +385,11 @@ def get_local_charm_base(series, charm_path, base_class):
         raise errors.JujuError("Unable to determine base for charm : %s" %
                                charm_path)
 
+    # Legacy k8s charms - assume ubuntu focal
+    # as per juju/cmd/juju/application/utils.DeduceOrigin()
+    if channel_for_base == "kubernetes" or os_name_for_base == "kubernetes":
+        channel_for_base = '20.04/stable'
+        os_name_for_base = 'ubuntu'
     return base_class(channel_for_base, os_name_for_base)
 
 
