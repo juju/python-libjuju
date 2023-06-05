@@ -1675,17 +1675,15 @@ class Model:
             '24/lxd/3' - place in container 3 on machine 24
 
             If None, a new machine is provisioned.
+        :param devices: charm device constraints
         :param bool trust: Trust signifies that the charm should be deployed
             with access to trusted credentials. Hooks run by the charm can access
             cloud credentials and other trusted access credentials.
 
         :param str[] attach_storage: Existing storage to attach to the deployed unit
             (not available on k8s models)
-        TODO::
-
-            - support local file resources
-
         """
+
         if storage:
             storage = {
                 k: client.Constraints(**v)
@@ -1817,6 +1815,15 @@ class Model:
             )
 
     async def _add_charm(self, charm_url, origin):
+        """_add_charm sends the given origin and the url to the Juju API too add the charm to the
+        state. Either calls the CharmsFacade.AddCharm for (> version 2), or the
+        ClientFacade.AddCharm (for older versions).
+
+        :param str charm_url: the url of the charm to be added
+        :param client.CharmOrigin origin: the origin for the charm to be added
+
+        :returns client.CharmOriginResult
+        """
         # client facade is deprecated with in Juju, and smaller, more focused
         # facades have been created and we'll use that if it's available.
         charms_cls = client.CharmsFacade
@@ -1880,6 +1887,12 @@ class Model:
         return str(charm_url), resolved_origin
 
     async def _resolve_architecture(self, url):
+        """_resolve_architecture returns the architecture for a given charm url.
+        :param str url: the client.URL to determine the arch for
+
+        :returns str architecture for the given url
+        """
+
         if url.architecture:
             return url.architecture
 
@@ -1893,6 +1906,16 @@ class Model:
                                       entity_url,
                                       origin,
                                       overrides=None):
+        """_add_charmhub_resources is called by the deploy to add pending resources requested by
+        the charm being deployed. It calls the ResourcesFacade.AddPendingResources.
+
+        :param str application: the name of the application
+        :param client.CharmURL entity_url: url for the charm that we add resources for
+        :param client.CharmOrigin origin: origin for the charm that we add resources for
+
+        :returns [string]string resource_map that is a map of resources to their assigned
+        pendingIDs.
+        """
         charm_facade = client.CharmsFacade.from_connection(self.connection())
         res = await charm_facade.CharmInfo(entity_url)
 
@@ -1936,6 +1959,20 @@ class Model:
         return resource_map
 
     async def add_local_resources(self, application, entity_url, metadata, resources):
+        """_add_local_resources is called by the deploy to add pending local  resources requested by
+        the charm being deployed. It calls the ResourcesFacade.AddPendingResources. After getting
+        the pending IDs from the controller it sends an HTTP PUT request to actually upload local
+        resources.
+
+        :param str application: the name of the application
+        :param client.CharmURL entity_url: url for the charm that we add resources for
+        :param [string]string metadata: metadata for the charm that we add resources for
+        :param [string] resources: the paths for the local files (or oci-images) to be added as
+        local resources
+
+        :returns [string]string resource_map that is a map of resources to their assigned
+        pendingIDs.
+        """
         if not resources:
             return None
 
