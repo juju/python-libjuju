@@ -223,9 +223,24 @@ class BundleHandler:
 
         return self.bundle, self.overlays
 
-    async def fetch_plan(self, charm_url, origin, overlays=[]):
-        entity_id = charm_url.path()
-        is_local = Schema.LOCAL.matches(charm_url.schema)
+    async def fetch_plan(self, bundle_url, origin, overlays=[]):
+        """fetch_plan is called by the model.deploy(). It gathers the information about the
+        bundle to be deployed (whether local or CharmHub), straightens it up, applies overlays
+        if any overlays are given. Validates the bundle against known issues. Resolves and adds
+        local charms if there's any in the bundle. Resolves and adds --include-file configs if
+        there's any. Finally it calls the BundleFacade.GetChanges() to get the plan for the
+        bundle to be handed to the execute_plan() by the model.deploy(). Note that it doesn't
+        return the plan, just saves it in the self (BundleHandler) to be used later.
+
+        :param client.URL bundle_url: the url of the bundle to be deployed
+        :param client.CharmOrigin origin: the origin of the bundle to be deployed
+        :param [string] overlays: paths for the yaml files containing overlays to be applied to
+        the bundle during deployment
+
+        :returns: None
+        """
+        entity_id = bundle_url.path()
+        is_local = Schema.LOCAL.matches(bundle_url.schema)
         bundle_dir = None
 
         if is_local and os.path.isfile(entity_id):
@@ -235,8 +250,8 @@ class BundleHandler:
             bundle_yaml = (Path(entity_id) / "bundle.yaml").read_text()
             bundle_dir = Path(entity_id)
 
-        if Schema.CHARM_HUB.matches(charm_url.schema):
-            bundle_yaml = await self._download_bundle(charm_url, origin)
+        if Schema.CHARM_HUB.matches(bundle_url.schema):
+            bundle_yaml = await self._download_bundle(bundle_url, origin)
 
         if not bundle_yaml:
             raise JujuError('empty bundle, nothing to deploy')
