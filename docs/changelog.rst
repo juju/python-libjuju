@@ -11,7 +11,9 @@ endpoints for secrets backend.
 
 This release works with any Juju 3.x controller.
 
-## What's Changed
+What's Changed
+==============
+
 * [JUJU-3202] Add facades for 3.1.1. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/807
 * Add destroy units by @cderici in https://github.com/juju/python-libjuju/pull/812
 * [JUJU-3517] Revisit _build_facades in connection by @cderici in https://github.com/juju/python-libjuju/pull/826
@@ -29,7 +31,9 @@ Connectivity with juju controllers in the 3.x series is allowed, connections wit
 
 This version is only tested using Juju 3.1.0.
 
-## What's Changed
+What's Changed
+==============
+
 * setup.py: adjust websockets versions for py38-310 by @mert-kirpici in https://github.com/juju/python-libjuju/pull/731
 * [JUJU-2175] Remove juju 2.9 support on 3.1.0 by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/774
 * [JUJU-2276] Series or base for local charms by @cderici in https://github.com/juju/python-libjuju/pull/777
@@ -42,7 +46,9 @@ This version is only tested using Juju 3.1.0.
 * Add compatibility for juju 3.1.0 by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/799
 * Replace schemas.json with a wellformed version. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/800
 
-## New Contributors
+New Contributors
+================
+
 * @mert-kirpici made their first contribution in https://github.com/juju/python-libjuju/pull/731
 
 **Full Changelog**: https://github.com/juju/python-libjuju/compare/3.0.4...3.1.0.1
@@ -52,12 +58,16 @@ This version is only tested using Juju 3.1.0.
 
 Wednesday 26th October
 
-## What's Changed
+What's Changed
+==============
+
 * [JUJU-2027] Local refresh with resoruces by @cderici in https://github.com/juju/python-libjuju/pull/757
 * [JUJU-2026] Improve resolve charm by @cderici in https://github.com/juju/python-libjuju/pull/761
 * Add owner and data to license file by @arturo-seijas in https://github.com/juju/python-libjuju/pull/760
 
-## New Contributors
+New Contributors
+================
+
 * @arturo-seijas made their first contribution in https://github.com/juju/python-libjuju/pull/760
 
 **Full Changelog**: https://github.com/juju/python-libjuju/compare/3.0.3...3.0.4
@@ -67,7 +77,8 @@ Wednesday 26th October
 
 Saturay October 22 2022
 
-## What's Changed
+What's Changed
+==============
 
 * Wait for idle arg type check by @cderici in https://github.com/juju/python-libjuju/pull/741
 * [JUJU-1970] Revise local refresh by @cderici in https://github.com/juju/python-libjuju/pull/742
@@ -87,7 +98,8 @@ Saturay October 22 2022
 
 Wednesday October 5 2022
 
-## What's Changed
+What's Changed
+==============
 
 * Model name can now be accessed through model.name by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/702
 * [JUJU-1593] Fix `unit.run()` and update the old client codes by @cderici in https://github.com/juju/python-libjuju/pull/710
