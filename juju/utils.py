@@ -331,12 +331,24 @@ ALL_SERIES_VERSIONS = {**UBUNTU_SERIES, **KUBERNETES_SERIES}
 
 
 def get_series_version(series_name):
+    """get_series_version outputs the version of the OS based on the given series
+    e.g. jammy -> 22.04, kubernetes -> kubernetes
+
+    :param str series_name: name of the series
+    :return str: os version
+    """
     if series_name not in ALL_SERIES_VERSIONS:
         raise errors.JujuError("Unknown series : %s", series_name)
     return ALL_SERIES_VERSIONS[series_name]
 
 
 def get_version_series(version):
+    """get_version_series is the opposite of the get_series_version. It outputs the series based
+    on given OS version
+
+    :param str version: version of the OS
+    return str: name of the series corresponding to the given version
+    """
     if version not in UBUNTU_SERIES.values():
         raise errors.JujuError("Unknown version : %s", version)
     return list(UBUNTU_SERIES.keys())[list(UBUNTU_SERIES.values()).index(version)]
