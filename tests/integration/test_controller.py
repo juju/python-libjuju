@@ -248,13 +248,13 @@ async def test_secrets_backend_lifecycle(event_loop):
     async with base.CleanModel() as m:
         controller = await m.get_controller()
         # deploy postgresql
-        await m.deploy('postgresql', channel="latest/stable", series="focal")
+        await m.deploy('postgresql', base='ubuntu@22.04')
         # deploy vault
-        await m.deploy("vault", series="focal")
+        await m.deploy("vault", base='ubuntu@20.04')
         # relate/integrate
         await m.integrate("vault:db", "postgresql:db")
         # wait for the postgresql app
-        await m.wait_for_idle(["postgresql", "vault"], timeout=900)
+        await m.wait_for_idle(["postgresql", "vault"], timeout=1900)
         # expose vault
         vault_app = m.applications["vault"]
         await vault_app.expose()
