@@ -120,6 +120,7 @@ client_facades = {
     'SecretBackends': {'versions': [1]},
     'SecretBackendsManager': {'versions': [1]},
     'SecretBackendsRotateWatcher': {'versions': [1]},
+    'SecretsDrain': {'versions': [1]},
     'SecretsRevisionWatcher': {'versions': [1]},
     'SecretsRotationWatcher': {'versions': [1]},
     'SecretsTriggerWatcher': {'versions': [1]},

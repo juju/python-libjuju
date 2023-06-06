@@ -65,6 +65,7 @@ class AdminFacade(Type):
                                                                              'type': 'array'},
                                                                    'type': 'array'},
                                                      'nonce': {'type': 'string'},
+                                                     'token': {'type': 'string'},
                                                      'user-data': {'type': 'string'}},
                                       'required': ['auth-tag',
                                                    'credentials',
@@ -117,7 +118,7 @@ class AdminFacade(Type):
     
 
     @ReturnMapping(LoginResult)
-    async def Login(self, auth_tag=None, bakery_version=None, cli_args=None, client_version=None, credentials=None, macaroons=None, nonce=None, user_data=None):
+    async def Login(self, auth_tag=None, bakery_version=None, cli_args=None, client_version=None, credentials=None, macaroons=None, nonce=None, token=None, user_data=None):
         '''
         Login logs in with the provided credentials.  All subsequent requests on the
         connection will act as the authenticated user.
@@ -129,6 +130,7 @@ class AdminFacade(Type):
         credentials : str
         macaroons : typing.Sequence[~Macaroon]
         nonce : str
+        token : str
         user_data : str
         Returns -> LoginResult
         '''
@@ -153,6 +155,9 @@ class AdminFacade(Type):
         if nonce is not None and not isinstance(nonce, (bytes, str)):
             raise Exception("Expected nonce to be a str, received: {}".format(type(nonce)))
 
+        if token is not None and not isinstance(token, (bytes, str)):
+            raise Exception("Expected token to be a str, received: {}".format(type(token)))
+
         if user_data is not None and not isinstance(user_data, (bytes, str)):
             raise Exception("Expected user_data to be a str, received: {}".format(type(user_data)))
 
@@ -169,6 +174,7 @@ class AdminFacade(Type):
         _params['credentials'] = credentials
         _params['macaroons'] = macaroons
         _params['nonce'] = nonce
+        _params['token'] = token
         _params['user-data'] = user_data
         reply = await self.rpc(msg)
         return reply
@@ -2009,6 +2015,7 @@ class ModelConfigFacade(Type):
                                               'container': {'type': 'string'},
                                               'cores': {'type': 'integer'},
                                               'cpu-power': {'type': 'integer'},
+                                              'image-id': {'type': 'string'},
                                               'instance-role': {'type': 'string'},
                                               'instance-type': {'type': 'string'},
                                               'mem': {'type': 'integer'},
@@ -2576,7 +2583,8 @@ class UpgradeSeriesFacade(Type):
                                                 'required': ['results'],
                                                 'type': 'object'},
                      'PinnedLeadershipResult': {'additionalProperties': False,
-                                                'properties': {'result': {'patternProperties': {'.*': {'items': {'type': 'string'},
+                                                'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                               'result': {'patternProperties': {'.*': {'items': {'type': 'string'},
                                                                                                        'type': 'array'}},
                                                                           'type': 'object'}},
                                                 'type': 'object'},
