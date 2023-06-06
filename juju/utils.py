@@ -418,19 +418,21 @@ DEFAULT_SUPPORTED_LTS = 'jammy'
 DEFAULT_SUPPORTED_LTS_BASE = client.Base(channel='22.04', name='ubuntu')
 
 
-def base_channel_from_series(track, risk, series=None):
+def base_channel_from_series(track, risk, series):
     return origin.Channel(track=track, risk=risk).normalize().compute_base_channel(series=series)
 
 
-def get_os_from_series(series=None):
-    if not series or series in UBUNTU_SERIES:
+def get_os_from_series(series):
+    if series in UBUNTU_SERIES:
         return 'ubuntu'
     raise JujuError(f'os for the series {series} needs to be added')
 
 
 def get_base_from_origin_or_channel(origin_or_channel, series=None):
-    channel = base_channel_from_series(origin_or_channel.track, origin_or_channel.risk, series)
-    os_name = get_os_from_series(series)
+    channel, os_name = None, None
+    if series:
+        channel = base_channel_from_series(origin_or_channel.track, origin_or_channel.risk, series)
+        os_name = get_os_from_series(series)
     return client.Base(channel=channel, name=os_name)
 
 

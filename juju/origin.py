@@ -113,15 +113,13 @@ class Channel:
             path = "{}/{}".format(self.track, path)
         return path
 
-    def compute_base_channel(self, series=None):
+    def compute_base_channel(self, series):
         """Determines the channel for a client.Base
         A base channel is a track/risk/branch
 
         """
         _ch = [self.risk]
-        tr = self.track
-        if series:
-            tr = utils.get_series_version(series)
+        tr = utils.get_series_version(series)
         if tr:
             _ch = [tr] + _ch
         return "/".join(_ch)
