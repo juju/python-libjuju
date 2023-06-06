@@ -1877,7 +1877,7 @@ class Model:
         result.charm_origin.base = utils.get_base_from_origin_or_channel(resolved_origin, selected_series)
         charm_url.series = selected_series
 
-        return result.url, result.charm_origin
+        return str(charm_url), resolved_origin
 
     async def _resolve_architecture(self, url):
         if url.architecture:
