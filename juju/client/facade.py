@@ -685,7 +685,7 @@ class Type:
                     value = entry[i:].strip()
                     d[key] = value
                 else:
-                    # something like k8s-api
+                    # this is a simple entry
                     d[entry] = ''
             return cls(**d)
         return None

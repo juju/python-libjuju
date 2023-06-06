@@ -27,6 +27,7 @@ class BundleHandler:
     Handle bundles by using the API to translate bundle YAML into a plan of
     steps and then dispatching each of those using the API.
     """
+
     def __init__(self, model, trusted=False, forced=False):
         self.model = model
         self.trusted = trusted
@@ -159,8 +160,7 @@ class BundleHandler:
                 apps_dict[app_name]["resources"] = resources
                 origin = client.CharmOrigin(source="local", risk="stable")
                 if not self.model.connection().is_using_old_client:
-                    origin.base = utils.get_local_charm_base(series, '',
-                                                             metadata,
+                    origin.base = utils.get_local_charm_base(series,
                                                              charm_dir,
                                                              client.Base)
                 self.origins[charm_url] = {str(None): origin}
@@ -523,6 +523,7 @@ class AddApplicationChange(ChangeInfo):
     :local_resources: identifies the path to the local resource of the
         application's charm.
     """
+
     def __init__(self, change_id, requires, params=None):
         super(AddApplicationChange, self).__init__(change_id, requires)
 
@@ -669,6 +670,7 @@ class AddCharmChange(ChangeInfo):
            not sufficient.
         :channel: preferred channel for obtaining the charm.
     """
+
     def __init__(self, change_id, requires, params=None):
         super(AddCharmChange, self).__init__(change_id, requires)
 
@@ -770,6 +772,7 @@ class AddMachineChange(ChangeInfo):
             "lxc" or kvm"). It is not specified for top level machines.
         :parent_id: id of the parent machine.
     """
+
     def __init__(self, change_id, requires, params=None):
         super(AddMachineChange, self).__init__(change_id, requires)
         # this one is weird, as it returns a set of parameters inside a list.
@@ -861,6 +864,7 @@ class AddRelationChange(ChangeInfo):
         application, and the interface is optional. Examples are
         "$deploy-42:web", "$deploy-42", "mysql:db".
     """
+
     def __init__(self, change_id, requires, params=None):
         super(AddRelationChange, self).__init__(change_id, requires)
 
@@ -922,6 +926,7 @@ class AddUnitChange(ChangeInfo):
         :to: optional location where to add the unit, as a placeholder
             pointing to another unit change or to a machine change.
     """
+
     def __init__(self, change_id, requires, params=None):
         super(AddUnitChange, self).__init__(change_id, requires)
 
@@ -990,6 +995,7 @@ class CreateOfferChange(ChangeInfo):
             offer.
         :offer_name: describes the offer name.
     """
+
     def __init__(self, change_id, requires, params=None):
         super(CreateOfferChange, self).__init__(change_id, requires)
 
@@ -1044,6 +1050,7 @@ class ConsumeOfferChange(ChangeInfo):
         :url: contains the location of the offer
         :application_name: describes the application name on offer.
     """
+
     def __init__(self, change_id, requires, params=None):
         super(ConsumeOfferChange, self).__init__(change_id, requires)
 
@@ -1099,6 +1106,7 @@ class ExposeChange(ChangeInfo):
             that should be able to access the port ranges that the application
             has opened for each endpoint.
     """
+
     def __init__(self, change_id, requires, params=None):
         super(ExposeChange, self).__init__(change_id, requires)
 
@@ -1148,6 +1156,7 @@ class ScaleChange(ChangeInfo):
         :application: placeholder name of the application to be scaled.
         :scale: is the new scale value to use.
     """
+
     def __init__(self, change_id, requires, params=None):
         super(ScaleChange, self).__init__(change_id, requires)
 
@@ -1200,6 +1209,7 @@ class SetAnnotationsChange(ChangeInfo):
         :entity_type: type of the entity, "application" or "machine".
         :ennotations: annotations as key/value pairs.
     """
+
     def __init__(self, change_id, requires, params=None):
         super(SetAnnotationsChange, self).__init__(change_id, requires)
 
