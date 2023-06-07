@@ -48,7 +48,7 @@ ubuntu charm, then exits:
   import logging
   import sys
 
-  from juju import jasyncio
+  from juju import asyncio
   from juju.model import Model
 
 
@@ -58,7 +58,7 @@ ubuntu charm, then exits:
       model = Model()
 
       # Connect to the currently active Juju model
-      await model.connect_current()
+      await model.connect()
 
       try:
           # Deploy a single unit of the ubuntu charm, using the latest revision
@@ -66,13 +66,12 @@ ubuntu charm, then exits:
           ubuntu_app = await model.deploy(
             'ubuntu',
             application_name='ubuntu',
-            series='xenial',
-            channel='stable',
           )
 
           if '--wait' in sys.argv:
               # optionally block until the application is ready
-              await model.block_until(lambda: ubuntu_app.status == 'active')
+              await model.wait_for_idle(status = 'active')
+
       finally:
           # Disconnect from the api server and cleanup.
           await model.disconnect()
@@ -87,7 +86,7 @@ ubuntu charm, then exits:
 
       # Run the deploy coroutine in an asyncio event loop, using a helper
       # that abstracts loop creation and teardown.
-      jasyncio.run(deploy())
+      asyncio.run(deploy())
 
 
   if __name__ == '__main__':
