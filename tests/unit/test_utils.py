@@ -1,7 +1,11 @@
 import unittest
 import pytest
 
-from juju.utils import series_selector, get_base_from_origin_or_channel, parse_base_arg, juju_config_dir, juju_ssh_key_paths, DEFAULT_SUPPORTED_LTS
+from juju.utils import series_selector, get_base_from_origin_or_channel, \
+    parse_base_arg, juju_config_dir, juju_ssh_key_paths, \
+    DEFAULT_SUPPORTED_LTS, get_series_version, get_version_series, \
+    base_channel_to_series, base_channel_from_series, \
+    get_os_from_series
 from juju.client import client
 from juju.errors import JujuError
 from juju.url import URL
@@ -26,13 +30,6 @@ class TestBaseArgument(unittest.TestCase):
         assert base.channel == '22.04'
 
 
-class TestBaseFromSeries(unittest.TestCase):
-    def test_get_base_from_series(self):
-        b = get_base_from_origin_or_channel(client.CharmOrigin(track='latest', risk='edge'), series='jammy')
-        assert b.name == 'ubuntu'
-        assert b.channel == '22.04/edge'
-
-
 class TestSeriesSelector(unittest.TestCase):
     def test_series_arg(self):
         assert series_selector('jammy', []) == 'jammy'
@@ -53,3 +50,26 @@ class TestSeriesSelector(unittest.TestCase):
 
     def test_return_lts(self):
         assert series_selector() == DEFAULT_SUPPORTED_LTS
+
+
+class TestBaseChannelOriginUtils(unittest.TestCase):
+    def test_get_series_version(self):
+        assert get_series_version(series_name='kubernetes') == 'kubernetes'
+        assert get_series_version(series_name='jammy') == '22.04'
+
+    def test_get_version_series(self):
+        assert get_version_series(version='22.04') == 'jammy'
+
+    def test_base_channel_to_series(self):
+        assert base_channel_to_series(channel='22.04/stable') == 'jammy'
+
+    def test_base_channel_from_series(self):
+        assert base_channel_from_series(track='latest', risk='stable', series='jammy') == \
+               '22.04/stable'
+
+    def test_get_os_from_series(self):
+        assert get_os_from_series('jammy') == 'ubuntu'
+
+    def test_get_base_from_series(self):
+        orgn = client.CharmOrigin(track='latest', risk='edge')
+        assert get_base_from_origin_or_channel(orgn, series='jammy') == client.Base('22.04/edge', 'ubuntu')

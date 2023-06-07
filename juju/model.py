@@ -517,6 +517,7 @@ class CharmhubDeployType:
         if series:
             base.channel = ch.normalize().compute_base_channel(series=series)
             base.name = 'ubuntu'
+
         origin = client.CharmOrigin(source=Source.CHARM_HUB.value,
                                     architecture=architecture,
                                     risk=ch.risk,
@@ -1865,7 +1866,7 @@ class Model:
 
         result = resp.results[0]
         if result.error:
-            raise JujuError(result.error.message)
+            raise JujuError(f'resolving {url} : {result.error.message}')
 
         supported_series = result.supported_series
         resolved_origin = result.charm_origin
@@ -1876,7 +1877,7 @@ class Model:
         result.charm_origin.base = utils.get_base_from_origin_or_channel(resolved_origin, selected_series)
         charm_url.series = selected_series
 
-        return result.url, result.charm_origin
+        return str(charm_url), resolved_origin
 
     async def _resolve_architecture(self, url):
         if url.architecture:

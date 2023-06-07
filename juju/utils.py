@@ -331,12 +331,24 @@ ALL_SERIES_VERSIONS = {**UBUNTU_SERIES, **KUBERNETES_SERIES}
 
 
 def get_series_version(series_name):
+    """get_series_version outputs the version of the OS based on the given series
+    e.g. jammy -> 22.04, kubernetes -> kubernetes
+
+    :param str series_name: name of the series
+    :return str: os version
+    """
     if series_name not in ALL_SERIES_VERSIONS:
         raise errors.JujuError("Unknown series : %s", series_name)
     return ALL_SERIES_VERSIONS[series_name]
 
 
 def get_version_series(version):
+    """get_version_series is the opposite of the get_series_version. It outputs the series based
+    on given OS version
+
+    :param str version: version of the OS
+    return str: name of the series corresponding to the given version
+    """
     if version not in UBUNTU_SERIES.values():
         raise errors.JujuError("Unknown version : %s", version)
     return list(UBUNTU_SERIES.keys())[list(UBUNTU_SERIES.values()).index(version)]
@@ -418,19 +430,21 @@ DEFAULT_SUPPORTED_LTS = 'jammy'
 DEFAULT_SUPPORTED_LTS_BASE = client.Base(channel='22.04', name='ubuntu')
 
 
-def base_channel_from_series(track, risk, series=None):
+def base_channel_from_series(track, risk, series):
     return origin.Channel(track=track, risk=risk).normalize().compute_base_channel(series=series)
 
 
-def get_os_from_series(series=None):
-    if not series or series in UBUNTU_SERIES:
+def get_os_from_series(series):
+    if series in UBUNTU_SERIES:
         return 'ubuntu'
     raise JujuError(f'os for the series {series} needs to be added')
 
 
 def get_base_from_origin_or_channel(origin_or_channel, series=None):
-    channel = base_channel_from_series(origin_or_channel.track, origin_or_channel.risk, series)
-    os_name = get_os_from_series(series)
+    channel, os_name = None, None
+    if series:
+        channel = base_channel_from_series(origin_or_channel.track, origin_or_channel.risk, series)
+        os_name = get_os_from_series(series)
     return client.Base(channel=channel, name=os_name)
 
 
