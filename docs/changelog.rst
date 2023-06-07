@@ -1,10 +1,31 @@
 Changelog
 ---------
 
+3.2.0.0
+^^^^^^^
+
+Wednesday 7th June 2023
+
+This release contains the new endpoints for Juju 3.2.0.
+
+This release works with any Juju 3.x controller.
+
+What's Changed
+==============
+
+* Add base.bootstrapped decorator to integration test by @cderici in https://github.com/juju/python-libjuju/pull/856
+* Add mantic and lunar to list of ubuntu series by @addyess in https://github.com/juju/python-libjuju/pull/853
+* [JUJU-3885] forward port ipv6 support by @cderici in https://github.com/juju/python-libjuju/pull/866
+* Revisit auto documentation generation with sphinx on RTD by @cderici in https://github.com/juju/python-libjuju/pull/871
+* [JUJU-3894] Forward port some fixes from 2.9 to master by @cderici in https://github.com/juju/python-libjuju/pull/870
+* Revisit the secret backend integration test by @cderici in https://github.com/juju/python-libjuju/pull/858
+* [JUJU-3954] Fix incorrect base channel computation by @cderici in https://github.com/juju/python-libjuju/pull/875
+* [JUJU-3927] Add 3.2.0 facades  by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/874
+
 3.1.2.0
 ^^^^^^^
 
-Friday 5th May 2022
+Friday 5th May 2023
 
 This release has been tested with Juju 3.1.2 and contains the new 
 endpoints for secrets backend.
