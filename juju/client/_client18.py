@@ -262,11 +262,6 @@ class ApplicationFacade(Type):
                                              'name': {'type': 'string'}},
                               'required': ['name', 'channel'],
                               'type': 'object'},
-                     'Channel': {'additionalProperties': False,
-                                 'properties': {'branch': {'type': 'string'},
-                                                'risk': {'type': 'string'},
-                                                'track': {'type': 'string'}},
-                                 'type': 'object'},
                      'CharmOrigin': {'additionalProperties': False,
                                      'properties': {'architecture': {'type': 'string'},
                                                     'base': {'$ref': '#/definitions/Base'},
@@ -334,6 +329,7 @@ class ApplicationFacade(Type):
                                                'properties': {'ApplicationOfferDetails': {'$ref': '#/definitions/ApplicationOfferDetails'},
                                                               'application-alias': {'type': 'string'},
                                                               'application-description': {'type': 'string'},
+                                                              'auth-token': {'type': 'string'},
                                                               'bindings': {'patternProperties': {'.*': {'type': 'string'}},
                                                                            'type': 'object'},
                                                               'endpoints': {'items': {'$ref': '#/definitions/RemoteEndpoint'},
@@ -363,41 +359,34 @@ class ApplicationFacade(Type):
                                                  'properties': {'ApplicationName': {'type': 'string'},
                                                                 'AttachStorage': {'items': {'type': 'string'},
                                                                                   'type': 'array'},
-                                                                'Base': {'$ref': '#/definitions/Base'},
-                                                                'Channel': {'$ref': '#/definitions/Channel'},
                                                                 'CharmName': {'type': 'string'},
                                                                 'ConfigYAML': {'type': 'string'},
                                                                 'Cons': {'$ref': '#/definitions/Value'},
                                                                 'Devices': {'patternProperties': {'.*': {'$ref': '#/definitions/Constraints'}},
                                                                             'type': 'object'},
                                                                 'DryRun': {'type': 'boolean'},
-                                                                'EndpointBindings': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                                     'type': 'object'},
-                                                                'Force': {'type': 'boolean'},
-                                                                'NumUnits': {'type': 'integer'},
                                                                 'Placement': {'items': {'$ref': '#/definitions/Placement'},
                                                                               'type': 'array'},
-                                                                'Resources': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                              'type': 'object'},
-                                                                'Revision': {'type': 'integer'},
                                                                 'Storage': {'patternProperties': {'.*': {'$ref': '#/definitions/Constraints'}},
                                                                             'type': 'object'},
-                                                                'Trust': {'type': 'boolean'}},
+                                                                'Trust': {'type': 'boolean'},
+                                                                'base': {'$ref': '#/definitions/Base'},
+                                                                'channel': {'type': 'string'},
+                                                                'endpoint-bindings': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                                      'type': 'object'},
+                                                                'force': {'type': 'boolean'},
+                                                                'num-units': {'type': 'integer'},
+                                                                'resources': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                              'type': 'object'},
+                                                                'revision': {'type': 'integer'}},
                                                  'required': ['CharmName',
                                                               'ApplicationName',
                                                               'AttachStorage',
-                                                              'Base',
-                                                              'Channel',
                                                               'ConfigYAML',
                                                               'Cons',
                                                               'Devices',
                                                               'DryRun',
-                                                              'EndpointBindings',
-                                                              'Force',
-                                                              'NumUnits',
                                                               'Placement',
-                                                              'Revision',
-                                                              'Resources',
                                                               'Storage',
                                                               'Trust'],
                                                  'type': 'object'},
@@ -406,11 +395,22 @@ class ApplicationFacade(Type):
                                                                           'type': 'array'}},
                                                   'required': ['Args'],
                                                   'type': 'object'},
+                     'DeployFromRepositoryInfo': {'additionalProperties': False,
+                                                  'properties': {'architecture': {'type': 'string'},
+                                                                 'base': {'$ref': '#/definitions/Base'},
+                                                                 'channel': {'type': 'string'},
+                                                                 'effective-channel': {'type': 'string'},
+                                                                 'name': {'type': 'string'},
+                                                                 'revision': {'type': 'integer'}},
+                                                  'required': ['architecture',
+                                                               'channel',
+                                                               'name',
+                                                               'revision'],
+                                                  'type': 'object'},
                      'DeployFromRepositoryResult': {'additionalProperties': False,
                                                     'properties': {'Errors': {'items': {'$ref': '#/definitions/Error'},
                                                                               'type': 'array'},
-                                                                   'Info': {'items': {'type': 'string'},
-                                                                            'type': 'array'},
+                                                                   'Info': {'$ref': '#/definitions/DeployFromRepositoryInfo'},
                                                                    'PendingResourceUploads': {'items': {'$ref': '#/definitions/PendingResourceUpload'},
                                                                                               'type': 'array'}},
                                                     'required': ['Errors',
@@ -569,11 +569,11 @@ class ApplicationFacade(Type):
                      'PendingResourceUpload': {'additionalProperties': False,
                                                'properties': {'Filename': {'type': 'string'},
                                                               'Name': {'type': 'string'},
-                                                              'PendingID': {'type': 'string'},
-                                                              'Type': {'type': 'string'}},
+                                                              'Type': {'type': 'string'},
+                                                              'pending-id': {'type': 'string'}},
                                                'required': ['Name',
                                                             'Filename',
-                                                            'PendingID',
+                                                            'pending-id',
                                                             'Type'],
                                                'type': 'object'},
                      'Placement': {'additionalProperties': False,
@@ -734,6 +734,7 @@ class ApplicationFacade(Type):
                                               'container': {'type': 'string'},
                                               'cores': {'type': 'integer'},
                                               'cpu-power': {'type': 'integer'},
+                                              'image-id': {'type': 'string'},
                                               'instance-role': {'type': 'string'},
                                               'instance-type': {'type': 'string'},
                                               'mem': {'type': 'integer'},
@@ -2536,6 +2537,11 @@ class UniterFacade(Type):
                                                                         'type': 'array'}},
                                              'required': ['results'],
                                              'type': 'object'},
+                     'SecretBackendArgs': {'additionalProperties': False,
+                                           'properties': {'backend-ids': {'items': {'type': 'string'},
+                                                                          'type': 'array'}},
+                                           'required': ['backend-ids'],
+                                           'type': 'object'},
                      'SecretBackendConfig': {'additionalProperties': False,
                                              'properties': {'params': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                                     'type': 'object'}},
@@ -2543,17 +2549,22 @@ class UniterFacade(Type):
                                                             'type': {'type': 'string'}},
                                              'required': ['type'],
                                              'type': 'object'},
+                     'SecretBackendConfigResult': {'additionalProperties': False,
+                                                   'properties': {'config': {'$ref': '#/definitions/SecretBackendConfig'},
+                                                                  'draining': {'type': 'boolean'},
+                                                                  'model-controller': {'type': 'string'},
+                                                                  'model-name': {'type': 'string'},
+                                                                  'model-uuid': {'type': 'string'}},
+                                                   'required': ['model-controller',
+                                                                'model-uuid',
+                                                                'model-name',
+                                                                'draining'],
+                                                   'type': 'object'},
                      'SecretBackendConfigResults': {'additionalProperties': False,
                                                     'properties': {'active-id': {'type': 'string'},
-                                                                   'configs': {'patternProperties': {'.*': {'$ref': '#/definitions/SecretBackendConfig'}},
-                                                                               'type': 'object'},
-                                                                   'model-controller': {'type': 'string'},
-                                                                   'model-name': {'type': 'string'},
-                                                                   'model-uuid': {'type': 'string'}},
-                                                    'required': ['model-controller',
-                                                                 'model-uuid',
-                                                                 'model-name',
-                                                                 'active-id'],
+                                                                   'results': {'patternProperties': {'.*': {'$ref': '#/definitions/SecretBackendConfigResult'}},
+                                                                               'type': 'object'}},
+                                                    'required': ['active-id'],
                                                     'type': 'object'},
                      'SecretConsumerInfoResult': {'additionalProperties': False,
                                                   'properties': {'error': {'$ref': '#/definitions/Error'},
@@ -2572,8 +2583,10 @@ class UniterFacade(Type):
                                                             'value-ref': {'$ref': '#/definitions/SecretValueRef'}},
                                              'type': 'object'},
                      'SecretContentResult': {'additionalProperties': False,
-                                             'properties': {'content': {'$ref': '#/definitions/SecretContentParams'},
-                                                            'error': {'$ref': '#/definitions/Error'}},
+                                             'properties': {'backend-config': {'$ref': '#/definitions/SecretBackendConfigResult'},
+                                                            'content': {'$ref': '#/definitions/SecretContentParams'},
+                                                            'error': {'$ref': '#/definitions/Error'},
+                                                            'latest-revision': {'type': 'integer'}},
                                              'required': ['content'],
                                              'type': 'object'},
                      'SecretContentResults': {'additionalProperties': False,
@@ -3122,13 +3135,14 @@ class UniterFacade(Type):
                                       'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                      'Result': {'$ref': '#/definitions/StringResults'}},
                                       'type': 'object'},
-                    'GetSecretBackendConfig': {'description': 'GetSecretBackendConfig '
-                                                              'gets the config '
-                                                              'needed to create a '
-                                                              'client to secret '
-                                                              'backends.',
-                                               'properties': {'Result': {'$ref': '#/definitions/SecretBackendConfigResults'}},
-                                               'type': 'object'},
+                    'GetSecretBackendConfigs': {'description': 'GetSecretBackendConfigs '
+                                                               'gets the config '
+                                                               'needed to create a '
+                                                               'client to secret '
+                                                               'backends.',
+                                                'properties': {'Params': {'$ref': '#/definitions/SecretBackendArgs'},
+                                                               'Result': {'$ref': '#/definitions/SecretBackendConfigResults'}},
+                                                'type': 'object'},
                     'GetSecretContentInfo': {'description': 'GetSecretContentInfo '
                                                             'returns the secret '
                                                             'values for the '
@@ -3151,14 +3165,6 @@ class UniterFacade(Type):
                                                      'properties': {'Params': {'$ref': '#/definitions/SecretRevisionArg'},
                                                                     'Result': {'$ref': '#/definitions/SecretContentResults'}},
                                                      'type': 'object'},
-                    'GetSecretStoreConfig': {'description': 'GetSecretStoreConfig '
-                                                            'is for 3.0.x agents.\n'
-                                                            'TODO(wallyworld) - '
-                                                            'remove when we auto '
-                                                            'upgrade migrated '
-                                                            'models.',
-                                             'properties': {'Result': {'$ref': '#/definitions/SecretBackendConfig'}},
-                                             'type': 'object'},
                     'GoalStates': {'description': 'GoalStates returns information '
                                                   'of charm units and relations.',
                                    'properties': {'Params': {'$ref': '#/definitions/Entities'},
@@ -4591,21 +4597,23 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(SecretBackendConfigResults)
-    async def GetSecretBackendConfig(self):
+    async def GetSecretBackendConfigs(self, backend_ids=None):
         '''
-        GetSecretBackendConfig gets the config needed to create a client to secret backends.
+        GetSecretBackendConfigs gets the config needed to create a client to secret backends.
 
-
+        backend_ids : typing.Sequence[str]
         Returns -> SecretBackendConfigResults
         '''
+        if backend_ids is not None and not isinstance(backend_ids, (bytes, str, list)):
+            raise Exception("Expected backend_ids to be a Sequence, received: {}".format(type(backend_ids)))
 
         # map input types to rpc msg
         _params = dict()
         msg = dict(type='Uniter',
-                   request='GetSecretBackendConfig',
+                   request='GetSecretBackendConfigs',
                    version=18,
                    params=_params)
-
+        _params['backend-ids'] = backend_ids
         reply = await self.rpc(msg)
         return reply
 
@@ -4683,28 +4691,6 @@ class UniterFacade(Type):
         _params['pending-delete'] = pending_delete
         _params['revisions'] = revisions
         _params['uri'] = uri
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(SecretBackendConfig)
-    async def GetSecretStoreConfig(self):
-        '''
-        GetSecretStoreConfig is for 3.0.x agents.
-        TODO(wallyworld) - remove when we auto upgrade migrated models.
-
-
-        Returns -> SecretBackendConfig
-        '''
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Uniter',
-                   request='GetSecretStoreConfig',
-                   version=18,
-                   params=_params)
-
         reply = await self.rpc(msg)
         return reply
 

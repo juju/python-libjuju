@@ -2,7 +2,7 @@ name: Nightly release edge testing
 
 on:
   schedule:
-    - cron: "0 0 * * *"  # Run at 12AM UTC, every day
+    - cron: "0 0 * * *" # Run at 12AM UTC, every day
 
 jobs:
   candidate-integration:
@@ -16,60 +16,60 @@ jobs:
           - "3.9"
           - "3.10"
     steps:
-    - name: Download artifact from previous workflow
-      id: download_artifact
-      uses: dawidd6/action-download-artifact@v2
-      with:
-        workflow_conclusion: success
-        name: juju-last-edge-version
-        if_no_artifact_found: ignore
-    - name: Check if there is a new candidate
-      shell: bash
-      run: |
-        edge=$(snap info juju | grep 3.1/edge | awk '{print $2}')
-        last_tested=NA
-        if [ -f juju-last-edge-version ]; then
-          last_tested=$(cat juju-last-edge-version)
-        fi
-        echo "Last tested was $last_tested"
-        echo "Latest juju version found is $edge"
-        next_test=NA
-        if [[ "$edge" == "^" ]]; then
-          echo "No edge to test"
-        else
-          if [[ "$edge" == "$last_tested" ]]; then
-            echo "Edge $edge was already tested"
+      - name: Download artifact from previous workflow
+        id: download_artifact
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow_conclusion: success
+          name: juju-last-edge-version
+          if_no_artifact_found: ignore
+      - name: Check if there is a new candidate
+        shell: bash
+        run: |
+          edge=$(snap info juju | grep 3.1/edge | awk '{print $2}')
+          last_tested=NA
+          if [ -f juju-last-edge-version ]; then
+            last_tested=$(cat juju-last-edge-version)
+          fi
+          echo "Last tested was $last_tested"
+          echo "Latest juju version found is $edge"
+          next_test=NA
+          if [[ "$edge" == "^" ]]; then
+            echo "No edge to test"
           else
-            echo "Edge $edge has to be tested"
-            next_test="$edge"
-          fi 
-        fi
-        echo "next-test=$next_test" >> $GITHUB_ENV
-        echo "$next_test" > ~/juju-last-edge-version
-    - name: Check out code
-      uses: actions/checkout@v3
-      if: ${{ env.next-test != 'NA' }}
-    - name: Setup operator environment
-      if: ${{ env.next-test != 'NA' }}
-      uses: charmed-kubernetes/actions-operator@main
-      with:
-        provider: lxd
-        juju-channel: 3.1/edge
-    - name: Setup Python
-      if: ${{ env.next-test != 'NA' }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python }}
-    - name: Install dependencies
-      if: ${{ env.next-test != 'NA' }}
-      run: pip install tox
-    - name: Run integration
-      if: ${{ env.next-test != 'NA' }}
-      # Force one single concurrent test
-      run: tox -e integration -- -n 1
-    - name: Upload artifact
-      if: ${{ env.next-test != 'NA' }}
-      uses: actions/upload-artifact@v3
-      with:
-        name: juju-last-edge-version
-        path: ~/juju-last-edge-version
+            if [[ "$edge" == "$last_tested" ]]; then
+              echo "Edge $edge was already tested"
+            else
+              echo "Edge $edge has to be tested"
+              next_test="$edge"
+            fi 
+          fi
+          echo "next-test=$next_test" >> $GITHUB_ENV
+          echo "$next_test" > ~/juju-last-edge-version
+      - name: Check out code
+        uses: actions/checkout@v3
+        if: ${{ env.next-test != 'NA' }}
+      - name: Setup operator environment
+        if: ${{ env.next-test != 'NA' }}
+        uses: charmed-kubernetes/actions-operator@main
+        with:
+          provider: lxd
+          juju-channel: 3.2/edge
+      - name: Setup Python
+        if: ${{ env.next-test != 'NA' }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install dependencies
+        if: ${{ env.next-test != 'NA' }}
+        run: pip install tox
+      - name: Run integration
+        if: ${{ env.next-test != 'NA' }}
+        # Force one single concurrent test
+        run: tox -e integration -- -n 1
+      - name: Upload artifact
+        if: ${{ env.next-test != 'NA' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: juju-last-edge-version
+          path: ~/juju-last-edge-version

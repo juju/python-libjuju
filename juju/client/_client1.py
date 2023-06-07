@@ -146,6 +146,105 @@ class ActionPrunerFacade(Type):
 
 
 
+class AgentLifeFlagFacade(Type):
+    name = 'AgentLifeFlag'
+    version = 1
+    schema =     {'definitions': {'Entities': {'additionalProperties': False,
+                                  'properties': {'entities': {'items': {'$ref': '#/definitions/Entity'},
+                                                              'type': 'array'}},
+                                  'required': ['entities'],
+                                  'type': 'object'},
+                     'Entity': {'additionalProperties': False,
+                                'properties': {'tag': {'type': 'string'}},
+                                'required': ['tag'],
+                                'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'LifeResult': {'additionalProperties': False,
+                                    'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                   'life': {'type': 'string'}},
+                                    'required': ['life'],
+                                    'type': 'object'},
+                     'LifeResults': {'additionalProperties': False,
+                                     'properties': {'results': {'items': {'$ref': '#/definitions/LifeResult'},
+                                                                'type': 'array'}},
+                                     'required': ['results'],
+                                     'type': 'object'},
+                     'NotifyWatchResult': {'additionalProperties': False,
+                                           'properties': {'NotifyWatcherId': {'type': 'string'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'required': ['NotifyWatcherId'],
+                                           'type': 'object'},
+                     'NotifyWatchResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/NotifyWatchResult'},
+                                                                       'type': 'array'}},
+                                            'required': ['results'],
+                                            'type': 'object'}},
+     'properties': {'Life': {'description': 'Life returns the life status of every '
+                                            'supplied entity, where available.',
+                             'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                            'Result': {'$ref': '#/definitions/LifeResults'}},
+                             'type': 'object'},
+                    'Watch': {'description': 'Watch starts an NotifyWatcher for '
+                                             'each given entity.',
+                              'properties': {'Params': {'$ref': '#/definitions/Entities'},
+                                             'Result': {'$ref': '#/definitions/NotifyWatchResults'}},
+                              'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(LifeResults)
+    async def Life(self, entities=None):
+        '''
+        Life returns the life status of every supplied entity, where available.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> LifeResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='AgentLifeFlag',
+                   request='Life',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
+    async def Watch(self, entities=None):
+        '''
+        Watch starts an NotifyWatcher for each given entity.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='AgentLifeFlag',
+                   request='Watch',
+                   version=1,
+                   params=_params)
+        _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class AgentToolsFacade(Type):
     name = 'AgentTools'
     version = 1
@@ -526,24 +625,6 @@ class CAASApplicationProvisionerFacade(Type):
                                              'name': {'type': 'string'}},
                               'required': ['name', 'channel'],
                               'type': 'object'},
-                     'CAASApplicationGarbageCollectArg': {'additionalProperties': False,
-                                                          'properties': {'active-pod-names': {'items': {'type': 'string'},
-                                                                                              'type': 'array'},
-                                                                         'application': {'$ref': '#/definitions/Entity'},
-                                                                         'desired-replicas': {'type': 'integer'},
-                                                                         'force': {'type': 'boolean'},
-                                                                         'observed-units': {'$ref': '#/definitions/Entities'}},
-                                                          'required': ['application',
-                                                                       'observed-units',
-                                                                       'desired-replicas',
-                                                                       'active-pod-names',
-                                                                       'force'],
-                                                          'type': 'object'},
-                     'CAASApplicationGarbageCollectArgs': {'additionalProperties': False,
-                                                           'properties': {'args': {'items': {'$ref': '#/definitions/CAASApplicationGarbageCollectArg'},
-                                                                                   'type': 'array'}},
-                                                           'required': ['args'],
-                                                           'type': 'object'},
                      'CAASApplicationOCIResourceResult': {'additionalProperties': False,
                                                           'properties': {'error': {'$ref': '#/definitions/Error'},
                                                                          'result': {'$ref': '#/definitions/CAASApplicationOCIResources'}},
@@ -558,6 +639,13 @@ class CAASApplicationProvisionerFacade(Type):
                                                                                'type': 'object'}},
                                                      'required': ['images'],
                                                      'type': 'object'},
+                     'CAASApplicationProvisionerConfig': {'additionalProperties': False,
+                                                          'properties': {'unmanaged-applications': {'$ref': '#/definitions/Entities'}},
+                                                          'type': 'object'},
+                     'CAASApplicationProvisionerConfigResult': {'additionalProperties': False,
+                                                                'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                               'provisioner-config': {'$ref': '#/definitions/CAASApplicationProvisionerConfig'}},
+                                                                'type': 'object'},
                      'CAASApplicationProvisioningInfo': {'additionalProperties': False,
                                                          'properties': {'api-addresses': {'items': {'type': 'string'},
                                                                                           'type': 'array'},
@@ -588,6 +676,22 @@ class CAASApplicationProvisionerFacade(Type):
                                                                 'properties': {'results': {'items': {'$ref': '#/definitions/CAASApplicationProvisioningInfo'},
                                                                                            'type': 'array'}},
                                                                 'required': ['results'],
+                                                                'type': 'object'},
+                     'CAASApplicationProvisioningState': {'additionalProperties': False,
+                                                          'properties': {'scale-target': {'type': 'integer'},
+                                                                         'scaling': {'type': 'boolean'}},
+                                                          'required': ['scaling',
+                                                                       'scale-target'],
+                                                          'type': 'object'},
+                     'CAASApplicationProvisioningStateArg': {'additionalProperties': False,
+                                                             'properties': {'application': {'$ref': '#/definitions/Entity'},
+                                                                            'provisioning-state': {'$ref': '#/definitions/CAASApplicationProvisioningState'}},
+                                                             'required': ['application',
+                                                                          'provisioning-state'],
+                                                             'type': 'object'},
+                     'CAASApplicationProvisioningStateResult': {'additionalProperties': False,
+                                                                'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                                               'provisioning-state': {'$ref': '#/definitions/CAASApplicationProvisioningState'}},
                                                                 'type': 'object'},
                      'CAASUnitInfo': {'additionalProperties': False,
                                       'properties': {'tag': {'type': 'string'},
@@ -794,6 +898,33 @@ class CAASApplicationProvisionerFacade(Type):
                                   'properties': {'url': {'type': 'string'}},
                                   'required': ['url'],
                                   'type': 'object'},
+                     'DestroyUnitInfo': {'additionalProperties': False,
+                                         'properties': {'destroyed-storage': {'items': {'$ref': '#/definitions/Entity'},
+                                                                              'type': 'array'},
+                                                        'detached-storage': {'items': {'$ref': '#/definitions/Entity'},
+                                                                             'type': 'array'}},
+                                         'type': 'object'},
+                     'DestroyUnitParams': {'additionalProperties': False,
+                                           'properties': {'destroy-storage': {'type': 'boolean'},
+                                                          'dry-run': {'type': 'boolean'},
+                                                          'force': {'type': 'boolean'},
+                                                          'max-wait': {'type': 'integer'},
+                                                          'unit-tag': {'type': 'string'}},
+                                           'required': ['unit-tag'],
+                                           'type': 'object'},
+                     'DestroyUnitResult': {'additionalProperties': False,
+                                           'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                          'info': {'$ref': '#/definitions/DestroyUnitInfo'}},
+                                           'type': 'object'},
+                     'DestroyUnitResults': {'additionalProperties': False,
+                                            'properties': {'results': {'items': {'$ref': '#/definitions/DestroyUnitResult'},
+                                                                       'type': 'array'}},
+                                            'type': 'object'},
+                     'DestroyUnitsParams': {'additionalProperties': False,
+                                            'properties': {'units': {'items': {'$ref': '#/definitions/DestroyUnitParams'},
+                                                                     'type': 'array'}},
+                                            'required': ['units'],
+                                            'type': 'object'},
                      'DetailedStatus': {'additionalProperties': False,
                                         'properties': {'data': {'patternProperties': {'.*': {'additionalProperties': True,
                                                                                              'type': 'object'}},
@@ -1080,6 +1211,7 @@ class CAASApplicationProvisionerFacade(Type):
                                               'container': {'type': 'string'},
                                               'cores': {'type': 'integer'},
                                               'cpu-power': {'type': 'integer'},
+                                              'image-id': {'type': 'string'},
                                               'instance-role': {'type': 'string'},
                                               'instance-type': {'type': 'string'},
                                               'mem': {'type': 'integer'},
@@ -1108,30 +1240,6 @@ class CAASApplicationProvisionerFacade(Type):
                                                 'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                'Result': {'$ref': '#/definitions/CAASApplicationOCIResourceResults'}},
                                                 'type': 'object'},
-                    'CAASApplicationGarbageCollect': {'description': 'CAASApplicationGarbageCollect '
-                                                                     'cleans up '
-                                                                     'units that '
-                                                                     'have gone '
-                                                                     'away '
-                                                                     'permanently.\n'
-                                                                     'Only '
-                                                                     'observed '
-                                                                     'units will '
-                                                                     'be deleted '
-                                                                     'as new units '
-                                                                     'could have '
-                                                                     'surfaced '
-                                                                     'between\n'
-                                                                     'the '
-                                                                     'capturing of '
-                                                                     'kuberentes '
-                                                                     'pod '
-                                                                     'state/application '
-                                                                     'state and '
-                                                                     'this call.',
-                                                      'properties': {'Params': {'$ref': '#/definitions/CAASApplicationGarbageCollectArgs'},
-                                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
-                                                      'type': 'object'},
                     'CharmInfo': {'description': 'CharmInfo returns information '
                                                  'about the requested charm.',
                                   'properties': {'Params': {'$ref': '#/definitions/CharmURL'},
@@ -1148,11 +1256,24 @@ class CAASApplicationProvisionerFacade(Type):
                                                    'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
                                                    'type': 'object'},
+                    'DestroyUnits': {'description': 'DestroyUnits is responsible '
+                                                    'for scaling down a set of '
+                                                    'units on the this\n'
+                                                    'Application.',
+                                     'properties': {'Params': {'$ref': '#/definitions/DestroyUnitsParams'},
+                                                    'Result': {'$ref': '#/definitions/DestroyUnitResults'}},
+                                     'type': 'object'},
                     'Life': {'description': 'Life returns the life status of every '
                                             'supplied entity, where available.',
                              'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                             'Result': {'$ref': '#/definitions/LifeResults'}},
                              'type': 'object'},
+                    'ProvisionerConfig': {'description': 'ProvisionerConfig '
+                                                         'returns the '
+                                                         "provisioner's "
+                                                         'configuration.',
+                                          'properties': {'Result': {'$ref': '#/definitions/CAASApplicationProvisionerConfigResult'}},
+                                          'type': 'object'},
                     'ProvisioningInfo': {'description': 'ProvisioningInfo returns '
                                                         'the info needed to '
                                                         'provision a caas '
@@ -1160,6 +1281,13 @@ class CAASApplicationProvisionerFacade(Type):
                                          'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                         'Result': {'$ref': '#/definitions/CAASApplicationProvisioningInfoResults'}},
                                          'type': 'object'},
+                    'ProvisioningState': {'description': 'ProvisioningState '
+                                                         'returns the provisioning '
+                                                         'state for the '
+                                                         'application.',
+                                          'properties': {'Params': {'$ref': '#/definitions/Entity'},
+                                                         'Result': {'$ref': '#/definitions/CAASApplicationProvisioningStateResult'}},
+                                          'type': 'object'},
                     'Remove': {'description': 'Remove removes every given entity '
                                               'from state, calling EnsureDead\n'
                                               'first, then Remove. It will fail if '
@@ -1179,6 +1307,13 @@ class CAASApplicationProvisionerFacade(Type):
                                      'properties': {'Params': {'$ref': '#/definitions/EntityPasswords'},
                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
                                      'type': 'object'},
+                    'SetProvisioningState': {'description': 'SetProvisioningState '
+                                                            'sets the provisioning '
+                                                            'state for the '
+                                                            'application.',
+                                             'properties': {'Params': {'$ref': '#/definitions/CAASApplicationProvisioningStateArg'},
+                                                            'Result': {'$ref': '#/definitions/ErrorResult'}},
+                                             'type': 'object'},
                     'Units': {'description': 'Units returns all the units for each '
                                              'application specified.',
                               'properties': {'Params': {'$ref': '#/definitions/Entities'},
@@ -1276,31 +1411,6 @@ class CAASApplicationProvisionerFacade(Type):
 
 
 
-    @ReturnMapping(ErrorResults)
-    async def CAASApplicationGarbageCollect(self, args=None):
-        '''
-        CAASApplicationGarbageCollect cleans up units that have gone away permanently.
-        Only observed units will be deleted as new units could have surfaced between
-        the capturing of kuberentes pod state/application state and this call.
-
-        args : typing.Sequence[~CAASApplicationGarbageCollectArg]
-        Returns -> ErrorResults
-        '''
-        if args is not None and not isinstance(args, (bytes, str, list)):
-            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='CAASApplicationProvisioner',
-                   request='CAASApplicationGarbageCollect',
-                   version=1,
-                   params=_params)
-        _params['args'] = args
-        reply = await self.rpc(msg)
-        return reply
-
-
-
     @ReturnMapping(Charm)
     async def CharmInfo(self, url=None):
         '''
@@ -1348,6 +1458,30 @@ class CAASApplicationProvisionerFacade(Type):
 
 
 
+    @ReturnMapping(DestroyUnitResults)
+    async def DestroyUnits(self, units=None):
+        '''
+        DestroyUnits is responsible for scaling down a set of units on the this
+        Application.
+
+        units : typing.Sequence[~DestroyUnitParams]
+        Returns -> DestroyUnitResults
+        '''
+        if units is not None and not isinstance(units, (bytes, str, list)):
+            raise Exception("Expected units to be a Sequence, received: {}".format(type(units)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASApplicationProvisioner',
+                   request='DestroyUnits',
+                   version=1,
+                   params=_params)
+        _params['units'] = units
+        reply = await self.rpc(msg)
+        return reply
+
+
+
     @ReturnMapping(LifeResults)
     async def Life(self, entities=None):
         '''
@@ -1371,6 +1505,27 @@ class CAASApplicationProvisionerFacade(Type):
 
 
 
+    @ReturnMapping(CAASApplicationProvisionerConfigResult)
+    async def ProvisionerConfig(self):
+        '''
+        ProvisionerConfig returns the provisioner's configuration.
+
+
+        Returns -> CAASApplicationProvisionerConfigResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASApplicationProvisioner',
+                   request='ProvisionerConfig',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
     @ReturnMapping(CAASApplicationProvisioningInfoResults)
     async def ProvisioningInfo(self, entities=None):
         '''
@@ -1389,6 +1544,29 @@ class CAASApplicationProvisionerFacade(Type):
                    version=1,
                    params=_params)
         _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CAASApplicationProvisioningStateResult)
+    async def ProvisioningState(self, tag=None):
+        '''
+        ProvisioningState returns the provisioning state for the application.
+
+        tag : str
+        Returns -> CAASApplicationProvisioningStateResult
+        '''
+        if tag is not None and not isinstance(tag, (bytes, str)):
+            raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASApplicationProvisioner',
+                   request='ProvisioningState',
+                   version=1,
+                   params=_params)
+        _params['tag'] = tag
         reply = await self.rpc(msg)
         return reply
 
@@ -1459,6 +1637,34 @@ class CAASApplicationProvisionerFacade(Type):
                    version=1,
                    params=_params)
         _params['changes'] = changes
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResult)
+    async def SetProvisioningState(self, application=None, provisioning_state=None):
+        '''
+        SetProvisioningState sets the provisioning state for the application.
+
+        application : Entity
+        provisioning_state : CAASApplicationProvisioningState
+        Returns -> ErrorResult
+        '''
+        if application is not None and not isinstance(application, (dict, Entity)):
+            raise Exception("Expected application to be a Entity, received: {}".format(type(application)))
+
+        if provisioning_state is not None and not isinstance(provisioning_state, (dict, CAASApplicationProvisioningState)):
+            raise Exception("Expected provisioning_state to be a CAASApplicationProvisioningState, received: {}".format(type(provisioning_state)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='CAASApplicationProvisioner',
+                   request='SetProvisioningState',
+                   version=1,
+                   params=_params)
+        _params['application'] = application
+        _params['provisioning-state'] = provisioning_state
         reply = await self.rpc(msg)
         return reply
 
@@ -9814,6 +10020,190 @@ class SecretBackendsRotateWatcherFacade(Type):
 
 
 
+class SecretsDrainFacade(Type):
+    name = 'SecretsDrain'
+    version = 1
+    schema =     {'definitions': {'ChangeSecretBackendArg': {'additionalProperties': False,
+                                                'properties': {'content': {'$ref': '#/definitions/SecretContentParams'},
+                                                               'revision': {'type': 'integer'},
+                                                               'uri': {'type': 'string'}},
+                                                'required': ['uri', 'revision'],
+                                                'type': 'object'},
+                     'ChangeSecretBackendArgs': {'additionalProperties': False,
+                                                 'properties': {'args': {'items': {'$ref': '#/definitions/ChangeSecretBackendArg'},
+                                                                         'type': 'array'}},
+                                                 'required': ['args'],
+                                                 'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'ListSecretResult': {'additionalProperties': False,
+                                          'properties': {'create-time': {'format': 'date-time',
+                                                                         'type': 'string'},
+                                                         'description': {'type': 'string'},
+                                                         'label': {'type': 'string'},
+                                                         'latest-expire-time': {'format': 'date-time',
+                                                                                'type': 'string'},
+                                                         'latest-revision': {'type': 'integer'},
+                                                         'next-rotate-time': {'format': 'date-time',
+                                                                              'type': 'string'},
+                                                         'owner-tag': {'type': 'string'},
+                                                         'revisions': {'items': {'$ref': '#/definitions/SecretRevision'},
+                                                                       'type': 'array'},
+                                                         'rotate-policy': {'type': 'string'},
+                                                         'update-time': {'format': 'date-time',
+                                                                         'type': 'string'},
+                                                         'uri': {'type': 'string'},
+                                                         'value': {'$ref': '#/definitions/SecretValueResult'},
+                                                         'version': {'type': 'integer'}},
+                                          'required': ['uri',
+                                                       'version',
+                                                       'owner-tag',
+                                                       'latest-revision',
+                                                       'create-time',
+                                                       'update-time',
+                                                       'revisions'],
+                                          'type': 'object'},
+                     'ListSecretResults': {'additionalProperties': False,
+                                           'properties': {'results': {'items': {'$ref': '#/definitions/ListSecretResult'},
+                                                                      'type': 'array'}},
+                                           'required': ['results'],
+                                           'type': 'object'},
+                     'NotifyWatchResult': {'additionalProperties': False,
+                                           'properties': {'NotifyWatcherId': {'type': 'string'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'required': ['NotifyWatcherId'],
+                                           'type': 'object'},
+                     'SecretContentParams': {'additionalProperties': False,
+                                             'properties': {'data': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                     'type': 'object'},
+                                                            'value-ref': {'$ref': '#/definitions/SecretValueRef'}},
+                                             'type': 'object'},
+                     'SecretRevision': {'additionalProperties': False,
+                                        'properties': {'backend-name': {'type': 'string'},
+                                                       'create-time': {'format': 'date-time',
+                                                                       'type': 'string'},
+                                                       'expire-time': {'format': 'date-time',
+                                                                       'type': 'string'},
+                                                       'revision': {'type': 'integer'},
+                                                       'update-time': {'format': 'date-time',
+                                                                       'type': 'string'},
+                                                       'value-ref': {'$ref': '#/definitions/SecretValueRef'}},
+                                        'required': ['revision'],
+                                        'type': 'object'},
+                     'SecretValueRef': {'additionalProperties': False,
+                                        'properties': {'backend-id': {'type': 'string'},
+                                                       'revision-id': {'type': 'string'}},
+                                        'required': ['backend-id', 'revision-id'],
+                                        'type': 'object'},
+                     'SecretValueResult': {'additionalProperties': False,
+                                           'properties': {'data': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                   'type': 'object'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'type': 'object'}},
+     'properties': {'ChangeSecretBackend': {'description': 'ChangeSecretBackend '
+                                                           'updates the backend '
+                                                           'for the specified '
+                                                           'secret after migration '
+                                                           'done.',
+                                            'properties': {'Params': {'$ref': '#/definitions/ChangeSecretBackendArgs'},
+                                                           'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                            'type': 'object'},
+                    'GetSecretsToDrain': {'description': 'GetSecretsToDrain '
+                                                         'returns metadata for the '
+                                                         'secrets that need to be '
+                                                         'drained.',
+                                          'properties': {'Result': {'$ref': '#/definitions/ListSecretResults'}},
+                                          'type': 'object'},
+                    'WatchSecretBackendChanged': {'description': 'WatchSecretBackendChanged '
+                                                                 'sets up a '
+                                                                 'watcher to '
+                                                                 'notify of '
+                                                                 'changes to the '
+                                                                 'secret backend.',
+                                                  'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+                                                  'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ErrorResults)
+    async def ChangeSecretBackend(self, args=None):
+        '''
+        ChangeSecretBackend updates the backend for the specified secret after migration done.
+
+        args : typing.Sequence[~ChangeSecretBackendArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsDrain',
+                   request='ChangeSecretBackend',
+                   version=1,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ListSecretResults)
+    async def GetSecretsToDrain(self):
+        '''
+        GetSecretsToDrain returns metadata for the secrets that need to be drained.
+
+
+        Returns -> ListSecretResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsDrain',
+                   request='GetSecretsToDrain',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResult)
+    async def WatchSecretBackendChanged(self):
+        '''
+        WatchSecretBackendChanged sets up a watcher to notify of changes to the secret backend.
+
+
+        Returns -> NotifyWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsDrain',
+                   request='WatchSecretBackendChanged',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class SecretsFacade(Type):
     name = 'Secrets'
     version = 1
@@ -10772,6 +11162,101 @@ class SecretsManagerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+class SecretsRevisionWatcherFacade(Type):
+    name = 'SecretsRevisionWatcher'
+    version = 1
+    schema =     {'definitions': {'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'SecretRevisionChange': {'additionalProperties': False,
+                                              'properties': {'revision': {'type': 'integer'},
+                                                             'uri': {'type': 'string'}},
+                                              'required': ['uri', 'revision'],
+                                              'type': 'object'},
+                     'SecretRevisionWatchResult': {'additionalProperties': False,
+                                                   'properties': {'changes': {'items': {'$ref': '#/definitions/SecretRevisionChange'},
+                                                                              'type': 'array'},
+                                                                  'error': {'$ref': '#/definitions/Error'},
+                                                                  'watcher-id': {'type': 'string'}},
+                                                   'required': ['watcher-id',
+                                                                'changes'],
+                                                   'type': 'object'}},
+     'properties': {'Next': {'description': 'Next returns when a change has '
+                                            'occurred to an entity of the\n'
+                                            'collection being watched since the '
+                                            'most recent call to Next\n'
+                                            'or the Watch call that created the '
+                                            'srvSecretRotationWatcher.',
+                             'properties': {'Result': {'$ref': '#/definitions/SecretRevisionWatchResult'}},
+                             'type': 'object'},
+                    'Stop': {'description': 'Stop stops the watcher.',
+                             'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(SecretRevisionWatchResult)
+    async def Next(self):
+        '''
+        Next returns when a change has occurred to an entity of the
+        collection being watched since the most recent call to Next
+        or the Watch call that created the srvSecretRotationWatcher.
+
+
+        Returns -> SecretRevisionWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsRevisionWatcher',
+                   request='Next',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def Stop(self):
+        '''
+        Stop stops the watcher.
+
+
+        Returns -> None
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='SecretsRevisionWatcher',
+                   request='Stop',
+                   version=1,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    async def rpc(self, msg):
+        '''
+        Patch rpc method to add Id.
+        '''
+        if not hasattr(self, 'Id'):
+            raise RuntimeError('Missing "Id" field')
+        msg['Id'] = id
+
+        from .facade import TypeEncoder
+        reply = await self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
 
