@@ -65,6 +65,11 @@ class Application(model.ModelEntity):
         ]
 
     @property
+    def subordinate_units(self):
+        """Returns the subordinate units of this application"""
+        return [u for u in self.units if u.is_subordinate]
+
+    @property
     def relations(self):
         return [rel for rel in self.model.relations if rel.matches(self.name)]
 
