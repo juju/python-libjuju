@@ -172,6 +172,11 @@ class ModelState:
         return self._live_entity_map('unit')
 
     @property
+    def subordinate_units(self):
+        """Return a map of unit-id:Unit for all subordinate units"""
+        return {u_name: u for u_name, u in self.units.items() if u.is_subordinate}
+
+    @property
     def relations(self):
         """Return a map of relation-id:Relation for all relations currently in
         the model.
@@ -968,6 +973,14 @@ class Model:
 
         """
         return self.state.units
+
+    @property
+    def subordinate_units(self):
+        """Return a map of unit-id:Unit for all subordiante units currently in
+        the model.
+
+        """
+        return self.state.subordinate_units
 
     @property
     def relations(self):
