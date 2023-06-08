@@ -255,3 +255,34 @@ async def test_unit_introspect(event_loop):
                            series='jammy',
                            to='0',
                            )
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_subordinate_units(event_loop):
+    async with base.CleanModel() as model:
+        u_app = await model.deploy('ubuntu')
+        n_app = await model.deploy('ntp')
+        await model.relate('ubuntu', 'ntp')
+        await model.wait_for_idle()
+
+        # model subordinates
+        model_subs = model.subordinate_units
+        assert len(model_subs) == 1
+        assert 'ntp/0' in model_subs
+        assert 'ubuntu/0' not in model_subs
+
+        n_unit = model_subs['ntp/0']
+        u_unit = u_app.units[0]
+
+        # application subordinates
+        app_sub_names = [u.name for u in n_app.subordinate_units]
+        assert n_unit.name in app_sub_names
+        assert u_unit.name not in app_sub_names
+
+        assert n_unit.is_subordinate
+        assert not u_unit.is_subordinate
+        assert n_unit.principal_unit == 'ubuntu/0'
+        assert u_unit.principal_unit == ''
+        assert [u.name for u in u_unit.get_subordinates()] == [n_unit.name]
+
