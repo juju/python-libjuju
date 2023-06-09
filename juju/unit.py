@@ -27,6 +27,20 @@ class Unit(model.ModelEntity):
         return pyrfc3339.parse(self.safe_data['agent-status']['since'])
 
     @property
+    def is_subordinate(self):
+        """True if the unit is subordinate of another unit
+
+        """
+        return self.safe_data['subordinate']
+
+    @property
+    def principal_unit(self):
+        """Returns the name of the unit of which this unit is a subordinate to.
+        Returns '' for principal units themselves.
+        """
+        return self.safe_data['principal']
+
+    @property
     def agent_status_message(self):
         """Get the agent status message.
 
@@ -76,6 +90,14 @@ class Unit(model.ModelEntity):
     @property
     def tag(self):
         return tag.unit(self.name)
+
+    def get_subordinates(self):
+        """Returns the unit objects that are subordinates to this unit
+
+        :return [Unit]
+        """
+        return [u for u_name, u in self.model.units.items() if u.is_subordinate and
+                u.principal_unit == self.name]
 
     async def destroy(self):
         """Destroy this unit.
