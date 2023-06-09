@@ -285,4 +285,3 @@ async def test_subordinate_units(event_loop):
         assert n_unit.principal_unit == 'ubuntu/0'
         assert u_unit.principal_unit == ''
         assert [u.name for u in u_unit.get_subordinates()] == [n_unit.name]
-
