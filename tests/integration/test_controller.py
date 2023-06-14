@@ -2,9 +2,10 @@ import asyncio
 import uuid
 import hvac
 
+from juju import access
 from juju.client.connection import Connection
 from juju.client import client
-from juju.errors import JujuAPIError
+from juju.errors import JujuAPIError, JujuError
 
 import pytest
 
@@ -107,50 +108,11 @@ async def test_reset_user_password(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_grant_revoke(event_loop):
-    async with base.CleanController() as controller:
-        username = 'test-grant{}'.format(uuid.uuid4())
-        user = await controller.add_user(username)
-        await user.grant('superuser')
-        assert user.access == 'superuser'
-        fresh = await controller.get_user(username)  # fetch fresh copy
-        assert fresh.access == 'superuser'
-        await user.grant('login')  # already has 'superuser', so no-op
-        assert user.access == 'superuser'
-        fresh = await controller.get_user(username)  # fetch fresh copy
-        assert fresh.access == 'superuser'
-        await user.revoke()
-        assert user.access == ''
-        fresh = await controller.get_user(username)  # fetch fresh copy
-        assert fresh.access == ''
-
-
-@base.bootstrapped
-@pytest.mark.asyncio
 async def test_list_models(event_loop):
     async with base.CleanController() as controller:
         async with base.CleanModel() as model:
             result = await controller.list_models()
             assert model.name in result
-
-
-@base.bootstrapped
-@pytest.mark.asyncio
-async def test_list_models_user_access(event_loop):
-    async with base.CleanController() as controller:
-        username = 'test-grant{}'.format(uuid.uuid4())
-        user = await controller.add_user(username)
-        await user.grant(acl='superuser')
-        assert user.access == 'superuser'
-        models1 = await controller.list_models(username)
-        await user.revoke(acl='superuser')
-        models2 = await controller.list_models(username)
-        assert len(models1) > len(models2)
-
-        # testing all flag
-        await user.grant(acl='superuser')
-        models_all = await controller.list_models(username, all=True)
-        assert len(models_all) > len(models2)
 
 
 @base.bootstrapped
@@ -314,3 +276,75 @@ async def test_secrets_backend_lifecycle(event_loop):
         list_after = await controller.list_secret_backends()
         assert len(list_after["results"]) == 1
         assert list_after["results"][0]["result"].name == "internal"
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_grant_revoke_controller_access(event_loop):
+    async with base.CleanController() as controller:
+        username = 'test-grant{}'.format(uuid.uuid4())
+        user = await controller.add_user(username)
+        await user.grant('superuser')
+        assert user.access == 'superuser'
+        fresh = await controller.get_user(username)  # fetch fresh copy
+        assert fresh.access == 'superuser'
+        await user.grant('login')  # already has 'superuser', so no-op
+        assert user.access == 'superuser'
+        fresh = await controller.get_user(username)  # fetch fresh copy
+        assert fresh.access == 'superuser'
+        await user.revoke()
+        assert user.access == ''
+        fresh = await controller.get_user(username)  # fetch fresh copy
+        assert fresh.access == ''
+        try:
+            # try removing the created user
+            await controller.remove_user(username)
+        except JujuError as e:
+            if 'state changing too quickly' in str(e):
+                pass
+            else:
+                raise
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_grant_revoke_model_access(event_loop):
+    async with base.CleanController() as controller:
+        username = 'test-grant{}'.format(uuid.uuid4())
+        user = await controller.add_user(username)
+
+        model_name = 'test-{}'.format(uuid.uuid4())
+        model = await controller.add_model(model_name)
+
+        with pytest.raises(JujuError):
+            # superuser is a controller access level, i.e. not a valid model acl
+            await user.grant('superuser', model_name=model_name)
+
+        models1 = await controller.list_models(username)
+        assert models1 == []
+
+        # grant user the access to see the model
+        await user.grant(access.READ_ACCESS, model_name=model_name)
+        models2 = await controller.list_models(username)
+
+        # assert that the user sees the model
+        assert model_name in models2
+
+        # now let's revoke the read access
+        await user.revoke(access.READ_ACCESS, model_name=model_name)
+        models3 = await controller.list_models(username)
+
+        # user shouldn't be able to see the model
+        assert models3 == []
+
+        # cleanup
+        await model.disconnect()
+        await controller.destroy_model(model_name)
+        try:
+            # try removing the created user
+            await controller.remove_user(username)
+        except JujuError as e:
+            if 'state changing too quickly' in str(e):
+                pass
+            else:
+                raise
