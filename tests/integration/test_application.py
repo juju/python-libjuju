@@ -247,6 +247,17 @@ async def test_upgrade_local_charm_resource(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_upgrade_charm_resource_same_rev_no_update(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('keystone', channel='victoria/stable')
+        ress = await app.get_resources()
+        await app.refresh(channel='ussuri/stable')
+        ress2 = await app.get_resources()
+        assert ress['policyd-override'].fingerprint == ress2['policyd-override'].fingerprint
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_trusted(event_loop):
     async with base.CleanModel() as model:
         await model.deploy('ubuntu', trust=True)
