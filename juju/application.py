@@ -759,8 +759,9 @@ class Application(model.ModelEntity):
 
             # no, if we already have it (and upstream doesn't have a newer res available)
             if res_name in existing_resources:
-                available_rev = resource['revision']
-                existing_rev = existing_resources[res_name].unknown_fields.get('revision', -1)
+                available_rev = resource.get('Revision', resource.get('revision', -1))
+                u_fields = existing_resources[res_name].unknown_fields
+                existing_rev = u_fields.get('Revision', resource.get('revision', -1))
                 if existing_rev >= available_rev:
                     continue
 
