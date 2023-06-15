@@ -740,11 +740,22 @@ class Application(model.ModelEntity):
         }
 
         # Compute the difference btw resources needed and the existing resources
-        resources_to_update = [
-            resource for resource in charm_resources
-            if resource.get('Name', resource.get('name')) not in existing_resources or
-            existing_resources[resource.get('Name', resource.get('name'))].origin != 'upload'
-        ]
+        resources_to_update = []
+        for resource in charm_resources:
+            # should upgrade resource?
+            res_name = resource.get('Name', resource.get('name'))
+            # no, if it's upload
+            if existing_resources[res_name].origin == 'upload':
+                continue
+
+            # no, if we already have it (and upstream doesn't have a newer res available)
+            if res_name in existing_resources:
+                available_rev = resource['revision']
+                existing_rev = existing_resources[res_name].unknown_fields.get('revision', -1)
+                if existing_rev >= available_rev:
+                    continue
+
+            resources_to_update.append(resource)
 
         # Update the resources
         if resources_to_update:
