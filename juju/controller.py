@@ -728,24 +728,32 @@ class Controller:
         consumers.
 
         @param endpoint: holds the application and endpoint you want to offer
-        @param offer_name: over ride the offer name to help the consumer
+        @param offer_name: override the offer name to help the consumer
+        @param application_name: overrides the application name in the endpoint
         """
-        try:
-            offer = parse_offer_endpoint(endpoint)
-        except OfferParseError as e:
-            log.error(e.message)
-            raise
 
-        if offer_name is None:
-            offer_name = offer.application
+        # If we have both the offer_name and the application_name
+        # then we're coming from bundle/overlays, so no need to parse the endpoint
+        # Also we accept endpoints without a colon (:) in the overlays
+        if offer_name and application_name:
+            o_name = offer_name
+            a_name = application_name
+            eps = {endpoint : endpoint}
+        else:
+            try:
+                offer = parse_offer_endpoint(endpoint)
+            except OfferParseError as e:
+                log.error(e.message)
+                raise
 
-        if application_name is None:
-            application_name = offer.application
+            o_name = offer_name if offer_name else offer.application
+            a_name = application_name if application_name else offer.application
+            eps = {name: name for name in offer.endpoints}
 
         params = client.AddApplicationOffer()
-        params.application_name = application_name
-        params.endpoints = {name: name for name in offer.endpoints}
-        params.offer_name = offer_name
+        params.application_name = a_name
+        params.endpoints = eps
+        params.offer_name = o_name
         params.model_tag = tag.model(model_uuid)
 
         facade = client.ApplicationOffersFacade.from_connection(self.connection())
