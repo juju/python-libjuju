@@ -329,6 +329,10 @@ async def test_deploy_bundle_with_multiple_overlays_with_include_files(event_loo
         assert 'test' not in model.applications
         assert 'memcached' not in model.applications
         assert 'grafana' in model.applications
+        assert 'grafana' in model.application_offers
+        assert 'grafana' == model.application_offers['grafana'].application_name
+        assert 'dashboards' == model.application_offers['grafana'].offer_name
+
 
 
 @base.bootstrapped
