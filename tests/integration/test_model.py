@@ -203,11 +203,27 @@ async def test_deploy_local_charm(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_deploy_charm_assumes(event_loop):
+    async with base.CleanModel() as model:
+        await model.deploy('postgresql', channel='14/edge')
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_deploy_local_charm_base_charmcraft_yaml(event_loop):
     charm_path = HERE_DIR / 'charm-base-charmcraft-yaml'
 
     async with base.CleanModel() as model:
         await model.deploy(str(charm_path))
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_deploy_local_charm_channel(event_loop):
+    charm_path = TESTS_DIR / 'charm'
+
+    async with base.CleanModel() as model:
+        await model.deploy(str(charm_path), channel='stable')
         assert 'charm' in model.applications
         await model.wait_for_idle(status="active")
         assert model.units['charm/0'].workload_status == 'active'
@@ -245,9 +261,10 @@ async def test_wait_local_charm_waiting_timeout(event_loop):
 @pytest.mark.asyncio
 async def test_deploy_bundle(event_loop):
     async with base.CleanModel() as model:
-        await model.deploy('canonical-livepatch-onprem', channel='edge', trust=True)
+        await model.deploy('anbox-cloud-core', channel='stable',
+                           trust=True)
 
-        for app in ('haproxy', 'livepatch', 'postgresql', 'ubuntu-advantage'):
+        for app in ('ams', 'etcd', 'ams-node-controller', 'etcd-ca', 'lxd'):
             assert app in model.applications
 
 
@@ -337,16 +354,18 @@ async def test_deploy_from_ch_channel_revision_success(event_loop):
         # Ensure we're able to resolve charm these with channel and revision,
         # or channel without revision (note that revision requires channel,
         # but not vice versa)
-        await model.deploy("postgresql", application_name="test1", channel='latest/stable')
-        await model.deploy("postgresql", application_name="test2", channel='latest/stable', revision=290)
+        await model.deploy("postgresql", application_name="test1", channel='14/stable', base='ubuntu@22.04')
+        await model.deploy("postgresql", application_name="test2", channel='14/stable', revision=288)
 
 
+@base.bootstrapped
 @pytest.mark.asyncio
 async def test_deploy_trusted_bundle(event_loop):
+    pytest.skip("skip until we have a deployable bundle available. Right now the landscape-dense fails because postgresql is broken")
     async with base.CleanModel() as model:
-        await model.deploy('canonical-livepatch-onprem', channel='stable', trust=True)
+        await model.deploy('landscape-dense', channel='stable', trust=True)
 
-        for app in ('haproxy', 'livepatch', 'postgresql', 'ubuntu-advantage'):
+        for app in ('haproxy', 'landscape-server', 'postgresql', 'rabbit-mq-server'):
             assert app in model.applications
 
         haproxy_app = model.applications['haproxy']
@@ -847,6 +866,28 @@ async def test_wait_for_idle_with_not_enough_units(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_wait_for_idle_more_units_than_needed(event_loop):
+    async with base.CleanModel() as model:
+        charm_path = TESTS_DIR / 'charm'
+
+        # we add 2 units of a local charm that does nothing
+        # (i.e. can't go into active/idle)
+        await model.deploy(str(charm_path), num_units=2)
+
+        # then add 1 unit of ubuntu charm
+        await model.deploy(
+            'ubuntu',
+            application_name='ubuntu',
+            num_units=1,
+        )
+
+        # because the wait_for_units=1, wait_for_idle should return without timing out
+        # even though there are two more units that aren't active/idle
+        await model.wait_for_idle(timeout=5 * 60, wait_for_units=1, status='active')
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_wait_for_idle_with_enough_units(event_loop):
     pytest.skip("This is testing juju functionality")
     async with base.CleanModel() as model:
@@ -1267,7 +1308,7 @@ async def test_detach_storage(event_loop):
 @pytest.mark.asyncio
 async def test_add_and_list_storage(event_loop):
     async with base.CleanModel() as model:
-        app = await model.deploy('postgresql', channel="latest/stable")
+        app = await model.deploy('postgresql', base='ubuntu@22.04')
         await model.wait_for_idle(status="active", timeout=900)
         unit = app.units[0]
         await unit.add_storage("pgdata", size=512)

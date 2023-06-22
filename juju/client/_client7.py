@@ -841,6 +841,7 @@ class CloudFacade(Type):
                                               'container': {'type': 'string'},
                                               'cores': {'type': 'integer'},
                                               'cpu-power': {'type': 'integer'},
+                                              'image-id': {'type': 'string'},
                                               'instance-role': {'type': 'string'},
                                               'instance-type': {'type': 'string'},
                                               'mem': {'type': 'integer'},
@@ -1595,17 +1596,18 @@ class FirewallerFacade(Type):
                                                        'underlay': {'type': 'string'}},
                                         'required': ['underlay', 'overlay'],
                                         'type': 'object'},
-                     'FirewallRule': {'additionalProperties': False,
-                                      'properties': {'known-service': {'type': 'string'},
-                                                     'whitelist-cidrs': {'items': {'type': 'string'},
-                                                                         'type': 'array'}},
-                                      'required': ['known-service'],
-                                      'type': 'object'},
-                     'KnownServiceArgs': {'additionalProperties': False,
-                                          'properties': {'known-services': {'items': {'type': 'string'},
-                                                                            'type': 'array'}},
-                                          'required': ['known-services'],
-                                          'type': 'object'},
+                     'IngressRule': {'additionalProperties': False,
+                                     'properties': {'port-range': {'$ref': '#/definitions/PortRange'},
+                                                    'source-cidrs': {'items': {'type': 'string'},
+                                                                     'type': 'array'}},
+                                     'required': ['port-range', 'source-cidrs'],
+                                     'type': 'object'},
+                     'IngressRulesResult': {'additionalProperties': False,
+                                            'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                           'rules': {'items': {'$ref': '#/definitions/IngressRule'},
+                                                                     'type': 'array'}},
+                                            'required': ['rules'],
+                                            'type': 'object'},
                      'LifeResult': {'additionalProperties': False,
                                     'properties': {'error': {'$ref': '#/definitions/Error'},
                                                    'life': {'type': 'string'}},
@@ -1616,11 +1618,6 @@ class FirewallerFacade(Type):
                                                                 'type': 'array'}},
                                      'required': ['results'],
                                      'type': 'object'},
-                     'ListFirewallRulesResults': {'additionalProperties': False,
-                                                  'properties': {'Rules': {'items': {'$ref': '#/definitions/FirewallRule'},
-                                                                           'type': 'array'}},
-                                                  'required': ['Rules'],
-                                                  'type': 'object'},
                      'Macaroon': {'additionalProperties': False, 'type': 'object'},
                      'MacaroonResult': {'additionalProperties': False,
                                         'properties': {'error': {'$ref': '#/definitions/Error'},
@@ -1813,13 +1810,6 @@ class FirewallerFacade(Type):
                                                         'configuration.',
                                          'properties': {'Result': {'$ref': '#/definitions/ControllerConfigResult'}},
                                          'type': 'object'},
-                    'FirewallRules': {'description': 'FirewallRules returns the '
-                                                     'firewall rules for the '
-                                                     'specified well known service '
-                                                     'types.',
-                                      'properties': {'Params': {'$ref': '#/definitions/KnownServiceArgs'},
-                                                     'Result': {'$ref': '#/definitions/ListFirewallRulesResults'}},
-                                      'type': 'object'},
                     'GetAssignedMachine': {'description': 'GetAssignedMachine '
                                                           'returns the assigned '
                                                           'machine tag (if any) '
@@ -1867,6 +1857,13 @@ class FirewallerFacade(Type):
                                                    "current model's configuration.",
                                     'properties': {'Result': {'$ref': '#/definitions/ModelConfigResult'}},
                                     'type': 'object'},
+                    'ModelFirewallRules': {'description': 'ModelFirewallRules '
+                                                          'returns the firewall '
+                                                          'rules that this model '
+                                                          'is\n'
+                                                          'configured to open',
+                                           'properties': {'Result': {'$ref': '#/definitions/IngressRulesResult'}},
+                                           'type': 'object'},
                     'OpenedMachinePortRanges': {'description': 'OpenedMachinePortRanges '
                                                                'returns a list of '
                                                                'the opened port '
@@ -1988,6 +1985,16 @@ class FirewallerFacade(Type):
                                                           'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                                          'Result': {'$ref': '#/definitions/StringsWatchResults'}},
                                                           'type': 'object'},
+                    'WatchModelFirewallRules': {'description': 'WatchModelFirewallRules '
+                                                               'returns a '
+                                                               'NotifyWatcher that '
+                                                               'notifies of\n'
+                                                               'potential changes '
+                                                               "to a model's "
+                                                               'configured '
+                                                               'firewall rules',
+                                                'properties': {'Result': {'$ref': '#/definitions/NotifyWatchResult'}},
+                                                'type': 'object'},
                     'WatchModelMachineStartTimes': {'description': 'WatchModelMachineStartTimes '
                                                                    'watches the '
                                                                    'non-container '
@@ -2124,29 +2131,6 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
 
-        reply = await self.rpc(msg)
-        return reply
-
-
-
-    @ReturnMapping(ListFirewallRulesResults)
-    async def FirewallRules(self, known_services=None):
-        '''
-        FirewallRules returns the firewall rules for the specified well known service types.
-
-        known_services : typing.Sequence[str]
-        Returns -> ListFirewallRulesResults
-        '''
-        if known_services is not None and not isinstance(known_services, (bytes, str, list)):
-            raise Exception("Expected known_services to be a Sequence, received: {}".format(type(known_services)))
-
-        # map input types to rpc msg
-        _params = dict()
-        msg = dict(type='Firewaller',
-                   request='FirewallRules',
-                   version=7,
-                   params=_params)
-        _params['known-services'] = known_services
         reply = await self.rpc(msg)
         return reply
 
@@ -2304,6 +2288,28 @@ class FirewallerFacade(Type):
         _params = dict()
         msg = dict(type='Firewaller',
                    request='ModelConfig',
+                   version=7,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(IngressRulesResult)
+    async def ModelFirewallRules(self):
+        '''
+        ModelFirewallRules returns the firewall rules that this model is
+        configured to open
+
+
+        Returns -> IngressRulesResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='ModelFirewallRules',
                    version=7,
                    params=_params)
 
@@ -2500,6 +2506,28 @@ class FirewallerFacade(Type):
                    version=7,
                    params=_params)
         _params['entities'] = entities
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResult)
+    async def WatchModelFirewallRules(self):
+        '''
+        WatchModelFirewallRules returns a NotifyWatcher that notifies of
+        potential changes to a model's configured firewall rules
+
+
+        Returns -> NotifyWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchModelFirewallRules',
+                   version=7,
+                   params=_params)
+
         reply = await self.rpc(msg)
         return reply
 

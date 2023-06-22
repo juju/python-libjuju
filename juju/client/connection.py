@@ -120,6 +120,7 @@ client_facades = {
     'SecretBackends': {'versions': [1]},
     'SecretBackendsManager': {'versions': [1]},
     'SecretBackendsRotateWatcher': {'versions': [1]},
+    'SecretsDrain': {'versions': [1]},
     'SecretsRevisionWatcher': {'versions': [1]},
     'SecretsRotationWatcher': {'versions': [1]},
     'SecretsTriggerWatcher': {'versions': [1]},
@@ -694,7 +695,9 @@ class Connection:
 
         """
         endpoint = self.endpoint
-        host, remainder = endpoint.split(':', 1)
+        # Support IPv6 by right splitting on : and removing [] around IP address for host
+        host, remainder = endpoint.rsplit(':', 1)
+        host = host.strip("[]")
         port = remainder
         if '/' in remainder:
             port, _ = remainder.split('/', 1)

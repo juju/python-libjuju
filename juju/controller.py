@@ -563,31 +563,14 @@ class Controller:
 
         :returns: {str name : str UUID}
         """
+        model_manager_facade = client.ModelManagerFacade.from_connection(self.connection())
+        u_name = username if username else self.get_current_username()
+        user = tag.user(u_name)
 
-        if all:
-            facade = client.ControllerFacade.from_connection(
-                self.connection())
-        else:
-            facade = client.ModelManagerFacade.from_connection(
-                self.connection())
-            u_name = username if username else self.get_current_username()
-            user = tag.user(u_name)
-
-        for attempt in (1, 2, 3):
-            try:
-                if all:
-                    userModelList = await facade.AllModels()
-                else:
-                    userModelList = await facade.ListModels(tag=user)
-
-                return {um.model.name: um.model.uuid
-                        for um in userModelList.user_models}
-            except errors.JujuAPIError as e:
-                # retry concurrency error until resolved in Juju
-                # see: https://bugs.launchpad.net/juju/+bug/1721786
-                if 'has been removed' not in e.message or attempt == 3:
-                    raise
-                await jasyncio.sleep(attempt)
+        user_model_list = await model_manager_facade.ListModelSummaries(user_tag=user, all_=all)
+        model_summaries = [msr.result for msr in user_model_list.results]
+        return {model_summary.name: model_summary.uuid
+                for model_summary in model_summaries}
 
     async def list_models(self, username=None, all=False):
         """Return list of names of the available models on this controller.

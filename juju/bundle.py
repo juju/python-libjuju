@@ -27,6 +27,7 @@ class BundleHandler:
     Handle bundles by using the API to translate bundle YAML into a plan of
     steps and then dispatching each of those using the API.
     """
+
     def __init__(self, model, trusted=False, forced=False):
         self.model = model
         self.trusted = trusted
@@ -159,8 +160,7 @@ class BundleHandler:
                 apps_dict[app_name]["resources"] = resources
                 origin = client.CharmOrigin(source="local", risk="stable")
                 if not self.model.connection().is_using_old_client:
-                    origin.base = utils.get_local_charm_base(series, '',
-                                                             metadata,
+                    origin.base = utils.get_local_charm_base(series,
                                                              charm_dir,
                                                              client.Base)
                 self.origins[charm_url] = {str(None): origin}
@@ -223,9 +223,24 @@ class BundleHandler:
 
         return self.bundle, self.overlays
 
-    async def fetch_plan(self, charm_url, origin, overlays=[]):
-        entity_id = charm_url.path()
-        is_local = Schema.LOCAL.matches(charm_url.schema)
+    async def fetch_plan(self, bundle_url, origin, overlays=[]):
+        """fetch_plan is called by the model.deploy(). It gathers the information about the
+        bundle to be deployed (whether local or CharmHub), straightens it up, applies overlays
+        if any overlays are given. Validates the bundle against known issues. Resolves and adds
+        local charms if there's any in the bundle. Resolves and adds --include-file configs if
+        there's any. Finally it calls the BundleFacade.GetChanges() to get the plan for the
+        bundle to be handed to the execute_plan() by the model.deploy(). Note that it doesn't
+        return the plan, just saves it in the self (BundleHandler) to be used later.
+
+        :param client.URL bundle_url: the url of the bundle to be deployed
+        :param client.CharmOrigin origin: the origin of the bundle to be deployed
+        :param [string] overlays: paths for the yaml files containing overlays to be applied to
+        the bundle during deployment
+
+        :returns: None
+        """
+        entity_id = bundle_url.path()
+        is_local = Schema.LOCAL.matches(bundle_url.schema)
         bundle_dir = None
 
         if is_local and os.path.isfile(entity_id):
@@ -235,8 +250,8 @@ class BundleHandler:
             bundle_yaml = (Path(entity_id) / "bundle.yaml").read_text()
             bundle_dir = Path(entity_id)
 
-        if Schema.CHARM_HUB.matches(charm_url.schema):
-            bundle_yaml = await self._download_bundle(charm_url, origin)
+        if Schema.CHARM_HUB.matches(bundle_url.schema):
+            bundle_yaml = await self._download_bundle(bundle_url, origin)
 
         if not bundle_yaml:
             raise JujuError('empty bundle, nothing to deploy')
@@ -523,6 +538,7 @@ class AddApplicationChange(ChangeInfo):
     :local_resources: identifies the path to the local resource of the
         application's charm.
     """
+
     def __init__(self, change_id, requires, params=None):
         super(AddApplicationChange, self).__init__(change_id, requires)
 
@@ -669,6 +685,7 @@ class AddCharmChange(ChangeInfo):
            not sufficient.
         :channel: preferred channel for obtaining the charm.
     """
+
     def __init__(self, change_id, requires, params=None):
         super(AddCharmChange, self).__init__(change_id, requires)
 
@@ -770,6 +787,7 @@ class AddMachineChange(ChangeInfo):
             "lxc" or kvm"). It is not specified for top level machines.
         :parent_id: id of the parent machine.
     """
+
     def __init__(self, change_id, requires, params=None):
         super(AddMachineChange, self).__init__(change_id, requires)
         # this one is weird, as it returns a set of parameters inside a list.
@@ -861,6 +879,7 @@ class AddRelationChange(ChangeInfo):
         application, and the interface is optional. Examples are
         "$deploy-42:web", "$deploy-42", "mysql:db".
     """
+
     def __init__(self, change_id, requires, params=None):
         super(AddRelationChange, self).__init__(change_id, requires)
 
@@ -922,6 +941,7 @@ class AddUnitChange(ChangeInfo):
         :to: optional location where to add the unit, as a placeholder
             pointing to another unit change or to a machine change.
     """
+
     def __init__(self, change_id, requires, params=None):
         super(AddUnitChange, self).__init__(change_id, requires)
 
@@ -990,6 +1010,7 @@ class CreateOfferChange(ChangeInfo):
             offer.
         :offer_name: describes the offer name.
     """
+
     def __init__(self, change_id, requires, params=None):
         super(CreateOfferChange, self).__init__(change_id, requires)
 
@@ -1044,6 +1065,7 @@ class ConsumeOfferChange(ChangeInfo):
         :url: contains the location of the offer
         :application_name: describes the application name on offer.
     """
+
     def __init__(self, change_id, requires, params=None):
         super(ConsumeOfferChange, self).__init__(change_id, requires)
 
@@ -1099,6 +1121,7 @@ class ExposeChange(ChangeInfo):
             that should be able to access the port ranges that the application
             has opened for each endpoint.
     """
+
     def __init__(self, change_id, requires, params=None):
         super(ExposeChange, self).__init__(change_id, requires)
 
@@ -1148,6 +1171,7 @@ class ScaleChange(ChangeInfo):
         :application: placeholder name of the application to be scaled.
         :scale: is the new scale value to use.
     """
+
     def __init__(self, change_id, requires, params=None):
         super(ScaleChange, self).__init__(change_id, requires)
 
@@ -1200,6 +1224,7 @@ class SetAnnotationsChange(ChangeInfo):
         :entity_type: type of the entity, "application" or "machine".
         :ennotations: annotations as key/value pairs.
     """
+
     def __init__(self, change_id, requires, params=None):
         super(SetAnnotationsChange, self).__init__(change_id, requires)
 

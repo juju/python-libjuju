@@ -97,6 +97,10 @@ class AgentFacade(TypeFactory):
     pass
 
 
+class AgentLifeFlagFacade(TypeFactory):
+    pass
+
+
 class AgentToolsFacade(TypeFactory):
     pass
 
@@ -473,11 +477,19 @@ class SecretBackendsRotateWatcherFacade(TypeFactory):
     pass
 
 
+class SecretsDrainFacade(TypeFactory):
+    pass
+
+
 class SecretsFacade(TypeFactory):
     pass
 
 
 class SecretsManagerFacade(TypeFactory):
+    pass
+
+
+class SecretsRevisionWatcherFacade(TypeFactory):
     pass
 
 

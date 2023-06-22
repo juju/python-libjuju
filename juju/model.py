@@ -170,6 +170,11 @@ class ModelState:
         return self._live_entity_map('unit')
 
     @property
+    def subordinate_units(self):
+        """Return a map of unit-id:Unit for all subordinate units"""
+        return {u_name: u for u_name, u in self.units.items() if u.is_subordinate}
+
+    @property
     def relations(self):
         """Return a map of relation-id:Relation for all relations currently in
         the model.
@@ -262,6 +267,7 @@ class ModelEntity:
         self._history_index = history_index
         self.connected = connected
         self.connection = model.connection()
+        self._status = 'unknown'
 
     def __repr__(self):
         return '<{} entity_id="{}">'.format(type(self).__name__,
@@ -516,6 +522,7 @@ class CharmhubDeployType:
         if series:
             base.channel = ch.normalize().compute_base_channel(series=series)
             base.name = 'ubuntu'
+
         origin = client.CharmOrigin(source=Source.CHARM_HUB.value,
                                     architecture=architecture,
                                     risk=ch.risk,
@@ -740,7 +747,26 @@ class Model:
         # we've received all the model data, which might be
         # a whole load of unneeded data if all the client wants
         # to do is make one RPC call.
-        await self._watch_received.wait()
+        async def watch_received_waiter():
+            await self._watch_received.wait()
+        waiter = jasyncio.create_task(watch_received_waiter())
+
+        # If we just wait for the _watch_received event and the _all_watcher task
+        # fails (e.g. because API fails like migration is in progress), then
+        # we'll hang because the _watch_received will never be set
+        # Instead, we watch for two things, 1) _watch_received, 2) _all_watcher done
+        # If _all_watcher is done before the _watch_received, then we should see
+        # (and raise) an exception coming from the _all_watcher
+        # Otherwise (i.e. _watch_received is set), then we're good to go
+        done, pending = await jasyncio.wait([waiter, self._watcher_task],
+                                            return_when=jasyncio.FIRST_COMPLETED)
+        if self._watcher_task in done:
+            # Cancel the _watch_received.wait
+            waiter.cancel()
+            # If there's no exception, then why did the _all_watcher broke its loop?
+            if not self._watcher_task.exception():
+                raise JujuError("AllWatcher task is finished abruptly without an exception.")
+            raise self._watcher_task.exception()
 
         if self.info is None:
             contr = await self.get_controller()
@@ -756,6 +782,12 @@ class Model:
         if not self._watch_stopped.is_set():
             log.debug('Stopping watcher task')
             self._watch_stopping.set()
+            # If the _all_watcher task is finished,
+            # check to see an exception, if yes, raise,
+            # otherwise we should see the _watch_stopped
+            # flag is set
+            if self._watcher_task.done() and self._watcher_task.exception():
+                raise self._watcher_task.exception()
             await self._watch_stopped.wait()
             self._watch_stopping.clear()
 
@@ -1052,6 +1084,14 @@ class Model:
         return self.state.units
 
     @property
+    def subordinate_units(self):
+        """Return a map of unit-id:Unit for all subordiante units currently in
+        the model.
+
+        """
+        return self.state.subordinate_units
+
+    @property
     def relations(self):
         """Return a list of all Relations currently in the model.
 
@@ -1133,6 +1173,7 @@ class Model:
         See :meth:`add_observer` to register an onchange callback.
 
         """
+
         def _post_step(obj):
             # Once we get the model, ensure we're running in the correct state
             # as a post step.
@@ -1222,7 +1263,7 @@ class Model:
         self._watch_received.clear()
         self._watch_stopping.clear()
         self._watch_stopped.clear()
-        jasyncio.ensure_future(_all_watcher())
+        self._watcher_task = jasyncio.create_task(_all_watcher())
 
     async def _notify_observers(self, delta, old_obj, new_obj):
         """Call observing callbacks, notifying them of a change in model state
@@ -1647,17 +1688,15 @@ class Model:
             '24/lxd/3' - place in container 3 on machine 24
 
             If None, a new machine is provisioned.
+        :param devices: charm device constraints
         :param bool trust: Trust signifies that the charm should be deployed
             with access to trusted credentials. Hooks run by the charm can access
             cloud credentials and other trusted access credentials.
 
         :param str[] attach_storage: Existing storage to attach to the deployed unit
             (not available on k8s models)
-        TODO::
-
-            - support local file resources
-
         """
+
         if storage:
             storage = {
                 k: client.Constraints(**v)
@@ -1744,11 +1783,10 @@ class Model:
                 # We have a local charm dir that needs to be uploaded
                 charm_dir = os.path.abspath(os.path.expanduser(identifier))
                 metadata = utils.get_local_charm_metadata(charm_dir)
-                charm_series = charm_series or await get_charm_series(metadata,
-                                                                      self)
-                if not base:
-                    charm_origin.base = utils.get_local_charm_base(
-                        charm_series, channel, metadata, charm_dir, client.Base)
+                charm_series = charm_series or await get_charm_series(metadata, self)
+
+                base = utils.get_local_charm_base(charm_series, charm_dir, client.Base)
+                charm_origin.base = base
 
                 if not application_name:
                     application_name = metadata['name']
@@ -1790,6 +1828,15 @@ class Model:
             )
 
     async def _add_charm(self, charm_url, origin):
+        """_add_charm sends the given origin and the url to the Juju API too add the charm to the
+        state. Either calls the CharmsFacade.AddCharm for (> version 2), or the
+        ClientFacade.AddCharm (for older versions).
+
+        :param str charm_url: the url of the charm to be added
+        :param client.CharmOrigin origin: the origin for the charm to be added
+
+        :returns client.CharmOriginResult
+        """
         # client facade is deprecated with in Juju, and smaller, more focused
         # facades have been created and we'll use that if it's available.
         charms_cls = client.CharmsFacade
@@ -1839,7 +1886,7 @@ class Model:
 
         result = resp.results[0]
         if result.error:
-            raise JujuError(result.error.message)
+            raise JujuError(f'resolving {url} : {result.error.message}')
 
         supported_series = result.supported_series
         resolved_origin = result.charm_origin
@@ -1850,9 +1897,15 @@ class Model:
         result.charm_origin.base = utils.get_base_from_origin_or_channel(resolved_origin, selected_series)
         charm_url.series = selected_series
 
-        return result.url, result.charm_origin
+        return str(charm_url), resolved_origin
 
     async def _resolve_architecture(self, url):
+        """_resolve_architecture returns the architecture for a given charm url.
+        :param str url: the client.URL to determine the arch for
+
+        :returns str architecture for the given url
+        """
+
         if url.architecture:
             return url.architecture
 
@@ -1866,6 +1919,16 @@ class Model:
                                       entity_url,
                                       origin,
                                       overrides=None):
+        """_add_charmhub_resources is called by the deploy to add pending resources requested by
+        the charm being deployed. It calls the ResourcesFacade.AddPendingResources.
+
+        :param str application: the name of the application
+        :param client.CharmURL entity_url: url for the charm that we add resources for
+        :param client.CharmOrigin origin: origin for the charm that we add resources for
+
+        :returns [string]string resource_map that is a map of resources to their assigned
+        pendingIDs.
+        """
         charm_facade = client.CharmsFacade.from_connection(self.connection())
         res = await charm_facade.CharmInfo(entity_url)
 
@@ -1909,6 +1972,20 @@ class Model:
         return resource_map
 
     async def add_local_resources(self, application, entity_url, metadata, resources):
+        """_add_local_resources is called by the deploy to add pending local  resources requested by
+        the charm being deployed. It calls the ResourcesFacade.AddPendingResources. After getting
+        the pending IDs from the controller it sends an HTTP PUT request to actually upload local
+        resources.
+
+        :param str application: the name of the application
+        :param client.CharmURL entity_url: url for the charm that we add resources for
+        :param [string]string metadata: metadata for the charm that we add resources for
+        :param [string] resources: the paths for the local files (or oci-images) to be added as
+        local resources
+
+        :returns [string]string resource_map that is a map of resources to their assigned
+        pendingIDs.
+        """
         if not resources:
             return None
 
@@ -2497,7 +2574,7 @@ class Model:
 
     async def wait_for_idle(self, apps=None, raise_on_error=True, raise_on_blocked=False,
                             wait_for_active=False, timeout=10 * 60, idle_period=15, check_freq=0.5,
-                            status=None, wait_for_units=1, wait_for_exact_units=None):
+                            status=None, wait_for_units=None, wait_for_exact_units=None):
         """Wait for applications in the model to settle into an idle state.
 
         :param apps (list[str]): Optional list of specific app names to wait on.
@@ -2545,6 +2622,8 @@ class Model:
             warnings.warn("wait_for_active is deprecated; use status", DeprecationWarning)
             status = "active"
 
+        _wait_for_units = wait_for_units if wait_for_units is not None else 1
+
         timeout = timedelta(seconds=timeout) if timeout is not None else None
         idle_period = timedelta(seconds=idle_period)
         start_time = datetime.now()
@@ -2556,6 +2635,7 @@ class Model:
 
         apps = apps or self.applications
         idle_times = {}
+        units_ready = set()  # The units that are in the desired state
         last_log_time = None
         log_interval = timedelta(seconds=30)
 
@@ -2581,6 +2661,9 @@ class Model:
                 'Invalid value for wait_for_exact_units : %s' % wait_for_exact_units
 
         while True:
+            # The list 'busy' is what keeps this loop going,
+            # i.e. it'll stop when busy is empty after all the
+            # units are scanned
             busy = []
             errors = {}
             blocks = {}
@@ -2589,19 +2672,28 @@ class Model:
                     busy.append(app_name + " (missing)")
                     continue
                 app = self.applications[app_name]
-                if raise_on_error and app.status == "error":
+                app_status = await app.get_status()
+                if raise_on_error and app_status == "error":
                     errors.setdefault("App", []).append(app.name)
-                if raise_on_blocked and app.status == "blocked":
+                if raise_on_blocked and app_status == "blocked":
                     blocks.setdefault("App", []).append(app.name)
+
+                # Check if wait_for_exact_units flag is used
                 if wait_for_exact_units is not None:
                     if len(app.units) != wait_for_exact_units:
                         busy.append(app.name + " (waiting for exactly %s units, current : %s)" %
                                     (wait_for_exact_units, len(app.units)))
                         continue
-                elif len(app.units) < wait_for_units:
+                # If we have less # of units then required, then wait a bit more
+                elif len(app.units) < _wait_for_units:
                     busy.append(app.name + " (not enough units yet - %s/%s)" %
-                                (len(app.units), wait_for_units))
+                                (len(app.units), _wait_for_units))
                     continue
+                # User wants to see a certain # of units, and we have enough
+                elif wait_for_units and len(units_ready) >= _wait_for_units:
+                    # So no need to keep looking, we have the desired number of units ready to go,
+                    # exit the loop. Don't return, though, we might still have some errors to raise
+                    break
                 for unit in app.units:
                     if unit.machine is not None and unit.machine.status == "error":
                         errors.setdefault("Machine", []).append(unit.machine.id)
@@ -2615,10 +2707,17 @@ class Model:
                     if raise_on_blocked and unit.workload_status == "blocked":
                         blocks.setdefault("Unit", []).append(unit.name)
                         continue
-                    waiting_for_status = status and unit.workload_status != status
-                    if not waiting_for_status and unit.agent_status == "idle":
+                    waiting_for_a_particular_status = status and unit.workload_status != status
+                    if not waiting_for_a_particular_status and unit.agent_status == "idle":
+                        # We'll be here in two cases:
+                        # 1) We're not waiting for a particular status and the agent is "idle"
+                        # 2) We're waiting for a particular status and the workload is in that status
+                        # Either way, the unit is ready, start measuring the time period that
+                        # it needs to stay in that state (i.e. idle_period)
+                        units_ready.add(unit.name)
                         now = datetime.now()
                         idle_start = idle_times.setdefault(unit.name, now)
+
                         if now - idle_start < idle_period:
                             busy.append("{} [{}] {}: {}".format(unit.name,
                                                                 unit.agent_status,

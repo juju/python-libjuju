@@ -292,6 +292,8 @@ HIRSUTE = "hirsute"
 IMPISH = "impish"
 JAMMY = "jammy"
 KINETIC = "kinetic"
+LUNAR = "lunar"
+MANTIC = "mantic"
 
 UBUNTU_SERIES = {
     PRECISE: "12.04",
@@ -316,67 +318,66 @@ UBUNTU_SERIES = {
     IMPISH: "21.10",
     JAMMY: "22.04",
     KINETIC: "22.10",
+    LUNAR: "23.04",
+    MANTIC: "23.10",
 }
+
+KUBERNETES = "kubernetes"
+KUBERNETES_SERIES = {
+    KUBERNETES: "kubernetes"
+}
+
+ALL_SERIES_VERSIONS = {**UBUNTU_SERIES, **KUBERNETES_SERIES}
 
 
 def get_series_version(series_name):
-    if series_name not in UBUNTU_SERIES:
+    """get_series_version outputs the version of the OS based on the given series
+    e.g. jammy -> 22.04, kubernetes -> kubernetes
+
+    :param str series_name: name of the series
+    :return str: os version
+    """
+    if series_name not in ALL_SERIES_VERSIONS:
         raise errors.JujuError("Unknown series : %s", series_name)
-    return UBUNTU_SERIES[series_name]
+    return ALL_SERIES_VERSIONS[series_name]
 
 
 def get_version_series(version):
+    """get_version_series is the opposite of the get_series_version. It outputs the series based
+    on given OS version
+
+    :param str version: version of the OS
+    return str: name of the series corresponding to the given version
+    """
     if version not in UBUNTU_SERIES.values():
         raise errors.JujuError("Unknown version : %s", version)
     return list(UBUNTU_SERIES.keys())[list(UBUNTU_SERIES.values()).index(version)]
 
 
-def get_local_charm_base(series, channel_from_arg, charm_metadata,
-                         charm_path, baseCls):
+def get_local_charm_base(series, charm_path, base_class):
     """Deduce the base [channel/osname] of a local charm based on what we
     know already
 
     :param str series: This may come from the argument or the metadata.yaml
-    :param str channel_from_arg: This is channel passed as argument, if any.
-    :param dict charm_metadata: metadata.yaml
     :param str charm_path: Path of charm directory/.charm file
-    :param class baseCls:
+    :param class base_class:
     :return: Instance of the baseCls with channel/osname informaiton
     """
 
     channel_for_base = ''
     os_name_for_base = ''
-    # If user passed a channel_arg, then check the supported series against
-    # the channel's track
-    chnl_check = origin.Channel.parse(channel_from_arg) if channel_from_arg \
-        else None
-    if chnl_check:
-        not_supported_error = errors.JujuError(
-            "Given channel [track/risk] is not supported --"
-            "\n - Given channel : %s"
-            "\n - Series in Charm Metadata : %s" %
-            (channel_from_arg, charm_metadata['series']))
-        channel_for_base = chnl_check.track
-        intented_series = get_version_series(channel_for_base)
-        if intented_series not in charm_metadata['series']:
-            raise not_supported_error
-        # Also check the manifest if there's one
-        charm_manifest = get_local_charm_manifest(charm_path)
-        if 'bases' in charm_manifest:
-            for base in charm_manifest['bases']:
-                if channel_for_base == base['channel']:
-                    break
-            else:
-                raise not_supported_error
 
-    # If we know the series, use it to get a channel
-    if channel_for_base == '':
+    # We should know the series, so use it to get a channel
+    if series:
         channel_for_base = get_series_version(series) if series else ''
         if channel_for_base:
             # we currently only support ubuntu series (statically)
             # TODO (cderici) : go juju/core/series/supported.go and get the
             #  others here too
-            os_name_for_base = 'ubuntu'
+            if series in KUBERNETES_SERIES:
+                os_name_for_base = 'kubernetes'
+            else:
+                os_name_for_base = 'ubuntu'
 
     # Check the charm manifest
     if channel_for_base == '':
@@ -384,18 +385,24 @@ def get_local_charm_base(series, channel_from_arg, charm_metadata,
         if 'bases' in charm_manifest:
             channel_for_base = charm_manifest['bases'][0]['channel']
             os_name_for_base = charm_manifest['bases'][0]['name']
-        else:
-            # Also check the charmcraft.yaml
-            charmcraft_yaml = get_local_charm_charmcraft_yaml(charm_path)
-            if 'bases' in charmcraft_yaml:
-                channel_for_base = charmcraft_yaml['bases'][0]['run-on'][0]['channel']
-                os_name_for_base = charmcraft_yaml['bases'][0]['run-on'][0]['name']
+
+    # Also check the charmcraft.yaml
+    if channel_for_base == '':
+        charmcraft_yaml = get_local_charm_charmcraft_yaml(charm_path)
+        if 'bases' in charmcraft_yaml:
+            channel_for_base = charmcraft_yaml['bases'][0]['run-on'][0]['channel']
+            os_name_for_base = charmcraft_yaml['bases'][0]['run-on'][0]['name']
 
     if channel_for_base == '':
         raise errors.JujuError("Unable to determine base for charm : %s" %
                                charm_path)
 
-    return baseCls(channel_for_base, os_name_for_base)
+    # Legacy k8s charms - assume ubuntu focal
+    # as per juju/cmd/juju/application/utils.DeduceOrigin()
+    if channel_for_base == "kubernetes" or os_name_for_base == "kubernetes":
+        channel_for_base = '20.04/stable'
+        os_name_for_base = 'ubuntu'
+    return base_class(channel_for_base, os_name_for_base)
 
 
 def base_channel_to_series(channel):
@@ -423,19 +430,21 @@ DEFAULT_SUPPORTED_LTS = 'jammy'
 DEFAULT_SUPPORTED_LTS_BASE = client.Base(channel='22.04', name='ubuntu')
 
 
-def base_channel_from_series(track, risk, series=None):
+def base_channel_from_series(track, risk, series):
     return origin.Channel(track=track, risk=risk).normalize().compute_base_channel(series=series)
 
 
-def get_os_from_series(series=None):
-    if not series or series in UBUNTU_SERIES:
+def get_os_from_series(series):
+    if series in UBUNTU_SERIES:
         return 'ubuntu'
     raise JujuError(f'os for the series {series} needs to be added')
 
 
 def get_base_from_origin_or_channel(origin_or_channel, series=None):
-    channel = base_channel_from_series(origin_or_channel.track, origin_or_channel.risk, series)
-    os_name = get_os_from_series(series)
+    channel, os_name = None, None
+    if series:
+        channel = base_channel_from_series(origin_or_channel.track, origin_or_channel.risk, series)
+        os_name = get_os_from_series(series)
     return client.Base(channel=channel, name=os_name)
 
 

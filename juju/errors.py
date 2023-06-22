@@ -87,6 +87,13 @@ class JujuBackupError(JujuError):
     pass
 
 
+class JujuNotValid(JujuError):
+    def __init__(self, entity_type, entity_name):
+        self.entity_type = entity_type
+        self.entity_name = entity_name
+        super().__init__(f'Invalid {entity_type} : {entity_name}')
+
+
 class JujuConfigError(JujuError):
     """Exception raised during processing a configuration key-value pair
     in a config set for an application.
