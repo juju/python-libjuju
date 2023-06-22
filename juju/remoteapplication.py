@@ -44,3 +44,11 @@ class ApplicationOffer(model.ModelEntity):
     @property
     def tag(self):
         return tag.application(self.name)
+
+    @property
+    def offer_name(self):
+        return self.safe_data['offer-name']
+
+    @property
+    def application_name(self):
+        return self.safe_data['application-name']
