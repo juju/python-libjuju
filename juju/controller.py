@@ -738,7 +738,7 @@ class Controller:
         if offer_name and application_name:
             o_name = offer_name
             a_name = application_name
-            eps = {endpoint : endpoint}
+            eps = {endpoint: endpoint}
         else:
             try:
                 offer = parse_offer_endpoint(endpoint)

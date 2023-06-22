@@ -334,7 +334,6 @@ async def test_deploy_bundle_with_multiple_overlays_with_include_files(event_loo
         assert 'dashboards' == model.application_offers['grafana'].offer_name
 
 
-
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_deploy_local_charm_folder_symlink(event_loop):
