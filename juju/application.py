@@ -749,11 +749,10 @@ class Application(model.ModelEntity):
         }
 
         # Compute the difference btw resources needed and the existing resources
-        resources_to_update = [
-            resource for resource in charm_resources
-            if resource.get('Name', resource.get('name')) not in existing_resources or
-            existing_resources[resource.get('Name', resource.get('name'))].origin != 'upload'
-        ]
+        resources_to_update = []
+        for resource in charm_resources:
+            if utils.should_upgrade_resource(resource, existing_resources):
+                resources_to_update.append(resource)
 
         # Update the resources
         if resources_to_update:
