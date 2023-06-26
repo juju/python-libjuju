@@ -2622,7 +2622,7 @@ class Model:
             warnings.warn("wait_for_active is deprecated; use status", DeprecationWarning)
             status = "active"
 
-        _wait_for_units = wait_for_units if wait_for_units is not None else 1
+        _wait_for_units = wait_for_at_least_units if wait_for_at_least_units is not None else 1
 
         timeout = timedelta(seconds=timeout) if timeout is not None else None
         idle_period = timedelta(seconds=idle_period)
@@ -2689,10 +2689,11 @@ class Model:
                     busy.append(app.name + " (not enough units yet - %s/%s)" %
                                 (len(app.units), _wait_for_units))
                     continue
-                # User wants to see a certain # of units, and we have enough
-                elif wait_for_units and len(units_ready) >= _wait_for_units:
+                # User is waiting for at least a certain # of units, and we have enough
+                elif wait_for_at_least_units and len(units_ready) >= _wait_for_units:
                     # So no need to keep looking, we have the desired number of units ready to go,
-                    # exit the loop. Don't return, though, we might still have some errors to raise
+                    # exit the loop. Don't just return here, though, we might still have some
+                    # errors to raise at the end
                     break
                 for unit in app.units:
                     if unit.machine is not None and unit.machine.status == "error":
@@ -2711,7 +2712,8 @@ class Model:
                     if not waiting_for_a_particular_status and unit.agent_status == "idle":
                         # We'll be here in two cases:
                         # 1) We're not waiting for a particular status and the agent is "idle"
-                        # 2) We're waiting for a particular status and the workload is in that status
+                        # 2) We're waiting for a particular status and the workload is in that
+                        # status
                         # Either way, the unit is ready, start measuring the time period that
                         # it needs to stay in that state (i.e. idle_period)
                         units_ready.add(unit.name)
