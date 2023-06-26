@@ -2574,47 +2574,48 @@ class Model:
 
     async def wait_for_idle(self, apps=None, raise_on_error=True, raise_on_blocked=False,
                             wait_for_active=False, timeout=10 * 60, idle_period=15, check_freq=0.5,
-                            status=None, wait_for_units=None, wait_for_exact_units=None):
+                            status=None, wait_for_at_least_units=None, wait_for_exact_units=None):
         """Wait for applications in the model to settle into an idle state.
 
-        :param apps (list[str]): Optional list of specific app names to wait on.
+        :param List[str] apps: Optional list of specific app names to wait on.
             If given, all apps must be present in the model and idle, while other
             apps in the model can still be busy. If not given, all apps currently
             in the model must be idle.
 
-        :param raise_on_error (bool): If True, then any unit or app going into
+        :param bool raise_on_error: If True, then any unit or app going into
             "error" status immediately raises either a JujuAppError or a JujuUnitError.
             Note that machine or agent failures will always raise an exception (either
             JujuMachineError or JujuAgentError), regardless of this param. The default
             is True.
 
-        :param raise_on_blocked (bool): If True, then any unit or app going into
+        :param bool raise_on_blocked: If True, then any unit or app going into
             "blocked" status immediately raises either a JujuAppError or a JujuUnitError.
-            The defaul tis False.
+            The default is False.
 
-        :param wait_for_active (bool): If True, then also wait for all unit workload
+        :param bool wait_for_active: If True, then also wait for all unit workload
             statuses to be "active" as well. The default is False.
 
-        :param timeout (float): How long to wait, in seconds, for the bundle settles
+        :param float timeout: How long to wait, in seconds, for the bundle settles
             before raising an asyncio.TimeoutError. If None, will wait forever.
             The default is 10 minutes.
 
-        :param idle_period (float): How long, in seconds, the agent statuses of all
+        :param float idle_period: How long, in seconds, the agent statuses of all
             units of all apps need to be `idle`. This delay is used to ensure that
             any pending hooks have a chance to start to avoid false positives.
             The default is 15 seconds.
 
-        :param check_freq (float): How frequently, in seconds, to check the model.
+        :param float check_freq: How frequently, in seconds, to check the model.
             The default is every half-second.
 
-        :param status (str): The status to wait for. If None, not waiting.
+        :param str status: The status to wait for. If None, not waiting.
             The default is None (not waiting for any status).
 
-        :param wait_for_units (int): The least number of units to be expected before
-            going into the idle state.
+        :param int wait_for_at_least_units: The least number of units to go into the idle
+        state. wait_for_idle will return after that many units are available (across all the
+        given applications).
             The default is 1 unit.
 
-        :param wait_for_exact_units (int): The exact number of units to be expected before
+        :param int wait_for_exact_units: The exact number of units to be expected before
             going into the idle state. (e.g. useful for scaling down).
             When set, takes precedence over the `wait_for_units` parameter.
         """
