@@ -1043,7 +1043,7 @@ class CreateOfferChange(ChangeInfo):
     def __str__(self):
         endpoints = ""
         if self.endpoints is not None:
-            endpoints = ":{}".format(self.endpoints.join(","))
+            endpoints = ":{}".format(",".join(self.endpoints))
         return "create offer {offer_name} using {application}{endpoints}".format(offer_name=self.offer_name,
                                                                                  application=self.application,
                                                                                  endpoints=endpoints)
