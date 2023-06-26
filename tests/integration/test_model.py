@@ -865,7 +865,7 @@ async def test_wait_for_idle_with_not_enough_units(event_loop):
             num_units=2,
         )
         with pytest.raises(jasyncio.TimeoutError):
-            await model.wait_for_idle(timeout=5 * 60, wait_for_units=3)
+            await model.wait_for_idle(timeout=5 * 60, wait_for_at_least_units=3)
 
 
 @base.bootstrapped
@@ -885,9 +885,9 @@ async def test_wait_for_idle_more_units_than_needed(event_loop):
             num_units=1,
         )
 
-        # because the wait_for_units=1, wait_for_idle should return without timing out
+        # because the wait_for_at_least_units=1, wait_for_idle should return without timing out
         # even though there are two more units that aren't active/idle
-        await model.wait_for_idle(timeout=5 * 60, wait_for_units=1, status='active')
+        await model.wait_for_idle(timeout=5 * 60, wait_for_at_least_units=1, status='active')
 
 
 @base.bootstrapped
@@ -902,7 +902,7 @@ async def test_wait_for_idle_with_enough_units(event_loop):
             channel='stable',
             num_units=3,
         )
-        await model.wait_for_idle(timeout=5 * 60, wait_for_units=3)
+        await model.wait_for_idle(timeout=5 * 60, wait_for_at_least_units=3)
 
 
 @base.bootstrapped
