@@ -181,6 +181,20 @@ async def test_deploy_bundle_local_charms(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 @pytest.mark.bundle
+async def test_deploy_bundle_local_charm_series_manifest(event_loop):
+    bundle_path = INTEGRATION_TEST_DIR / 'bundle' / 'local-manifest.yaml'
+
+    async with base.CleanModel() as model:
+        await model.deploy(bundle_path)
+        await wait_for_bundle(model, bundle_path)
+        assert set(model.units.keys()) == set(['test1/0'])
+        assert model.units['test1/0'].agent_status == 'idle'
+        assert model.units['test1/0'].workload_status == 'active'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+@pytest.mark.bundle
 async def test_deploy_invalid_bundle(event_loop):
     pytest.skip('test_deploy_invalid_bundle intermittent test failure')
     bundle_path = TESTS_DIR / 'bundle' / 'invalid.yaml'
