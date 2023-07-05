@@ -127,8 +127,9 @@ class BundleHandler:
                 metadata = utils.get_local_charm_metadata(charm_dir)
                 series = await get_charm_series(metadata, self.model)
             if not series:
-                metadata = utils.get_local_charm_metadata(charm_dir)
-                series = await get_charm_series(metadata, self.model)
+                base = utils.get_local_charm_base(None, charm_path, client.Base)
+                series = utils.base_channel_to_series(base.channel)
+            if not series:
                 raise JujuError(
                     "Couldn't determine series for charm at {}. "
                     "Add a 'series' key to the bundle.".format(charm_dir))
