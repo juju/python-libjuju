@@ -1,0 +1,13 @@
+analysis:
+  attributes:
+  - name: language
+    result: python
+  - name: framework
+    result: operator
+bases:
+- architectures:
+  - amd64
+  channel: '20.04'
+  name: ubuntu
+charmcraft-started-at: '2021-08-20T08:09:00.639806Z'
+charmcraft-version: 1.2.1

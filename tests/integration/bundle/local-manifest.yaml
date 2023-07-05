@@ -1,0 +1,4 @@
+applications:
+  test1:
+    charm: "../charm-manifest"
+    num_units: 1
