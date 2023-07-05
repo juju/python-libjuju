@@ -4593,6 +4593,78 @@ class CAASApplicationProvisioningInfoResults(Type):
 
 
 
+class CAASApplicationProvisioningState(Type):
+    _toSchema = {'scale_target': 'scale-target', 'scaling': 'scaling'}
+    _toPy = {'scale-target': 'scale_target', 'scaling': 'scaling'}
+    def __init__(self, scale_target=None, scaling=None, **unknown_fields):
+        '''
+        scale_target : int
+        scaling : bool
+        '''
+        scale_target_ = scale_target
+        scaling_ = scaling
+
+        # Validate arguments against known Juju API types.
+        if scale_target_ is not None and not isinstance(scale_target_, int):
+            raise Exception("Expected scale_target_ to be a int, received: {}".format(type(scale_target_)))
+
+        if scaling_ is not None and not isinstance(scaling_, bool):
+            raise Exception("Expected scaling_ to be a bool, received: {}".format(type(scaling_)))
+
+        self.scale_target = scale_target_
+        self.scaling = scaling_
+        self.unknown_fields = unknown_fields
+
+
+
+class CAASApplicationProvisioningStateArg(Type):
+    _toSchema = {'application': 'application', 'provisioning_state': 'provisioning-state'}
+    _toPy = {'application': 'application', 'provisioning-state': 'provisioning_state'}
+    def __init__(self, application=None, provisioning_state=None, **unknown_fields):
+        '''
+        application : Entity
+        provisioning_state : CAASApplicationProvisioningState
+        '''
+        application_ = Entity.from_json(application) if application else None
+        provisioning_state_ = CAASApplicationProvisioningState.from_json(provisioning_state) if provisioning_state else None
+
+        # Validate arguments against known Juju API types.
+        if application_ is not None and not isinstance(application_, (dict, Entity)):
+            raise Exception("Expected application_ to be a Entity, received: {}".format(type(application_)))
+
+        if provisioning_state_ is not None and not isinstance(provisioning_state_, (dict, CAASApplicationProvisioningState)):
+            raise Exception("Expected provisioning_state_ to be a CAASApplicationProvisioningState, received: {}".format(type(provisioning_state_)))
+
+        self.application = application_
+        self.provisioning_state = provisioning_state_
+        self.unknown_fields = unknown_fields
+
+
+
+class CAASApplicationProvisioningStateResult(Type):
+    _toSchema = {'error': 'error', 'provisioning_state': 'provisioning-state'}
+    _toPy = {'error': 'error', 'provisioning-state': 'provisioning_state'}
+    def __init__(self, error=None, provisioning_state=None, **unknown_fields):
+        '''
+        error : Error
+        provisioning_state : CAASApplicationProvisioningState
+        '''
+        error_ = Error.from_json(error) if error else None
+        provisioning_state_ = CAASApplicationProvisioningState.from_json(provisioning_state) if provisioning_state else None
+
+        # Validate arguments against known Juju API types.
+        if error_ is not None and not isinstance(error_, (dict, Error)):
+            raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
+
+        if provisioning_state_ is not None and not isinstance(provisioning_state_, (dict, CAASApplicationProvisioningState)):
+            raise Exception("Expected provisioning_state_ to be a CAASApplicationProvisioningState, received: {}".format(type(provisioning_state_)))
+
+        self.error = error_
+        self.provisioning_state = provisioning_state_
+        self.unknown_fields = unknown_fields
+
+
+
 class CAASUnitInfo(Type):
     _toSchema = {'tag': 'tag', 'unit_status': 'unit-status'}
     _toPy = {'tag': 'tag', 'unit-status': 'unit_status'}
@@ -12310,18 +12382,16 @@ class InfoResponse(Type):
 
 
 class IngressNetworksChangeEvent(Type):
-    _toSchema = {'application_token': 'application-token', 'bakery_version': 'bakery-version', 'ingress_required': 'ingress-required', 'macaroons': 'macaroons', 'networks': 'networks', 'relation_token': 'relation-token'}
-    _toPy = {'application-token': 'application_token', 'bakery-version': 'bakery_version', 'ingress-required': 'ingress_required', 'macaroons': 'macaroons', 'networks': 'networks', 'relation-token': 'relation_token'}
-    def __init__(self, application_token=None, bakery_version=None, ingress_required=None, macaroons=None, networks=None, relation_token=None, **unknown_fields):
+    _toSchema = {'bakery_version': 'bakery-version', 'ingress_required': 'ingress-required', 'macaroons': 'macaroons', 'networks': 'networks', 'relation_token': 'relation-token'}
+    _toPy = {'bakery-version': 'bakery_version', 'ingress-required': 'ingress_required', 'macaroons': 'macaroons', 'networks': 'networks', 'relation-token': 'relation_token'}
+    def __init__(self, bakery_version=None, ingress_required=None, macaroons=None, networks=None, relation_token=None, **unknown_fields):
         '''
-        application_token : str
         bakery_version : int
         ingress_required : bool
         macaroons : typing.Sequence[~Macaroon]
         networks : typing.Sequence[str]
         relation_token : str
         '''
-        application_token_ = application_token
         bakery_version_ = bakery_version
         ingress_required_ = ingress_required
         macaroons_ = [Macaroon.from_json(o) for o in macaroons or []]
@@ -12329,9 +12399,6 @@ class IngressNetworksChangeEvent(Type):
         relation_token_ = relation_token
 
         # Validate arguments against known Juju API types.
-        if application_token_ is not None and not isinstance(application_token_, (bytes, str)):
-            raise Exception("Expected application_token_ to be a str, received: {}".format(type(application_token_)))
-
         if bakery_version_ is not None and not isinstance(bakery_version_, int):
             raise Exception("Expected bakery_version_ to be a int, received: {}".format(type(bakery_version_)))
 
@@ -12347,7 +12414,6 @@ class IngressNetworksChangeEvent(Type):
         if relation_token_ is not None and not isinstance(relation_token_, (bytes, str)):
             raise Exception("Expected relation_token_ to be a str, received: {}".format(type(relation_token_)))
 
-        self.application_token = application_token_
         self.bakery_version = bakery_version_
         self.ingress_required = ingress_required_
         self.macaroons = macaroons_

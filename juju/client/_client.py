@@ -103,6 +103,10 @@ class AgentFacade(TypeFactory):
     pass
 
 
+class AgentLifeFlagFacade(TypeFactory):
+    pass
+
+
 class AgentToolsFacade(TypeFactory):
     pass
 
