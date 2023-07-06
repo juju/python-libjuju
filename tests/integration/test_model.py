@@ -5,7 +5,6 @@ import string
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
-from pathlib import Path
 
 import mock
 import paramiko
@@ -19,13 +18,7 @@ from juju.model import Model, ModelObserver
 from juju.utils import block_until, run_with_interrupt, wait_for_bundle
 
 from .. import base
-
-MB = 1
-GB = 1024
-SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsYMJGNGG74HAJha3n2CFmWYsOOaORnJK6VqNy86pj0MIpvRXBzFzVy09uPQ66GOQhTEoJHEqE77VMui7+62AcMXT+GG7cFHcnU8XVQsGM6UirCcNyWNysfiEMoAdZScJf/GvoY87tMEszhZIUV37z8PUBx6twIqMdr31W1J0IaPa+sV6FEDadeLaNTvancDcHK1zuKsL39jzAg7+LYjKJfEfrsQP+lj/EQcjtKqlhVS5kzsJVfx8ZEd0xhW5G7N6bCdKNalS8mKCMaBXJpijNQ82AiyqCIDCRrre2To0/i7pTjRiL0U9f9mV3S4NJaQaokR050w/ZLySFf6F7joJT mathijs@Qrama-Mathijs'  # noqa
-HERE_DIR = Path(__file__).absolute().parent  # tests/integration
-TESTS_DIR = HERE_DIR.parent  # tests/
-OVERLAYS_DIR = HERE_DIR / 'bundle' / 'test-overlays'
+from ..utils import MB, GB, TESTS_DIR, OVERLAYS_DIR, SSH_KEY, INTEGRATION_TEST_DIR
 
 
 @base.bootstrapped
@@ -68,7 +61,7 @@ async def test_deploy_local_bundle_file(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_deploy_bundle_local_resource_relative_path(event_loop):
-    bundle_file_path = HERE_DIR / 'bundle-file-resource.yaml'
+    bundle_file_path = INTEGRATION_TEST_DIR / 'bundle-file-resource.yaml'
 
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_file_path))
@@ -82,7 +75,7 @@ async def test_deploy_bundle_local_resource_relative_path(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_deploy_local_bundle_include_file(event_loop):
-    bundle_dir = TESTS_DIR / 'integration' / 'bundle'
+    bundle_dir = INTEGRATION_TEST_DIR / 'bundle'
     bundle_yaml_path = bundle_dir / 'bundle-include-file.yaml'
 
     async with base.CleanModel() as model:
@@ -99,7 +92,7 @@ async def test_deploy_local_bundle_include_file(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_deploy_local_bundle_include_base64(event_loop):
-    bundle_dir = TESTS_DIR / 'integration' / 'bundle'
+    bundle_dir = INTEGRATION_TEST_DIR / 'bundle'
     bundle_yaml_path = bundle_dir / 'bundle-include-base64.yaml'
 
     async with base.CleanModel() as model:
@@ -115,7 +108,7 @@ async def test_deploy_local_bundle_include_base64(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_deploy_bundle_local_charms(event_loop):
-    bundle_path = TESTS_DIR / 'integration' / 'bundle' / 'local.yaml'
+    bundle_path = INTEGRATION_TEST_DIR / 'bundle' / 'local.yaml'
 
     async with base.CleanModel() as model:
         await model.deploy(bundle_path)
@@ -665,7 +658,7 @@ async def test_local_oci_image_resource_charm(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_local_file_resource_charm(event_loop):
-    charm_path = TESTS_DIR / 'integration' / 'file-resource-charm'
+    charm_path = INTEGRATION_TEST_DIR / 'file-resource-charm'
     async with base.CleanModel() as model:
         resources = {"file-res": "test.file"}
         app = await model.deploy(str(charm_path), resources=resources)
@@ -703,7 +696,7 @@ async def test_attach_resource(event_loop):
 async def test_store_resources_bundle(event_loop):
     pytest.skip('test_store_resources_bundle intermittent test failure')
     async with base.CleanModel() as model:
-        bundle = str(Path(__file__).parent / 'bundle')
+        bundle = INTEGRATION_TEST_DIR / 'bundle'
         await model.deploy(bundle)
         assert 'ghost' in model.applications
         ghost = model.applications['ghost']
@@ -725,7 +718,7 @@ async def test_store_resources_bundle(event_loop):
 async def test_store_resources_bundle_revs(event_loop):
     pytest.skip('test_store_resources_bundle_revs intermittent test failure')
     async with base.CleanModel() as model:
-        bundle = str(Path(__file__).parent / 'bundle/bundle-resource-rev.yaml')
+        bundle = INTEGRATION_TEST_DIR / 'bundle/bundle-resource-rev.yaml'
         await model.deploy(bundle)
         assert 'ghost' in model.applications
         ghost = model.applications['ghost']
