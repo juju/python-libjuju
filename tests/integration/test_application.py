@@ -4,6 +4,7 @@ import pytest
 import logging
 
 from .. import base
+from ..utils import INTEGRATION_TEST_DIR
 from juju import errors
 from juju.url import URL, Schema
 
@@ -235,6 +236,28 @@ async def test_upgrade_charm_resource_same_rev_no_update(event_loop):
         await app.refresh(channel='ussuri/stable')
         ress2 = await app.get_resources()
         assert ress['policyd-override'].fingerprint == ress2['policyd-override'].fingerprint
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_upgrade_local_charm_with_resource(event_loop):
+    charm_path = INTEGRATION_TEST_DIR / 'file-resource-charm'
+    async with base.CleanModel() as model:
+        app = await model.deploy(str(charm_path))
+        assert 'file-resource-charm' in model.applications
+
+        await model.wait_for_idle()
+        assert app.units[0].agent_status == 'idle'
+
+        resources = {"file-res": "test.file"}
+        await app.refresh(local_charm_path=str(charm_path), resources=resources)
+
+        await model.wait_for_idle()
+        assert app.units[0].agent_status == 'idle'
+
+        ress = await app.get_resources()
+        assert 'file-res' in ress
+        assert ress['file-res']
 
 
 @base.bootstrapped
