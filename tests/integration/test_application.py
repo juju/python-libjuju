@@ -250,7 +250,7 @@ async def test_upgrade_local_charm_with_resource(event_loop):
         assert app.units[0].agent_status == 'idle'
 
         resources = {"file-res": "test.file"}
-        await app.refresh(local_charm_path=str(charm_path), resources=resources)
+        await app.refresh(path=str(charm_path), resources=resources)
 
         await model.wait_for_idle()
         assert app.units[0].agent_status == 'idle'
