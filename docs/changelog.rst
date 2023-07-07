@@ -1,12 +1,24 @@
 Changelog
 ---------
 
+2.9.43.0
+^^^^^^^^
+
+Wednesday Jul 6 2023
+
+## What's Changed
+
+* [JUJU-1682] Utilities for subordinate units by @cderici in https://github.com/juju/python-libjuju/pull/879
+* [JUJU-4018] Avoid upgrade resource in app refresh if upstream has same resource revision by @cderici in https://github.com/juju/python-libjuju/pull/884
+* [JUJU-4112] Determining series for local bundle deploying local charm with manifest by @cderici in https://github.com/juju/python-libjuju/pull/896
+* [JUJU-4188] Add 2.9.43 facades by @cderici in https://github.com/juju/python-libjuju/pull/895
+* [JUJU-3998] Pass through local_refresh if refreshing with local charm & resources by @cderici in https://github.com/juju/python-libjuju/pull/894
+
 2.9.42.4
 ^^^^^^^^
 
 Wednesday May 31 2023
 
-## What's Changed
 * [JUJU-3886] Kubernetes series version by @cderici in https://github.com/juju/python-libjuju/pull/868
 * [JUJU-3887] Avoid removing the track if set to latest in channel normalization by @cderici in https://github.com/juju/python-libjuju/pull/867
 
@@ -16,7 +28,6 @@ Wednesday May 31 2023
 
 Wednesday May 24 2023
 
-## What's Changed
 * [JUJU-1467] Application status from API by @cderici in https://github.com/juju/python-libjuju/pull/849
 * [JUJU-3750] Fix bug in Type.from_json() parsing simple entries by @cderici in https://github.com/juju/python-libjuju/pull/854
 
@@ -25,8 +36,6 @@ Wednesday May 24 2023
 ^^^^^^^^
 
 Thursday May 11 2023
-
-## What's Changed
 
 * [JUJU-3253] add missing force in bundle deployment by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/815
 * [JUJU-3348] Fix assumes parsing by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/820
