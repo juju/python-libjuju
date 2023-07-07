@@ -623,7 +623,7 @@ class Application(model.ModelEntity):
 
     async def refresh(
             self, channel=None, force=False, force_series=False, force_units=False,
-            local_charm_path=None, resources=None, revision=None, switch=None):
+            path=None, resources=None, revision=None, switch=None):
         """Refresh the charm for this application.
 
         :param str channel: Channel to use when getting the charm from the
@@ -632,13 +632,13 @@ class Application(model.ModelEntity):
             application is not supported by the new charm
         :param bool force_units: Refresh all units immediately, even if in
             error state
-        :param str local_charm_path: Refresh to a charm located at path
+        :param str path: Refresh to a charm located at path
         :param dict resources: Dictionary of resource name/filepath pairs
         :param int revision: Explicit refresh revision
         :param str switch: Crossgrade charm url
 
         """
-        if local_charm_path is None and resources is not None:
+        if path is None and resources is not None:
             raise NotImplementedError("refreshing a non-local charm with resources option is not yet implemented")
 
         if switch is not None and revision is not None:
@@ -660,9 +660,9 @@ class Application(model.ModelEntity):
         charm_url = switch or charm_url_origin_result.url
         origin = charm_url_origin_result.charm_origin
 
-        if local_charm_path is not None:
+        if path is not None:
             await self.local_refresh(origin, force, force_series,
-                                     force_units, local_charm_path, resources)
+                                     force_units, path, resources)
             return
 
         parsed_url = URL.parse(charm_url)
