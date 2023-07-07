@@ -24,17 +24,13 @@ test: lint
 	tox -e py3
 	tox -e integration
 
-
 .PHONY: lint
 lint: 
 	tox -e lint
 
 .PHONY: docs
-docs: .tox
-	$(PIP) install -r docs/requirements.txt
-	rm -rf docs/_build/
-	$(BIN)/sphinx-build -b html docs/  docs/_build/
-	cd docs/_build/ && zip -r docs.zip *
+docs:
+	tox -e docs
 
 .PHONY: release
 release:
