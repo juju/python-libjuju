@@ -1,6 +1,6 @@
 pytz
 pymacaroons
-sphinx==4.3.2
+sphinx==5.3.0
 sphinxcontrib-asyncio
 sphinx_rtd_theme
 websockets
