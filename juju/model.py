@@ -1022,6 +1022,14 @@ class Model:
         return self.info
 
     @property
+    def name(self):
+        """Return the name of this model
+        """
+        if self._info is None:
+            raise JujuError("Model is not connected")
+        return self._info.name
+
+    @property
     def info(self):
         """Return the cached client.ModelInfo object for this Model.
 
