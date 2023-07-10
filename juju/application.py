@@ -568,10 +568,18 @@ class Application(model.ModelEntity):
         )
 
     @property
-    def charm_url(self):
-        """Get the charm url for a given application
+    def charm_name(self):
+        """Get the charm name of this application
 
-        :return string: The charm url for an application
+        :return str: The name of the charm
+        """
+        return URL.parse(self.charm_url).name
+
+    @property
+    def charm_url(self):
+        """Get the charm url for this application
+
+        :return str: The charm url
         """
         return self.safe_data['charm-url']
 
