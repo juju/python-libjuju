@@ -23,6 +23,19 @@ from ..utils import MB, GB, TESTS_DIR, OVERLAYS_DIR, SSH_KEY, INTEGRATION_TEST_D
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_model_name(event_loop):
+    model = Model()
+    with pytest.raises(JujuError):
+        model.name
+
+    async with base.CleanModel() as new_model:
+        await model.connect(new_model.name)
+        assert model.name == new_model.name
+        await model.disconnect()
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_deploy_local_bundle_dir(event_loop):
     bundle_path = TESTS_DIR / 'bundle'
 
