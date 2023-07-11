@@ -204,7 +204,7 @@ async def test_deploy_charm_assumes(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 async def test_deploy_local_charm_base_charmcraft_yaml(event_loop):
-    charm_path = HERE_DIR / 'charm-base-charmcraft-yaml'
+    charm_path = INTEGRATION_TEST_DIR / 'charm-base-charmcraft-yaml'
 
     async with base.CleanModel() as model:
         await model.deploy(str(charm_path))
