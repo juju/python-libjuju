@@ -349,7 +349,7 @@ class TestModelWaitForIdle(asynctest.TestCase):
                     workload_status_message="workload_status_message",
                     machine=None,
                     agent_status="idle",
-                )],
+            )],
         )
 
         app.get_status = base.AsyncMock(return_value=app_status)
@@ -387,7 +387,7 @@ class TestModelWaitForIdle(asynctest.TestCase):
                     workload_status_message="workload_status_message",
                     machine=None,
                     agent_status="idle",
-                )],
+            )],
         )
 
         app.get_status = base.AsyncMock(return_value=app_status)
