@@ -2564,12 +2564,24 @@ class Model:
                     if raise_on_blocked and unit.workload_status == "blocked":
                         blocks.setdefault("Unit", []).append(unit.name)
                         continue
-                    waiting_for_a_particular_status = status and unit.workload_status != status
-                    if not waiting_for_a_particular_status and unit.agent_status == "idle":
-                        # We'll be here in two cases:
-                        # 1) We're not waiting for a particular status and the agent is "idle"
-                        # 2) We're waiting for a particular status and the workload is in that status
-                        # Either way, the unit is ready, start measuring the time period that
+                    # TODO (cderici): we need two versions of wait_for_idle, one for waiting on
+                    #  individual units, another one for waiting for an application.
+                    #  The convoluted logic below is the result of trying to do both at the same
+                    #  time
+                    need_to_wait_more_for_a_particular_status = status and unit.workload_status != status
+                    if not need_to_wait_more_for_a_particular_status and \
+                            unit.agent_status == "idle" and \
+                            (wait_for_units or (not status or app_status == status)):
+                        # A unit is ready if either:
+                        # 1) Don't need to wait more for a particular status and the agent is "idle"
+                        # 2) We're looking for a particular status and the unit's workload,
+                        # as well as the application, is in that status. If the user wants to
+                        # see only a particular number of units in that state -- i.e. a subset of
+                        # the units is needed, then we don't care about the application status
+                        # (because e.g. app can be in 'waiting' while unit.0 is 'active' and unit.1
+                        # is 'waiting')
+
+                        # The unit is ready, start measuring the time period that
                         # it needs to stay in that state (i.e. idle_period)
                         units_ready.add(unit.name)
                         now = datetime.now()
