@@ -2623,7 +2623,7 @@ class Model:
             warnings.warn("wait_for_active is deprecated; use status", DeprecationWarning)
             status = "active"
 
-        _wait_for_units = wait_for_at_least_units if wait_for_at_least_units is not None else 1
+        _wait_for_units = wait_for_at_least_units or 1
 
         timeout = timedelta(seconds=timeout) if timeout is not None else None
         idle_period = timedelta(seconds=idle_period)
@@ -2657,7 +2657,7 @@ class Model:
                     ", ".join(errored),
                 ))
 
-        if wait_for_exact_units is not None:
+        if wait_for_exact_units:
             assert type(wait_for_exact_units) == int and wait_for_exact_units >= 0, \
                 'Invalid value for wait_for_exact_units : %s' % wait_for_exact_units
 
@@ -2680,7 +2680,7 @@ class Model:
                     blocks.setdefault("App", []).append(app.name)
 
                 # Check if wait_for_exact_units flag is used
-                if wait_for_exact_units is not None:
+                if wait_for_exact_units:
                     if len(app.units) != wait_for_exact_units:
                         busy.append(app.name + " (waiting for exactly %s units, current : %s)" %
                                     (wait_for_exact_units, len(app.units)))
@@ -2697,7 +2697,7 @@ class Model:
                     # errors to raise at the end
                     break
                 for unit in app.units:
-                    if unit.machine is not None and unit.machine.status == "error":
+                    if unit.machine and unit.machine.status == "error":
                         errors.setdefault("Machine", []).append(unit.machine.id)
                         continue
                     if unit.agent_status == "error":
@@ -2709,12 +2709,24 @@ class Model:
                     if raise_on_blocked and unit.workload_status == "blocked":
                         blocks.setdefault("Unit", []).append(unit.name)
                         continue
-                    waiting_for_a_particular_status = status and unit.workload_status != status
-                    if not waiting_for_a_particular_status and unit.agent_status == "idle":
-                        # We'll be here in two cases:
-                        # 1) We're not waiting for a particular status and the agent is "idle"
-                        # 2) We're waiting for a particular status and the workload is in that
-                        # status
+                    # TODO (cderici): we need two versions of wait_for_idle, one for waiting on
+                    #  individual units, another one for waiting for an application.
+                    #  The convoluted logic below is the result of trying to do both at the same
+                    #  time
+                    need_to_wait_more_for_a_particular_status = status and (unit.workload_status != status)
+                    app_is_in_desired_status = (not status) or (app_status == status)
+                    if not need_to_wait_more_for_a_particular_status and \
+                            unit.agent_status == "idle" and \
+                            (wait_for_at_least_units or app_is_in_desired_status):
+                        # A unit is ready if either:
+                        # 1) Don't need to wait more for a particular status and the agent is "idle"
+                        # 2) We're looking for a particular status and the unit's workload,
+                        # as well as the application, is in that status. If the user wants to
+                        # see only a particular number of units in that state -- i.e. a subset of
+                        # the units is needed, then we don't care about the application status
+                        # (because e.g. app can be in 'waiting' while unit.0 is 'active' and unit.1
+                        # is 'waiting')
+
                         # Either way, the unit is ready, start measuring the time period that
                         # it needs to stay in that state (i.e. idle_period)
                         units_ready.add(unit.name)
@@ -2737,7 +2749,7 @@ class Model:
             if not busy:
                 break
             busy = "\n  ".join(busy)
-            if timeout is not None and datetime.now() - start_time > timeout:
+            if timeout and datetime.now() - start_time > timeout:
                 raise jasyncio.TimeoutError("Timed out waiting for model:\n" + busy)
             if last_log_time is None or datetime.now() - last_log_time > log_interval:
                 log.info("Waiting for model:\n  " + busy)
