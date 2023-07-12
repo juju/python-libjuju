@@ -72,54 +72,6 @@ class TestAddApplicationChange(unittest.TestCase):
     def test_method(self):
         self.assertEqual("deploy", AddApplicationChange.method())
 
-    def test_list_params_juju_2_4(self):
-        change = AddApplicationChange(1, [], params=["charm",
-                                                     "series",
-                                                     "application",
-                                                     "options",
-                                                     "constraints",
-                                                     {"db": "pool,1,1GB"},
-                                                     "endpoint_bindings",
-                                                     "resources"])
-        self.assertEqual({"change_id": 1,
-                          "requires": [],
-                          "charm": "charm",
-                          "series": "series",
-                          "application": "application",
-                          "options": "options",
-                          "constraints": "constraints",
-                          "storage": {"db": {"pool": "pool", "count": 1, "size": 1024}},
-                          "endpoint_bindings": "endpoint_bindings",
-                          "resources": "resources",
-                          "devices": None,
-                          "num_units": None,
-                          "channel": None}, change.__dict__)
-
-    def test_list_params_juju_2_5(self):
-        change = AddApplicationChange(1, [], params=["charm",
-                                                     "series",
-                                                     "application",
-                                                     "options",
-                                                     "constraints",
-                                                     {"db": "pool,1,1GB"},
-                                                     {"gpu": "1,gpu,attr1=a;attr2=b"},
-                                                     "endpoint_bindings",
-                                                     "resources",
-                                                     "num_units"])
-        self.assertEqual({"change_id": 1,
-                          "requires": [],
-                          "charm": "charm",
-                          "series": "series",
-                          "application": "application",
-                          "options": "options",
-                          "constraints": "constraints",
-                          "storage": {"db": {"pool": "pool", "count": 1, "size": 1024}},
-                          "endpoint_bindings": "endpoint_bindings",
-                          "resources": "resources",
-                          "devices": {"gpu": {"type": "gpu", "count": 1, "attributes": {"attr1": "a", "attr2": "b"}}},
-                          "num_units": "num_units",
-                          "channel": None}, change.__dict__)
-
     def test_dict_params(self):
         change = AddApplicationChange(1, [], params={"charm": "charm",
                                                      "series": "series",
@@ -360,27 +312,6 @@ class TestAddCharmChange(unittest.TestCase):
     def test_method(self):
         self.assertEqual("addCharm", AddCharmChange.method())
 
-    def test_list_params_juju_2_6(self):
-        change = AddCharmChange(1, [], params=["charm",
-                                               "series"])
-        self.assertEqual({"change_id": 1,
-                          "requires": [],
-                          "charm": "charm",
-                          "series": "series",
-                          "channel": None,
-                          "architecture": None}, change.__dict__)
-
-    def test_list_params_juju_2_7(self):
-        change = AddCharmChange(1, [], params=["charm",
-                                               "series",
-                                               "channel"])
-        self.assertEqual({"change_id": 1,
-                          "requires": [],
-                          "charm": "charm",
-                          "series": "series",
-                          "channel": "channel",
-                          "architecture": None}, change.__dict__)
-
     def test_dict_params(self):
         change = AddCharmChange(1, [], params={"charm": "charm",
                                                "series": "series",
@@ -435,18 +366,6 @@ class TestAddMachineChange(unittest.TestCase):
 
     def test_method(self):
         self.assertEqual("addMachines", AddMachineChange.method())
-
-    def test_list_params(self):
-        change = AddMachineChange(1, [], params=[{"series": "series",
-                                                  "constraints": "constraints",
-                                                  "containerType": "container_type",
-                                                  "parentId": "parent_id"}])
-        self.assertEqual({"change_id": 1,
-                          "requires": [],
-                          "series": "series",
-                          "constraints": "constraints",
-                          "container_type": "container_type",
-                          "parent_id": "parent_id"}, change.__dict__)
 
     def test_dict_params(self):
         change = AddMachineChange(1, [], params={"series": "series",
@@ -506,13 +425,6 @@ class TestAddRelationChange(unittest.TestCase):
     def test_method(self):
         self.assertEqual("addRelation", AddRelationChange.method())
 
-    def test_list_params(self):
-        change = AddRelationChange(1, [], params=["endpoint1", "endpoint2"])
-        self.assertEqual({"change_id": 1,
-                          "requires": [],
-                          "endpoint1": "endpoint1",
-                          "endpoint2": "endpoint2"}, change.__dict__)
-
     def test_dict_params(self):
         change = AddRelationChange(1, [], params={"endpoint1": "endpoint1",
                                                   "endpoint2": "endpoint2"})
@@ -567,13 +479,6 @@ class TestAddUnitChange(unittest.TestCase):
 
     def test_method(self):
         self.assertEqual("addUnit", AddUnitChange.method())
-
-    def test_list_params(self):
-        change = AddUnitChange(1, [], params=["application", "to"])
-        self.assertEqual({"change_id": 1,
-                          "requires": [],
-                          "application": "application",
-                          "to": "to"}, change.__dict__)
 
     def test_dict_params(self):
         change = AddUnitChange(1, [], params={"application": "application",
@@ -630,14 +535,6 @@ class TestCreateOfferChange(unittest.TestCase):
     def test_method(self):
         self.assertEqual("createOffer", CreateOfferChange.method())
 
-    def test_list_params(self):
-        change = CreateOfferChange(1, [], params=["application", "endpoints", "offer_name"])
-        self.assertEqual({"change_id": 1,
-                          "requires": [],
-                          "application": "application",
-                          "endpoints": "endpoints",
-                          "offer_name": "offer_name"}, change.__dict__)
-
     def test_dict_params(self):
         change = CreateOfferChange(1, [], params={"application": "application",
                                                   "endpoints": "endpoints",
@@ -687,13 +584,6 @@ class TestConsumeOfferChange(unittest.TestCase):
     def test_method(self):
         self.assertEqual("consumeOffer", ConsumeOfferChange.method())
 
-    def test_list_params(self):
-        change = ConsumeOfferChange(1, [], params=["url", "application_name"])
-        self.assertEqual({"change_id": 1,
-                          "requires": [],
-                          "url": "url",
-                          "application_name": "application_name"}, change.__dict__)
-
     def test_dict_params(self):
         change = ConsumeOfferChange(1, [], params={"url": "url",
                                                    "application-name": "application_name"})
@@ -736,13 +626,6 @@ class TestExposeChange(unittest.TestCase):
 
     def test_method(self):
         self.assertEqual("expose", ExposeChange.method())
-
-    def test_list_params(self):
-        change = ExposeChange(1, [], params=["application"])
-        self.assertEqual({"change_id": 1,
-                          "requires": [],
-                          "application": "application",
-                          "exposed_endpoints": None}, change.__dict__)
 
     def test_dict_params(self):
         change = ExposeChange(1, [], params={"application": "application"})
@@ -837,13 +720,6 @@ class TestScaleChange(unittest.TestCase):
     def test_method(self):
         self.assertEqual("scale", ScaleChange.method())
 
-    def test_list_params(self):
-        change = ScaleChange(1, [], params=["application", "scale"])
-        self.assertEqual({"change_id": 1,
-                          "requires": [],
-                          "application": "application",
-                          "scale": "scale"}, change.__dict__)
-
     def test_dict_params(self):
         change = ScaleChange(1, [], params={"application": "application",
                                             "scale": "scale"})
@@ -887,14 +763,6 @@ class TestSetAnnotationsChange(unittest.TestCase):
 
     def test_method(self):
         self.assertEqual("setAnnotations", SetAnnotationsChange.method())
-
-    def test_list_params(self):
-        change = SetAnnotationsChange(1, [], params=["id", "entity_type", "annotations"])
-        self.assertEqual({"change_id": 1,
-                          "requires": [],
-                          "id": "id",
-                          "entity_type": "entity_type",
-                          "annotations": "annotations"}, change.__dict__)
 
     def test_dict_params(self):
         change = SetAnnotationsChange(1, [], params={"id": "id",

@@ -142,6 +142,7 @@ async def test_relate_with_offer(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.bundle
 async def test_add_bundle(event_loop):
     pytest.skip("skip until we have a faster example to test")
     tests_dir = Path(__file__).absolute().parent
