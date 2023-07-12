@@ -1,5 +1,15 @@
-pytz==2021.1
-pymacaroons>=0.13.0,<1.0  # force new version with pynacl instead of libnacl
-sphinx==4.3.2
+pytz
+pymacaroons
+sphinx==5.3.0
 sphinxcontrib-asyncio
 sphinx_rtd_theme
+websockets
+typing-inspect
+pyyaml
+pyasn1
+pyrfc3339
+paramiko
+macaroonbakery
+toposort
+python-dateutil
+kubernetes

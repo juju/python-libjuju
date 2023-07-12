@@ -6,9 +6,9 @@ these endpoints.
 
 Connecting to the controller endpoint is useful if you want to programmatically
 create a new model. If the model you want to use already exists, you can
-connect directly to it (see py:doc:`model`).
+connect directly to it (see :doc:`model`).
 
-For API docs, see py:class:`juju.controller.Controller`.
+For API docs, see :class:`juju.controller.Controller`.
 
 
 Connecting to the Current Controller
