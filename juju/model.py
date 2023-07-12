@@ -2568,10 +2568,11 @@ class Model:
                     #  individual units, another one for waiting for an application.
                     #  The convoluted logic below is the result of trying to do both at the same
                     #  time
-                    need_to_wait_more_for_a_particular_status = status and unit.workload_status != status
+                    need_to_wait_more_for_a_particular_status = status and (unit.workload_status != status)
+                    app_is_in_desired_status = (not status) or (app_status == status)
                     if not need_to_wait_more_for_a_particular_status and \
                             unit.agent_status == "idle" and \
-                            (wait_for_units or (not status or app_status == status)):
+                            (wait_for_units or app_is_in_desired_status):
                         # A unit is ready if either:
                         # 1) Don't need to wait more for a particular status and the agent is "idle"
                         # 2) We're looking for a particular status and the unit's workload,
@@ -2581,7 +2582,7 @@ class Model:
                         # (because e.g. app can be in 'waiting' while unit.0 is 'active' and unit.1
                         # is 'waiting')
 
-                        # The unit is ready, start measuring the time period that
+                        # Either way, the unit is ready, start measuring the time period that
                         # it needs to stay in that state (i.e. idle_period)
                         units_ready.add(unit.name)
                         now = datetime.now()
