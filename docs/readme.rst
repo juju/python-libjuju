@@ -40,6 +40,9 @@ Here's a simple example that shows basic usage of the library. The example
 connects to the currently active Juju model, deploys a single unit of the
 ubuntu charm, then exits:
 
+.. note::
+
+Pylibjuju requires an already bootstrapped Juju controller to connect to.
 
 .. code:: python
 
@@ -65,7 +68,7 @@ ubuntu charm, then exits:
           # from the stable channel of the Charm Store.
           ubuntu_app = await model.deploy(
             'ubuntu',
-            application_name='ubuntu',
+            application_name='my-ubuntu',
           )
 
           if '--wait' in sys.argv:
@@ -124,5 +127,7 @@ and then, to connect to the current model and fetch status:
 Versioning
 ----------
 
-Pylibjuju releases now track the Juju release cadence. New generated schemas
+The current Pylibjuju release policy tracks the Juju release cadence.
+In particular, whenever Juju makes a latest/stable release, pylibjuju pushes out
+a release with the same version in the following week. Newly generated schemas
 will be updated per Juju releases.
