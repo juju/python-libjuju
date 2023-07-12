@@ -12,7 +12,7 @@ import yaml
 from toposort import toposort_flatten
 
 from .client import client
-from .constraints import parse as parse_constraints, parse_storage_constraint, parse_device_constraint
+from .constraints import parse as parse_constraints
 from .errors import JujuError
 from . import utils, jasyncio
 from .origin import Channel, Source
@@ -273,7 +273,7 @@ class BundleHandler:
             _yaml_data.append(yaml.dump(overlay).replace('null', ''))
         yaml_data = "---\n".join(_yaml_data)
 
-        self.plan = await self.bundle_facade.GetChanges(
+        self.plan = await self.bundle_facade.GetChangesMapArgs(
             bundleurl=entity_id,
             yaml=yaml_data)
 
@@ -473,9 +473,11 @@ class ChangeSet:
 class ChangeInfo:
     _toPy = {}
 
-    def __init__(self, change_id, requires):
+    def __init__(self, change_id, requires, params=None):
         self.change_id = change_id
         self.requires = requires
+
+        type(self).from_dict(self, params)
 
     @classmethod
     def from_dict(cls, self, data):
@@ -523,38 +525,6 @@ class AddApplicationChange(ChangeInfo):
     :local_resources: identifies the path to the local resource of the
         application's charm.
     """
-    def __init__(self, change_id, requires, params=None):
-        super(AddApplicationChange, self).__init__(change_id, requires)
-
-        if isinstance(params, list):
-            self.charm = params[0]
-            self.series = params[1]
-            self.application = params[2]
-            self.options = params[3]
-            self.constraints = params[4]
-            self.storage = {k: parse_storage_constraint(v) for k, v in params[5].items()}
-            self.channel = None
-            if len(params) == 8:
-                # Juju 2.4 and below only sends the endpoint bindings and resources
-                self.endpoint_bindings = params[6]
-                self.resources = params[7]
-                self.devices = None
-                self.num_units = None
-            else:
-                # Juju 2.5+ sends devices before endpoint bindings, as well as num_units
-                # There might be placement but we need to ignore that.
-                self.devices = {k: parse_device_constraint(v) for k, v in params[6].items()}
-                self.endpoint_bindings = params[7]
-                self.resources = params[8]
-                self.num_units = params[9]
-                if len(params) > 10:
-                    self.channel = params[10]
-
-        elif isinstance(params, dict):
-            AddApplicationChange.from_dict(self, params)
-        else:
-            raise Exception("unexpected params type")
-
     @staticmethod
     def method():
         """method returns an associated ID for the Juju API call.
@@ -669,25 +639,6 @@ class AddCharmChange(ChangeInfo):
            not sufficient.
         :channel: preferred channel for obtaining the charm.
     """
-    def __init__(self, change_id, requires, params=None):
-        super(AddCharmChange, self).__init__(change_id, requires)
-
-        if isinstance(params, list):
-            self.charm = params[0]
-            self.series = params[1]
-            if len(params) > 2 and params[2] != "":
-                self.channel = params[2]
-            else:
-                self.channel = None
-            if len(params) > 3 and params[3] != "":
-                self.architecture = params[3]
-            else:
-                self.architecture = None
-        elif isinstance(params, dict):
-            AddCharmChange.from_dict(self, params)
-        else:
-            raise Exception("unexpected params type")
-
     @staticmethod
     def method():
         """method returns an associated ID for the Juju API call.
@@ -770,20 +721,6 @@ class AddMachineChange(ChangeInfo):
             "lxc" or kvm"). It is not specified for top level machines.
         :parent_id: id of the parent machine.
     """
-    def __init__(self, change_id, requires, params=None):
-        super(AddMachineChange, self).__init__(change_id, requires)
-        # this one is weird, as it returns a set of parameters inside a list.
-        if isinstance(params, list):
-            options = params[0] or {}
-            self.series = options.get("series")
-            self.constraints = options.get("constraints")
-            self.container_type = options.get("containerType")
-            self.parent_id = options.get("parentId")
-        elif isinstance(params, dict):
-            AddMachineChange.from_dict(self, params)
-        else:
-            raise Exception("unexpected params type")
-
     @staticmethod
     def method():
         """method returns an associated ID for the Juju API call.
@@ -861,17 +798,6 @@ class AddRelationChange(ChangeInfo):
         application, and the interface is optional. Examples are
         "$deploy-42:web", "$deploy-42", "mysql:db".
     """
-    def __init__(self, change_id, requires, params=None):
-        super(AddRelationChange, self).__init__(change_id, requires)
-
-        if isinstance(params, list):
-            self.endpoint1 = params[0]
-            self.endpoint2 = params[1]
-        elif isinstance(params, dict):
-            AddRelationChange.from_dict(self, params)
-        else:
-            raise Exception("unexpected params type")
-
     @staticmethod
     def method():
         """method returns an associated ID for the Juju API call.
@@ -922,17 +848,6 @@ class AddUnitChange(ChangeInfo):
         :to: optional location where to add the unit, as a placeholder
             pointing to another unit change or to a machine change.
     """
-    def __init__(self, change_id, requires, params=None):
-        super(AddUnitChange, self).__init__(change_id, requires)
-
-        if isinstance(params, list):
-            self.application = params[0]
-            self.to = params[1]
-        elif isinstance(params, dict):
-            AddUnitChange.from_dict(self, params)
-        else:
-            raise Exception("unexpected params type")
-
     @staticmethod
     def method():
         """method returns an associated ID for the Juju API call.
@@ -990,18 +905,6 @@ class CreateOfferChange(ChangeInfo):
             offer.
         :offer_name: describes the offer name.
     """
-    def __init__(self, change_id, requires, params=None):
-        super(CreateOfferChange, self).__init__(change_id, requires)
-
-        if isinstance(params, list):
-            self.application = params[0]
-            self.endpoints = params[1]
-            self.offer_name = params[2]
-        elif isinstance(params, dict):
-            CreateOfferChange.from_dict(self, params)
-        else:
-            raise Exception("unexpected params type")
-
     @staticmethod
     def method():
         """method returns an associated ID for the Juju API call.
@@ -1044,17 +947,6 @@ class ConsumeOfferChange(ChangeInfo):
         :url: contains the location of the offer
         :application_name: describes the application name on offer.
     """
-    def __init__(self, change_id, requires, params=None):
-        super(ConsumeOfferChange, self).__init__(change_id, requires)
-
-        if isinstance(params, list):
-            self.url = params[0]
-            self.application_name = params[1]
-        elif isinstance(params, dict):
-            ConsumeOfferChange.from_dict(self, params)
-        else:
-            raise Exception("unexpected params type")
-
     @staticmethod
     def method():
         """method returns an associated ID for the Juju API call.
@@ -1099,17 +991,6 @@ class ExposeChange(ChangeInfo):
             that should be able to access the port ranges that the application
             has opened for each endpoint.
     """
-    def __init__(self, change_id, requires, params=None):
-        super(ExposeChange, self).__init__(change_id, requires)
-
-        self.exposed_endpoints = None
-        if isinstance(params, list):
-            self.application = params[0]
-        elif isinstance(params, dict):
-            ExposeChange.from_dict(self, params)
-        else:
-            raise Exception("unexpected params type")
-
     @staticmethod
     def method():
         """method returns an associated ID for the Juju API call.
@@ -1148,17 +1029,6 @@ class ScaleChange(ChangeInfo):
         :application: placeholder name of the application to be scaled.
         :scale: is the new scale value to use.
     """
-    def __init__(self, change_id, requires, params=None):
-        super(ScaleChange, self).__init__(change_id, requires)
-
-        if isinstance(params, list):
-            self.application = params[0]
-            self.scale = params[1]
-        elif isinstance(params, dict):
-            ScaleChange.from_dict(self, params)
-        else:
-            raise Exception("unexpected params type")
-
     @staticmethod
     def method():
         """method returns an associated ID for the Juju API call.
@@ -1200,18 +1070,6 @@ class SetAnnotationsChange(ChangeInfo):
         :entity_type: type of the entity, "application" or "machine".
         :ennotations: annotations as key/value pairs.
     """
-    def __init__(self, change_id, requires, params=None):
-        super(SetAnnotationsChange, self).__init__(change_id, requires)
-
-        if isinstance(params, list):
-            self.id = params[0]
-            self.entity_type = params[1]
-            self.annotations = params[2]
-        elif isinstance(params, dict):
-            SetAnnotationsChange.from_dict(self, params)
-        else:
-            raise Exception("unexpected params type")
-
     @staticmethod
     def method():
         """method returns an associated ID for the Juju API call.
