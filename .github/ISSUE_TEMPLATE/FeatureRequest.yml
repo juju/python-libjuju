@@ -1,6 +1,6 @@
 name: Feature Request
 description: You want something to be added to python-libjuju? Proceed with this one.
-title: "[Feature]: "
+title: ""
 labels: [wishlisted]
 body:
   - type: markdown
