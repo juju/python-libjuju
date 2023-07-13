@@ -36,6 +36,7 @@ async def test_model_name(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.bundle
 async def test_deploy_local_bundle_dir(event_loop):
     bundle_path = TESTS_DIR / 'bundle'
 
@@ -56,6 +57,7 @@ async def test_deploy_local_bundle_dir(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.bundle
 async def test_deploy_local_bundle_file(event_loop):
     bundle_path = TESTS_DIR / 'bundle'
     mini_bundle_file_path = bundle_path / 'mini-bundle.yaml'
@@ -73,6 +75,7 @@ async def test_deploy_local_bundle_file(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.bundle
 async def test_deploy_bundle_local_resource_relative_path(event_loop):
     bundle_file_path = INTEGRATION_TEST_DIR / 'bundle-file-resource.yaml'
 
@@ -126,6 +129,7 @@ async def test_deploy_by_revision_validate_flags(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.bundle
 async def test_deploy_local_bundle_include_file(event_loop):
     bundle_dir = INTEGRATION_TEST_DIR / 'bundle'
     bundle_yaml_path = bundle_dir / 'bundle-include-file.yaml'
@@ -143,6 +147,7 @@ async def test_deploy_local_bundle_include_file(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.bundle
 async def test_deploy_local_bundle_include_base64(event_loop):
     bundle_dir = INTEGRATION_TEST_DIR / 'bundle'
     bundle_yaml_path = bundle_dir / 'bundle-include-base64.yaml'
@@ -159,6 +164,7 @@ async def test_deploy_local_bundle_include_base64(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.bundle
 async def test_deploy_bundle_local_charms(event_loop):
     bundle_path = INTEGRATION_TEST_DIR / 'bundle' / 'local.yaml'
 
@@ -174,6 +180,7 @@ async def test_deploy_bundle_local_charms(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.bundle
 async def test_deploy_invalid_bundle(event_loop):
     pytest.skip('test_deploy_invalid_bundle intermittent test failure')
     bundle_path = TESTS_DIR / 'bundle' / 'invalid.yaml'
@@ -252,6 +259,7 @@ async def test_wait_local_charm_waiting_timeout(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.bundle
 async def test_deploy_bundle(event_loop):
     async with base.CleanModel() as model:
         await model.deploy('anbox-cloud-core', channel='stable',
@@ -263,6 +271,7 @@ async def test_deploy_bundle(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.bundle
 async def test_deploy_local_bundle_with_overlay_multi(event_loop):
     async with base.CleanModel() as model:
         bundle_with_overlay_path = OVERLAYS_DIR / 'bundle-with-overlay-multi.yaml'
@@ -276,6 +285,7 @@ async def test_deploy_local_bundle_with_overlay_multi(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.bundle
 async def test_deploy_bundle_with_overlay_as_argument(event_loop):
     async with base.CleanModel() as model:
         overlay_path = OVERLAYS_DIR / 'test-overlay.yaml'
@@ -297,6 +307,7 @@ async def test_deploy_bundle_with_overlay_as_argument(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.bundle
 async def test_deploy_bundle_with_multi_overlay_as_argument(event_loop):
     async with base.CleanModel() as model:
         overlay_path = OVERLAYS_DIR / 'test-multi-overlay.yaml'
@@ -309,6 +320,7 @@ async def test_deploy_bundle_with_multi_overlay_as_argument(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.bundle
 async def test_deploy_bundle_with_multiple_overlays_with_include_files(event_loop):
     async with base.CleanModel() as model:
         bundle_yaml_path = TESTS_DIR / 'integration' / 'bundle' / 'bundle.yaml'
@@ -357,6 +369,7 @@ async def test_deploy_from_ch_channel_revision_success(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.bundle
 async def test_deploy_trusted_bundle(event_loop):
     pytest.skip("skip until we have a deployable bundle available. Right now the landscape-dense fails because postgresql is broken")
     async with base.CleanModel() as model:
@@ -767,6 +780,7 @@ async def test_attach_resource(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.bundle
 async def test_store_resources_bundle(event_loop):
     pytest.skip('test_store_resources_bundle intermittent test failure')
     async with base.CleanModel() as model:
@@ -789,6 +803,7 @@ async def test_store_resources_bundle(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.bundle
 async def test_store_resources_bundle_revs(event_loop):
     pytest.skip('test_store_resources_bundle_revs intermittent test failure')
     async with base.CleanModel() as model:
