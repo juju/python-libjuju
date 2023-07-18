@@ -397,7 +397,7 @@ class TestModelWaitForIdle(asynctest.TestCase):
             mock_apps.return_value = apps
             m = Model()
 
-            await m.wait_for_idle(apps=["dummy_app"], status="active", wait_for_units=1,
+            await m.wait_for_idle(apps=["dummy_app"], status="active", wait_for_at_least_units=1,
                                   timeout=None)
 
         mock_apps.assert_called_with()

@@ -2749,7 +2749,7 @@ class Model:
             if not busy:
                 break
             busy = "\n  ".join(busy)
-            if timeout and datetime.now() - start_time > timeout:
+            if timeout is not None and datetime.now() - start_time > timeout:
                 raise jasyncio.TimeoutError("Timed out waiting for model:\n" + busy)
             if last_log_time is None or datetime.now() - last_log_time > log_interval:
                 log.info("Waiting for model:\n  " + busy)
