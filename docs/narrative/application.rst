@@ -17,12 +17,10 @@ To deploy a new application, connect a model and then call its
   await model.connect_current()
 
   mysql_app = await model.deploy(
-      # If a revision number is not included in the charm url,
-      # the latest revision from the Charm Store will be used.
-      'cs:mysql-55',
-      application_name='mysql',
-      series='trusty',
-      channel='stable',
+      'mysql',
+      application_name='my-mysql',
+      series='jammy',
+      channel='8.0/stable',
       config={
           'tuning-level': 'safest',
       },
@@ -46,9 +44,9 @@ To deploy a local charm, pass the charm directory path to
 
   # Deploy a local charm using a path to the charm directory
   await model.deploy(
-      '/home/tvansteenburgh/src/charms/ubuntu',
+      './charms/ubuntu',
       application_name='ubuntu',
-      series='trusty',
+      series='jammy',
   )
 
 
@@ -63,7 +61,6 @@ added units (:class:`~juju.unit.Unit` objects) is returned.
   ubuntu_app = await model.deploy(
       'ubuntu',
       application_name='ubuntu',
-      series='trusty',
       channel='stable',
   )
 
@@ -107,18 +104,18 @@ The :meth:`juju.application.Application.relate` method returns a
 
   # Deploy mysql-master application
   mysql_master = await model.deploy(
-      'cs:mysql-55',
+      'mysql',
       application_name='mysql-master',
-      series='trusty',
-      channel='stable',
+      series='jammy',
+      channel='8.0/stable',
   )
 
   # Deploy mysql-slave application
   mysql_slave = await model.deploy(
-      'cs:mysql-55',
+      'mysql',
       application_name='mysql-slave',
-      series='trusty',
-      channel='stable',
+      series='jammy',
+      channel='8.0/stable',
   )
 
   # Add the master-slave relation

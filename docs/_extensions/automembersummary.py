@@ -18,9 +18,9 @@ import inspect
 import textwrap
 
 from docutils import nodes
+from docutils.parsers.rst import Directive
 from docutils.statemachine import ViewList
 from sphinx.errors import SphinxError
-from sphinx.util.compat import Directive
 from sphinx.util.nodes import nested_parse_with_titles
 
 

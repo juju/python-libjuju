@@ -4,7 +4,7 @@ A Juju controller provides websocket endpoints for each of its
 models. In order to do anything useful with a model, the juju lib must
 connect to one of these endpoints. There are several ways to do this.
 
-For api docs, see py:class:`juju.model.Model`.
+For api docs, see :class:`juju.model.Model`.
 
 
 Connecting to the Current Model
@@ -92,8 +92,8 @@ require the Juju CLI client to be installed.
 Creating and Destroying a Model
 -------------------------------
 Example of creating a new model and then destroying it. See
-py:method:`juju.controller.Controller.add_model` and
-py:method:`juju.controller.Controller.destroy_model` for more info.
+:method:`juju.controller.Controller.add_model` and
+:method:`juju.controller.Controller.destroy_model` for more info.
 
 .. code:: python
 
@@ -119,8 +119,8 @@ py:method:`juju.controller.Controller.destroy_model` for more info.
 Adding Machines and Containers
 ------------------------------
 To add a machine or container, connect to a model and then call its
-py:method:`~juju.model.Model.add_machine` method. A
-py:class:`~juju.machine.Machine` instance is returned. The machine id
+:method:`~juju.model.Model.add_machine` method. A
+:class:`~juju.machine.Machine` instance is returned. The machine id
 can be used to deploy a charm to a specific machine or container.
 
 .. code:: python
@@ -177,7 +177,7 @@ Reacting to Changes in a Model
 ------------------------------
 To watch for and respond to changes in a model, register an observer with the
 model. The easiest way to do this is by creating a
-py:class:`juju.model.ModelObserver` subclass.
+:class:`juju.model.ModelObserver` subclass.
 
 .. code:: python
 
@@ -268,7 +268,7 @@ to the entity and type of change that you wish to handle.
           # specific handler method is not defined.
 
 
-Any py:class:`juju.model.ModelEntity` object can be observed directly by
+Any :class:`juju.model.ModelEntity` object can be observed directly by
 registering callbacks on the object itself.
 
 .. code:: python
