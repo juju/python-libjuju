@@ -2623,7 +2623,7 @@ class Model:
             warnings.warn("wait_for_active is deprecated; use status", DeprecationWarning)
             status = "active"
 
-        _wait_for_units = wait_for_at_least_units or 1
+        _wait_for_units = wait_for_at_least_units if wait_for_at_least_units is not None else 1
 
         timeout = timedelta(seconds=timeout) if timeout is not None else None
         idle_period = timedelta(seconds=idle_period)
@@ -2657,7 +2657,7 @@ class Model:
                     ", ".join(errored),
                 ))
 
-        if wait_for_exact_units:
+        if wait_for_exact_units is not None:
             assert type(wait_for_exact_units) == int and wait_for_exact_units >= 0, \
                 'Invalid value for wait_for_exact_units : %s' % wait_for_exact_units
 
@@ -2680,7 +2680,7 @@ class Model:
                     blocks.setdefault("App", []).append(app.name)
 
                 # Check if wait_for_exact_units flag is used
-                if wait_for_exact_units:
+                if wait_for_exact_units is not None:
                     if len(app.units) != wait_for_exact_units:
                         busy.append(app.name + " (waiting for exactly %s units, current : %s)" %
                                     (wait_for_exact_units, len(app.units)))
@@ -2697,7 +2697,7 @@ class Model:
                     # errors to raise at the end
                     break
                 for unit in app.units:
-                    if unit.machine and unit.machine.status == "error":
+                    if unit.machine is not None and unit.machine.status == "error":
                         errors.setdefault("Machine", []).append(unit.machine.id)
                         continue
                     if unit.agent_status == "error":
