@@ -1,6 +1,29 @@
 Changelog
 ---------
 
+3.2.0.1
+^^^^^^^
+
+Thursday 20th July 2023
+
+This is a point release on the 3.x track, works with any Juju 3.x controller.
+
+What's Changed
+==============
+
+* Update readme and add some docstrings for functions by @cderici in https://github.com/juju/python-libjuju/pull/873
+* Forward port subordinate utils by @cderici in https://github.com/juju/python-libjuju/pull/880
+* [JUJU-3952] Revisit access control levels by @cderici in https://github.com/juju/python-libjuju/pull/882
+* [JUJU-3999] Avoid parsing endpoint for overlay offers by @cderici in https://github.com/juju/python-libjuju/pull/887
+* Forward port upgrade resource fixes in app refresh by @cderici in https://github.com/juju/python-libjuju/pull/889
+* [JUJU-4076] Rename `wait_for_units` and make semantics clearer by @cderici in https://github.com/juju/python-libjuju/pull/890
+* Stabilize sphinx build on RTD by @cderici in https://github.com/juju/python-libjuju/pull/899
+* Move test utils into a separate module by @cderici in https://github.com/juju/python-libjuju/pull/903
+* Remove title prefixes from issue templates by @cderici in https://github.com/juju/python-libjuju/pull/904
+* [JUJU-4048] Use GetChangesMapArgs for bundle changes by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/907
+* Forward ports from 2.9 to 3.x by @cderici in https://github.com/juju/python-libjuju/pull/910
+* Remove ceiling on pyyaml version by @cderici in https://github.com/juju/python-libjuju/pull/918
+
 3.2.0.0
 ^^^^^^^
 
@@ -9,9 +32,6 @@ Wednesday 7th June 2023
 This release contains the new endpoints for Juju 3.2.0.
 
 This release works with any Juju 3.x controller.
-
-What's Changed
-==============
 
 * Add base.bootstrapped decorator to integration test by @cderici in https://github.com/juju/python-libjuju/pull/856
 * Add mantic and lunar to list of ubuntu series by @addyess in https://github.com/juju/python-libjuju/pull/853
@@ -32,9 +52,6 @@ endpoints for secrets backend.
 
 This release works with any Juju 3.x controller.
 
-What's Changed
-==============
-
 * [JUJU-3202] Add facades for 3.1.1. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/807
 * Add destroy units by @cderici in https://github.com/juju/python-libjuju/pull/812
 * [JUJU-3517] Revisit _build_facades in connection by @cderici in https://github.com/juju/python-libjuju/pull/826
@@ -51,9 +68,6 @@ This release targets juju version 3.1.0 and enables the new secrets backend api.
 Connectivity with juju controllers in the 3.x series is allowed, connections with different major version controllers (e.g. 2.x, 4.x, etc.) will be cancelled.
 
 This version is only tested using Juju 3.1.0.
-
-What's Changed
-==============
 
 * setup.py: adjust websockets versions for py38-310 by @mert-kirpici in https://github.com/juju/python-libjuju/pull/731
 * [JUJU-2175] Remove juju 2.9 support on 3.1.0 by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/774
@@ -79,9 +93,6 @@ New Contributors
 
 Wednesday 26th October
 
-What's Changed
-==============
-
 * [JUJU-2027] Local refresh with resoruces by @cderici in https://github.com/juju/python-libjuju/pull/757
 * [JUJU-2026] Improve resolve charm by @cderici in https://github.com/juju/python-libjuju/pull/761
 * Add owner and data to license file by @arturo-seijas in https://github.com/juju/python-libjuju/pull/760
@@ -97,9 +108,6 @@ New Contributors
 ^^^^^
 
 Saturay October 22 2022
-
-What's Changed
-==============
 
 * Wait for idle arg type check by @cderici in https://github.com/juju/python-libjuju/pull/741
 * [JUJU-1970] Revise local refresh by @cderici in https://github.com/juju/python-libjuju/pull/742
@@ -118,9 +126,6 @@ What's Changed
 ^^^^^
 
 Wednesday October 5 2022
-
-What's Changed
-==============
 
 * Model name can now be accessed through model.name by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/702
 * [JUJU-1593] Fix `unit.run()` and update the old client codes by @cderici in https://github.com/juju/python-libjuju/pull/710
