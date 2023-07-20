@@ -23,6 +23,7 @@ long_description = '{}\n\n{}'.format(
     readme.read_text(),
     changelog.read_text()
 )
+long_description_content_type = 'text/x-rst'
 version = here / 'VERSION'
 
 setup(
