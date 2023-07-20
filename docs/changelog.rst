@@ -1,12 +1,24 @@
 Changelog
 ---------
 
+2.9.44.0
+^^^^^^^^
+
+Thursday Jul 20 2023
+
+## What's Changed
+
+* [JUJU-4110] `charm_name` on Application object by @cderici in https://github.com/juju/python-libjuju/pull/901
+* [JUJU-4204] Model.name on 2.9 by @cderici in https://github.com/juju/python-libjuju/pull/902
+* [JUJU-4231] wait_for_idle to consider app status by @cderici in https://github.com/juju/python-libjuju/pull/905
+* Stabilize sphinx doc builds for `2.9` track by @cderici in https://github.com/juju/python-libjuju/pull/911
+* Add pytest.ini to register custom pytest marks by @cderici in https://github.com/juju/python-libjuju/pull/912
+* [JUJU-4291] Removing Upper Constraint by @markbeierl in https://github.com/juju/python-libjuju/pull/916
+
 2.9.43.0
 ^^^^^^^^
 
 Wednesday Jul 6 2023
-
-## What's Changed
 
 * [JUJU-1682] Utilities for subordinate units by @cderici in https://github.com/juju/python-libjuju/pull/879
 * [JUJU-4018] Avoid upgrade resource in app refresh if upstream has same resource revision by @cderici in https://github.com/juju/python-libjuju/pull/884
