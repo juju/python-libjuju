@@ -181,6 +181,20 @@ async def test_deploy_bundle_local_charms(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 @pytest.mark.bundle
+async def test_deploy_bundle_local_charm_series_manifest(event_loop):
+    bundle_path = INTEGRATION_TEST_DIR / 'bundle' / 'local-manifest.yaml'
+
+    async with base.CleanModel() as model:
+        await model.deploy(bundle_path)
+        await wait_for_bundle(model, bundle_path)
+        assert set(model.units.keys()) == set(['test1/0'])
+        assert model.units['test1/0'].agent_status == 'idle'
+        assert model.units['test1/0'].workload_status == 'active'
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+@pytest.mark.bundle
 async def test_deploy_invalid_bundle(event_loop):
     pytest.skip('test_deploy_invalid_bundle intermittent test failure')
     bundle_path = TESTS_DIR / 'bundle' / 'invalid.yaml'
@@ -848,12 +862,12 @@ async def test_get_machines(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.wait_for_idle
 async def test_wait_for_idle_without_units(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(
             'ubuntu',
             application_name='ubuntu',
-            series='bionic',
             channel='stable',
             num_units=0,
         )
@@ -863,12 +877,12 @@ async def test_wait_for_idle_without_units(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.wait_for_idle
 async def test_wait_for_idle_with_not_enough_units(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(
             'ubuntu',
             application_name='ubuntu',
-            series='bionic',
             channel='stable',
             num_units=2,
         )
@@ -878,6 +892,7 @@ async def test_wait_for_idle_with_not_enough_units(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.wait_for_idle
 async def test_wait_for_idle_more_units_than_needed(event_loop):
     async with base.CleanModel() as model:
         charm_path = TESTS_DIR / 'charm'
@@ -900,13 +915,13 @@ async def test_wait_for_idle_more_units_than_needed(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.wait_for_idle
 async def test_wait_for_idle_with_enough_units(event_loop):
     pytest.skip("This is testing juju functionality")
     async with base.CleanModel() as model:
         await model.deploy(
             'ubuntu',
             application_name='ubuntu',
-            series='jammy',
             channel='stable',
             num_units=3,
         )
@@ -915,13 +930,13 @@ async def test_wait_for_idle_with_enough_units(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.wait_for_idle
 async def test_wait_for_idle_with_exact_units(event_loop):
     pytest.skip("This is testing juju functionality")
     async with base.CleanModel() as model:
         await model.deploy(
             'ubuntu',
             application_name='ubuntu',
-            series='jammy',
             channel='stable',
             num_units=2,
         )
@@ -930,6 +945,7 @@ async def test_wait_for_idle_with_exact_units(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.wait_for_idle
 async def test_wait_for_idle_with_exact_units_scale_down(event_loop):
     """Deploys 3 units, waits for them to be idle, then removes 2 of them,
     then waits for exactly 1 unit to be left.

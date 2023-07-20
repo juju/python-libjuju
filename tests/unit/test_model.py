@@ -293,25 +293,23 @@ class TestModelWaitForIdle(asynctest.TestCase):
         self.assertEqual(str(cm.exception), "Timed out waiting for model:\nnonexisting_app (missing)")
 
     @pytest.mark.asyncio
+    @pytest.mark.wait_for_idle
     async def test_wait_for_active_status(self):
+        app_status = 'active'
         # create a custom apps mock
         from types import SimpleNamespace
         app = SimpleNamespace(
-            status="active",
+            status=app_status,
             units=[SimpleNamespace(
                 name="mockunit/0",
-                workload_status="active",
+                workload_status='active',
                 workload_status_message="workload_status_message",
                 machine=None,
                 agent_status="idle",
             )],
         )
-        # This is a small hack to act like we're getting 'unknown'
-        # from the api (the get_status() call), which shouldn't
-        # change the semantics of this test, as the 'unknown'
-        # has the lowest severity (so the app's 'active' status
-        # will overrule it)
-        app.get_status = base.AsyncMock(return_value='unknown')
+
+        app.get_status = base.AsyncMock(return_value=app_status)
         apps = {"dummy_app": app}
 
         with patch.object(Model, 'applications', new_callable=PropertyMock) as mock_apps:
@@ -326,5 +324,80 @@ class TestModelWaitForIdle(asynctest.TestCase):
 
             # use both `status` and `wait_for_active` - `wait_for_active` takes precedence
             await m.wait_for_idle(apps=["dummy_app"], wait_for_active=True, status="doesn't matter")
+
+        mock_apps.assert_called_with()
+
+    @pytest.mark.asyncio
+    @pytest.mark.wait_for_idle
+    async def test_wait_for_active_units_waiting_application(self):
+        # If the app is in waiting state, then wait more even if the units are ready
+        app_status = 'waiting'
+        # create a custom apps mock
+        from types import SimpleNamespace
+        app = SimpleNamespace(
+            status=app_status,
+            units=[SimpleNamespace(
+                name="mockunit/0",
+                workload_status='active',
+                workload_status_message="workload_status_message",
+                machine=None,
+                agent_status="idle",
+            ),
+                SimpleNamespace(
+                    name="mockunit/1",
+                    workload_status='active',
+                    workload_status_message="workload_status_message",
+                    machine=None,
+                    agent_status="idle",
+            )],
+        )
+
+        app.get_status = base.AsyncMock(return_value=app_status)
+        apps = {"dummy_app": app}
+
+        with patch.object(Model, 'applications', new_callable=PropertyMock) as mock_apps:
+            mock_apps.return_value = apps
+            m = Model()
+
+            with self.assertRaises(jasyncio.TimeoutError):
+                await m.wait_for_idle(apps=["dummy_app"], status="active")
+
+        mock_apps.assert_called_with()
+
+    @pytest.mark.asyncio
+    @pytest.mark.wait_for_idle
+    async def test_wait_for_active_units_waiting_for_units(self):
+        # If user wants to see a particular number of units, then application may be in a waiting
+        # state, return when there's at least that number of units in the desired state
+        app_status = 'waiting'
+        # create a custom apps mock
+        from types import SimpleNamespace
+        app = SimpleNamespace(
+            status=app_status,
+            units=[SimpleNamespace(
+                name="mockunit/0",
+                workload_status='active',
+                workload_status_message="workload_status_message",
+                machine=None,
+                agent_status="idle",
+            ),
+                SimpleNamespace(
+                    name="mockunit/1",
+                    workload_status='waiting',
+                    workload_status_message="workload_status_message",
+                    machine=None,
+                    agent_status="idle",
+            )],
+        )
+
+        app.get_status = base.AsyncMock(return_value=app_status)
+        apps = {"dummy_app": app}
+
+        with patch.object(Model, 'applications', new_callable=PropertyMock) as mock_apps:
+            mock_apps.return_value = apps
+            m = Model()
+
+            await m.wait_for_idle(apps=["dummy_app"], status="active", wait_for_at_least_units=1,
+                                  timeout=None)
 
         mock_apps.assert_called_with()

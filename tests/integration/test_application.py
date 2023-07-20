@@ -297,3 +297,13 @@ async def test_app_remove_wait_flag(event_loop):
 
         await model.remove_application(app.name, block_until_done=True)
         assert a_name not in model.applications
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_app_charm_name(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('ubuntu')
+        await model.wait_for_idle(status="active")
+        assert 'ubuntu' in app.charm_url
+        assert 'ubuntu' == app.charm_name
