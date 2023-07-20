@@ -1,6 +1,5 @@
 name: Bug Report
 description: Something's not working right in python-libjuju? Use this template.
-title: ""
 labels: [bug]
 body:
   - type: markdown
