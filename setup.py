@@ -50,6 +50,7 @@ setup(
     maintainer_email='juju@lists.ubuntu.com',
     description=('Python library for Juju'),
     long_description=long_description,
+    long_description_content_type=long_description_content_type,
     url='https://github.com/juju/python-libjuju',
     license='Apache 2',
     classifiers=[
