@@ -23,6 +23,7 @@ long_description = '{}\n\n{}'.format(
     readme.read_text(),
     changelog.read_text()
 )
+long_description_content_type = 'text/x-rst'
 version = here / 'VERSION'
 
 setup(
@@ -49,6 +50,7 @@ setup(
     maintainer_email='juju@lists.ubuntu.com',
     description=('Python library for Juju'),
     long_description=long_description,
+    long_description_content_type=long_description_content_type,
     url='https://github.com/juju/python-libjuju',
     license='Apache 2',
     classifiers=[

@@ -43,9 +43,7 @@ Here's a simple example that shows basic usage of the library. The example
 connects to the currently active Juju model, deploys a single unit of the
 ubuntu charm, then exits:
 
-.. note::
-
-Pylibjuju requires an already bootstrapped Juju controller to connect to.
+Note : Pylibjuju requires an already bootstrapped Juju controller to connect to.
 
 .. code:: python
 
