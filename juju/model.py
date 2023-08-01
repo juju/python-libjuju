@@ -1548,7 +1548,8 @@ class Model:
         return _find_relation(*specs)
 
     async def relate(self, relation1, relation2):
-        """The relate function is deprecated in favor of instead.
+        """The relate function is deprecated in favor of integrate.
+
         The logic is the same.
         """
         log.warn("relate is deprecated and will be removed. Use integrate instead.")
