@@ -419,7 +419,7 @@ def parse_base_arg(base):
     :param base str : The base to deploy a charm (e.g. ubuntu@22.04)
     """
     client.CharmBase()
-    if type(base) != str or "@" not in base:
+    if not (isinstance(base, str) and "@" in base):
         raise errors.JujuError(f"expected base string to contain os and channel separated by '@', got : {base}")
 
     name, channel = base.split('@')

@@ -1706,7 +1706,7 @@ class Model:
         if trust and (self.info.agent_version < client.Number.from_json('2.4.0')):
             raise NotImplementedError("trusted is not supported on model version {}".format(self.info.agent_version))
 
-        if not all([type(st) == str for st in attach_storage]):
+        if not all([isinstance(st, str) for st in attach_storage]):
             raise JujuError("Expected attach_storage to be a list of strings, given {}".format(attach_storage))
 
         # Ensure what we pass in, is a string.
@@ -2659,7 +2659,7 @@ class Model:
                 ))
 
         if wait_for_exact_units is not None:
-            assert type(wait_for_exact_units) == int and wait_for_exact_units >= 0, \
+            assert isinstance(wait_for_exact_units, int) and wait_for_exact_units >= 0, \
                 'Invalid value for wait_for_exact_units : %s' % wait_for_exact_units
 
         while True:
