@@ -23,6 +23,8 @@ class JujuData:
         If the controller part is empty, the current controller will be used.
         If the model part is empty, the current model will be used for
         the controller.
+        If no argument is given, will look first for JUJU_MODEL in environment
+        and if not found, current model and controller will be used.
         The returned model name will always be qualified with a username.
         :param model str: The model name to parse.
         :return (str, str): The controller and model names.
