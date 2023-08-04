@@ -27,20 +27,7 @@ class JujuData:
         :param model str: The model name to parse.
         :return (str, str): The controller and model names.
         """
-        # TODO if model is empty, use $JUJU_MODEL environment variable.
-        if model and ':' in model:
-            # explicit controller given
-            controller_name, model_name = model.split(':')
-        else:
-            # use the current controller if one isn't explicitly given
-            controller_name = self.current_controller()
-            model_name = model
-        if not controller_name:
-            controller_name = self.current_controller()
-        if not model_name:
-            model_name = self.current_model(controller_name, model_only=True)
-            if not model_name:
-                raise NoModelException('no current model')
+        controller_name, model_name = self._get_controller_and_model_names(model)
 
         if '/' not in model_name:
             # model name doesn't include a user prefix, so add one
@@ -52,6 +39,30 @@ class JujuData:
             if username is None:
                 raise JujuError('No username found for controller {}'.format(controller_name))
             model_name = username + "/" + model_name
+
+        return controller_name, model_name
+
+    def _get_controller_and_model_names(self, model):
+        if model and ':' in model:
+            # explicit controller given
+            controller_name, model_name = model.split(':')
+        elif not model:
+            env_model = os.environ.get('JUJU_MODEL', None)
+            if env_model is not None:
+                model_name = env_model
+            else:
+                model_name = None
+            controller_name = self.current_controller()
+        else:
+            # use the current controller if one isn't explicitly given
+            controller_name = self.current_controller()
+            model_name = model
+        if not controller_name:
+            controller_name = self.current_controller()
+        if not model_name:
+            model_name = self.current_model(controller_name, model_only=True)
+            if not model_name:
+                raise NoModelException('no current model')
 
         return controller_name, model_name
 
