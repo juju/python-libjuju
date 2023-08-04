@@ -118,3 +118,8 @@ class TestJujuDataParseModelWithEnvVariable(unittest.TestCase, BaseTestJujuDataP
         controller_name, model_name = self._parse_model()
         assert controller_name == 'test-controller'
         assert model_name == 'test-user/env-model'
+
+    def test_controller_name_env_model(self):
+        controller_name, model_name = self._parse_model('test-controller:')
+        assert controller_name == 'test-controller'
+        assert model_name == 'test-user/env-model'

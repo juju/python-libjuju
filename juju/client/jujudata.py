@@ -23,8 +23,6 @@ class JujuData:
         If the controller part is empty, the current controller will be used.
         If the model part is empty, the current model will be used for
         the controller.
-        If no argument is given, will look first for JUJU_MODEL in environment
-        and if not found, current model and controller will be used.
         The returned model name will always be qualified with a username.
         :param model str: The model name to parse.
         :return (str, str): The controller and model names.
@@ -48,13 +46,6 @@ class JujuData:
         if model and ':' in model:
             # explicit controller given
             controller_name, model_name = model.split(':')
-        elif not model:
-            env_model = os.environ.get('JUJU_MODEL', None)
-            if env_model is not None:
-                model_name = env_model
-            else:
-                model_name = None
-            controller_name = self.current_controller()
         else:
             # use the current controller if one isn't explicitly given
             controller_name = self.current_controller()
@@ -91,21 +82,27 @@ class FileJujuData(JujuData):
         '''Return the current model, qualified by its controller name.
         If controller_name is specified, the current model for
         that controller will be returned.
+        If JUJU_MODEL environment variable is set, then this is returned
+        instead of the current model.
 
         If model_only is true, only the model name, not qualified by
         its controller name, will be returned.
         '''
-        # TODO respect JUJU_MODEL environment variable.
         if not controller_name:
             controller_name = self.current_controller()
         if not controller_name:
             raise JujuError('No current controller')
-        models = self.models()[controller_name]
-        if 'current-model' not in models:
-            return None
+        env_model = os.environ.get('JUJU_MODEL', None)
+        if env_model is not None:
+            model = env_model
+        else:
+            models = self.models()[controller_name]
+            if 'current-model' not in models:
+                return None
+            model = models['current-model']
         if model_only:
-            return models['current-model']
-        return controller_name + ':' + models['current-model']
+            return model
+        return controller_name + ':' + model
 
     def load_credential(self, cloud, name=None):
         """Load a local credential.
