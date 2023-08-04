@@ -18,7 +18,7 @@ class NoModelException(Exception):
 class JujuData:
     __metaclass__ = abc.ABCMeta
 
-    def parse_model(self, model):
+    def parse_model(self, model=None):
         """Split the given model_name into controller and model parts.
         If the controller part is empty, the current controller will be used.
         If the model part is empty, the current model will be used for

@@ -56,7 +56,7 @@ class BaseTestJujuDataParseModel:
         jjdata._loaded = yamls()
         return jjdata
 
-    def _parse_model(self, model):
+    def _parse_model(self, model=None):
         data = self._jujudata()
         return data.parse_model(model)
 
@@ -98,23 +98,23 @@ class BaseTestJujuDataParseModel:
         data._loaded['controllers.yaml']['current-controller'] = 'other-controller'
         with self.assertRaises(NoModelException):
             # other-controller does not have a model
-            data.parse_model(None)
+            data.parse_model()
 
 
 class TestJujuDataParseModelWithoutEnvVariable(unittest.TestCase, BaseTestJujuDataParseModel):
     def test_no_args_current_model(self):
-        controller_name, model_name = self._parse_model(None)
+        controller_name, model_name = self._parse_model()
         assert controller_name == 'test-controller'
         assert model_name == 'test-user/test-model'
 
 
 class TestJujuDataParseModelWithEnvVariable(unittest.TestCase, BaseTestJujuDataParseModel):
-    def _parse_model(self, model):
+    def _parse_model(self, model=None):
         data = self._jujudata()
         with set_env_juju_model():
             return data.parse_model(model)
 
     def test_no_args_env_model(self):
-        controller_name, model_name = self._parse_model(None)
+        controller_name, model_name = self._parse_model()
         assert controller_name == 'test-controller'
         assert model_name == 'test-user/env-model'
