@@ -22,6 +22,7 @@ client_facades = {
     'Action': {'versions': [2, 6, 7]},
     'ActionPruner': {'versions': [1]},
     'Agent': {'versions': [2, 3]},
+    'AgentLifeFlag': {'versions': [1]},
     'AgentTools': {'versions': [1]},
     'AllModelWatcher': {'versions': [2, 3, 4]},
     'AllWatcher': {'versions': [1, 2, 3, 4]},
