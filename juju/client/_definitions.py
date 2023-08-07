@@ -6581,14 +6581,13 @@ class ConstraintsResults(Type):
 
 
 class ConsumeApplicationArg(Type):
-    _toSchema = {'application_alias': 'application-alias', 'application_description': 'application-description', 'applicationofferdetails': 'ApplicationOfferDetails', 'auth_token': 'auth-token', 'bindings': 'bindings', 'endpoints': 'endpoints', 'external_controller': 'external-controller', 'macaroon': 'macaroon', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'offer_uuid': 'offer-uuid', 'source_model_tag': 'source-model-tag', 'spaces': 'spaces', 'users': 'users'}
-    _toPy = {'ApplicationOfferDetails': 'applicationofferdetails', 'application-alias': 'application_alias', 'application-description': 'application_description', 'auth-token': 'auth_token', 'bindings': 'bindings', 'endpoints': 'endpoints', 'external-controller': 'external_controller', 'macaroon': 'macaroon', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'offer-uuid': 'offer_uuid', 'source-model-tag': 'source_model_tag', 'spaces': 'spaces', 'users': 'users'}
-    def __init__(self, applicationofferdetails=None, application_alias=None, application_description=None, auth_token=None, bindings=None, endpoints=None, external_controller=None, macaroon=None, offer_name=None, offer_url=None, offer_uuid=None, source_model_tag=None, spaces=None, users=None, **unknown_fields):
+    _toSchema = {'application_alias': 'application-alias', 'application_description': 'application-description', 'applicationofferdetails': 'ApplicationOfferDetails', 'bindings': 'bindings', 'endpoints': 'endpoints', 'external_controller': 'external-controller', 'macaroon': 'macaroon', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'offer_uuid': 'offer-uuid', 'source_model_tag': 'source-model-tag', 'spaces': 'spaces', 'users': 'users'}
+    _toPy = {'ApplicationOfferDetails': 'applicationofferdetails', 'application-alias': 'application_alias', 'application-description': 'application_description', 'bindings': 'bindings', 'endpoints': 'endpoints', 'external-controller': 'external_controller', 'macaroon': 'macaroon', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'offer-uuid': 'offer_uuid', 'source-model-tag': 'source_model_tag', 'spaces': 'spaces', 'users': 'users'}
+    def __init__(self, applicationofferdetails=None, application_alias=None, application_description=None, bindings=None, endpoints=None, external_controller=None, macaroon=None, offer_name=None, offer_url=None, offer_uuid=None, source_model_tag=None, spaces=None, users=None, **unknown_fields):
         '''
         applicationofferdetails : ApplicationOfferDetails
         application_alias : str
         application_description : str
-        auth_token : str
         bindings : typing.Mapping[str, str]
         endpoints : typing.Sequence[~RemoteEndpoint]
         external_controller : ExternalControllerInfo
@@ -6603,7 +6602,6 @@ class ConsumeApplicationArg(Type):
         applicationofferdetails_ = ApplicationOfferDetails.from_json(applicationofferdetails) if applicationofferdetails else None
         application_alias_ = application_alias
         application_description_ = application_description
-        auth_token_ = auth_token
         bindings_ = bindings
         endpoints_ = [RemoteEndpoint.from_json(o) for o in endpoints or []]
         external_controller_ = ExternalControllerInfo.from_json(external_controller) if external_controller else None
@@ -6624,9 +6622,6 @@ class ConsumeApplicationArg(Type):
 
         if application_description_ is not None and not isinstance(application_description_, (bytes, str)):
             raise Exception("Expected application_description_ to be a str, received: {}".format(type(application_description_)))
-
-        if auth_token_ is not None and not isinstance(auth_token_, (bytes, str)):
-            raise Exception("Expected auth_token_ to be a str, received: {}".format(type(auth_token_)))
 
         if bindings_ is not None and not isinstance(bindings_, dict):
             raise Exception("Expected bindings_ to be a Mapping, received: {}".format(type(bindings_)))
@@ -6661,7 +6656,6 @@ class ConsumeApplicationArg(Type):
         self.applicationofferdetails = applicationofferdetails_
         self.application_alias = application_alias_
         self.application_description = application_description_
-        self.auth_token = auth_token_
         self.bindings = bindings_
         self.endpoints = endpoints_
         self.external_controller = external_controller_
@@ -6695,24 +6689,19 @@ class ConsumeApplicationArgs(Type):
 
 
 class ConsumeOfferDetails(Type):
-    _toSchema = {'auth_token': 'auth-token', 'external_controller': 'external-controller', 'macaroon': 'macaroon', 'offer': 'offer'}
-    _toPy = {'auth-token': 'auth_token', 'external-controller': 'external_controller', 'macaroon': 'macaroon', 'offer': 'offer'}
-    def __init__(self, auth_token=None, external_controller=None, macaroon=None, offer=None, **unknown_fields):
+    _toSchema = {'external_controller': 'external-controller', 'macaroon': 'macaroon', 'offer': 'offer'}
+    _toPy = {'external-controller': 'external_controller', 'macaroon': 'macaroon', 'offer': 'offer'}
+    def __init__(self, external_controller=None, macaroon=None, offer=None, **unknown_fields):
         '''
-        auth_token : str
         external_controller : ExternalControllerInfo
         macaroon : Macaroon
         offer : ApplicationOfferDetails
         '''
-        auth_token_ = auth_token
         external_controller_ = ExternalControllerInfo.from_json(external_controller) if external_controller else None
         macaroon_ = Macaroon.from_json(macaroon) if macaroon else None
         offer_ = ApplicationOfferDetails.from_json(offer) if offer else None
 
         # Validate arguments against known Juju API types.
-        if auth_token_ is not None and not isinstance(auth_token_, (bytes, str)):
-            raise Exception("Expected auth_token_ to be a str, received: {}".format(type(auth_token_)))
-
         if external_controller_ is not None and not isinstance(external_controller_, (dict, ExternalControllerInfo)):
             raise Exception("Expected external_controller_ to be a ExternalControllerInfo, received: {}".format(type(external_controller_)))
 
@@ -6722,7 +6711,6 @@ class ConsumeOfferDetails(Type):
         if offer_ is not None and not isinstance(offer_, (dict, ApplicationOfferDetails)):
             raise Exception("Expected offer_ to be a ApplicationOfferDetails, received: {}".format(type(offer_)))
 
-        self.auth_token = auth_token_
         self.external_controller = external_controller_
         self.macaroon = macaroon_
         self.offer = offer_
@@ -6755,19 +6743,17 @@ class ConsumeOfferDetailsArg(Type):
 
 
 class ConsumeOfferDetailsResult(Type):
-    _toSchema = {'auth_token': 'auth-token', 'consumeofferdetails': 'ConsumeOfferDetails', 'error': 'error', 'external_controller': 'external-controller', 'macaroon': 'macaroon', 'offer': 'offer'}
-    _toPy = {'ConsumeOfferDetails': 'consumeofferdetails', 'auth-token': 'auth_token', 'error': 'error', 'external-controller': 'external_controller', 'macaroon': 'macaroon', 'offer': 'offer'}
-    def __init__(self, consumeofferdetails=None, auth_token=None, error=None, external_controller=None, macaroon=None, offer=None, **unknown_fields):
+    _toSchema = {'consumeofferdetails': 'ConsumeOfferDetails', 'error': 'error', 'external_controller': 'external-controller', 'macaroon': 'macaroon', 'offer': 'offer'}
+    _toPy = {'ConsumeOfferDetails': 'consumeofferdetails', 'error': 'error', 'external-controller': 'external_controller', 'macaroon': 'macaroon', 'offer': 'offer'}
+    def __init__(self, consumeofferdetails=None, error=None, external_controller=None, macaroon=None, offer=None, **unknown_fields):
         '''
         consumeofferdetails : ConsumeOfferDetails
-        auth_token : str
         error : Error
         external_controller : ExternalControllerInfo
         macaroon : Macaroon
         offer : ApplicationOfferDetails
         '''
         consumeofferdetails_ = ConsumeOfferDetails.from_json(consumeofferdetails) if consumeofferdetails else None
-        auth_token_ = auth_token
         error_ = Error.from_json(error) if error else None
         external_controller_ = ExternalControllerInfo.from_json(external_controller) if external_controller else None
         macaroon_ = Macaroon.from_json(macaroon) if macaroon else None
@@ -6776,9 +6762,6 @@ class ConsumeOfferDetailsResult(Type):
         # Validate arguments against known Juju API types.
         if consumeofferdetails_ is not None and not isinstance(consumeofferdetails_, (dict, ConsumeOfferDetails)):
             raise Exception("Expected consumeofferdetails_ to be a ConsumeOfferDetails, received: {}".format(type(consumeofferdetails_)))
-
-        if auth_token_ is not None and not isinstance(auth_token_, (bytes, str)):
-            raise Exception("Expected auth_token_ to be a str, received: {}".format(type(auth_token_)))
 
         if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
@@ -6793,7 +6776,6 @@ class ConsumeOfferDetailsResult(Type):
             raise Exception("Expected offer_ to be a ApplicationOfferDetails, received: {}".format(type(offer_)))
 
         self.consumeofferdetails = consumeofferdetails_
-        self.auth_token = auth_token_
         self.error = error_
         self.external_controller = external_controller_
         self.macaroon = macaroon_
@@ -11495,18 +11477,16 @@ class ImportStorageResults(Type):
 
 
 class IngressNetworksChangeEvent(Type):
-    _toSchema = {'application_token': 'application-token', 'bakery_version': 'bakery-version', 'ingress_required': 'ingress-required', 'macaroons': 'macaroons', 'networks': 'networks', 'relation_token': 'relation-token'}
-    _toPy = {'application-token': 'application_token', 'bakery-version': 'bakery_version', 'ingress-required': 'ingress_required', 'macaroons': 'macaroons', 'networks': 'networks', 'relation-token': 'relation_token'}
-    def __init__(self, application_token=None, bakery_version=None, ingress_required=None, macaroons=None, networks=None, relation_token=None, **unknown_fields):
+    _toSchema = {'bakery_version': 'bakery-version', 'ingress_required': 'ingress-required', 'macaroons': 'macaroons', 'networks': 'networks', 'relation_token': 'relation-token'}
+    _toPy = {'bakery-version': 'bakery_version', 'ingress-required': 'ingress_required', 'macaroons': 'macaroons', 'networks': 'networks', 'relation-token': 'relation_token'}
+    def __init__(self, bakery_version=None, ingress_required=None, macaroons=None, networks=None, relation_token=None, **unknown_fields):
         '''
-        application_token : str
         bakery_version : int
         ingress_required : bool
         macaroons : typing.Sequence[~Macaroon]
         networks : typing.Sequence[str]
         relation_token : str
         '''
-        application_token_ = application_token
         bakery_version_ = bakery_version
         ingress_required_ = ingress_required
         macaroons_ = [Macaroon.from_json(o) for o in macaroons or []]
@@ -11514,9 +11494,6 @@ class IngressNetworksChangeEvent(Type):
         relation_token_ = relation_token
 
         # Validate arguments against known Juju API types.
-        if application_token_ is not None and not isinstance(application_token_, (bytes, str)):
-            raise Exception("Expected application_token_ to be a str, received: {}".format(type(application_token_)))
-
         if bakery_version_ is not None and not isinstance(bakery_version_, int):
             raise Exception("Expected bakery_version_ to be a int, received: {}".format(type(bakery_version_)))
 
@@ -11532,7 +11509,6 @@ class IngressNetworksChangeEvent(Type):
         if relation_token_ is not None and not isinstance(relation_token_, (bytes, str)):
             raise Exception("Expected relation_token_ to be a str, received: {}".format(type(relation_token_)))
 
-        self.application_token = application_token_
         self.bakery_version = bakery_version_
         self.ingress_required = ingress_required_
         self.macaroons = macaroons_
@@ -18996,12 +18972,11 @@ class RegionDefaults(Type):
 
 
 class RegisterRemoteRelationArg(Type):
-    _toSchema = {'application_token': 'application-token', 'auth_token': 'auth-token', 'bakery_version': 'bakery-version', 'consume_version': 'consume-version', 'local_endpoint_name': 'local-endpoint-name', 'macaroons': 'macaroons', 'offer_uuid': 'offer-uuid', 'relation_token': 'relation-token', 'remote_endpoint': 'remote-endpoint', 'remote_space': 'remote-space', 'source_model_tag': 'source-model-tag'}
-    _toPy = {'application-token': 'application_token', 'auth-token': 'auth_token', 'bakery-version': 'bakery_version', 'consume-version': 'consume_version', 'local-endpoint-name': 'local_endpoint_name', 'macaroons': 'macaroons', 'offer-uuid': 'offer_uuid', 'relation-token': 'relation_token', 'remote-endpoint': 'remote_endpoint', 'remote-space': 'remote_space', 'source-model-tag': 'source_model_tag'}
-    def __init__(self, application_token=None, auth_token=None, bakery_version=None, consume_version=None, local_endpoint_name=None, macaroons=None, offer_uuid=None, relation_token=None, remote_endpoint=None, remote_space=None, source_model_tag=None, **unknown_fields):
+    _toSchema = {'application_token': 'application-token', 'bakery_version': 'bakery-version', 'consume_version': 'consume-version', 'local_endpoint_name': 'local-endpoint-name', 'macaroons': 'macaroons', 'offer_uuid': 'offer-uuid', 'relation_token': 'relation-token', 'remote_endpoint': 'remote-endpoint', 'remote_space': 'remote-space', 'source_model_tag': 'source-model-tag'}
+    _toPy = {'application-token': 'application_token', 'bakery-version': 'bakery_version', 'consume-version': 'consume_version', 'local-endpoint-name': 'local_endpoint_name', 'macaroons': 'macaroons', 'offer-uuid': 'offer_uuid', 'relation-token': 'relation_token', 'remote-endpoint': 'remote_endpoint', 'remote-space': 'remote_space', 'source-model-tag': 'source_model_tag'}
+    def __init__(self, application_token=None, bakery_version=None, consume_version=None, local_endpoint_name=None, macaroons=None, offer_uuid=None, relation_token=None, remote_endpoint=None, remote_space=None, source_model_tag=None, **unknown_fields):
         '''
         application_token : str
-        auth_token : str
         bakery_version : int
         consume_version : int
         local_endpoint_name : str
@@ -19013,7 +18988,6 @@ class RegisterRemoteRelationArg(Type):
         source_model_tag : str
         '''
         application_token_ = application_token
-        auth_token_ = auth_token
         bakery_version_ = bakery_version
         consume_version_ = consume_version
         local_endpoint_name_ = local_endpoint_name
@@ -19027,9 +19001,6 @@ class RegisterRemoteRelationArg(Type):
         # Validate arguments against known Juju API types.
         if application_token_ is not None and not isinstance(application_token_, (bytes, str)):
             raise Exception("Expected application_token_ to be a str, received: {}".format(type(application_token_)))
-
-        if auth_token_ is not None and not isinstance(auth_token_, (bytes, str)):
-            raise Exception("Expected auth_token_ to be a str, received: {}".format(type(auth_token_)))
 
         if bakery_version_ is not None and not isinstance(bakery_version_, int):
             raise Exception("Expected bakery_version_ to be a int, received: {}".format(type(bakery_version_)))
@@ -19059,7 +19030,6 @@ class RegisterRemoteRelationArg(Type):
             raise Exception("Expected source_model_tag_ to be a str, received: {}".format(type(source_model_tag_)))
 
         self.application_token = application_token_
-        self.auth_token = auth_token_
         self.bakery_version = bakery_version_
         self.consume_version = consume_version_
         self.local_endpoint_name = local_endpoint_name_
@@ -21774,19 +21744,25 @@ class SecretBackend(Type):
 
 
 class SecretBackendArgs(Type):
-    _toSchema = {'backend_ids': 'backend-ids'}
-    _toPy = {'backend-ids': 'backend_ids'}
-    def __init__(self, backend_ids=None, **unknown_fields):
+    _toSchema = {'backend_ids': 'backend-ids', 'for_drain': 'for-drain'}
+    _toPy = {'backend-ids': 'backend_ids', 'for-drain': 'for_drain'}
+    def __init__(self, backend_ids=None, for_drain=None, **unknown_fields):
         '''
         backend_ids : typing.Sequence[str]
+        for_drain : bool
         '''
         backend_ids_ = backend_ids
+        for_drain_ = for_drain
 
         # Validate arguments against known Juju API types.
         if backend_ids_ is not None and not isinstance(backend_ids_, (bytes, str, list)):
             raise Exception("Expected backend_ids_ to be a Sequence, received: {}".format(type(backend_ids_)))
 
+        if for_drain_ is not None and not isinstance(for_drain_, bool):
+            raise Exception("Expected for_drain_ to be a bool, received: {}".format(type(for_drain_)))
+
         self.backend_ids = backend_ids_
+        self.for_drain = for_drain_
         self.unknown_fields = unknown_fields
 
 
@@ -27809,17 +27785,19 @@ class WatchContainers(Type):
 
 
 class WatchRemoteSecretChangesArg(Type):
-    _toSchema = {'application_token': 'application-token', 'bakery_version': 'bakery-version', 'macaroons': 'macaroons'}
-    _toPy = {'application-token': 'application_token', 'bakery-version': 'bakery_version', 'macaroons': 'macaroons'}
-    def __init__(self, application_token=None, bakery_version=None, macaroons=None, **unknown_fields):
+    _toSchema = {'application_token': 'application-token', 'bakery_version': 'bakery-version', 'macaroons': 'macaroons', 'relation_token': 'relation-token'}
+    _toPy = {'application-token': 'application_token', 'bakery-version': 'bakery_version', 'macaroons': 'macaroons', 'relation-token': 'relation_token'}
+    def __init__(self, application_token=None, bakery_version=None, macaroons=None, relation_token=None, **unknown_fields):
         '''
         application_token : str
         bakery_version : int
         macaroons : typing.Sequence[~Macaroon]
+        relation_token : str
         '''
         application_token_ = application_token
         bakery_version_ = bakery_version
         macaroons_ = [Macaroon.from_json(o) for o in macaroons or []]
+        relation_token_ = relation_token
 
         # Validate arguments against known Juju API types.
         if application_token_ is not None and not isinstance(application_token_, (bytes, str)):
@@ -27831,9 +27809,13 @@ class WatchRemoteSecretChangesArg(Type):
         if macaroons_ is not None and not isinstance(macaroons_, (bytes, str, list)):
             raise Exception("Expected macaroons_ to be a Sequence, received: {}".format(type(macaroons_)))
 
+        if relation_token_ is not None and not isinstance(relation_token_, (bytes, str)):
+            raise Exception("Expected relation_token_ to be a str, received: {}".format(type(relation_token_)))
+
         self.application_token = application_token_
         self.bakery_version = bakery_version_
         self.macaroons = macaroons_
+        self.relation_token = relation_token_
         self.unknown_fields = unknown_fields
 
 

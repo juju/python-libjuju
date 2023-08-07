@@ -1947,8 +1947,7 @@ class CrossModelRelationsFacade(Type):
                                       'required': ['results'],
                                       'type': 'object'},
                      'IngressNetworksChangeEvent': {'additionalProperties': False,
-                                                    'properties': {'application-token': {'type': 'string'},
-                                                                   'bakery-version': {'type': 'integer'},
+                                                    'properties': {'bakery-version': {'type': 'integer'},
                                                                    'ingress-required': {'type': 'boolean'},
                                                                    'macaroons': {'items': {'$ref': '#/definitions/Macaroon'},
                                                                                  'type': 'array'},
@@ -1956,7 +1955,6 @@ class CrossModelRelationsFacade(Type):
                                                                                 'type': 'array'},
                                                                    'relation-token': {'type': 'string'}},
                                                     'required': ['relation-token',
-                                                                 'application-token',
                                                                  'ingress-required'],
                                                     'type': 'object'},
                      'IngressNetworksChanges': {'additionalProperties': False,
@@ -1996,7 +1994,6 @@ class CrossModelRelationsFacade(Type):
                                                  'type': 'object'},
                      'RegisterRemoteRelationArg': {'additionalProperties': False,
                                                    'properties': {'application-token': {'type': 'string'},
-                                                                  'auth-token': {'type': 'string'},
                                                                   'bakery-version': {'type': 'integer'},
                                                                   'consume-version': {'type': 'integer'},
                                                                   'local-endpoint-name': {'type': 'string'},
@@ -2191,8 +2188,10 @@ class CrossModelRelationsFacade(Type):
                                                      'properties': {'application-token': {'type': 'string'},
                                                                     'bakery-version': {'type': 'integer'},
                                                                     'macaroons': {'items': {'$ref': '#/definitions/Macaroon'},
-                                                                                  'type': 'array'}},
-                                                     'required': ['application-token'],
+                                                                                  'type': 'array'},
+                                                                    'relation-token': {'type': 'string'}},
+                                                     'required': ['application-token',
+                                                                  'relation-token'],
                                                      'type': 'object'},
                      'WatchRemoteSecretChangesArgs': {'additionalProperties': False,
                                                       'properties': {'relations': {'items': {'$ref': '#/definitions/WatchRemoteSecretChangesArg'},
@@ -5239,8 +5238,9 @@ class SecretsManagerFacade(Type):
                                            'type': 'object'},
                      'SecretBackendArgs': {'additionalProperties': False,
                                            'properties': {'backend-ids': {'items': {'type': 'string'},
-                                                                          'type': 'array'}},
-                                           'required': ['backend-ids'],
+                                                                          'type': 'array'},
+                                                          'for-drain': {'type': 'boolean'}},
+                                           'required': ['for-drain', 'backend-ids'],
                                            'type': 'object'},
                      'SecretBackendConfig': {'additionalProperties': False,
                                              'properties': {'params': {'patternProperties': {'.*': {'additionalProperties': True,
@@ -5630,15 +5630,19 @@ class SecretsManagerFacade(Type):
 
 
     @ReturnMapping(SecretBackendConfigResults)
-    async def GetSecretBackendConfigs(self, backend_ids=None):
+    async def GetSecretBackendConfigs(self, backend_ids=None, for_drain=None):
         '''
         GetSecretBackendConfigs gets the config needed to create a client to secret backends.
 
         backend_ids : typing.Sequence[str]
+        for_drain : bool
         Returns -> SecretBackendConfigResults
         '''
         if backend_ids is not None and not isinstance(backend_ids, (bytes, str, list)):
             raise Exception("Expected backend_ids to be a Sequence, received: {}".format(type(backend_ids)))
+
+        if for_drain is not None and not isinstance(for_drain, bool):
+            raise Exception("Expected for_drain to be a bool, received: {}".format(type(for_drain)))
 
         # map input types to rpc msg
         _params = dict()
@@ -5647,6 +5651,7 @@ class SecretsManagerFacade(Type):
                    version=2,
                    params=_params)
         _params['backend-ids'] = backend_ids
+        _params['for-drain'] = for_drain
         reply = await self.rpc(msg)
         return reply
 
