@@ -16,13 +16,12 @@ logger = logging.getLogger(__name__)
 @pytest.mark.asyncio
 async def test_action(event_loop):
     async with base.CleanModel() as model:
-        ubuntu_app = await model.deploy(
-            'percona-cluster',
+        mysql_app = await model.deploy(
+            'mysql',
             application_name='mysql',
-            series='xenial',
-            channel='stable',
+            channel='8.0/stable',
             config={
-                'tuning-level': 'safest',
+                'cluster-name': 'cluster1',
             },
             constraints={
                 'arch': 'amd64',
@@ -31,25 +30,25 @@ async def test_action(event_loop):
         )
 
         # update and check app config
-        await ubuntu_app.set_config({'tuning-level': 'fast'})
-        config = await ubuntu_app.get_config()
-        assert config['tuning-level']['value'] == 'fast'
+        await mysql_app.set_config({'cluster-name': 'cluster2'})
+        config = await mysql_app.get_config()
+        assert config['cluster-name']['value'] == 'cluster2'
 
         # Restore config back to default
-        await ubuntu_app.reset_config(['tuning-level'])
-        config = await ubuntu_app.get_config()
-        assert config['tuning-level']['value'] == 'safest'
+        await mysql_app.reset_config(['cluster-name'])
+        config = await mysql_app.get_config()
+        assert 'value' not in config['cluster-name']
 
         # update and check app constraints
-        await ubuntu_app.set_constraints({'mem': 512 * MB})
-        constraints = await ubuntu_app.get_constraints()
+        await mysql_app.set_constraints({'mem': 512 * MB})
+        constraints = await mysql_app.get_constraints()
         assert constraints['mem'] == 512 * MB
 
-        await jasyncio.sleep(5)
+        await jasyncio.sleep(10)
 
         # check action definitions
-        actions = await ubuntu_app.get_actions()
-        assert 'backup' in actions.keys()
+        actions = await mysql_app.get_actions(schema=True)
+        assert 'create-backup' in actions.keys()
 
 
 @base.bootstrapped
