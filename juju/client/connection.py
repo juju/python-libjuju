@@ -894,6 +894,7 @@ class Connection:
                 # if a facade is required but the client doesn't know about
                 # it, then log a warning.
                 log.warning(f'unexpected facade {name} received from the controller')
+                continue
 
             try:
                 # allow the ability to specify a set of facade versions, so the
