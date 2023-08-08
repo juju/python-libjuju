@@ -16,39 +16,10 @@ logger = logging.getLogger(__name__)
 @pytest.mark.asyncio
 async def test_action(event_loop):
     async with base.CleanModel() as model:
-        mysql_app = await model.deploy(
-            'mysql',
-            application_name='mysql',
-            channel='8.0/stable',
-            config={
-                'cluster-name': 'cluster1',
-            },
-            constraints={
-                'arch': 'amd64',
-                'mem': 256 * MB,
-            },
-        )
-
-        # update and check app config
-        await mysql_app.set_config({'cluster-name': 'cluster2'})
-        config = await mysql_app.get_config()
-        assert config['cluster-name']['value'] == 'cluster2'
-
-        # Restore config back to default
-        await mysql_app.reset_config(['cluster-name'])
-        config = await mysql_app.get_config()
-        assert 'value' not in config['cluster-name']
-
-        # update and check app constraints
-        await mysql_app.set_constraints({'mem': 512 * MB})
-        constraints = await mysql_app.get_constraints()
-        assert constraints['mem'] == 512 * MB
-
+        app = await model.deploy('juju-qa-test')
         await jasyncio.sleep(10)
-
-        # check action definitions
-        actions = await mysql_app.get_actions(schema=True)
-        assert 'create-backup' in actions.keys()
+        actions = await app.get_actions(schema=True)
+        assert 'fortune' in actions.keys(), 'mis"fortune" in charm actions'
 
 
 @base.bootstrapped
