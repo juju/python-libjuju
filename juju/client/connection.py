@@ -22,6 +22,7 @@ client_facades = {
     'Action': {'versions': [2, 6, 7]},
     'ActionPruner': {'versions': [1]},
     'Agent': {'versions': [2, 3]},
+    'AgentLifeFlag': {'versions': [1]},
     'AgentTools': {'versions': [1]},
     'AllModelWatcher': {'versions': [2, 3, 4]},
     'AllWatcher': {'versions': [1, 2, 3, 4]},
@@ -894,6 +895,7 @@ class Connection:
                 # if a facade is required but the client doesn't know about
                 # it, then log a warning.
                 log.warning(f'unexpected facade {name} received from the controller')
+                continue
 
             try:
                 # allow the ability to specify a set of facade versions, so the

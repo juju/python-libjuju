@@ -329,7 +329,6 @@ class ApplicationFacade(Type):
                                                'properties': {'ApplicationOfferDetails': {'$ref': '#/definitions/ApplicationOfferDetails'},
                                                               'application-alias': {'type': 'string'},
                                                               'application-description': {'type': 'string'},
-                                                              'auth-token': {'type': 'string'},
                                                               'bindings': {'patternProperties': {'.*': {'type': 'string'}},
                                                                            'type': 'object'},
                                                               'endpoints': {'items': {'$ref': '#/definitions/RemoteEndpoint'},
@@ -2539,8 +2538,9 @@ class UniterFacade(Type):
                                              'type': 'object'},
                      'SecretBackendArgs': {'additionalProperties': False,
                                            'properties': {'backend-ids': {'items': {'type': 'string'},
-                                                                          'type': 'array'}},
-                                           'required': ['backend-ids'],
+                                                                          'type': 'array'},
+                                                          'for-drain': {'type': 'boolean'}},
+                                           'required': ['for-drain', 'backend-ids'],
                                            'type': 'object'},
                      'SecretBackendConfig': {'additionalProperties': False,
                                              'properties': {'params': {'patternProperties': {'.*': {'additionalProperties': True,
@@ -4597,15 +4597,19 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(SecretBackendConfigResults)
-    async def GetSecretBackendConfigs(self, backend_ids=None):
+    async def GetSecretBackendConfigs(self, backend_ids=None, for_drain=None):
         '''
         GetSecretBackendConfigs gets the config needed to create a client to secret backends.
 
         backend_ids : typing.Sequence[str]
+        for_drain : bool
         Returns -> SecretBackendConfigResults
         '''
         if backend_ids is not None and not isinstance(backend_ids, (bytes, str, list)):
             raise Exception("Expected backend_ids to be a Sequence, received: {}".format(type(backend_ids)))
+
+        if for_drain is not None and not isinstance(for_drain, bool):
+            raise Exception("Expected for_drain to be a bool, received: {}".format(type(for_drain)))
 
         # map input types to rpc msg
         _params = dict()
@@ -4614,6 +4618,7 @@ class UniterFacade(Type):
                    version=18,
                    params=_params)
         _params['backend-ids'] = backend_ids
+        _params['for-drain'] = for_drain
         reply = await self.rpc(msg)
         return reply
 
