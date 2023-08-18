@@ -1,3 +1,6 @@
+# Copyright 2023 Canonical Ltd.
+# Licensed under the Apache V2, see LICENCE file for details.
+
 # TODO: Tags should be a proper class, so that we can distinguish whether
 # something is already a tag or not.  For example, 'user-foo' is a valid
 # username, but is ambiguous with the already-tagged username 'foo'.
