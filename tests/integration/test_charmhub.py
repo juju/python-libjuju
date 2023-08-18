@@ -107,4 +107,4 @@ async def test_subordinate_charm_zero_units(event_loop):
 async def test_list_resources(event_loop):
     async with base.CleanModel() as model:
         resources = await model.charmhub.list_resources('hello-kubecon')
-        assert type(resources) == list and len(resources) > 0
+        assert isinstance(resources, list) and len(resources) > 0
