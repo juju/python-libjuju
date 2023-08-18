@@ -1,4 +1,6 @@
-#!/usr/bin/env python3.5
+# Copyright 2023 Canonical Ltd.
+# Licensed under the Apache V2, see LICENCE file for details.
+
 
 """
 This example:
