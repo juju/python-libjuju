@@ -7,7 +7,6 @@ from .. import base
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 @pytest.mark.skip('Update charm')
 async def test_status(event_loop):
     async with base.CleanModel() as model:
@@ -38,7 +37,6 @@ async def test_status(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_scp(event_loop):
     # ensure that asyncio.subprocess will work;
     try:

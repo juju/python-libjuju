@@ -144,11 +144,6 @@ class TestJujuData(FileJujuData):
         return all_models
 
 
-class AsyncMock(mock.MagicMock):
-    async def __call__(self, *args, **kwargs):
-        return super().__call__(*args, **kwargs)
-
-
 @contextmanager
 def patch_file(filename):
     """

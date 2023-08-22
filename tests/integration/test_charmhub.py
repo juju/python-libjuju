@@ -6,7 +6,6 @@ from juju import jasyncio
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_info(event_loop):
     async with base.CleanModel() as model:
         _, name = await model.charmhub.get_charm_id("ubuntu")
@@ -28,7 +27,6 @@ async def test_info(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_info_with_channel(event_loop):
     async with base.CleanModel() as model:
         charm_info = await model.charmhub.info("juju-qa-test", "2.0/stable")
@@ -47,7 +45,6 @@ async def test_info_with_channel(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_info_not_found(event_loop):
     async with base.CleanModel() as model:
         with pytest.raises(JujuError) as err:
@@ -56,7 +53,6 @@ async def test_info_not_found(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 @pytest.mark.skip('CharmHub facade no longer exists')
 async def test_find(event_loop):
     async with base.CleanModel() as model:
@@ -69,7 +65,6 @@ async def test_find(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 @pytest.mark.skip('CharmHub facade no longer exists')
 async def test_find_bundles(event_loop):
     async with base.CleanModel() as model:
@@ -82,7 +77,6 @@ async def test_find_bundles(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 @pytest.mark.skip('CharmHub facade no longer exists')
 async def test_find_all(event_loop):
     async with base.CleanModel() as model:
@@ -95,7 +89,6 @@ async def test_find_all(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 @pytest.mark.skip('This tries to test juju controller logic')
 async def test_subordinate_charm_zero_units(event_loop):
     # normally in pylibjuju deploy num_units defaults to 1, we switch
@@ -123,7 +116,6 @@ async def test_subordinate_charm_zero_units(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_subordinate_false_field_exists(event_loop):
     async with base.CleanModel() as model:
         assert await model.charmhub.is_subordinate("rsyslog-forwarder-ha")
@@ -131,7 +123,6 @@ async def test_subordinate_false_field_exists(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_list_resources(event_loop):
     async with base.CleanModel() as model:
         resources = await model.charmhub.list_resources('hello-kubecon')

@@ -33,7 +33,6 @@ class WebsocketMock:
         self.closed = True
 
 
-@pytest.mark.asyncio
 async def test_out_of_order(event_loop):
     ws = WebsocketMock([
         {'request-id': 1},
@@ -49,16 +48,16 @@ async def test_out_of_order(event_loop):
     con = None
     try:
         with \
-                mock.patch('websockets.connect', base.AsyncMock(return_value=ws)), \
+                mock.patch('websockets.connect', mock.AsyncMock(return_value=ws)), \
                 mock.patch(
                     'juju.client.connection.Connection.login',
-                    base.AsyncMock(return_value={'response': {
+                    mock.AsyncMock(return_value={'response': {
                         'facades': minimal_facades,
                         'server-version': '3.0',
                     }}),
                 ), \
                 mock.patch('juju.client.connection.Connection._get_ssl'), \
-                mock.patch('juju.client.connection.Connection._pinger', base.AsyncMock()):
+                mock.patch('juju.client.connection.Connection._pinger', mock.AsyncMock()):
             con = await Connection.connect('0.1.2.3:999')
         actual_responses = []
         for i in range(3):
@@ -69,7 +68,6 @@ async def test_out_of_order(event_loop):
             await con.close()
 
 
-@pytest.mark.asyncio
 async def test_bubble_redirect_exception(event_loop):
     ca_cert = """
 -----BEGIN CERTIFICATE-----
@@ -101,7 +99,7 @@ SOMECERT
         },
     ])
     with pytest.raises(JujuRedirectException) as caught_ex:
-        with mock.patch('websockets.connect', base.AsyncMock(return_value=ws)):
+        with mock.patch('websockets.connect', mock.AsyncMock(return_value=ws)):
             await Connection.connect('0.1.2.3:999')
 
     redir_error = caught_ex.value
@@ -113,7 +111,6 @@ SOMECERT
     ]
 
 
-@pytest.mark.asyncio
 async def test_follow_redirect(event_loop):
     ca_cert = """
 -----BEGIN CERTIFICATE-----
@@ -160,11 +157,11 @@ SOMECERT
     try:
         with \
             mock.patch('websockets.connect',
-                       base.AsyncMock(side_effect=[wsForCont1, wsForCont2])
+                       mock.AsyncMock(side_effect=[wsForCont1, wsForCont2])
                        ), \
             mock.patch('juju.client.connection.Connection._get_ssl'), \
             mock.patch('juju.client.connection.Connection._pinger',
-                       base.AsyncMock()):
+                       mock.AsyncMock()):
             con = await Connection.connect('0.1.2.3:999')
     finally:
         if con:
@@ -172,7 +169,6 @@ SOMECERT
             await con.close()
 
 
-@pytest.mark.asyncio
 async def test_rpc_none_results(event_loop):
     ws = WebsocketMock([
         {'request-id': 1, 'response': {'results': None}},
@@ -184,16 +180,16 @@ async def test_rpc_none_results(event_loop):
     con = None
     try:
         with \
-                mock.patch('websockets.connect', base.AsyncMock(return_value=ws)), \
+                mock.patch('websockets.connect', mock.AsyncMock(return_value=ws)), \
                 mock.patch(
                     'juju.client.connection.Connection.login',
-                    base.AsyncMock(return_value={'response': {
+                    mock.AsyncMock(return_value={'response': {
                         'facades': minimal_facades,
                         'server-version': '3.0',
                     }}),
                 ), \
                 mock.patch('juju.client.connection.Connection._get_ssl'), \
-                mock.patch('juju.client.connection.Connection._pinger', base.AsyncMock()):
+                mock.patch('juju.client.connection.Connection._pinger', mock.AsyncMock()):
             con = await Connection.connect('0.1.2.3:999')
         actual_responses = []
         actual_responses.append(await con.rpc({'version': 1}))

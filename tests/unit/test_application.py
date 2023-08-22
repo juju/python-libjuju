@@ -1,5 +1,5 @@
+import unittest
 import mock
-import asynctest
 import asyncio
 
 from juju.model import Model
@@ -7,8 +7,8 @@ from juju.application import (Application, ExposedEndpoint)
 from juju.errors import JujuError
 
 
-class TestExposeApplication(asynctest.TestCase):
-    @asynctest.patch("juju.model.Model.connection")
+class TestExposeApplication(unittest.IsolatedAsyncioTestCase):
+    @mock.patch("juju.model.Model.connection")
     async def test_expose_with_exposed_endpoints_as_raw_dict(self, mock_conn):
         mock_facade_version = mock.MagicMock(return_value=13)
         mock_facade = mock.MagicMock(name="application_facade")
@@ -40,7 +40,7 @@ class TestExposeApplication(asynctest.TestCase):
                 }
             })
 
-    @asynctest.patch("juju.model.Model.connection")
+    @mock.patch("juju.model.Model.connection")
     async def test_expose_with_exposed_endpoints(self, mock_conn):
         mock_facade_version = mock.MagicMock(return_value=13)
         mock_facade = mock.MagicMock(name="application_facade")
@@ -76,7 +76,7 @@ class TestExposeApplication(asynctest.TestCase):
                 },
             })
 
-    @asynctest.patch("juju.model.Model.connection")
+    @mock.patch("juju.model.Model.connection")
     async def test_expose_endpoints_on_older_controller(self, mock_conn):
         mock_facade_version = mock.MagicMock(return_value=12)
         mock_facade = mock.MagicMock(name="application_facade")
@@ -123,8 +123,8 @@ class TestExposeApplication(asynctest.TestCase):
         mock_facade().Expose.assert_called_once_with(application="panther")
 
 
-class TestUnExposeApplication(asynctest.TestCase):
-    @asynctest.patch("juju.model.Model.connection")
+class TestUnExposeApplication(unittest.IsolatedAsyncioTestCase):
+    @mock.patch("juju.model.Model.connection")
     async def test_unexpose_endpoints_on_older_controller(self, mock_conn):
         mock_facade_version = mock.MagicMock(return_value=12)
         mock_facade = mock.MagicMock(name="application_facade")
@@ -145,7 +145,7 @@ class TestUnExposeApplication(asynctest.TestCase):
         await app.unexpose()
         mock_facade().Unexpose.assert_called_once_with(application="panther")
 
-    @asynctest.patch("juju.model.Model.connection")
+    @mock.patch("juju.model.Model.connection")
     async def test_unexpose_endpoints_on_29_controller(self, mock_conn):
         mock_facade_version = mock.MagicMock(return_value=13)
         mock_facade = mock.MagicMock(name="application_facade")

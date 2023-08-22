@@ -122,7 +122,6 @@ class TestAddApplicationChange(unittest.TestCase):
 
 class TestAddApplicationChangeRun:
 
-    @pytest.mark.asyncio
     async def test_run_with_charmhub_charm(self, event_loop):
         change = AddApplicationChange(1, [], params={"charm": "charm",
                                                      "series": "series",
@@ -137,8 +136,8 @@ class TestAddApplicationChangeRun:
                                                      "channel": "channel"})
 
         model = Mock()
-        model._deploy = base.AsyncMock(return_value=None)
-        model._add_charmhub_resources = base.AsyncMock(return_value=["resource1"])
+        model._deploy = mock.AsyncMock(return_value=None)
+        model._add_charmhub_resources = mock.AsyncMock(return_value=["resource1"])
         model.applications = {}
 
         context = Mock()
@@ -147,7 +146,7 @@ class TestAddApplicationChangeRun:
         context.trusted = False
         context.model = model
 
-        info_func = base.AsyncMock(return_value=["12345", "name"])
+        info_func = mock.AsyncMock(return_value=["12345", "name"])
 
         with patch.object(charmhub.CharmHub, 'get_charm_id', info_func):
             result = await change.run(context)
@@ -167,7 +166,6 @@ class TestAddApplicationChangeRun:
                                          charm_origin=ANY,
                                          num_units="num_units")
 
-    @pytest.mark.asyncio
     async def test_run_with_charmhub_charm_no_channel(self, event_loop):
         """Test to verify if when the given channel is None, the channel defaults to "local/stable", which
             is the default channel value for the Charm Hub
@@ -186,8 +184,8 @@ class TestAddApplicationChangeRun:
                                                      })
 
         model = Mock()
-        model._deploy = base.AsyncMock(return_value=None)
-        model._add_charmhub_resources = base.AsyncMock(return_value=["resource1"])
+        model._deploy = mock.AsyncMock(return_value=None)
+        model._add_charmhub_resources = mock.AsyncMock(return_value=["resource1"])
         model.applications = {}
 
         context = Mock()
@@ -196,7 +194,7 @@ class TestAddApplicationChangeRun:
         context.trusted = False
         context.model = model
 
-        info_func = base.AsyncMock(return_value=["12345", "name"])
+        info_func = mock.AsyncMock(return_value=["12345", "name"])
 
         with patch.object(charmhub.CharmHub, 'get_charm_id', info_func):
             result = await change.run(context)
@@ -216,7 +214,6 @@ class TestAddApplicationChangeRun:
                                          charm_origin=ANY,
                                          num_units="num_units")
 
-    @pytest.mark.asyncio
     async def test_run_local(self, event_loop):
         change = AddApplicationChange(1, [], params={"charm": "local:charm",
                                                      "series": "series",
@@ -229,7 +226,7 @@ class TestAddApplicationChangeRun:
                                                      "num-units": "num_units"})
 
         model = mock.Mock()
-        model._deploy = base.AsyncMock(return_value=None)
+        model._deploy = mock.AsyncMock(return_value=None)
         model.applications = {}
 
         context = mock.Mock()
@@ -255,7 +252,6 @@ class TestAddApplicationChangeRun:
                                          channel="",
                                          charm_origin=ANY)
 
-    @pytest.mark.asyncio
     async def test_run_no_series(self, event_loop):
         change = AddApplicationChange(1, [], params={"charm": "ch:charm1",
                                                      "series": "",
@@ -270,8 +266,8 @@ class TestAddApplicationChangeRun:
                                                      "channel": "channel"})
 
         model = mock.Mock()
-        model._deploy = base.AsyncMock(return_value=None)
-        model._add_charmhub_resources = base.AsyncMock(return_value=["resource1"])
+        model._deploy = mock.AsyncMock(return_value=None)
+        model._add_charmhub_resources = mock.AsyncMock(return_value=["resource1"])
         model.applications = {}
 
         context = mock.Mock()
@@ -337,19 +333,18 @@ class TestAddCharmChange(unittest.TestCase):
 
 class TestAddCharmChangeRun:
 
-    @pytest.mark.asyncio
     async def test_run(self, event_loop):
         change = AddCharmChange(1, [], params={"charm": "ch:charm",
                                                "series": "jammy",
                                                "channel": "channel"})
 
         charms_facade = mock.Mock()
-        charms_facade.AddCharm = base.AsyncMock(return_value=None)
+        charms_facade.AddCharm = mock.AsyncMock(return_value=None)
 
         model = mock.Mock()
-        model._add_charm = base.AsyncMock(return_value=None)
-        model._resolve_architecture = base.AsyncMock(return_value=None)
-        model._resolve_charm = base.AsyncMock(return_value=("entity_id",
+        model._add_charm = mock.AsyncMock(return_value=None)
+        model._resolve_architecture = mock.AsyncMock(return_value=None)
+        model._resolve_charm = mock.AsyncMock(return_value=("entity_id",
                                                             None))
 
         context = mock.Mock()
@@ -393,7 +388,6 @@ class TestAddMachineChange(unittest.TestCase):
 
 class TestAddMachineChangeRun:
 
-    @pytest.mark.asyncio
     async def test_run(self, event_loop):
         change = AddMachineChange(1, [], params={"series": "series",
                                                  "constraints": "cores=1",
@@ -403,7 +397,7 @@ class TestAddMachineChangeRun:
         machines = [client.AddMachinesResult(machine="machine1")]
 
         machine_manager_facade = mock.Mock()
-        machine_manager_facade.AddMachines = base.AsyncMock(return_value=client.AddMachinesResults(machines))
+        machine_manager_facade.AddMachines = mock.AsyncMock(return_value=client.AddMachinesResults(machines))
 
         context = mock.Mock()
         context.resolve.return_value = "parent_id1"
@@ -442,8 +436,6 @@ class TestAddRelationChange(unittest.TestCase):
 
 
 class TestAddRelationChangeRun:
-
-    @pytest.mark.asyncio
     async def test_run(self, event_loop):
         change = AddRelationChange(1, [], params={"endpoint1": "endpoint1",
                                                   "endpoint2": "endpoint2"})
@@ -452,7 +444,7 @@ class TestAddRelationChangeRun:
         rel2 = mock.Mock(name="rel2", **{"matches.return_value": True})
 
         model = mock.Mock()
-        model.relate = base.AsyncMock(return_value=rel2)
+        model.relate = mock.AsyncMock(return_value=rel2)
 
         context = mock.Mock()
         context.resolve_relation = mock.Mock(side_effect=['endpoint_1', 'endpoint_2'])
@@ -508,13 +500,12 @@ class MockModel:
 
 class TestAddUnitChangeRun:
 
-    @pytest.mark.asyncio
     async def test_run(self, event_loop):
         change = AddUnitChange(1, [], params={"application": "application",
                                               "to": "to"})
 
         app = mock.Mock()
-        app.add_unit = base.AsyncMock(return_value="unit1")
+        app.add_unit = mock.AsyncMock(return_value="unit1")
 
         model = MockModel({"application1": app})
 
@@ -557,14 +548,13 @@ class TestCreateOfferChange(unittest.TestCase):
 
 class TestCreateOfferChangeRun:
 
-    @pytest.mark.asyncio
     async def test_run(self, event_loop):
         change = CreateOfferChange(1, [], params={"application": "application",
                                                   "endpoints": ["endpoints"],
                                                   "offer-name": "offer_name"})
 
         model = mock.Mock()
-        model.create_offer = base.AsyncMock(return_value=None)
+        model.create_offer = mock.AsyncMock(return_value=None)
 
         context = mock.Mock()
         context.resolve = mock.Mock(side_effect=['application1'])
@@ -602,13 +592,12 @@ class TestConsumeOfferChange(unittest.TestCase):
 
 class TestConsumeOfferChangeRun:
 
-    @pytest.mark.asyncio
     async def test_run(self, event_loop):
         change = ConsumeOfferChange(1, [], params={"url": "url",
                                                    "application-name": "application_name"})
 
         model = mock.Mock()
-        model.consume = base.AsyncMock(return_value=None)
+        model.consume = mock.AsyncMock(return_value=None)
 
         context = mock.Mock()
         context.resolve = mock.Mock(side_effect=['application1'])
@@ -673,7 +662,6 @@ class TestExposeChange(unittest.TestCase):
 
 class TestExposeChangeRun:
 
-    @pytest.mark.asyncio
     async def test_run(self, event_loop):
         params = {
             "application": "application",
@@ -691,7 +679,7 @@ class TestExposeChangeRun:
         change = ExposeChange(1, [], params=params)
 
         app = mock.Mock()
-        app.expose = base.AsyncMock(return_value=None)
+        app.expose = mock.AsyncMock(return_value=None)
 
         model = MockModel({"application1": app})
 
@@ -738,13 +726,12 @@ class TestScaleChange(unittest.TestCase):
 
 class TestScaleChangeRun:
 
-    @pytest.mark.asyncio
     async def test_run(self, event_loop):
         change = ScaleChange(1, [], params={"application": "application",
                                             "scale": 1})
 
         app = mock.Mock()
-        app.scale = base.AsyncMock(return_value=None)
+        app.scale = mock.AsyncMock(return_value=None)
 
         model = MockModel({"application1": app})
 
@@ -786,14 +773,13 @@ class TestSetAnnotationsChange(unittest.TestCase):
 
 class TestSetAnnotationsChangeRun:
 
-    @pytest.mark.asyncio
     async def test_run(self, event_loop):
         change = SetAnnotationsChange(1, [], params={"id": "id",
                                                      "entity-type": "entity_type",
                                                      "annotations": "annotations"})
 
         entity = mock.Mock()
-        entity.set_annotations = base.AsyncMock(return_value="annotations1")
+        entity.set_annotations = mock.AsyncMock(return_value="annotations1")
 
         state = mock.Mock()
         state.get_entity = mock.Mock(return_value=entity)
@@ -813,7 +799,6 @@ class TestSetAnnotationsChangeRun:
 
 
 class TestBundleHandler:
-    @pytest.mark.asyncio
     async def test_fetch_plan_local_k8s_bundle(self, event_loop):
         class AsyncMock(mock.MagicMock):
             async def __call__(self, *args, **kwargs):

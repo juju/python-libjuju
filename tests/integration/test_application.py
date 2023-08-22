@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_action(event_loop):
     async with base.CleanModel() as model:
         ubuntu_app = await model.deploy(
@@ -53,7 +52,6 @@ async def test_action(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_get_set_config(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy(
@@ -78,7 +76,6 @@ async def test_get_set_config(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 @pytest.mark.skip('Update charm')
 async def test_status_is_not_unset(event_loop):
     async with base.CleanModel() as model:
@@ -93,7 +90,6 @@ async def test_status_is_not_unset(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 @pytest.mark.skip('Update charm')
 async def test_status(event_loop):
     async with base.CleanModel() as model:
@@ -109,7 +105,6 @@ async def test_status(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 @pytest.mark.skip('Update charm')
 async def test_add_units(event_loop):
     from juju.unit import Unit
@@ -129,7 +124,6 @@ async def test_add_units(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_deploy_charmhub_charm(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu')
@@ -139,7 +133,6 @@ async def test_deploy_charmhub_charm(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 @pytest.mark.skip('Skip until a similar k8s solution is found')
 async def test_upgrade_charm_switch_channel(event_loop):
     # Note for future:
@@ -184,7 +177,6 @@ async def test_upgrade_charm_switch_channel(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 @pytest.mark.skip('Update charm')
 async def test_upgrade_charm_revision(event_loop):
     async with base.CleanModel() as model:
@@ -197,7 +189,6 @@ async def test_upgrade_charm_revision(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 @pytest.mark.skip('Update charm')
 async def test_upgrade_charm_switch(event_loop):
     async with base.CleanModel() as model:
@@ -212,7 +203,6 @@ async def test_upgrade_charm_switch(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_upgrade_local_charm(event_loop):
     async with base.CleanModel() as model:
         tests_dir = Path(__file__).absolute().parent
@@ -226,7 +216,6 @@ async def test_upgrade_local_charm(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_upgrade_local_charm_resource(event_loop):
     async with base.CleanModel() as model:
         tests_dir = Path(__file__).absolute().parent
@@ -246,7 +235,6 @@ async def test_upgrade_local_charm_resource(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_upgrade_charm_resource_same_rev_no_update(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('keystone', channel='victoria/stable')
@@ -257,7 +245,6 @@ async def test_upgrade_charm_resource_same_rev_no_update(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_trusted(event_loop):
     async with base.CleanModel() as model:
         await model.deploy('ubuntu', trust=True)
@@ -272,7 +259,6 @@ async def test_trusted(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_app_destroy(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu')
@@ -288,7 +274,6 @@ async def test_app_destroy(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_app_remove_wait_flag(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu')
@@ -300,7 +285,6 @@ async def test_app_remove_wait_flag(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_app_charm_name(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu')

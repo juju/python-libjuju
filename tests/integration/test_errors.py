@@ -7,7 +7,6 @@ GB = 1024
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_juju_api_error(event_loop):
     '''
     Verify that we raise a JujuAPIError for responses with an error in
@@ -22,7 +21,6 @@ async def test_juju_api_error(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_juju_error_in_results_list(event_loop):
     '''
     Replicate the code that caused
@@ -51,7 +49,6 @@ async def test_juju_error_in_results_list(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_juju_error_in_result(event_loop):
     '''
     Verify that we raise a JujuError when appropriate when we are
