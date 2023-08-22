@@ -1,3 +1,6 @@
+# Copyright 2023 Canonical Ltd.
+# Licensed under the Apache V2, see LICENCE file for details.
+
 from pathlib import Path
 
 import pytest
@@ -21,7 +24,7 @@ async def test_action(event_loop):
             'percona-cluster',
             application_name='mysql',
             series='bionic',
-            channel='stable',
+            channel='latest/stable',
             config={
                 'tuning-level': 'safest',
             },
@@ -59,7 +62,7 @@ async def test_get_set_config(event_loop):
             'percona-cluster',
             application_name='mysql',
             series='bionic',
-            channel='stable',
+            channel='latest/stable',
             config={
                 'tuning-level': 'safest',
             },

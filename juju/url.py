@@ -1,3 +1,6 @@
+# Copyright 2023 Canonical Ltd.
+# Licensed under the Apache V2, see LICENCE file for details.
+
 from enum import Enum
 from .errors import JujuError
 from urllib.parse import urlparse

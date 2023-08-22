@@ -1,3 +1,6 @@
+# Copyright 2023 Canonical Ltd.
+# Licensed under the Apache V2, see LICENCE file for details.
+
 """
 This example demonstrates how to obtain a formatted full status
 description. For a similar solution using the FullStatus object

@@ -1,3 +1,6 @@
+# Copyright 2023 Canonical Ltd.
+# Licensed under the Apache V2, see LICENCE file for details.
+
 import os
 
 PYLIBJUJU_DEV_FEATURE_FLAG = "PYLIBJUJU_DEV_FEATURE_FLAGS"
