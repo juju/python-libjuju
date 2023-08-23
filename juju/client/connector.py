@@ -5,12 +5,14 @@ import copy
 import logging
 
 import macaroonbakery.httpbakery as httpbakery
+
+from juju.client import client
 from juju.client.connection import Connection
 from juju.client.gocookies import GoCookieJar, go_to_py_cookie
-from juju.client.jujudata import FileJujuData, API_ENDPOINTS_KEY
+from juju.client.jujudata import API_ENDPOINTS_KEY, FileJujuData
 from juju.client.proxy.factory import proxy_from_config
-from juju.errors import JujuConnectionError, JujuError, PylibjujuProgrammingError
-from juju.client import client
+from juju.errors import (JujuConnectionError, JujuError,
+                         PylibjujuProgrammingError)
 from juju.version import SUPPORTED_MAJOR_VERSION, TARGET_JUJU_VERSION
 
 log = logging.getLogger('connector')
@@ -113,8 +115,6 @@ class Connector:
         """
         if not controller_name:
             controller_name = self.jujudata.current_controller()
-        if not controller_name:
-            raise JujuConnectionError('No current controller')
 
         controller = self.jujudata.controllers()[controller_name]
         endpoints = controller[API_ENDPOINTS_KEY]
