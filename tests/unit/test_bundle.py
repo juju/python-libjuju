@@ -5,7 +5,6 @@ from mock import patch, Mock, ANY
 
 import yaml
 
-import pytest
 from juju.bundle import (
     AddApplicationChange,
     AddCharmChange,
@@ -23,8 +22,6 @@ from juju.bundle import (
 from juju import charmhub
 from juju.client import client
 from toposort import CircularDependencyError
-
-from .. import base
 
 
 class TestChangeSet(unittest.TestCase):

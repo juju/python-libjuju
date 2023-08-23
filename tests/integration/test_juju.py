@@ -1,5 +1,3 @@
-import pytest
-
 from juju.controller import Controller
 from juju.juju import Juju
 from .. import base

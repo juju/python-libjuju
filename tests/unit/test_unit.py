@@ -1,11 +1,8 @@
 import mock
-import pytest
 
 from juju.client._definitions import FullStatus
 from juju.model import Model
 from juju.unit import Unit
-
-from .. import base
 
 
 @mock.patch('juju.client.client.ClientFacade')

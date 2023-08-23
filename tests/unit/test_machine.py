@@ -1,5 +1,4 @@
 import mock
-import pytest
 
 from juju.model import Model
 from juju.machine import Machine

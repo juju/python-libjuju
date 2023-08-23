@@ -9,8 +9,6 @@ from websockets.exceptions import ConnectionClosed
 
 import pytest
 
-from .. import base
-
 
 class WebsocketMock:
     def __init__(self, responses):

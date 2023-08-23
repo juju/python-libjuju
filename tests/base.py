@@ -4,8 +4,6 @@ import uuid
 from contextlib import contextmanager
 from pathlib import Path
 
-import mock
-
 import pytest
 from juju.client.jujudata import FileJujuData
 from juju.controller import Controller

@@ -12,8 +12,6 @@ from juju.application import Application
 from juju import jasyncio
 from juju.errors import JujuConnectionError, JujuError
 
-from .. import base
-
 
 def _make_delta(entity, type_, data=None):
     from juju.client.client import Delta

@@ -7,8 +7,6 @@ import mock
 from juju.client import client
 from juju.controller import Controller
 
-from .. import base
-
 
 class TestControllerConnect(unittest.IsolatedAsyncioTestCase):
     @mock.patch('juju.controller.Controller.update_endpoints')
