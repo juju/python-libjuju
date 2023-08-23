@@ -1,3 +1,6 @@
+# Copyright 2023 Canonical Ltd.
+# Licensed under the Apache V2, see LICENCE file for details.
+
 """
 This is a very basic example that connects to the currently selected model
 and prints the number of applications deployed to it.

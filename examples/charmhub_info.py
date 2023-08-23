@@ -1,3 +1,6 @@
+# Copyright 2023 Canonical Ltd.
+# Licensed under the Apache V2, see LICENCE file for details.
+
 """
 Example to show how to connect to the current model and query the charm-hub
 repository for information about a given charm.

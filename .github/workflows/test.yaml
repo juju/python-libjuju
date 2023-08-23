@@ -21,7 +21,9 @@ jobs:
       - name: Install dependencies
         run: pip install tox
       - name: Run linter
-        run: tox -e lint
+        run: |
+          tox -e lint
+          ./scripts/copyright.sh
 
   unit-tests:
     needs: lint

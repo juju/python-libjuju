@@ -1,3 +1,6 @@
+# Copyright 2023 Canonical Ltd.
+# Licensed under the Apache V2, see LICENCE file for details.
+
 # -*- coding: utf-8 -*-
 #
 # libjuju documentation build configuration file, created by
