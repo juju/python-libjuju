@@ -1,3 +1,6 @@
+# Copyright 2023 Canonical Ltd.
+# Licensed under the Apache V2, see LICENCE file for details.
+
 from juju.controller import Controller
 from juju.juju import Juju
 from .. import base

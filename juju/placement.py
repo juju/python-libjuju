@@ -1,3 +1,6 @@
+# Copyright 2023 Canonical Ltd.
+# Licensed under the Apache V2, see LICENCE file for details.
+
 #
 # This module allows us to parse a machine placement directive into a
 # Placement object suitable for passing through the websocket API.

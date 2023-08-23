@@ -1,3 +1,6 @@
+# Copyright 2023 Canonical Ltd.
+# Licensed under the Apache V2, see LICENCE file for details.
+
 """
 This example doesn't work - it demonstrates features that don't exist yet.
 
