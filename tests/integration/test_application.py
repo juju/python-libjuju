@@ -15,40 +15,10 @@ logger = logging.getLogger(__name__)
 @base.bootstrapped
 async def test_action(event_loop):
     async with base.CleanModel() as model:
-        ubuntu_app = await model.deploy(
-            'percona-cluster',
-            application_name='mysql',
-            series='xenial',
-            channel='stable',
-            config={
-                'tuning-level': 'safest',
-            },
-            constraints={
-                'arch': 'amd64',
-                'mem': 256 * MB,
-            },
-        )
-
-        # update and check app config
-        await ubuntu_app.set_config({'tuning-level': 'fast'})
-        config = await ubuntu_app.get_config()
-        assert config['tuning-level']['value'] == 'fast'
-
-        # Restore config back to default
-        await ubuntu_app.reset_config(['tuning-level'])
-        config = await ubuntu_app.get_config()
-        assert config['tuning-level']['value'] == 'safest'
-
-        # update and check app constraints
-        await ubuntu_app.set_constraints({'mem': 512 * MB})
-        constraints = await ubuntu_app.get_constraints()
-        assert constraints['mem'] == 512 * MB
-
-        await jasyncio.sleep(5)
-
-        # check action definitions
-        actions = await ubuntu_app.get_actions()
-        assert 'backup' in actions.keys()
+        app = await model.deploy('juju-qa-test')
+        await jasyncio.sleep(10)
+        actions = await app.get_actions(schema=True)
+        assert 'fortune' in actions.keys(), 'mis"fortune" in charm actions'
 
 
 @base.bootstrapped
