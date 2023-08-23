@@ -25,7 +25,8 @@ test: lint
 	tox -e integration
 
 .PHONY: lint
-lint: 
+lint:
+	@./scripts/copyright.sh
 	tox -e lint
 
 .PHONY: docs
