@@ -19,7 +19,7 @@ async def test_info(event_loop):
         assert charm_info['id'] == 'Hw30RWzpUBnJLGtO71SX8VDWvd3WrjaJ'
         assert '2.0/stable' in charm_info['channel-map']
         cm_rev = charm_info['channel-map']['2.0/stable']['revision']
-        if type(cm_rev) == dict:
+        if isinstance(cm_rev, dict):
             # New client (>= 3.0)
             assert cm_rev['revision'] == 22
         else:
@@ -135,4 +135,4 @@ async def test_subordinate_false_field_exists(event_loop):
 async def test_list_resources(event_loop):
     async with base.CleanModel() as model:
         resources = await model.charmhub.list_resources('hello-kubecon')
-        assert type(resources) == list and len(resources) > 0
+        assert isinstance(resources, list) and len(resources) > 0
