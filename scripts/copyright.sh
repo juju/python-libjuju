@@ -25,7 +25,7 @@ red() {
 }
 
 run_copyright() {
-	OUT=$(find . -name '*.py' | grep -v -E "./(docs|scripts|debian|juju-egg-info|.tox|.git|juju/client)|__init__" | sort | xargs grep -L -E '# (Copyright|Code generated)' || true)
+	OUT=$(find . -name '*.py' | grep -v -E "./(docs|scripts|debian|juju-egg-info|.tox|.git|juju/client|tests/charm)|__init__" | sort | xargs grep -L -E '# (Copyright|Code generated)' || true)
 	LINES=$(echo "${OUT}" | wc -w)
 	if [ "$LINES" != 0 ]; then
 		echo ""

@@ -27,6 +27,7 @@ test: lint
 .PHONY: lint
 lint:
 	@./scripts/copyright.sh
+	@echo "==> Running flake8 linter"
 	tox -e lint
 
 .PHONY: docs
