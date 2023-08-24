@@ -7,7 +7,6 @@ from unittest.mock import patch, PropertyMock
 import mock
 
 import pytest
-import asynctest
 import datetime
 
 from juju.client.jujudata import FileJujuData
@@ -15,8 +14,6 @@ from juju.model import Model
 from juju.application import Application
 from juju import jasyncio
 from juju.errors import JujuConnectionError, JujuError
-
-from .. import base
 
 
 def _make_delta(entity, type_, data=None):
@@ -79,7 +76,6 @@ class TestObserver(unittest.TestCase):
 
 
 class TestModelState(unittest.TestCase):
-    @pytest.mark.asyncio
     def test_apply_delta(self):
 
         model = Model()
@@ -109,10 +105,9 @@ class TestModelState(unittest.TestCase):
         self.assertTrue(prev)
 
 
-class TestContextManager(asynctest.TestCase):
-    @asynctest.patch('juju.model.Model.disconnect')
-    @asynctest.patch('juju.model.Model.connect')
-    @pytest.mark.asyncio
+class TestContextManager(unittest.IsolatedAsyncioTestCase):
+    @mock.patch('juju.model.Model.disconnect')
+    @mock.patch('juju.model.Model.connect')
     async def test_normal_use(self, mock_connect, mock_disconnect):
 
         async with Model() as model:
@@ -121,9 +116,8 @@ class TestContextManager(asynctest.TestCase):
         self.assertTrue(mock_connect.called)
         self.assertTrue(mock_disconnect.called)
 
-    @asynctest.patch('juju.model.Model.disconnect')
-    @asynctest.patch('juju.model.Model.connect')
-    @pytest.mark.asyncio
+    @mock.patch('juju.model.Model.disconnect')
+    @mock.patch('juju.model.Model.connect')
     async def test_exception(self, mock_connect, mock_disconnect):
 
         class SomeException(Exception):
@@ -147,26 +141,23 @@ class TestContextManager(asynctest.TestCase):
                 pass
 
 
-@asynctest.patch('juju.model.Model._after_connect')
-class TestModelConnect(asynctest.TestCase):
-    @asynctest.patch('juju.client.connector.Connector.connect_model')
-    @pytest.mark.asyncio
+@mock.patch('juju.model.Model._after_connect')
+class TestModelConnect(unittest.IsolatedAsyncioTestCase):
+    @mock.patch('juju.client.connector.Connector.connect_model')
     async def test_no_args(self, mock_connect_model, _):
         m = Model()
         mock_connect_model.side_effect = [("_", "uuid")]
         await m.connect()
         mock_connect_model.assert_called_once_with(None)
 
-    @asynctest.patch('juju.client.connector.Connector.connect_model')
-    @pytest.mark.asyncio
+    @mock.patch('juju.client.connector.Connector.connect_model')
     async def test_with_model_name(self, mock_connect_model, _):
         m = Model()
         mock_connect_model.side_effect = [("_", "uuid")]
         await m.connect(model_name='foo')
         mock_connect_model.assert_called_once_with('foo')
 
-    @asynctest.patch('juju.client.connector.Connector.connect_model')
-    @pytest.mark.asyncio
+    @mock.patch('juju.client.connector.Connector.connect_model')
     async def test_with_endpoint_but_no_uuid(self, mock_connect_model, _):
         m = Model()
         mock_connect_model.side_effect = [("_", "uuid")]
@@ -174,16 +165,14 @@ class TestModelConnect(asynctest.TestCase):
             await m.connect(endpoint='0.1.2.3:4566')
         self.assertEqual(mock_connect_model.call_count, 0)
 
-    @asynctest.patch('juju.client.connector.Connector.connect')
-    @pytest.mark.asyncio
+    @mock.patch('juju.client.connector.Connector.connect')
     async def test_with_endpoint_and_uuid_no_auth(self, mock_connect, _):
         m = Model()
         with self.assertRaises(TypeError):
             await m.connect(endpoint='0.1.2.3:4566', uuid='some-uuid')
         self.assertEqual(mock_connect.call_count, 0)
 
-    @asynctest.patch('juju.client.connector.Connector.connect')
-    @pytest.mark.asyncio
+    @mock.patch('juju.client.connector.Connector.connect')
     async def test_with_endpoint_and_uuid_with_userpass(self, mock_connect, _):
         m = Model()
         with self.assertRaises(TypeError):
@@ -199,8 +188,7 @@ class TestModelConnect(asynctest.TestCase):
                                              username='user',
                                              password='pass')
 
-    @asynctest.patch('juju.client.connector.Connector.connect')
-    @pytest.mark.asyncio
+    @mock.patch('juju.client.connector.Connector.connect')
     async def test_with_endpoint_and_uuid_with_bakery(self, mock_connect, _):
         m = Model()
         await m.connect(endpoint='0.1.2.3:4566',
@@ -210,8 +198,7 @@ class TestModelConnect(asynctest.TestCase):
                                              uuid='some-uuid',
                                              bakery_client='bakery')
 
-    @asynctest.patch('juju.client.connector.Connector.connect')
-    @pytest.mark.asyncio
+    @mock.patch('juju.client.connector.Connector.connect')
     async def test_with_endpoint_and_uuid_with_macaroon(self, mock_connect, _):
         m = Model()
         with self.assertRaises(TypeError):
@@ -233,8 +220,8 @@ class TestModelConnect(asynctest.TestCase):
                                         bakery_client='bakery',
                                         macaroons=['macaroon'])
 
-    @asynctest.patch('juju.client.connector.Connector.connect_model')
-    @asynctest.patch('juju.client.connector.Connector.connect')
+    @mock.patch('juju.client.connector.Connector.connect_model')
+    @mock.patch('juju.client.connector.Connector.connect')
     async def test_with_posargs(self, mock_connect, mock_connect_model, _):
         m = Model()
         mock_connect_model.side_effect = [("_", "uuid")]
@@ -264,15 +251,13 @@ class TestModelConnect(asynctest.TestCase):
 # Patch timedelta to immediately force a timeout to avoid introducing an unnecessary delay in the test failing.
 # It should be safe to always set it up to lead to a timeout.
 @patch('juju.model.timedelta', new=lambda *a, **kw: datetime.timedelta(0))
-class TestModelWaitForIdle(asynctest.TestCase):
-    @pytest.mark.asyncio
+class TestModelWaitForIdle(unittest.IsolatedAsyncioTestCase):
     async def test_no_args(self):
         m = Model()
         with self.assertWarns(DeprecationWarning):
             # no apps so should return right away
             await m.wait_for_idle(wait_for_active=True)
 
-    @pytest.mark.asyncio
     async def test_apps_no_lst(self):
         m = Model()
         with self.assertRaises(JujuError):
@@ -287,7 +272,6 @@ class TestModelWaitForIdle(asynctest.TestCase):
             # apps arg has to be a List[str]
             await m.wait_for_idle(apps=[3])
 
-    @pytest.mark.asyncio
     async def test_timeout(self):
         m = Model()
         with self.assertRaises(jasyncio.TimeoutError) as cm:
@@ -295,7 +279,6 @@ class TestModelWaitForIdle(asynctest.TestCase):
             await m.wait_for_idle(apps=["nonexisting_app"])
         self.assertEqual(str(cm.exception), "Timed out waiting for model:\nnonexisting_app (missing)")
 
-    @pytest.mark.asyncio
     @pytest.mark.wait_for_idle
     async def test_wait_for_active_status(self):
         app_status = 'active'
@@ -312,7 +295,7 @@ class TestModelWaitForIdle(asynctest.TestCase):
             )],
         )
 
-        app.get_status = base.AsyncMock(return_value=app_status)
+        app.get_status = mock.AsyncMock(return_value=app_status)
         apps = {"dummy_app": app}
 
         with patch.object(Model, 'applications', new_callable=PropertyMock) as mock_apps:
@@ -330,7 +313,6 @@ class TestModelWaitForIdle(asynctest.TestCase):
 
         mock_apps.assert_called_with()
 
-    @pytest.mark.asyncio
     @pytest.mark.wait_for_idle
     async def test_wait_for_active_units_waiting_application(self):
         # If the app is in waiting state, then wait more even if the units are ready
@@ -355,7 +337,7 @@ class TestModelWaitForIdle(asynctest.TestCase):
             )],
         )
 
-        app.get_status = base.AsyncMock(return_value=app_status)
+        app.get_status = mock.AsyncMock(return_value=app_status)
         apps = {"dummy_app": app}
 
         with patch.object(Model, 'applications', new_callable=PropertyMock) as mock_apps:
@@ -367,7 +349,6 @@ class TestModelWaitForIdle(asynctest.TestCase):
 
         mock_apps.assert_called_with()
 
-    @pytest.mark.asyncio
     @pytest.mark.wait_for_idle
     async def test_wait_for_active_units_waiting_for_units(self):
         # If user wants to see a particular number of units, then application may be in a waiting
@@ -393,7 +374,7 @@ class TestModelWaitForIdle(asynctest.TestCase):
             )],
         )
 
-        app.get_status = base.AsyncMock(return_value=app_status)
+        app.get_status = mock.AsyncMock(return_value=app_status)
         apps = {"dummy_app": app}
 
         with patch.object(Model, 'applications', new_callable=PropertyMock) as mock_apps:

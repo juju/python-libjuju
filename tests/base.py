@@ -7,8 +7,6 @@ import uuid
 from contextlib import contextmanager
 from pathlib import Path
 
-import mock
-
 import pytest
 from juju.client.jujudata import FileJujuData
 from juju.controller import Controller
@@ -145,11 +143,6 @@ class TestJujuData(FileJujuData):
         cmodels = all_models[self.__controller_name]['models']
         cmodels[self.__model_name] = {'uuid': self.__model_uuid}
         return all_models
-
-
-class AsyncMock(mock.MagicMock):
-    async def __call__(self, *args, **kwargs):
-        return super().__call__(*args, **kwargs)
 
 
 @contextmanager

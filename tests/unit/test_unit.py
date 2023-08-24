@@ -1,19 +1,14 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-import asynctest
 import mock
-import pytest
 
+from juju.client._definitions import FullStatus
 from juju.model import Model
 from juju.unit import Unit
-from juju.client._definitions import FullStatus
-
-from .. import base
 
 
-@asynctest.patch('juju.client.client.ClientFacade')
-@pytest.mark.asyncio
+@mock.patch('juju.client.client.ClientFacade')
 async def test_unit_is_leader(mock_cf):
     tests = [
         {
@@ -143,7 +138,7 @@ async def test_unit_is_leader(mock_cf):
     for test in tests:
         status = FullStatus.from_json(test)
         client_facade = mock_cf.from_connection()
-        client_facade.FullStatus = base.AsyncMock(return_value=status)
+        client_facade.FullStatus = mock.AsyncMock(return_value=status)
 
         unit = Unit("test", model)
         unit.name = test['unit']

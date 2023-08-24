@@ -3,13 +3,10 @@
 
 from juju.client import client
 
-import pytest
-
 from .. import base
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_user_info(event_loop):
     async with base.CleanModel() as model:
         controller_conn = await model.connection().controller()

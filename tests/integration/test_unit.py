@@ -12,7 +12,6 @@ from .. import base
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_block_coroutine(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy(
@@ -31,7 +30,6 @@ async def test_block_coroutine(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_unit_public_address(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy(
@@ -64,7 +62,6 @@ async def test_unit_public_address(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_run(event_loop):
     from juju.action import Action
 
@@ -111,7 +108,6 @@ async def test_run(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_run_action(event_loop):
     pytest.skip('Find a better charm for this test')
 
@@ -160,7 +156,6 @@ async def test_run_action(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_scp(event_loop):
     # ensure that asyncio.subprocess will work;
     try:
@@ -194,7 +189,6 @@ async def test_scp(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_ssh(event_loop):
     # ensure that asyncio.subprocess will work;
     try:
@@ -222,7 +216,6 @@ async def test_ssh(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_resolve_local(event_loop):
     charm_file = Path(__file__).absolute().parent / 'charm.charm'
 
@@ -247,7 +240,6 @@ async def test_resolve_local(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_unit_introspect(event_loop):
     async with base.CleanModel() as model:
         await model.deploy('ubuntu', series='jammy')
@@ -261,7 +253,6 @@ async def test_unit_introspect(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_subordinate_units(event_loop):
     async with base.CleanModel() as model:
         u_app = await model.deploy('ubuntu')

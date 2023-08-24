@@ -26,9 +26,9 @@ class TestLoop(unittest.TestCase):
     async def test_run_interrupt(self):
         async def _test():
             jasyncio.run._sigint = True
-        await self.assertRaises(KeyboardInterrupt, jasyncio.run, _test())
+        self.assertRaises(KeyboardInterrupt, jasyncio.run, _test())
 
     async def test_run_exception(self):
         async def _test():
             raise ValueError()
-        await self.assertRaises(ValueError, jasyncio.run, _test())
+        self.assertRaises(ValueError, jasyncio.run, _test())

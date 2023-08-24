@@ -25,7 +25,6 @@ logger = logging.getLogger(__name__)
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_monitor(event_loop):
     async with base.CleanModel() as model:
         conn = model.connection()
@@ -36,7 +35,6 @@ async def test_monitor(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_monitor_catches_error(event_loop):
 
     async with base.CleanModel() as model:
@@ -57,7 +55,6 @@ async def test_monitor_catches_error(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 @pytest.mark.skip('Update charm')
 async def test_full_status(event_loop):
     async with base.CleanModel() as model:
@@ -74,7 +71,6 @@ async def test_full_status(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_reconnect(event_loop):
     async with base.CleanModel() as model:
         kwargs = model.connection().connect_params()
@@ -90,7 +86,6 @@ async def test_reconnect(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 @pytest.mark.skip('tests the websocket protocol, not pylibjuju, needs to be revised')
 async def test_redirect(event_loop):
     controller = Controller()
@@ -238,7 +233,6 @@ class RedirectServer:
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_verify_controller_cert(event_loop):
     jujudata = FileJujuData()
     controller_name = jujudata.current_controller()

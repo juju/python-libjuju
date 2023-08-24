@@ -1,15 +1,12 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-import pytest
-
 from juju.controller import Controller
 from juju.juju import Juju
 from .. import base
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_get_controllers(event_loop):
     async with base.CleanController() as controller:
         j = Juju()

@@ -3,43 +3,41 @@
 
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+import unittest
 
 import mock
 
-import asynctest
 from juju.client import client
 from juju.controller import Controller
 
-from .. import base
 
-
-class TestControllerConnect(asynctest.TestCase):
-    @asynctest.patch('juju.controller.Controller.update_endpoints')
-    @asynctest.patch('juju.client.connector.Connector.connect_controller')
+class TestControllerConnect(unittest.IsolatedAsyncioTestCase):
+    @mock.patch('juju.controller.Controller.update_endpoints')
+    @mock.patch('juju.client.connector.Connector.connect_controller')
     async def test_no_args(self, mock_connect_controller, mock_update_endpoints):
         c = Controller()
         await c.connect()
         mock_connect_controller.assert_called_once_with(None)
         mock_update_endpoints.assert_called_once_with()
 
-    @asynctest.patch('juju.controller.Controller.update_endpoints')
-    @asynctest.patch('juju.client.connector.Connector.connect_controller')
+    @mock.patch('juju.controller.Controller.update_endpoints')
+    @mock.patch('juju.client.connector.Connector.connect_controller')
     async def test_with_controller_name(self, mock_connect_controller, mock_update_endpoints):
         c = Controller()
         await c.connect(controller_name='foo')
         mock_connect_controller.assert_called_once_with('foo')
         mock_update_endpoints.assert_called_once_with()
 
-    @asynctest.patch('juju.controller.Controller.update_endpoints')
-    @asynctest.patch('juju.client.connector.Connector.connect')
+    @mock.patch('juju.controller.Controller.update_endpoints')
+    @mock.patch('juju.client.connector.Connector.connect')
     async def test_with_endpoint_and_no_auth(self, mock_connect, mock_update_endpoints):
         c = Controller()
         with self.assertRaises(TypeError):
             await c.connect(endpoint='0.1.2.3:4566')
         self.assertEqual(mock_connect.call_count, 0)
 
-    @asynctest.patch('juju.controller.Controller.update_endpoints')
-    @asynctest.patch('juju.client.connector.Connector.connect')
+    @mock.patch('juju.controller.Controller.update_endpoints')
+    @mock.patch('juju.client.connector.Connector.connect')
     async def test_with_endpoint_and_userpass(self, mock_connect, mock_update_endpoints):
         c = Controller()
         with self.assertRaises(TypeError):
@@ -52,8 +50,8 @@ class TestControllerConnect(asynctest.TestCase):
                                              password='pass')
         mock_update_endpoints.assert_called_once_with()
 
-    @asynctest.patch('juju.controller.Controller.update_endpoints')
-    @asynctest.patch('juju.client.connector.Connector.connect')
+    @mock.patch('juju.controller.Controller.update_endpoints')
+    @mock.patch('juju.client.connector.Connector.connect')
     async def test_with_endpoint_and_bakery_client(self, mock_connect, mock_update_endpoints):
         c = Controller()
         await c.connect(endpoint='0.1.2.3:4566', bakery_client='bakery')
@@ -61,8 +59,8 @@ class TestControllerConnect(asynctest.TestCase):
                                              bakery_client='bakery')
         mock_update_endpoints.assert_called_once_with()
 
-    @asynctest.patch('juju.controller.Controller.update_endpoints')
-    @asynctest.patch('juju.client.connector.Connector.connect')
+    @mock.patch('juju.controller.Controller.update_endpoints')
+    @mock.patch('juju.client.connector.Connector.connect')
     async def test_with_endpoint_and_macaroons(self, mock_connect, mock_update_endpoints):
         c = Controller()
         await c.connect(endpoint='0.1.2.3:4566',
@@ -78,9 +76,9 @@ class TestControllerConnect(asynctest.TestCase):
                                         macaroons=['macaroon'])
         mock_update_endpoints.assert_called_with()
 
-    @asynctest.patch('juju.controller.Controller.update_endpoints')
-    @asynctest.patch('juju.client.connector.Connector.connect_controller')
-    @asynctest.patch('juju.client.connector.Connector.connect')
+    @mock.patch('juju.controller.Controller.update_endpoints')
+    @mock.patch('juju.client.connector.Connector.connect_controller')
+    @mock.patch('juju.client.connector.Connector.connect')
     async def test_with_posargs(self, mock_connect, mock_connect_controller, mock_update_endpoints):
         c = Controller()
         await c.connect('foo')
@@ -104,7 +102,7 @@ class TestControllerConnect(asynctest.TestCase):
                                         max_frame_size='max_frame_size')
         mock_update_endpoints.assert_called_with()
 
-    @asynctest.patch('juju.client.client.CloudFacade')
+    @mock.patch('juju.client.client.CloudFacade')
     async def test_file_cred_v2(self, mock_cf):
         with NamedTemporaryFile() as tempfile:
             tempfile.close()
@@ -114,8 +112,8 @@ class TestControllerConnect(asynctest.TestCase):
                                           attrs={'file': tempfile.name})
             jujudata = mock.MagicMock()
             c = Controller(jujudata=jujudata)
-            c._connector = base.AsyncMock()
-            up_creds = base.AsyncMock()
+            c._connector = mock.Mock()
+            up_creds = mock.AsyncMock()
             cloud_facade = mock_cf.from_connection()
             cloud_facade.version = 2
             cloud_facade.UpdateCredentials = up_creds
@@ -130,7 +128,7 @@ class TestControllerConnect(asynctest.TestCase):
             assert cred.attrs['file'] == tempfile.name
             assert new_cred.attrs['file'] == 'cred-test'
 
-    @asynctest.patch('juju.client.client.CloudFacade')
+    @mock.patch('juju.client.client.CloudFacade')
     async def test_file_cred_v3(self, mock_cf):
         with NamedTemporaryFile() as tempfile:
             tempfile.close()
@@ -140,8 +138,8 @@ class TestControllerConnect(asynctest.TestCase):
                                           attrs={'file': tempfile.name})
             jujudata = mock.MagicMock()
             c = Controller(jujudata=jujudata)
-            c._connector = base.AsyncMock()
-            up_creds = base.AsyncMock()
+            c._connector = mock.Mock()
+            up_creds = mock.AsyncMock()
             cloud_facade = mock_cf.from_connection()
             cloud_facade.version = 3
             cloud_facade.UpdateCredentialsCheckModels = up_creds

@@ -11,7 +11,6 @@ from juju import jasyncio
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 @pytest.mark.skip('Update charm')
 async def test_offer(event_loop):
     async with base.CleanModel() as model:
@@ -33,7 +32,6 @@ async def test_offer(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 @pytest.mark.skip('Update charm')
 async def test_consume(event_loop):
     async with base.CleanModel() as model_1:
@@ -64,7 +62,6 @@ async def test_consume(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 @pytest.mark.skip('Update charm')
 async def test_remove_saas(event_loop):
     async with base.CleanModel() as model_1:
@@ -98,7 +95,6 @@ async def test_remove_saas(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_relate_with_offer(event_loop):
     # pytest.skip('Revise: intermittent problem with the remove_saas call')
     async with base.CleanModel() as model_1:
@@ -144,7 +140,6 @@ async def test_relate_with_offer(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 @pytest.mark.bundle
 async def test_add_bundle(event_loop):
     pytest.skip("skip until we have a faster example to test")

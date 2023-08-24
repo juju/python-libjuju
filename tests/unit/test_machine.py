@@ -1,16 +1,13 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-import asynctest
 import mock
-import pytest
 
 from juju.model import Model
 from juju.machine import Machine
 
 
-@asynctest.patch('juju.client.client.ClientFacade')
-@pytest.mark.asyncio
+@mock.patch('juju.client.client.ClientFacade')
 async def test_hostname(mock_cf):
     model = Model()
     model._connector = mock.MagicMock()

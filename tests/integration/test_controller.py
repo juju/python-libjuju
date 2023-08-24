@@ -16,7 +16,6 @@ from .. import base
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_add_remove_user(event_loop):
     async with base.CleanController() as controller:
         username = 'test{}'.format(uuid.uuid4())
@@ -36,7 +35,6 @@ async def test_add_remove_user(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_disable_enable_user(event_loop):
     async with base.CleanController() as controller:
         username = 'test-disable{}'.format(uuid.uuid4())
@@ -60,7 +58,6 @@ async def test_disable_enable_user(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_change_user_password(event_loop):
     async with base.CleanController() as controller:
         username = 'test-password{}'.format(uuid.uuid4())
@@ -81,7 +78,6 @@ async def test_change_user_password(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_reset_user_password(event_loop):
     async with base.CleanController() as controller:
         username = 'test{}'.format(uuid.uuid4())
@@ -110,7 +106,6 @@ async def test_reset_user_password(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_list_models(event_loop):
     async with base.CleanController() as controller:
         async with base.CleanModel() as model:
@@ -119,7 +114,6 @@ async def test_list_models(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_get_model(event_loop):
     async with base.CleanController() as controller:
         by_name, by_uuid = None, None
@@ -153,7 +147,6 @@ async def _wait_for_model_gone(controller, model_name):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_destroy_model_by_name(event_loop):
     async with base.CleanController() as controller:
         model_name = 'test-{}'.format(uuid.uuid4())
@@ -169,7 +162,6 @@ async def test_destroy_model_by_name(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_add_destroy_model_by_uuid(event_loop):
     async with base.CleanController() as controller:
         model_name = 'test-{}'.format(uuid.uuid4())
@@ -186,7 +178,6 @@ async def test_add_destroy_model_by_uuid(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_add_remove_cloud(event_loop):
     async with base.CleanController() as controller:
         cloud_name = 'test-{}'.format(uuid.uuid4())
@@ -204,7 +195,6 @@ async def test_add_remove_cloud(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_secrets_backend_lifecycle(event_loop):
     """Testing the add_secret_backends is particularly
     costly in term of resources. This test sets a vault
@@ -282,7 +272,6 @@ async def test_secrets_backend_lifecycle(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_grant_revoke_controller_access(event_loop):
     async with base.CleanController() as controller:
         username = 'test-grant{}'.format(uuid.uuid4())
@@ -310,7 +299,6 @@ async def test_grant_revoke_controller_access(event_loop):
 
 
 @base.bootstrapped
-@pytest.mark.asyncio
 async def test_grant_revoke_model_access(event_loop):
     async with base.CleanController() as controller:
         username = 'test-grant{}'.format(uuid.uuid4())
