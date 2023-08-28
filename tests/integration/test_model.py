@@ -1274,7 +1274,13 @@ async def test_detach_storage(event_loop):
 async def test_add_and_list_storage(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('postgresql', base='ubuntu@22.04')
-        await model.wait_for_idle(status="active", timeout=900)
+        # TODO (cderici):
+        # This is a good use case for waiting on individual unit status
+        # (i.e. not caring about the app status)
+        # All we need is to make sure a unit is up, doesn't even need to
+        # be in 'active' or 'idle', i.e.
+        # await model.wait_for_idle(status="waiting", wait_for_exact_units=1)
+        await jasyncio.sleep(5)
         unit = app.units[0]
         await unit.add_storage("pgdata", size=512)
         storages = await model.list_storage()
