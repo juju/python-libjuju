@@ -661,6 +661,18 @@ class Type:
 
     @classmethod
     def from_json(cls, data):
+        def _parse_nested_list_entry(expr, result_dict):
+            if isinstance(expr, str):
+                cls.splitEntries(expr, result_dict)
+            elif isinstance(expr, dict):
+                for _, v in expr.items():
+                    _parse_nested_list_entry(v, result_dict)
+            elif isinstance(expr, list):
+                for v in expr:
+                    _parse_nested_list_entry(v, result_dict)
+            else:
+                raise TypeError(f"Unexpected type of entry in assumes expression: {expr}")
+
         if isinstance(data, cls):
             return data
         if isinstance(data, str):
@@ -679,20 +691,7 @@ class Type:
         if isinstance(data, list):
             # check: https://juju.is/docs/sdk/assumes
             d = {}
-            for entry in data:
-                if isinstance(entry, dict):
-                    # this could be
-                    # any-of
-                    # all-of
-                    for _, v in entry.items():
-                        if isinstance(v, list):
-                            for i in v:
-                                cls.splitEntries(i, d)
-                        else:
-                            cls.splitEntries(v, d)
-                else:
-                    # this is a simple entry
-                    cls.splitEntries(entry, d)
+            _parse_nested_list_entry(data, d)
             return cls(**d)
         return None
 
