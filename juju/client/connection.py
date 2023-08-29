@@ -456,6 +456,9 @@ class Connection:
             await jasyncio.gather(*jasyncio.all_tasks())
         except jasyncio.CancelledError:
             pass
+        except websockets.exceptions.ConnectionClosed:
+            pass
+
         self._pinger_task = None
         self._receiver_task = None
         self._debug_log_task = None
