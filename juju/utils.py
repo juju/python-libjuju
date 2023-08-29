@@ -181,6 +181,10 @@ async def run_with_interrupt(task, *events, log=None):
                                         return_when=jasyncio.FIRST_COMPLETED)
     for f in pending:
         f.cancel()  # cancel unfinished tasks
+        try:
+            await f
+        except jasyncio.CancelledError:
+            pass
     for f in done:
         f.exception()  # prevent "exception was not retrieved" errors
     if task in done:
