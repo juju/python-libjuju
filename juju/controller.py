@@ -309,7 +309,9 @@ class Controller:
             the current user.
         :param dict config: Model configuration.
         :param str region: Region in which to create the model.
-        :return Model: A connection to the newly created model.
+        :return Model: A connection to the newly created model. Run
+            await <model>.connect(<connect-params>) to ensure the model
+            is connected before using the model.
         """
         model_facade = client.ModelManagerFacade.from_connection(
             self.connection())
