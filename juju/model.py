@@ -1897,7 +1897,7 @@ class Model:
         charm_url = URL.parse(result.url)
 
         # run the series selector to get a series for the base
-        selected_series = utils.series_selector(series, url, model_config, supported_series, force)
+        selected_series = utils.series_selector(series, charm_url, model_config, supported_series, force)
         result.charm_origin.base = utils.get_base_from_origin_or_channel(resolved_origin, selected_series)
         charm_url.series = selected_series
 
