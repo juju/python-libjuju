@@ -407,12 +407,13 @@ def should_upgrade_resource(available_resource, existing_resources):
     """
     # should upgrade resource?
     res_name = available_resource.get('Name', available_resource.get('name'))
-    # no, if it's upload
-    if existing_resources[res_name].origin == 'upload':
-        return False
 
-    # no, if we already have it (and upstream doesn't have a newer res available)
+    # do we have it already?
     if res_name in existing_resources:
+        # no upgrade, if it's upload
+        if existing_resources[res_name].origin == 'upload':
+            return False
+        # no upgrade, if upstream doesn't have a newer revision of the resource available
         available_rev = available_resource.get('Revision', available_resource.get('revision', -1))
         u_fields = existing_resources[res_name].unknown_fields
         existing_rev = u_fields.get('Revision', u_fields.get('revision', -1))
