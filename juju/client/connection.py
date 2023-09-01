@@ -451,16 +451,17 @@ class Connection:
         if self._ws and not self._ws.closed:
             await self._ws.close()
 
-        """
-        Temporarily disabling this to investigate CI blockage
         try:
             log.debug('Gathering all tasks for connection close')
-            await jasyncio.gather(*jasyncio.all_tasks())
+
+            # Avoid gathering the current task
+            tasks_need_to_be_gathered = [task for task in jasyncio.all_tasks()
+                                         if task != jasyncio.current_task()]
+            await jasyncio.gather(*tasks_need_to_be_gathered)
         except jasyncio.CancelledError:
             pass
         except websockets.exceptions.ConnectionClosed:
             pass
-        """
 
         self._pinger_task = None
         self._receiver_task = None
