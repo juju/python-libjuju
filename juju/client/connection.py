@@ -218,7 +218,8 @@ class Monitor:
         if connection.is_debug_log_connection:
             stopped = connection._debug_log_task.cancelled()
         else:
-            stopped = connection._receiver_task.cancelled()
+            stopped = connection._receiver_task is not None and \
+                      connection._receiver_task.cancelled()
 
         if stopped or not connection._ws.open:
             return self.ERROR
@@ -451,17 +452,17 @@ class Connection:
         if self._ws and not self._ws.closed:
             await self._ws.close()
 
-        try:
-            log.debug('Gathering all tasks for connection close')
+        if not to_reconnect:
+            try:
+                log.debug('Gathering all tasks for connection close')
 
-            # Avoid gathering the current task
-            tasks_need_to_be_gathered = [task for task in jasyncio.all_tasks()
-                                         if task != jasyncio.current_task()]
-            await jasyncio.gather(*tasks_need_to_be_gathered)
-        except jasyncio.CancelledError:
-            pass
-        except websockets.exceptions.ConnectionClosed:
-            pass
+                # Avoid gathering the current task
+                tasks_need_to_be_gathered = [task for task in jasyncio.all_tasks() if task != jasyncio.current_task()]
+                await jasyncio.gather(*tasks_need_to_be_gathered)
+            except jasyncio.CancelledError:
+                pass
+            except websockets.exceptions.ConnectionClosed:
+                pass
 
         self._pinger_task = None
         self._receiver_task = None
