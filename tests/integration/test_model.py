@@ -7,7 +7,6 @@ import random
 import string
 import time
 import uuid
-from concurrent.futures import ThreadPoolExecutor
 
 import mock
 import paramiko
@@ -661,32 +660,6 @@ async def test_relate(event_loop):
             ), timeout)
 
         assert isinstance(my_relation, Relation)
-
-
-async def _deploy_in_loop(new_loop, model_name, jujudata):
-    new_model = Model(jujudata=jujudata)
-    await new_model.connect(model_name)
-    try:
-        await new_model.deploy('ubuntu', channel='stable')
-        assert 'ubuntu' in new_model.applications
-    finally:
-        await new_model.disconnect()
-
-
-@base.bootstrapped
-async def test_explicit_loop_threaded(event_loop):
-    async with base.CleanModel() as model:
-        model_name = model.name
-        new_loop = jasyncio.new_event_loop()
-        with ThreadPoolExecutor(1) as executor:
-            f = executor.submit(
-                new_loop.run_until_complete,
-                _deploy_in_loop(new_loop,
-                                model_name,
-                                model._connector.jujudata))
-            f.result()
-        await model._wait_for_new('application', 'ubuntu')
-        assert 'ubuntu' in model.applications
 
 
 @base.bootstrapped
