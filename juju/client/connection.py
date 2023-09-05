@@ -218,8 +218,7 @@ class Monitor:
         if connection.is_debug_log_connection:
             stopped = connection._debug_log_task.cancelled()
         else:
-            stopped = connection._receiver_task is not None and \
-                      connection._receiver_task.cancelled()
+            stopped = connection._receiver_task is not None and connection._receiver_task.cancelled()
 
         if stopped or not connection._ws.open:
             return self.ERROR
