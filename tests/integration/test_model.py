@@ -1086,7 +1086,7 @@ async def test_application_annotations(event_loop):
 async def test_unit_annotations(event_loop):
 
     async with base.CleanModel() as model:
-        app = await model.deploy('ubuntu', channel="stable")
+        app = await model.deploy('ubuntu')
         await model.wait_for_idle()
         unit = app.units[0]
 
@@ -1096,8 +1096,8 @@ async def test_unit_annotations(event_loop):
         expected = {"foo": "bar", "another": "value"}
         await unit.set_annotations(expected)
 
-        annotations = await unit.get_annotations()
-        assert annotations == expected
+        annotations_2 = await unit.get_annotations()
+        assert annotations_2 == expected
 
 
 @base.bootstrapped

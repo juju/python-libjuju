@@ -1,0 +1,13 @@
+name: assumes-charm
+summary: "test"
+description: "test"
+maintainers: ["test"]
+assumes:
+  - juju
+  - any-of:
+      - all-of:
+          - juju >= 2.9
+          - juju < 3
+      - all-of:
+          - juju >= 3.1
+          - juju < 4

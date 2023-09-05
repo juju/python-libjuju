@@ -1,0 +1,13 @@
+#!/bin/bash
+
+status="$(config-get status)"
+
+if [[ "$status" == "error" ]]; then
+    if [[ -e .errored ]]; then
+        status="active"
+    else
+        touch .errored
+        exit 1
+    fi
+fi
+status-set "$status"
