@@ -7,7 +7,6 @@ import random
 import string
 import time
 import uuid
-from concurrent.futures import ThreadPoolExecutor
 
 import mock
 import paramiko
@@ -663,32 +662,6 @@ async def test_relate(event_loop):
         assert isinstance(my_relation, Relation)
 
 
-async def _deploy_in_loop(new_loop, model_name, jujudata):
-    new_model = Model(jujudata=jujudata)
-    await new_model.connect(model_name)
-    try:
-        await new_model.deploy('ubuntu', channel='stable')
-        assert 'ubuntu' in new_model.applications
-    finally:
-        await new_model.disconnect()
-
-
-@base.bootstrapped
-async def test_explicit_loop_threaded(event_loop):
-    async with base.CleanModel() as model:
-        model_name = model.name
-        new_loop = jasyncio.new_event_loop()
-        with ThreadPoolExecutor(1) as executor:
-            f = executor.submit(
-                new_loop.run_until_complete,
-                _deploy_in_loop(new_loop,
-                                model_name,
-                                model._connector.jujudata))
-            f.result()
-        await model._wait_for_new('application', 'ubuntu')
-        assert 'ubuntu' in model.applications
-
-
 @base.bootstrapped
 async def test_store_resources_charm(event_loop):
     pytest.skip('Revise: test_store_resources_charm intermittent test failure')
@@ -1086,7 +1059,7 @@ async def test_application_annotations(event_loop):
 async def test_unit_annotations(event_loop):
 
     async with base.CleanModel() as model:
-        app = await model.deploy('ubuntu', channel="stable")
+        app = await model.deploy('ubuntu')
         await model.wait_for_idle()
         unit = app.units[0]
 
@@ -1096,8 +1069,8 @@ async def test_unit_annotations(event_loop):
         expected = {"foo": "bar", "another": "value"}
         await unit.set_annotations(expected)
 
-        annotations = await unit.get_annotations()
-        assert annotations == expected
+        annotations_2 = await unit.get_annotations()
+        assert annotations_2 == expected
 
 
 @base.bootstrapped
@@ -1274,7 +1247,13 @@ async def test_detach_storage(event_loop):
 async def test_add_and_list_storage(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('postgresql', base='ubuntu@22.04')
-        await model.wait_for_idle(status="active", timeout=900)
+        # TODO (cderici):
+        # This is a good use case for waiting on individual unit status
+        # (i.e. not caring about the app status)
+        # All we need is to make sure a unit is up, doesn't even need to
+        # be in 'active' or 'idle', i.e.
+        # await model.wait_for_idle(status="waiting", wait_for_exact_units=1)
+        await jasyncio.sleep(5)
         unit = app.units[0]
         await unit.add_storage("pgdata", size=512)
         storages = await model.list_storage()

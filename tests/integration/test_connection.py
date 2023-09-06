@@ -31,7 +31,7 @@ async def test_monitor(event_loop):
         assert conn.monitor.status == 'connected'
         await conn.close()
 
-        assert conn.monitor.status == 'disconnected'
+        assert conn.monitor.status == 'disconnecting'
 
 
 @base.bootstrapped

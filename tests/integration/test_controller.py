@@ -205,7 +205,7 @@ async def test_secrets_backend_lifecycle(event_loop):
         # deploy postgresql
         await m.deploy('postgresql', base='ubuntu@22.04')
         # deploy vault
-        await m.deploy("vault", base='ubuntu@20.04')
+        await m.deploy("vault", channel='1.8/stable', base='ubuntu@22.04')
         # relate/integrate
         await m.integrate("vault:db", "postgresql:db")
         # wait for the postgresql app
