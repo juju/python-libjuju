@@ -104,7 +104,7 @@ async def test_relate_with_offer(event_loop):
             channel='14/stable',
         )
         assert 'postgresql' in model_1.applications
-        await model_1.wait_for_idle(status="active")
+        await model_1.wait_for_idle()
         await model_1.create_offer("postgresql:db")
 
         offers = await model_1.list_offers()
