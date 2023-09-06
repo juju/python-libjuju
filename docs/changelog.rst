@@ -1,12 +1,21 @@
 Changelog
 ---------
 
+2.9.44.1
+^^^^^^^^
+
+Tuesday Sep 5 2023
+
+## What's Changed
+
+* Cleanup release process by @cderici in https://github.com/juju/python-libjuju/pull/921
+* [JUJU-4488] Add licence headers to source files by @cderici in https://github.com/juju/python-libjuju/pull/933
+* Parse nested assumes expressions by @cderici in https://github.com/juju/python-libjuju/pull/940
+
 2.9.44.0
 ^^^^^^^^
 
 Thursday Jul 20 2023
-
-## What's Changed
 
 * [JUJU-4110] `charm_name` on Application object by @cderici in https://github.com/juju/python-libjuju/pull/901
 * [JUJU-4204] Model.name on 2.9 by @cderici in https://github.com/juju/python-libjuju/pull/902
