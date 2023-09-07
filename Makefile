@@ -39,6 +39,7 @@ release:
 	git fetch --tags
 	rm dist/*.tar.gz || true
 	$(PY) setup.py sdist
+	$(BIN)/twine check dist/*
 	$(BIN)/twine upload --repository juju dist/*
 	git tag ${VERSION}
 	git push --tags
