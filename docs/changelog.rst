@@ -8,8 +8,7 @@ Wednesday 6th September 2023
 
 This is a minor release on the 3.x track, works with any Juju 3.x controller.
 
-What's Changed
-==============
+## What's Changed
 
 * Repository Maintenance Improvements by @cderici in https://github.com/juju/python-libjuju/pull/922
 * Stale bot to not bother feature requests by @cderici in https://github.com/juju/python-libjuju/pull/926
@@ -101,8 +100,7 @@ This version is only tested using Juju 3.1.0.
 * Add compatibility for juju 3.1.0 by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/799
 * Replace schemas.json with a wellformed version. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/800
 
-New Contributors
-================
+## New Contributors
 
 * @mert-kirpici made their first contribution in https://github.com/juju/python-libjuju/pull/731
 
@@ -117,8 +115,7 @@ Wednesday 26th October
 * [JUJU-2026] Improve resolve charm by @cderici in https://github.com/juju/python-libjuju/pull/761
 * Add owner and data to license file by @arturo-seijas in https://github.com/juju/python-libjuju/pull/760
 
-New Contributors
-================
+## New Contributors
 
 * @arturo-seijas made their first contribution in https://github.com/juju/python-libjuju/pull/760
 
