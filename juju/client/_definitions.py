@@ -9488,19 +9488,25 @@ class ErrorResults(Type):
 
 
 class ExportBundleParams(Type):
-    _toSchema = {'include_charm_defaults': 'include-charm-defaults'}
-    _toPy = {'include-charm-defaults': 'include_charm_defaults'}
-    def __init__(self, include_charm_defaults=None, **unknown_fields):
+    _toSchema = {'include_charm_defaults': 'include-charm-defaults', 'include_series': 'include-series'}
+    _toPy = {'include-charm-defaults': 'include_charm_defaults', 'include-series': 'include_series'}
+    def __init__(self, include_charm_defaults=None, include_series=None, **unknown_fields):
         '''
         include_charm_defaults : bool
+        include_series : bool
         '''
         include_charm_defaults_ = include_charm_defaults
+        include_series_ = include_series
 
         # Validate arguments against known Juju API types.
         if include_charm_defaults_ is not None and not isinstance(include_charm_defaults_, bool):
             raise Exception("Expected include_charm_defaults_ to be a bool, received: {}".format(type(include_charm_defaults_)))
 
+        if include_series_ is not None and not isinstance(include_series_, bool):
+            raise Exception("Expected include_series_ to be a bool, received: {}".format(type(include_series_)))
+
         self.include_charm_defaults = include_charm_defaults_
+        self.include_series = include_series_
         self.unknown_fields = unknown_fields
 
 
@@ -11062,6 +11068,30 @@ class GrantRevokeSecretArgs(Type):
 
 
 
+class GrantRevokeUserSecretArg(Type):
+    _toSchema = {'applications': 'applications', 'uri': 'uri'}
+    _toPy = {'applications': 'applications', 'uri': 'uri'}
+    def __init__(self, applications=None, uri=None, **unknown_fields):
+        '''
+        applications : typing.Sequence[str]
+        uri : str
+        '''
+        applications_ = applications
+        uri_ = uri
+
+        # Validate arguments against known Juju API types.
+        if applications_ is not None and not isinstance(applications_, (bytes, str, list)):
+            raise Exception("Expected applications_ to be a Sequence, received: {}".format(type(applications_)))
+
+        if uri_ is not None and not isinstance(uri_, (bytes, str)):
+            raise Exception("Expected uri_ to be a str, received: {}".format(type(uri_)))
+
+        self.applications = applications_
+        self.uri = uri_
+        self.unknown_fields = unknown_fields
+
+
+
 class HardwareCharacteristics(Type):
     _toSchema = {'arch': 'arch', 'availability_zone': 'availability-zone', 'cpu_cores': 'cpu-cores', 'cpu_power': 'cpu-power', 'mem': 'mem', 'root_disk': 'root-disk', 'root_disk_source': 'root-disk-source', 'tags': 'tags', 'virt_type': 'virt-type'}
     _toPy = {'arch': 'arch', 'availability-zone': 'availability_zone', 'cpu-cores': 'cpu_cores', 'cpu-power': 'cpu_power', 'mem': 'mem', 'root-disk': 'root_disk', 'root-disk-source': 'root_disk_source', 'tags': 'tags', 'virt-type': 'virt_type'}
@@ -11717,14 +11747,13 @@ class InstanceInfo(Type):
 
 
 class InstanceType(Type):
-    _toSchema = {'arches': 'arches', 'cost': 'cost', 'cpu_cores': 'cpu-cores', 'deprecated': 'deprecated', 'memory': 'memory', 'name': 'name', 'root_disk': 'root-disk', 'virt_type': 'virt-type'}
-    _toPy = {'arches': 'arches', 'cost': 'cost', 'cpu-cores': 'cpu_cores', 'deprecated': 'deprecated', 'memory': 'memory', 'name': 'name', 'root-disk': 'root_disk', 'virt-type': 'virt_type'}
-    def __init__(self, arches=None, cost=None, cpu_cores=None, deprecated=None, memory=None, name=None, root_disk=None, virt_type=None, **unknown_fields):
+    _toSchema = {'arches': 'arches', 'cost': 'cost', 'cpu_cores': 'cpu-cores', 'memory': 'memory', 'name': 'name', 'root_disk': 'root-disk', 'virt_type': 'virt-type'}
+    _toPy = {'arches': 'arches', 'cost': 'cost', 'cpu-cores': 'cpu_cores', 'memory': 'memory', 'name': 'name', 'root-disk': 'root_disk', 'virt-type': 'virt_type'}
+    def __init__(self, arches=None, cost=None, cpu_cores=None, memory=None, name=None, root_disk=None, virt_type=None, **unknown_fields):
         '''
         arches : typing.Sequence[str]
         cost : int
         cpu_cores : int
-        deprecated : bool
         memory : int
         name : str
         root_disk : int
@@ -11733,7 +11762,6 @@ class InstanceType(Type):
         arches_ = arches
         cost_ = cost
         cpu_cores_ = cpu_cores
-        deprecated_ = deprecated
         memory_ = memory
         name_ = name
         root_disk_ = root_disk
@@ -11748,9 +11776,6 @@ class InstanceType(Type):
 
         if cpu_cores_ is not None and not isinstance(cpu_cores_, int):
             raise Exception("Expected cpu_cores_ to be a int, received: {}".format(type(cpu_cores_)))
-
-        if deprecated_ is not None and not isinstance(deprecated_, bool):
-            raise Exception("Expected deprecated_ to be a bool, received: {}".format(type(deprecated_)))
 
         if memory_ is not None and not isinstance(memory_, int):
             raise Exception("Expected memory_ to be a int, received: {}".format(type(memory_)))
@@ -11767,7 +11792,6 @@ class InstanceType(Type):
         self.arches = arches_
         self.cost = cost_
         self.cpu_cores = cpu_cores_
-        self.deprecated = deprecated_
         self.memory = memory_
         self.name = name_
         self.root_disk = root_disk_
@@ -18057,19 +18081,17 @@ class PayloadResults(Type):
 
 
 class PendingResourceUpload(Type):
-    _toSchema = {'filename': 'Filename', 'name': 'Name', 'pending_id': 'pending-id', 'type_': 'Type'}
-    _toPy = {'Filename': 'filename', 'Name': 'name', 'Type': 'type_', 'pending-id': 'pending_id'}
-    def __init__(self, filename=None, name=None, type_=None, pending_id=None, **unknown_fields):
+    _toSchema = {'filename': 'Filename', 'name': 'Name', 'type_': 'Type'}
+    _toPy = {'Filename': 'filename', 'Name': 'name', 'Type': 'type_'}
+    def __init__(self, filename=None, name=None, type_=None, **unknown_fields):
         '''
         filename : str
         name : str
         type_ : str
-        pending_id : str
         '''
         filename_ = filename
         name_ = name
         type__ = type_
-        pending_id_ = pending_id
 
         # Validate arguments against known Juju API types.
         if filename_ is not None and not isinstance(filename_, (bytes, str)):
@@ -18081,13 +18103,9 @@ class PendingResourceUpload(Type):
         if type__ is not None and not isinstance(type__, (bytes, str)):
             raise Exception("Expected type__ to be a str, received: {}".format(type(type__)))
 
-        if pending_id_ is not None and not isinstance(pending_id_, (bytes, str)):
-            raise Exception("Expected pending_id_ to be a str, received: {}".format(type(pending_id_)))
-
         self.filename = filename_
         self.name = name_
         self.type_ = type__
-        self.pending_id = pending_id_
         self.unknown_fields = unknown_fields
 
 
@@ -20904,18 +20922,18 @@ class ResolveCharmWithChannel(Type):
 
 
 class ResolveCharmWithChannelResult(Type):
-    _toSchema = {'charm_origin': 'charm-origin', 'error': 'error', 'supported_series': 'supported-series', 'url': 'url'}
-    _toPy = {'charm-origin': 'charm_origin', 'error': 'error', 'supported-series': 'supported_series', 'url': 'url'}
-    def __init__(self, charm_origin=None, error=None, supported_series=None, url=None, **unknown_fields):
+    _toSchema = {'charm_origin': 'charm-origin', 'error': 'error', 'supported_bases': 'supported-bases', 'url': 'url'}
+    _toPy = {'charm-origin': 'charm_origin', 'error': 'error', 'supported-bases': 'supported_bases', 'url': 'url'}
+    def __init__(self, charm_origin=None, error=None, supported_bases=None, url=None, **unknown_fields):
         '''
         charm_origin : CharmOrigin
         error : Error
-        supported_series : typing.Sequence[str]
+        supported_bases : typing.Sequence[~Base]
         url : str
         '''
         charm_origin_ = CharmOrigin.from_json(charm_origin) if charm_origin else None
         error_ = Error.from_json(error) if error else None
-        supported_series_ = supported_series
+        supported_bases_ = [Base.from_json(o) for o in supported_bases or []]
         url_ = url
 
         # Validate arguments against known Juju API types.
@@ -20925,15 +20943,15 @@ class ResolveCharmWithChannelResult(Type):
         if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if supported_series_ is not None and not isinstance(supported_series_, (bytes, str, list)):
-            raise Exception("Expected supported_series_ to be a Sequence, received: {}".format(type(supported_series_)))
+        if supported_bases_ is not None and not isinstance(supported_bases_, (bytes, str, list)):
+            raise Exception("Expected supported_bases_ to be a Sequence, received: {}".format(type(supported_bases_)))
 
         if url_ is not None and not isinstance(url_, (bytes, str)):
             raise Exception("Expected url_ to be a str, received: {}".format(type(url_)))
 
         self.charm_origin = charm_origin_
         self.error = error_
-        self.supported_series = supported_series_
+        self.supported_bases = supported_bases_
         self.url = url_
         self.unknown_fields = unknown_fields
 
@@ -26184,6 +26202,90 @@ class UpdateSecretBackendArgs(Type):
         args : typing.Sequence[~UpdateSecretBackendArg]
         '''
         args_ = [UpdateSecretBackendArg.from_json(o) for o in args or []]
+
+        # Validate arguments against known Juju API types.
+        if args_ is not None and not isinstance(args_, (bytes, str, list)):
+            raise Exception("Expected args_ to be a Sequence, received: {}".format(type(args_)))
+
+        self.args = args_
+        self.unknown_fields = unknown_fields
+
+
+
+class UpdateUserSecretArg(Type):
+    _toSchema = {'auto_prune': 'auto-prune', 'content': 'content', 'description': 'description', 'expire_time': 'expire-time', 'label': 'label', 'params': 'params', 'rotate_policy': 'rotate-policy', 'upsertsecretarg': 'UpsertSecretArg', 'uri': 'uri'}
+    _toPy = {'UpsertSecretArg': 'upsertsecretarg', 'auto-prune': 'auto_prune', 'content': 'content', 'description': 'description', 'expire-time': 'expire_time', 'label': 'label', 'params': 'params', 'rotate-policy': 'rotate_policy', 'uri': 'uri'}
+    def __init__(self, upsertsecretarg=None, auto_prune=None, content=None, description=None, expire_time=None, label=None, params=None, rotate_policy=None, uri=None, **unknown_fields):
+        '''
+        upsertsecretarg : UpsertSecretArg
+        auto_prune : bool
+        content : SecretContentParams
+        description : str
+        expire_time : str
+        label : str
+        params : typing.Mapping[str, typing.Any]
+        rotate_policy : str
+        uri : str
+        '''
+        upsertsecretarg_ = UpsertSecretArg.from_json(upsertsecretarg) if upsertsecretarg else None
+        auto_prune_ = auto_prune
+        content_ = SecretContentParams.from_json(content) if content else None
+        description_ = description
+        expire_time_ = expire_time
+        label_ = label
+        params_ = params
+        rotate_policy_ = rotate_policy
+        uri_ = uri
+
+        # Validate arguments against known Juju API types.
+        if upsertsecretarg_ is not None and not isinstance(upsertsecretarg_, (dict, UpsertSecretArg)):
+            raise Exception("Expected upsertsecretarg_ to be a UpsertSecretArg, received: {}".format(type(upsertsecretarg_)))
+
+        if auto_prune_ is not None and not isinstance(auto_prune_, bool):
+            raise Exception("Expected auto_prune_ to be a bool, received: {}".format(type(auto_prune_)))
+
+        if content_ is not None and not isinstance(content_, (dict, SecretContentParams)):
+            raise Exception("Expected content_ to be a SecretContentParams, received: {}".format(type(content_)))
+
+        if description_ is not None and not isinstance(description_, (bytes, str)):
+            raise Exception("Expected description_ to be a str, received: {}".format(type(description_)))
+
+        if expire_time_ is not None and not isinstance(expire_time_, (bytes, str)):
+            raise Exception("Expected expire_time_ to be a str, received: {}".format(type(expire_time_)))
+
+        if label_ is not None and not isinstance(label_, (bytes, str)):
+            raise Exception("Expected label_ to be a str, received: {}".format(type(label_)))
+
+        if params_ is not None and not isinstance(params_, dict):
+            raise Exception("Expected params_ to be a Mapping, received: {}".format(type(params_)))
+
+        if rotate_policy_ is not None and not isinstance(rotate_policy_, (bytes, str)):
+            raise Exception("Expected rotate_policy_ to be a str, received: {}".format(type(rotate_policy_)))
+
+        if uri_ is not None and not isinstance(uri_, (bytes, str)):
+            raise Exception("Expected uri_ to be a str, received: {}".format(type(uri_)))
+
+        self.upsertsecretarg = upsertsecretarg_
+        self.auto_prune = auto_prune_
+        self.content = content_
+        self.description = description_
+        self.expire_time = expire_time_
+        self.label = label_
+        self.params = params_
+        self.rotate_policy = rotate_policy_
+        self.uri = uri_
+        self.unknown_fields = unknown_fields
+
+
+
+class UpdateUserSecretArgs(Type):
+    _toSchema = {'args': 'args'}
+    _toPy = {'args': 'args'}
+    def __init__(self, args=None, **unknown_fields):
+        '''
+        args : typing.Sequence[~UpdateUserSecretArg]
+        '''
+        args_ = [UpdateUserSecretArg.from_json(o) for o in args or []]
 
         # Validate arguments against known Juju API types.
         if args_ is not None and not isinstance(args_, (bytes, str, list)):

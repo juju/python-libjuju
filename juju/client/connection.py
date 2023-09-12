@@ -31,7 +31,7 @@ client_facades = {
     'AllModelWatcher': {'versions': [2, 3, 4]},
     'AllWatcher': {'versions': [1, 2, 3, 4]},
     'Annotations': {'versions': [2]},
-    'Application': {'versions': [14, 15, 16, 17]},
+    'Application': {'versions': [14, 15, 16, 17, 19]},
     'ApplicationOffers': {'versions': [1, 2, 4]},
     'ApplicationScaler': {'versions': [1]},
     'Backups': {'versions': [1, 2, 3]},
