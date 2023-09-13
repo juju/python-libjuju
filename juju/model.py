@@ -2099,7 +2099,10 @@ class Model:
                 revision=charm_origin.revision,
             )
             result = await app_facade.DeployFromRepository([app])
-            errors = [[e.message for e in r.errors] for r in result.results if r.errors]
+            errors = []
+            for r in result.results:
+                if r.errors:
+                    errors.extend([e.message for e in r.errors])
         else:
             app = client.ApplicationDeploy(
                 charm_url=charm_url,
