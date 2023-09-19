@@ -1,12 +1,9 @@
 series: jammy
 applications:
-  grafana:
-    charm: "grafana"
-    channel: stable
+  juju-qa-test:
+    charm: "juju-qa-test"
     num_units: 1
-  prometheus:
-    charm: "prometheus2"
-    channel: stable
-    num_units: 1
+  nrpe:
+    charm: "nrpe"
 relations:
-  - ["prometheus:grafana-source", "grafana:grafana-source"]
+  - ["nrpe:general-info", "juju-qa-test:juju-info"]
