@@ -39,7 +39,8 @@ release:
 	git fetch --tags
 	rm dist/*.tar.gz || true
 	$(PY) setup.py sdist
-	$(BIN)/twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
+	$(BIN)/twine check dist/*
+	$(BIN)/twine upload --repository juju dist/*
 	git tag ${VERSION}
 	git push --tags
 
