@@ -1743,6 +1743,8 @@ class Model:
         if base:
             charm_origin.base = utils.parse_base_arg(base)
 
+        server_side_deploy = False
+
         if res.is_bundle:
             handler = BundleHandler(self, trusted=trust, forced=force)
             await handler.fetch_plan(url, charm_origin, overlays=overlays)
@@ -1774,9 +1776,20 @@ class Model:
                 else:
                     charm_origin = add_charm_res.charm_origin
                 if Schema.CHARM_HUB.matches(url.schema):
-                    resources = await self._add_charmhub_resources(res.app_name,
-                                                                   identifier,
-                                                                   add_charm_res.charm_origin)
+
+                    if client.ApplicationFacade.best_facade_version(self.connection()) >= 19:
+                        server_side_deploy = True
+                    else:
+                        # TODO (cderici): this is an awkward workaround for basically not calling
+                        # the AddPendingResources in case this is a server side deploy.
+                        # If that's the case, then the store resources (and revisioned local
+                        # resources) are handled at the server side if this is a server side deploy
+                        # (local uploads are handled right after we get the pendingIDs returned
+                        # from the facade call).
+                        resources = await self._add_charmhub_resources(res.app_name,
+                                                                       identifier,
+                                                                       add_charm_res.charm_origin)
+
                     is_sub = await self.charmhub.is_subordinate(url.name)
                     if is_sub:
                         if num_units > 1:
@@ -1829,6 +1842,7 @@ class Model:
                 charm_origin=charm_origin,
                 attach_storage=attach_storage,
                 force=force,
+                server_side_deploy=server_side_deploy,
             )
 
     async def _add_charm(self, charm_url, origin):
@@ -2029,42 +2043,42 @@ class Model:
                     'username': '',
                     'password': '',
                 }
-
                 data = yaml.dump(docker_image_details)
+            else:
+                p = Path(path)
+                data = p.read_text() if p.exists() else ''
 
-                hash_alg = hashlib.sha3_384
-
-                charmresource['fingerprint'] = hash_alg(bytes(data, 'utf-8')).digest()
-
-                conn, headers, path_prefix = self.connection().https_connection()
-
-                query = "?pendingid={}".format(pending_id)
-                url = "{}/applications/{}/resources/{}{}".format(
-                    path_prefix, application, name, query)
-                if resource_type == "oci-image":
-                    disp = "multipart/form-data; filename=\"{}\"".format(path)
-                else:
-                    disp = "form-data; filename=\"{}\"".format(path)
-
-                headers['Content-Type'] = 'application/octet-stream'
-                headers['Content-Length'] = len(data)
-                headers['Content-Sha384'] = charmresource['fingerprint'].hex()
-                headers['Content-Disposition'] = disp
-
-                conn.request('PUT', url, data, headers)
-
-                response = conn.getresponse()
-                result = response.read().decode()
-                if not response.status == 200:
-                    raise JujuError(result)
+            self._upload(data, path, application, name, resource_type, pending_id)
 
         return resource_map
+
+    def _upload(self, data, path, app_name, res_name, res_type, pending_id):
+        conn, headers, path_prefix = self.connection().https_connection()
+
+        query = "?pendingid={}".format(pending_id)
+        url = "{}/applications/{}/resources/{}{}".format(path_prefix, app_name, res_name, query)
+        if res_type == "oci-image":
+            disp = "multipart/form-data; filename=\"{}\"".format(path)
+        else:
+            disp = "form-data; filename=\"{}\"".format(path)
+
+        headers['Content-Type'] = 'application/octet-stream'
+        headers['Content-Length'] = len(data)
+        headers['Content-Sha384'] = hashlib.sha384(bytes(data, 'utf-8')).hexdigest()
+        headers['Content-Disposition'] = disp
+
+        conn.request('PUT', url, data, headers)
+
+        response = conn.getresponse()
+        result = response.read().decode()
+        if not response.status == 200:
+            raise JujuError(result)
 
     async def _deploy(self, charm_url, application, series, config,
                       constraints, endpoint_bindings, resources, storage,
                       channel=None, num_units=None, placement=None,
                       devices=None, charm_origin=None, attach_storage=[],
-                      force=False):
+                      force=False, server_side_deploy=False):
         """Logic shared between `Model.deploy` and `BundleHandler.deploy`.
         """
         log.info('Deploying %s', charm_url)
@@ -2077,7 +2091,7 @@ class Model:
 
         app_facade = client.ApplicationFacade.from_connection(self.connection())
 
-        if client.ApplicationFacade.best_facade_version(self.connection()) >= 19:
+        if server_side_deploy:
             # Call DeployFromRepository
             app = client.DeployFromRepositoryArg(
                 applicationname=application,
@@ -2125,6 +2139,14 @@ class Model:
             errors = [r.error.message for r in result.results if r.error]
         if errors:
             raise JujuError('\n'.join(errors))
+
+        for _result in result.results:
+            for pending_upload_resource in _result.pendingresourceuploads:
+                _path = pending_upload_resource.filename
+                p = Path(_path)
+                data = p.read_text() if p.exists() else ''
+                self._upload(data, _path, application, pending_upload_resource.name, 'file', '')
+
         return await self._wait_for_new('application', application)
 
     async def destroy_unit(self, unit_id, destroy_storage=False, dry_run=False, force=False, max_wait=None):
