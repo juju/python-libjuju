@@ -2752,10 +2752,10 @@ class Model:
                     # errors to raise at the end
                     break
                 for unit in app.units:
-                    if unit.machine is not None and unit.machine.status == "error":
+                    if raise_on_error and unit.machine is not None and unit.machine.status == "error":
                         errors.setdefault("Machine", []).append(unit.machine.id)
                         continue
-                    if unit.agent_status == "error":
+                    if raise_on_error and unit.agent_status == "error":
                         errors.setdefault("Agent", []).append(unit.name)
                         continue
                     if raise_on_error and unit.workload_status == "error":

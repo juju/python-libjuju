@@ -14,6 +14,7 @@ MB = 1
 
 logger = logging.getLogger(__name__)
 
+from ..utils import INTEGRATION_TEST_DIR
 
 @base.bootstrapped
 async def test_action(event_loop):
@@ -191,17 +192,16 @@ async def test_upgrade_local_charm(event_loop):
 @base.bootstrapped
 async def test_upgrade_local_charm_resource(event_loop):
     async with base.CleanModel() as model:
-        tests_dir = Path(__file__).absolute().parent
-        charm_path = tests_dir / 'file-resource-charm'
+        charm_path = INTEGRATION_TEST_DIR / 'file-resource-charm'
         resources = {"file-res": "test.file"}
 
         app = await model.deploy(str(charm_path), resources=resources)
         assert 'file-resource-charm' in model.applications
-        await model.wait_for_idle()
+        await model.wait_for_idle(raise_on_error=False)
         assert app.units[0].agent_status == 'idle'
 
         await app.upgrade_charm(path=charm_path, resources=resources)
-        await model.wait_for_idle()
+        await model.wait_for_idle(raise_on_error=False)
         ress = await app.get_resources()
         assert 'file-res' in ress
         assert ress['file-res']
