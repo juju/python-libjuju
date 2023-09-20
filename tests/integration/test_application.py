@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 from ..utils import INTEGRATION_TEST_DIR
 
+
 @base.bootstrapped
 async def test_action(event_loop):
     async with base.CleanModel() as model:
