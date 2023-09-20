@@ -5,6 +5,5 @@ applications:
     num_units: 1
   nrpe:
     charm: "nrpe"
-    num_units: 1
 relations:
   - ["nrpe:general-info", "juju-qa-test:juju-info"]
