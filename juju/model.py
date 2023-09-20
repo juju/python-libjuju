@@ -2113,10 +2113,18 @@ class Model:
                 revision=charm_origin.revision,
             )
             result = await app_facade.DeployFromRepository([app])
+            # Collect the errors
             errors = []
             for r in result.results:
                 if r.errors:
                     errors.extend([e.message for e in r.errors])
+            # Upload pending local resources if any
+            for _result in result.results:
+                for pending_upload_resource in getattr(_result, 'pendingresourceuploads', []):
+                    _path = pending_upload_resource.filename
+                    p = Path(_path)
+                    data = p.read_text() if p.exists() else ''
+                    self._upload(data, _path, application, pending_upload_resource.name, 'file', '')
         else:
             app = client.ApplicationDeploy(
                 charm_url=charm_url,
@@ -2139,13 +2147,6 @@ class Model:
             errors = [r.error.message for r in result.results if r.error]
         if errors:
             raise JujuError('\n'.join(errors))
-
-        for _result in result.results:
-            for pending_upload_resource in _result.pendingresourceuploads:
-                _path = pending_upload_resource.filename
-                p = Path(_path)
-                data = p.read_text() if p.exists() else ''
-                self._upload(data, _path, application, pending_upload_resource.name, 'file', '')
 
         return await self._wait_for_new('application', application)
 
