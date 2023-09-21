@@ -450,6 +450,7 @@ class Connection:
             self._debug_log_task.cancel()
 
         if self._ws and not self._ws.closed:
+            log.debug('close: calling websocket.close()')
             await self._ws.close()
 
         if not to_reconnect:
@@ -463,6 +464,7 @@ class Connection:
                 pass
             except websockets.exceptions.ConnectionClosed:
                 pass
+        log.debug('close: all tasks are done')
 
         self._pinger_task = None
         self._receiver_task = None
@@ -595,6 +597,7 @@ class Connection:
             raise
 
     async def _pinger(self):
+        log.warning('Pinger: Starting')
         '''
         A Controller can time us out if we are silent for too long. This
         is especially true in JaaS, which has a fairly strict timeout.
@@ -604,6 +607,7 @@ class Connection:
         '''
         async def _do_ping():
             try:
+                log.debug(f'Pinger {self._pinger_task}: pinging')
                 await pinger_facade.Ping()
             except jasyncio.CancelledError:
                 raise
@@ -643,7 +647,7 @@ class Connection:
         if "version" not in msg:
             msg['version'] = self.facades[msg['type']]
         outgoing = json.dumps(msg, indent=2, cls=encoder)
-        log.debug('connection {} -> {}'.format(id(self), outgoing))
+        log.debug('connection id: {} -- sending {}'.format(id(self), outgoing))
         for attempt in range(3):
             if self.monitor.status == Monitor.DISCONNECTED:
                 # closed cleanly; shouldn't try to reconnect
@@ -666,7 +670,7 @@ class Connection:
                     log.error('RPC: Automatic reconnect failed')
                     raise
         result = await self._recv(msg['request-id'])
-        log.debug('connection {} <- {}'.format(id(self), result))
+        log.debug('connection id : {} -- receiving {}'.format(id(self), result))
 
         if not result:
             return result
@@ -797,6 +801,7 @@ class Connection:
             if not self.is_debug_log_connection:
                 self._build_facades(res.get('facades', {}))
                 if not self._pinger_task:
+                    log.debug('reconnect: creating pinger task')
                     self._pinger_task = jasyncio.create_task(self._pinger(), name="Task_Pinger")
 
     async def _connect(self, endpoints):
@@ -853,6 +858,7 @@ class Connection:
         #  If this is regular connection, and we dont have a
         #  receiver_task yet, then schedule a _receiver_task
         elif not self.is_debug_log_connection and not self._receiver_task:
+            log.debug('_connect: creating receiver task')
             self._receiver_task = jasyncio.create_task(self._receiver(), name="Task_Receiver")
 
         log.debug("Driver connected to juju %s", self.addr)
@@ -908,6 +914,7 @@ class Connection:
             login_result = await self._connect_with_login(e.endpoints)
         self._build_facades(login_result.get('facades', {}))
         if not self._pinger_task:
+            log.debug('_connect_with_redirect: creating pinger task')
             self._pinger_task = jasyncio.create_task(self._pinger(), name="Task_Pinger")
 
     # _build_facades takes the facade list that comes from the connection with the controller,
