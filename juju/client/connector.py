@@ -94,7 +94,7 @@ class Connector:
         """Shut down the watcher task and close websockets.
         """
         if self._connection:
-            log.debug(f'Closing {entity} connection')
+            log.debug(f'Connector: closing {entity} connection')
             await self._connection.close()
             self._connection = None
         if self._log_connection:

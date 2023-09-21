@@ -454,7 +454,6 @@ class Connection:
             self._debug_log_task.cancel()
 
         if self._ws and not self._ws.closed:
-            log.debug('close: calling websocket.close()')
             await self._ws.close()
 
         if not to_reconnect:
@@ -465,7 +464,6 @@ class Connection:
                 pass
             except websockets.exceptions.ConnectionClosed:
                 pass
-        log.debug('close: all tasks are done')
 
         self._pinger_task = None
         self._receiver_task = None
@@ -598,7 +596,6 @@ class Connection:
             raise
 
     async def _pinger(self):
-        log.warning('Pinger: Starting')
         '''
         A Controller can time us out if we are silent for too long. This
         is especially true in JaaS, which has a fairly strict timeout.
@@ -802,7 +799,7 @@ class Connection:
             if not self.is_debug_log_connection:
                 self._build_facades(res.get('facades', {}))
                 if not self._pinger_task:
-                    log.debug('reconnect: creating pinger task')
+                    log.debug('reconnect: scheduling a pinger task')
                     self._pinger_task = jasyncio.create_task(self._pinger(), name="Task_Pinger")
 
     async def _connect(self, endpoints):
@@ -859,7 +856,7 @@ class Connection:
         #  If this is regular connection, and we dont have a
         #  receiver_task yet, then schedule a _receiver_task
         elif not self.is_debug_log_connection and not self._receiver_task:
-            log.debug('_connect: creating receiver task')
+            log.debug('_connect: scheduling a receiver task')
             self._receiver_task = jasyncio.create_task(self._receiver(), name="Task_Receiver")
 
         log.debug("Driver connected to juju %s", self.addr)
@@ -915,7 +912,7 @@ class Connection:
             login_result = await self._connect_with_login(e.endpoints)
         self._build_facades(login_result.get('facades', {}))
         if not self._pinger_task:
-            log.debug('_connect_with_redirect: creating pinger task')
+            log.debug('_connect_with_redirect: scheduling a pinger task')
             self._pinger_task = jasyncio.create_task(self._pinger(), name="Task_Pinger")
 
     # _build_facades takes the facade list that comes from the connection with the controller,
