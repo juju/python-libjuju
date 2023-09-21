@@ -433,6 +433,7 @@ class Connection:
             max_size=self.max_frame_size,
             server_hostname=server_hostname,
             sock=sock,
+            close_timeout=1,
         )), url, endpoint, cacert
 
     async def close(self, to_reconnect=False):
