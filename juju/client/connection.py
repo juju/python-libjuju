@@ -442,11 +442,15 @@ class Connection:
         self.monitor.close_called.set()
 
         # Cancel all the tasks (that we started):
+        tasks_need_to_be_gathered = []
         if self._pinger_task:
+            tasks_need_to_be_gathered.append(self._pinger_task)
             self._pinger_task.cancel()
         if self._receiver_task:
+            tasks_need_to_be_gathered.append(self._receiver_task)
             self._receiver_task.cancel()
         if self._debug_log_task:
+            tasks_need_to_be_gathered.append(self._debug_log_task)
             self._debug_log_task.cancel()
 
         if self._ws and not self._ws.closed:
@@ -456,7 +460,6 @@ class Connection:
         if not to_reconnect:
             try:
                 log.debug('Gathering all tasks for connection close')
-                tasks_need_to_be_gathered = [self._receiver_task, self._pinger_task]
                 await jasyncio.gather(*tasks_need_to_be_gathered)
             except jasyncio.CancelledError:
                 pass
