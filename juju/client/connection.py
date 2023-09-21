@@ -456,9 +456,7 @@ class Connection:
         if not to_reconnect:
             try:
                 log.debug('Gathering all tasks for connection close')
-
-                # Avoid gathering the current task
-                tasks_need_to_be_gathered = [task for task in jasyncio.all_tasks() if task != jasyncio.current_task()]
+                tasks_need_to_be_gathered = [self._receiver_task, self._pinger_task]
                 await jasyncio.gather(*tasks_need_to_be_gathered)
             except jasyncio.CancelledError:
                 pass
