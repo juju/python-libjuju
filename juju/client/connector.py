@@ -73,6 +73,12 @@ class Connector:
             assert self._connection
             self._log_connection = await Connection.connect(**kwargs)
         else:
+            # TODO (cderici): we need to investigate how to reuse/share
+            # connections between Model & Controller objects
+            # At least either avoid overwriting self._connection with
+            # different types of connections (model, controller), or
+            # have an indication of which type of entity this is
+            # connected to.
             if self._connection:
                 await self._connection.close()
             self._connection = await Connection.connect(**kwargs)
@@ -84,11 +90,11 @@ class Connector:
         if not self._connection.info['server-version'].startswith(SUPPORTED_MAJOR_VERSION):
             raise JujuConnectionError("juju server-version %s not supported" % juju_server_version)
 
-    async def disconnect(self):
+    async def disconnect(self, entity):
         """Shut down the watcher task and close websockets.
         """
         if self._connection:
-            log.debug('Closing model connection')
+            log.debug(f'Closing {entity} connection')
             await self._connection.close()
             self._connection = None
         if self._log_connection:
