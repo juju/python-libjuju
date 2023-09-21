@@ -26,7 +26,8 @@ async def test_block_coroutine(event_loop):
             return any([await u.is_leader_from_status() for u in app.units])
 
         await utils.block_until_with_coroutine(is_leader_elected,
-                                               timeout=480)
+                                               timeout=480,
+                                               wait_period=5)
 
 
 @base.bootstrapped
