@@ -433,7 +433,6 @@ class Connection:
             max_size=self.max_frame_size,
             server_hostname=server_hostname,
             sock=sock,
-            close_timeout=1,
         )), url, endpoint, cacert
 
     async def close(self, to_reconnect=False):
@@ -645,7 +644,7 @@ class Connection:
         if "version" not in msg:
             msg['version'] = self.facades[msg['type']]
         outgoing = json.dumps(msg, indent=2, cls=encoder)
-        log.debug('connection id: {} -- sending {}'.format(id(self), outgoing))
+        log.debug('connection id: {} ---> {}'.format(id(self), outgoing))
         for attempt in range(3):
             if self.monitor.status == Monitor.DISCONNECTED:
                 # closed cleanly; shouldn't try to reconnect
@@ -668,7 +667,7 @@ class Connection:
                     log.error('RPC: Automatic reconnect failed')
                     raise
         result = await self._recv(msg['request-id'])
-        log.debug('connection id : {} -- receiving {}'.format(id(self), result))
+        log.debug('connection id : {} <--- {}'.format(id(self), result))
 
         if not result:
             return result

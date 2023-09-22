@@ -771,7 +771,7 @@ class Model:
                 raise JujuError("AllWatcher task is finished abruptly without an exception.")
             raise self._watcher_task.exception()
 
-        if self.info is None:
+        if self._info is None:
             # TODO (cderici): See if this can be optimized away, or at least
             # be done lazily (i.e. not everytime after_connect, but whenever
             # self.info is needed -- which here can be bypassed if model_uuid
@@ -799,7 +799,7 @@ class Model:
             self._watch_stopping.clear()
 
         if self.is_connected():
-            await self._connector.disconnect(entity='Model')
+            await self._connector.disconnect(entity='model')
             self._info = None
 
     async def add_local_charm_dir(self, charm_dir, series):
