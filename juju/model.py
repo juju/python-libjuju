@@ -1892,7 +1892,8 @@ class Model:
         if result.error:
             raise JujuError(f'resolving {url} : {result.error.message}')
 
-        supported_series = result.supported_series
+        # TODO (cderici) : supported_bases
+        supported_series = result.get('supported_series', result.unknown_fields['supported-series'])
         resolved_origin = result.charm_origin
         charm_url = URL.parse(result.url)
 
@@ -2068,33 +2069,60 @@ class Model:
         """
         log.info('Deploying %s', charm_url)
 
+        trust = config.get('trust', False)
         # stringify all config values for API, and convert to YAML
         config = {k: str(v) for k, v in config.items()}
         config = yaml.dump({application: config},
                            default_flow_style=False)
 
-        app_facade = client.ApplicationFacade.from_connection(
-            self.connection())
+        app_facade = client.ApplicationFacade.from_connection(self.connection())
 
-        app = client.ApplicationDeploy(
-            charm_url=charm_url,
-            application=application,
-            series=series,
-            channel=channel,
-            charm_origin=charm_origin,
-            config_yaml=config,
-            constraints=parse_constraints(constraints),
-            endpoint_bindings=endpoint_bindings,
-            num_units=num_units,
-            resources=resources,
-            storage=storage,
-            placement=placement,
-            devices=devices,
-            attach_storage=attach_storage,
-            force=force,
-        )
-        result = await app_facade.Deploy(applications=[app])
-        errors = [r.error.message for r in result.results if r.error]
+        if client.ApplicationFacade.best_facade_version(self.connection()) >= 19:
+            # Call DeployFromRepository
+            app = client.DeployFromRepositoryArg(
+                applicationname=application,
+                attachstorage=attach_storage,
+                charmname=charm_url,
+                configyaml=config,
+                cons=parse_constraints(constraints),
+                devices=devices,
+                dryrun=False,
+                placement=placement,
+                storage=storage,
+                trust=trust,
+                base=charm_origin.base,
+                channel=channel,
+                endpoint_bindings=endpoint_bindings,
+                force=force,
+                num_units=num_units,
+                resources=resources,
+                revision=charm_origin.revision,
+            )
+            result = await app_facade.DeployFromRepository([app])
+            errors = []
+            for r in result.results:
+                if r.errors:
+                    errors.extend([e.message for e in r.errors])
+        else:
+            app = client.ApplicationDeploy(
+                charm_url=charm_url,
+                application=application,
+                series=series,
+                channel=channel,
+                charm_origin=charm_origin,
+                config_yaml=config,
+                constraints=parse_constraints(constraints),
+                endpoint_bindings=endpoint_bindings,
+                num_units=num_units,
+                resources=resources,
+                storage=storage,
+                placement=placement,
+                devices=devices,
+                attach_storage=attach_storage,
+                force=force,
+            )
+            result = await app_facade.Deploy(applications=[app])
+            errors = [r.error.message for r in result.results if r.error]
         if errors:
             raise JujuError('\n'.join(errors))
         return await self._wait_for_new('application', application)

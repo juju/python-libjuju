@@ -43,16 +43,15 @@ async def test_deploy_local_bundle_dir(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_path))
 
-        app1 = model.applications.get('grafana')
-        app2 = model.applications.get('prometheus')
+        app1 = model.applications.get('juju-qa-test')
+        app2 = model.applications.get('nrpe')
         with open("/tmp/output", "w") as writer:
             writer.write(str(bundle_path) + "\n")
             for (k, v) in model.applications.items():
                 writer.write(k)
         assert app1 and app2
-        await model.block_until(lambda: (len(app1.units) == 1 and
-                                len(app2.units) == 1),
-                                timeout=60 * 4)
+        # import pdb;pdb.set_trace()
+        await model.wait_for_idle(['juju-qa-test', 'nrpe'], wait_for_at_least_units=1)
 
 
 @base.bootstrapped
@@ -64,12 +63,10 @@ async def test_deploy_local_bundle_file(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(mini_bundle_file_path))
 
-        app1 = model.applications.get('grafana')
-        app2 = model.applications.get('prometheus')
+        app1 = model.applications.get('juju-qa-test')
+        app2 = model.applications.get('nrpe')
         assert app1 and app2
-        await model.block_until(lambda: (len(app1.units) == 1 and
-                                len(app2.units) == 1),
-                                timeout=60 * 4)
+        await model.wait_for_idle(['juju-qa-test', 'nrpe'], wait_for_at_least_units=1)
 
 
 @base.bootstrapped

@@ -298,7 +298,7 @@ class BundleHandler:
             bundleurl=entity_id,
             yaml=yaml_data)
 
-        if self.plan.errors:
+        if self.plan.errors and any(self.plan.errors):
             raise JujuError(self.plan.errors)
 
     async def _download_bundle(self, charm_url, origin):

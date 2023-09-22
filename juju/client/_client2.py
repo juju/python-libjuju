@@ -5105,6 +5105,360 @@ class RemoteRelationsFacade(Type):
 
 
 
+class SecretsFacade(Type):
+    name = 'Secrets'
+    version = 2
+    schema =     {'definitions': {'CreateSecretArg': {'additionalProperties': False,
+                                         'properties': {'UpsertSecretArg': {'$ref': '#/definitions/UpsertSecretArg'},
+                                                        'content': {'$ref': '#/definitions/SecretContentParams'},
+                                                        'description': {'type': 'string'},
+                                                        'expire-time': {'format': 'date-time',
+                                                                        'type': 'string'},
+                                                        'label': {'type': 'string'},
+                                                        'owner-tag': {'type': 'string'},
+                                                        'params': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                'type': 'object'}},
+                                                                   'type': 'object'},
+                                                        'rotate-policy': {'type': 'string'},
+                                                        'uri': {'type': 'string'}},
+                                         'required': ['UpsertSecretArg',
+                                                      'owner-tag'],
+                                         'type': 'object'},
+                     'CreateSecretArgs': {'additionalProperties': False,
+                                          'properties': {'args': {'items': {'$ref': '#/definitions/CreateSecretArg'},
+                                                                  'type': 'array'}},
+                                          'required': ['args'],
+                                          'type': 'object'},
+                     'DeleteSecretArg': {'additionalProperties': False,
+                                         'properties': {'revisions': {'items': {'type': 'integer'},
+                                                                      'type': 'array'},
+                                                        'uri': {'type': 'string'}},
+                                         'required': ['uri'],
+                                         'type': 'object'},
+                     'DeleteSecretArgs': {'additionalProperties': False,
+                                          'properties': {'args': {'items': {'$ref': '#/definitions/DeleteSecretArg'},
+                                                                  'type': 'array'}},
+                                          'required': ['args'],
+                                          'type': 'object'},
+                     'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'GrantRevokeUserSecretArg': {'additionalProperties': False,
+                                                  'properties': {'applications': {'items': {'type': 'string'},
+                                                                                  'type': 'array'},
+                                                                 'uri': {'type': 'string'}},
+                                                  'required': ['uri',
+                                                               'applications'],
+                                                  'type': 'object'},
+                     'ListSecretResult': {'additionalProperties': False,
+                                          'properties': {'create-time': {'format': 'date-time',
+                                                                         'type': 'string'},
+                                                         'description': {'type': 'string'},
+                                                         'label': {'type': 'string'},
+                                                         'latest-expire-time': {'format': 'date-time',
+                                                                                'type': 'string'},
+                                                         'latest-revision': {'type': 'integer'},
+                                                         'next-rotate-time': {'format': 'date-time',
+                                                                              'type': 'string'},
+                                                         'owner-tag': {'type': 'string'},
+                                                         'revisions': {'items': {'$ref': '#/definitions/SecretRevision'},
+                                                                       'type': 'array'},
+                                                         'rotate-policy': {'type': 'string'},
+                                                         'update-time': {'format': 'date-time',
+                                                                         'type': 'string'},
+                                                         'uri': {'type': 'string'},
+                                                         'value': {'$ref': '#/definitions/SecretValueResult'},
+                                                         'version': {'type': 'integer'}},
+                                          'required': ['uri',
+                                                       'version',
+                                                       'owner-tag',
+                                                       'latest-revision',
+                                                       'create-time',
+                                                       'update-time',
+                                                       'revisions'],
+                                          'type': 'object'},
+                     'ListSecretResults': {'additionalProperties': False,
+                                           'properties': {'results': {'items': {'$ref': '#/definitions/ListSecretResult'},
+                                                                      'type': 'array'}},
+                                           'required': ['results'],
+                                           'type': 'object'},
+                     'ListSecretsArgs': {'additionalProperties': False,
+                                         'properties': {'filter': {'$ref': '#/definitions/SecretsFilter'},
+                                                        'show-secrets': {'type': 'boolean'}},
+                                         'required': ['show-secrets', 'filter'],
+                                         'type': 'object'},
+                     'SecretContentParams': {'additionalProperties': False,
+                                             'properties': {'data': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                     'type': 'object'},
+                                                            'value-ref': {'$ref': '#/definitions/SecretValueRef'}},
+                                             'type': 'object'},
+                     'SecretRevision': {'additionalProperties': False,
+                                        'properties': {'backend-name': {'type': 'string'},
+                                                       'create-time': {'format': 'date-time',
+                                                                       'type': 'string'},
+                                                       'expire-time': {'format': 'date-time',
+                                                                       'type': 'string'},
+                                                       'revision': {'type': 'integer'},
+                                                       'update-time': {'format': 'date-time',
+                                                                       'type': 'string'},
+                                                       'value-ref': {'$ref': '#/definitions/SecretValueRef'}},
+                                        'required': ['revision'],
+                                        'type': 'object'},
+                     'SecretValueRef': {'additionalProperties': False,
+                                        'properties': {'backend-id': {'type': 'string'},
+                                                       'revision-id': {'type': 'string'}},
+                                        'required': ['backend-id', 'revision-id'],
+                                        'type': 'object'},
+                     'SecretValueResult': {'additionalProperties': False,
+                                           'properties': {'data': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                   'type': 'object'},
+                                                          'error': {'$ref': '#/definitions/Error'}},
+                                           'type': 'object'},
+                     'SecretsFilter': {'additionalProperties': False,
+                                       'properties': {'owner-tag': {'type': 'string'},
+                                                      'revision': {'type': 'integer'},
+                                                      'uri': {'type': 'string'}},
+                                       'type': 'object'},
+                     'StringResult': {'additionalProperties': False,
+                                      'properties': {'error': {'$ref': '#/definitions/Error'},
+                                                     'result': {'type': 'string'}},
+                                      'required': ['result'],
+                                      'type': 'object'},
+                     'StringResults': {'additionalProperties': False,
+                                       'properties': {'results': {'items': {'$ref': '#/definitions/StringResult'},
+                                                                  'type': 'array'}},
+                                       'required': ['results'],
+                                       'type': 'object'},
+                     'UpdateUserSecretArg': {'additionalProperties': False,
+                                             'properties': {'UpsertSecretArg': {'$ref': '#/definitions/UpsertSecretArg'},
+                                                            'auto-prune': {'type': 'boolean'},
+                                                            'content': {'$ref': '#/definitions/SecretContentParams'},
+                                                            'description': {'type': 'string'},
+                                                            'expire-time': {'format': 'date-time',
+                                                                            'type': 'string'},
+                                                            'label': {'type': 'string'},
+                                                            'params': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                    'type': 'object'}},
+                                                                       'type': 'object'},
+                                                            'rotate-policy': {'type': 'string'},
+                                                            'uri': {'type': 'string'}},
+                                             'required': ['UpsertSecretArg', 'uri'],
+                                             'type': 'object'},
+                     'UpdateUserSecretArgs': {'additionalProperties': False,
+                                              'properties': {'args': {'items': {'$ref': '#/definitions/UpdateUserSecretArg'},
+                                                                      'type': 'array'}},
+                                              'required': ['args'],
+                                              'type': 'object'},
+                     'UpsertSecretArg': {'additionalProperties': False,
+                                         'properties': {'content': {'$ref': '#/definitions/SecretContentParams'},
+                                                        'description': {'type': 'string'},
+                                                        'expire-time': {'format': 'date-time',
+                                                                        'type': 'string'},
+                                                        'label': {'type': 'string'},
+                                                        'params': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                                'type': 'object'}},
+                                                                   'type': 'object'},
+                                                        'rotate-policy': {'type': 'string'}},
+                                         'type': 'object'}},
+     'properties': {'CreateSecrets': {'description': 'CreateSecrets creates new '
+                                                     'secrets.',
+                                      'properties': {'Params': {'$ref': '#/definitions/CreateSecretArgs'},
+                                                     'Result': {'$ref': '#/definitions/StringResults'}},
+                                      'type': 'object'},
+                    'GrantSecret': {'description': 'GrantSecret grants access to a '
+                                                   'user secret.',
+                                    'properties': {'Params': {'$ref': '#/definitions/GrantRevokeUserSecretArg'},
+                                                   'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                    'type': 'object'},
+                    'ListSecrets': {'description': 'ListSecrets lists available '
+                                                   'secrets.',
+                                    'properties': {'Params': {'$ref': '#/definitions/ListSecretsArgs'},
+                                                   'Result': {'$ref': '#/definitions/ListSecretResults'}},
+                                    'type': 'object'},
+                    'RemoveSecrets': {'description': 'RemoveSecrets remove user '
+                                                     'secret.',
+                                      'properties': {'Params': {'$ref': '#/definitions/DeleteSecretArgs'},
+                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                      'type': 'object'},
+                    'RevokeSecret': {'description': 'RevokeSecret revokes access '
+                                                    'to a user secret.',
+                                     'properties': {'Params': {'$ref': '#/definitions/GrantRevokeUserSecretArg'},
+                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                     'type': 'object'},
+                    'UpdateSecrets': {'description': 'UpdateSecrets creates new '
+                                                     'secrets.',
+                                      'properties': {'Params': {'$ref': '#/definitions/UpdateUserSecretArgs'},
+                                                     'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                      'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(StringResults)
+    async def CreateSecrets(self, args=None):
+        '''
+        CreateSecrets creates new secrets.
+
+        args : typing.Sequence[~CreateSecretArg]
+        Returns -> StringResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Secrets',
+                   request='CreateSecrets',
+                   version=2,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def GrantSecret(self, applications=None, uri=None):
+        '''
+        GrantSecret grants access to a user secret.
+
+        applications : typing.Sequence[str]
+        uri : str
+        Returns -> ErrorResults
+        '''
+        if applications is not None and not isinstance(applications, (bytes, str, list)):
+            raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
+
+        if uri is not None and not isinstance(uri, (bytes, str)):
+            raise Exception("Expected uri to be a str, received: {}".format(type(uri)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Secrets',
+                   request='GrantSecret',
+                   version=2,
+                   params=_params)
+        _params['applications'] = applications
+        _params['uri'] = uri
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ListSecretResults)
+    async def ListSecrets(self, filter_=None, show_secrets=None):
+        '''
+        ListSecrets lists available secrets.
+
+        filter_ : SecretsFilter
+        show_secrets : bool
+        Returns -> ListSecretResults
+        '''
+        if filter_ is not None and not isinstance(filter_, (dict, SecretsFilter)):
+            raise Exception("Expected filter_ to be a SecretsFilter, received: {}".format(type(filter_)))
+
+        if show_secrets is not None and not isinstance(show_secrets, bool):
+            raise Exception("Expected show_secrets to be a bool, received: {}".format(type(show_secrets)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Secrets',
+                   request='ListSecrets',
+                   version=2,
+                   params=_params)
+        _params['filter'] = filter_
+        _params['show-secrets'] = show_secrets
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def RemoveSecrets(self, args=None):
+        '''
+        RemoveSecrets remove user secret.
+
+        args : typing.Sequence[~DeleteSecretArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Secrets',
+                   request='RemoveSecrets',
+                   version=2,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def RevokeSecret(self, applications=None, uri=None):
+        '''
+        RevokeSecret revokes access to a user secret.
+
+        applications : typing.Sequence[str]
+        uri : str
+        Returns -> ErrorResults
+        '''
+        if applications is not None and not isinstance(applications, (bytes, str, list)):
+            raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
+
+        if uri is not None and not isinstance(uri, (bytes, str)):
+            raise Exception("Expected uri to be a str, received: {}".format(type(uri)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Secrets',
+                   request='RevokeSecret',
+                   version=2,
+                   params=_params)
+        _params['applications'] = applications
+        _params['uri'] = uri
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    async def UpdateSecrets(self, args=None):
+        '''
+        UpdateSecrets creates new secrets.
+
+        args : typing.Sequence[~UpdateUserSecretArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Secrets',
+                   request='UpdateSecrets',
+                   version=2,
+                   params=_params)
+        _params['args'] = args
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class SecretsManagerFacade(Type):
     name = 'SecretsManager'
     version = 2
