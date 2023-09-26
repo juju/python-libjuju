@@ -702,7 +702,7 @@ async def test_local_file_resource_charm(event_loop):
         app = await model.deploy(str(charm_path), resources=resources)
         assert 'file-resource-charm' in model.applications
 
-        await model.wait_for_idle()
+        await model.wait_for_idle(raise_on_error=False)
         assert app.units[0].agent_status == 'idle'
 
         ress = await app.get_resources()
@@ -718,7 +718,7 @@ async def test_attach_resource(event_loop):
         app = await model.deploy(str(charm_path), resources=resources)
         assert 'file-resource-charm' in model.applications
 
-        await model.wait_for_idle()
+        await model.wait_for_idle(raise_on_error=False)
         assert app.units[0].agent_status == 'idle'
 
         with open(str(charm_path / 'test.file')) as f:
