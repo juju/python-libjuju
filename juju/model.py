@@ -771,10 +771,14 @@ class Model:
                 raise JujuError("AllWatcher task is finished abruptly without an exception.")
             raise self._watcher_task.exception()
 
-        if self.info is None:
-            contr = await self.get_controller()
-            self._info = await contr.get_model_info(model_name, model_uuid)
-            log.debug('Got ModelInfo: %s', vars(self.info))
+        if self._info is None:
+            # TODO (cderici): See if this can be optimized away, or at least
+            # be done lazily (i.e. not everytime after_connect, but whenever
+            # self.info is needed -- which here can be bypassed if model_uuid
+            # is known)
+            async with ConnectedController(self.connection()) as contr:
+                self._info = await contr.get_model_info(model_name, model_uuid)
+                log.debug('Got ModelInfo: %s', vars(self.info))
 
         self.uuid = self.info.uuid
 
@@ -795,8 +799,7 @@ class Model:
             self._watch_stopping.clear()
 
         if self.is_connected():
-            log.debug('Closing model connection')
-            await self._connector.disconnect()
+            await self._connector.disconnect(entity='model')
             self._info = None
 
     async def add_local_charm_dir(self, charm_dir, series):

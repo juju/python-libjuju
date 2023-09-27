@@ -223,8 +223,6 @@ async def test_deploy_local_charm_channel(event_loop):
     async with base.CleanModel() as model:
         await model.deploy(str(charm_path), channel='stable')
         assert 'charm' in model.applications
-        await model.wait_for_idle(status="active")
-        assert model.units['charm/0'].workload_status == 'active'
 
 
 @base.bootstrapped

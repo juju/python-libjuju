@@ -441,11 +441,15 @@ class Connection:
         self.monitor.close_called.set()
 
         # Cancel all the tasks (that we started):
+        tasks_need_to_be_gathered = []
         if self._pinger_task:
+            tasks_need_to_be_gathered.append(self._pinger_task)
             self._pinger_task.cancel()
         if self._receiver_task:
+            tasks_need_to_be_gathered.append(self._receiver_task)
             self._receiver_task.cancel()
         if self._debug_log_task:
+            tasks_need_to_be_gathered.append(self._debug_log_task)
             self._debug_log_task.cancel()
 
         if self._ws and not self._ws.closed:
@@ -454,9 +458,6 @@ class Connection:
         if not to_reconnect:
             try:
                 log.debug('Gathering all tasks for connection close')
-
-                # Avoid gathering the current task
-                tasks_need_to_be_gathered = [task for task in jasyncio.all_tasks() if task != jasyncio.current_task()]
                 await jasyncio.gather(*tasks_need_to_be_gathered)
             except jasyncio.CancelledError:
                 pass
@@ -603,6 +604,7 @@ class Connection:
         '''
         async def _do_ping():
             try:
+                log.debug(f'Pinger {self._pinger_task}: pinging')
                 await pinger_facade.Ping()
             except jasyncio.CancelledError:
                 raise
@@ -642,7 +644,7 @@ class Connection:
         if "version" not in msg:
             msg['version'] = self.facades[msg['type']]
         outgoing = json.dumps(msg, indent=2, cls=encoder)
-        log.debug('connection {} -> {}'.format(id(self), outgoing))
+        log.debug('connection id: {} ---> {}'.format(id(self), outgoing))
         for attempt in range(3):
             if self.monitor.status == Monitor.DISCONNECTED:
                 # closed cleanly; shouldn't try to reconnect
@@ -665,7 +667,7 @@ class Connection:
                     log.error('RPC: Automatic reconnect failed')
                     raise
         result = await self._recv(msg['request-id'])
-        log.debug('connection {} <- {}'.format(id(self), result))
+        log.debug('connection id : {} <--- {}'.format(id(self), result))
 
         if not result:
             return result
@@ -796,6 +798,7 @@ class Connection:
             if not self.is_debug_log_connection:
                 self._build_facades(res.get('facades', {}))
                 if not self._pinger_task:
+                    log.debug('reconnect: scheduling a pinger task')
                     self._pinger_task = jasyncio.create_task(self._pinger(), name="Task_Pinger")
 
     async def _connect(self, endpoints):
@@ -852,6 +855,7 @@ class Connection:
         #  If this is regular connection, and we dont have a
         #  receiver_task yet, then schedule a _receiver_task
         elif not self.is_debug_log_connection and not self._receiver_task:
+            log.debug('_connect: scheduling a receiver task')
             self._receiver_task = jasyncio.create_task(self._receiver(), name="Task_Receiver")
 
         log.debug("Driver connected to juju %s", self.addr)
@@ -907,6 +911,7 @@ class Connection:
             login_result = await self._connect_with_login(e.endpoints)
         self._build_facades(login_result.get('facades', {}))
         if not self._pinger_task:
+            log.debug('_connect_with_redirect: scheduling a pinger task')
             self._pinger_task = jasyncio.create_task(self._pinger(), name="Task_Pinger")
 
     # _build_facades takes the facade list that comes from the connection with the controller,

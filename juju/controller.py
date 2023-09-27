@@ -193,7 +193,7 @@ class Controller:
         """Shut down the watcher task and close websockets.
 
         """
-        await self._connector.disconnect()
+        await self._connector.disconnect(entity='controller')
 
     async def add_credential(self, name=None, credential=None, cloud=None,
                              owner=None, force=False):
