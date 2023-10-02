@@ -1558,7 +1558,7 @@ class Model:
 
         The logic is the same.
         """
-        log.warn("relate is deprecated and will be removed. Use integrate instead.")
+        log.warning("relate is deprecated and will be removed. Use integrate instead.")
         return await self.integrate(relation1, relation2)
 
     async def add_space(self, name, cidrs=None, public=True):
