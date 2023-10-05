@@ -11,12 +11,13 @@ async def main():
     await model.connect()
 
     try:
-        print(f'Deploying {charm} --channel 2.0/stable --revision 22')
+        print(f'Deploying {charm} --channel latest/edge --revision 19')
         application = await model.deploy(
             'juju-qa-test',
             application_name='test',
-            channel='2.0/stable',
-            revision=22,
+            channel='latest/edge',
+            series='xenial',
+            revision=19,
         )
 
         print('Waiting for active')
