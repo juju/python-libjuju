@@ -22,7 +22,8 @@ setup(
         exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     package_data={'juju': ['py.typed']},
     install_requires=[
-        'macaroonbakery>=1.1,<2.0',
+        # see https://github.com/juju/python-libjuju/issues/914 for macaroon dependency
+        'macaroonbakery@git+https://github.com/cderici/py-macaroon-bakery@relax-protobuf-version#egg=macaroonbakery',
         'pyRFC3339>=1.0,<2.0',
         'pyyaml>=5.1.2',
         'websockets>=8.1,<9.0 ; python_version=="3.8"',
