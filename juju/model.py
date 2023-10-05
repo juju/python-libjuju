@@ -1796,6 +1796,7 @@ class Model:
                 'architecture': origin.architecture,
                 'track': origin.track,
                 'risk': origin.risk,
+                'revision': origin.revision,
             }
         }])
         if len(resp.results) != 1:
