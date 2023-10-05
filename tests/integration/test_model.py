@@ -95,9 +95,11 @@ async def test_deploy_by_revision(event_loop):
         app = await model.deploy('juju-qa-test',
                                  application_name='test',
                                  channel='2.0/stable',
-                                 revision=22,)
+                                 series='xenial',
+                                 revision=19,
+        )
 
-        assert url.URL.parse(app.charm_url).revision == 22
+        assert url.URL.parse(app.charm_url).revision == 19
 
 
 @base.bootstrapped
