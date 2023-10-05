@@ -96,8 +96,7 @@ async def test_deploy_by_revision(event_loop):
                                  application_name='test',
                                  channel='2.0/stable',
                                  series='xenial',
-                                 revision=19,
-        )
+                                 revision=19,)
 
         assert url.URL.parse(app.charm_url).revision == 19
 
