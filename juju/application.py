@@ -778,13 +778,11 @@ class Application(model.ModelEntity):
                 res_name = resource.get('Name', resource.get('name'))
                 request_data.append(client.CharmResource(
                     description=resource.get('Description', resource.get('description')),
-                    fingerprint=resource.get('Fingerprint', resource.get('fingerprint', [])),
                     name=res_name,
                     path=_arg_res_filenames.get(res_name,
                                                 resource.get('Path',
                                                              resource.get('filename', ''))),
                     revision=_arg_res_revisions.get(res_name, -1),
-                    size=resource.get('Size', resource.get('size', 0)),
                     type_=resource.get('Type', resource.get('type')),
                     origin='store',
                 ))
