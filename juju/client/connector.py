@@ -7,9 +7,9 @@ import logging
 import macaroonbakery.httpbakery as httpbakery
 from juju.client.connection import Connection
 from juju.client.gocookies import GoCookieJar, go_to_py_cookie
-from juju.client.jujudata import FileJujuData
+from juju.client.jujudata import FileJujuData, API_ENDPOINTS_KEY
 from juju.client.proxy.factory import proxy_from_config
-from juju.errors import JujuConnectionError, JujuError
+from juju.errors import JujuConnectionError, JujuError, PylibjujuProgrammingError
 from juju.client import client
 from juju.version import SUPPORTED_MAJOR_VERSION, TARGET_JUJU_VERSION
 
@@ -83,6 +83,11 @@ class Connector:
                 await self._connection.close()
             self._connection = await Connection.connect(**kwargs)
 
+        if not self.controller_name:
+            if 'endpoint' not in kwargs:
+                raise PylibjujuProgrammingError("Please report this error to the maintainers.")
+            self.controller_name = self.jujudata.controller_name_by_endpoint(kwargs['endpoint'])
+
         # Check if we support the target controller
         juju_server_version = self._connection.info['server-version']
         if not juju_server_version.startswith(TARGET_JUJU_VERSION):
@@ -112,7 +117,7 @@ class Connector:
             raise JujuConnectionError('No current controller')
 
         controller = self.jujudata.controllers()[controller_name]
-        endpoints = controller['api-endpoints']
+        endpoints = controller[API_ENDPOINTS_KEY]
         accounts = self.jujudata.accounts().get(controller_name, {})
 
         proxy = proxy_from_config(controller.get('proxy-config', None))
@@ -146,7 +151,7 @@ class Connector:
         if controller is None:
             raise JujuConnectionError('Controller {} not found'.format(
                 controller_name))
-        endpoints = controller['api-endpoints']
+        endpoints = controller[API_ENDPOINTS_KEY]
         account = self.jujudata.accounts().get(controller_name, {})
         models = self.jujudata.models().get(controller_name, {}).get('models',
                                                                      {})
