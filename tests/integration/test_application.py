@@ -209,6 +209,39 @@ async def test_upgrade_local_charm_resource(event_loop):
 
 
 @base.bootstrapped
+@pytest.mark.asyncio
+async def test_upgrade_charm_resource(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('cs:~juju-qa/bionic/upgrade-charm-resource-test-0')
+
+        await model.wait_for_idle(wait_for_units=1)
+        unit = app.units[0]
+        expected_message = 'I have no resource.'
+        assert unit.workload_status_message == expected_message
+
+        await app.upgrade_charm(revision=1)
+        await model.block_until(
+            lambda: unit.workload_status_message != 'I have no resource.',
+            timeout=60,
+        )
+        expected_message = 'My resource: I am the resource.'
+        assert app.units[0].workload_status_message == expected_message
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_refresh_with_resource_argument(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('juju-qa-test', resources={'foo-file': 2})
+        res2 = await app.get_resources()
+        assert res2['foo-file'].revision == 2
+        await app.refresh(resources={'foo-file': 4})
+        res4 = await app.get_resources()
+        assert res4['foo-file'].revision == 4
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_upgrade_charm_resource_same_rev_no_update(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('keystone', channel='victoria/stable')
