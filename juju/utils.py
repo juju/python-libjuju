@@ -421,6 +421,7 @@ def base_channel_to_series(channel):
     return get_version_series(origin.Channel.parse(channel).track)
 
 
+<<<<<<< HEAD
 def parse_base_arg(base):
     """Parses a given base into a Client.Base object
     :param base str : The base to deploy a charm (e.g. ubuntu@22.04)
@@ -532,7 +533,7 @@ def series_selector(series_arg='', charm_url=None, model_config=None, supported_
     return DEFAULT_SUPPORTED_LTS
 
 
-def should_upgrade_resource(available_resource, existing_resources, arg_resources):
+def should_upgrade_resource(available_resource, existing_resources, arg_resources={}):
     """Called in the context of upgrade_charm. Given a resource R, takes a look at the resources we
     already have and decides if we need to refresh R.
 
