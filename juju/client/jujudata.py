@@ -15,6 +15,7 @@ from juju.utils import juju_config_dir
 
 API_ENDPOINTS_KEY = 'api-endpoints'
 
+
 class NoModelException(Exception):
     pass
 

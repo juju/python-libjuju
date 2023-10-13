@@ -89,8 +89,10 @@ class JujuUnitError(JujuError):
 class JujuBackupError(JujuError):
     pass
 
+
 class PylibjujuProgrammingError(Exception):
     pass
+
 
 class JujuNotValid(JujuError):
     def __init__(self, entity_type, entity_name):
