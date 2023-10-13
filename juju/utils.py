@@ -394,7 +394,7 @@ def base_channel_to_series(channel):
     return get_version_series(origin.Channel.parse(channel).track)
 
 
-def should_upgrade_resource(available_resource, existing_resources):
+def should_upgrade_resource(available_resource, existing_resources, arg_resources):
     """Called in the context of upgrade_charm. Given a resource R, takes a look at the resources we
     already have and decides if we need to refresh R.
 
@@ -402,11 +402,16 @@ def should_upgrade_resource(available_resource, existing_resources):
     charmhub api. We're considering if we need to refresh this during upgrade_charm.
     :param dict[str] existing_resources: The dict coming from resources_facade.ListResources
     representing the resources of the currently deployed charm.
+    :param dict[str] arg_resources: user provided resources to be refreshed
 
     :result bool: The decision to refresh the given resource
     """
+
     # should upgrade resource?
     res_name = available_resource.get('Name', available_resource.get('name'))
+
+    if res_name in arg_resources:
+        return True
 
     # do we have it already?
     if res_name in existing_resources:

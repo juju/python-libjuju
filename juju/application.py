@@ -620,7 +620,7 @@ class Application(model.ModelEntity):
 
     async def refresh(
             self, channel=None, force=False, force_series=False, force_units=False,
-            path=None, resources=None, revision=None, switch=None):
+            path=None, resources={}, revision=None, switch=None):
         """Refresh the charm for this application.
 
         :param str channel: Channel to use when getting the charm from the
@@ -635,9 +635,6 @@ class Application(model.ModelEntity):
         :param str switch: Crossgrade charm url
 
         """
-        if path is None and resources is not None:
-            raise NotImplementedError("refreshing a non-local charm with resources option is not yet implemented")
-
         if switch is not None and revision is not None:
             raise ValueError("switch and revision parameters are mutually exclusive in application refresh")
 
@@ -727,6 +724,20 @@ class Application(model.ModelEntity):
 
         # Now take care of the resources:
 
+        # user supplied resources to be used in refresh,
+        # will override the default values if there's any
+        arg_resources = resources
+
+        # need to process the given resources, as they can be
+        # paths or revisions
+        _arg_res_filenames = {}
+        _arg_res_revisions = {}
+        for res, filename_or_rev in arg_resources.items():
+            if isinstance(filename_or_rev, int):
+                _arg_res_revisions[res] = filename_or_rev
+            else:
+                _arg_res_filenames[res] = filename_or_rev
+
         # Already prepped the charm_resources
         # Now get the existing resources from the ResourcesFacade
         request_data = [client.Entity(self.tag)]
@@ -739,23 +750,27 @@ class Application(model.ModelEntity):
         # Compute the difference btw resources needed and the existing resources
         resources_to_update = []
         for resource in charm_resources:
-            if utils.should_upgrade_resource(resource, existing_resources):
+            if utils.should_upgrade_resource(resource, existing_resources, arg_resources):
                 resources_to_update.append(resource)
 
         # Update the resources
         if resources_to_update:
             request_data = []
             for resource in resources_to_update:
+                res_name = resource.get('Name', resource.get('name'))
                 request_data.append(client.CharmResource(
                     description=resource.get('Description', resource.get('description')),
-                    fingerprint=resource.get('Fingerprint', resource.get('fingerprint')),
-                    name=resource.get('Name', resource.get('name')),
-                    path=resource.get('Path', resource.get('filename')),
-                    revision=resource.get('Revision', resource.get('revision', -1)),
-                    size=resource.get('Size', resource.get('size')),
+                    fingerprint=resource.get('Fingerprint', resource.get('fingerprint', [])),
+                    name=res_name,
+                    path=_arg_res_filenames.get(res_name,
+                                                resource.get('Path',
+                                                             resource.get('filename', ''))),
+                    revision=_arg_res_revisions.get(res_name, -1),
+                    size=resource.get('Size', resource.get('size', 0)),
                     type_=resource.get('Type', resource.get('type')),
                     origin='store',
                 ))
+
             response = await resources_facade.AddPendingResources(
                 application_tag=self.tag,
                 charm_url=charm_url,
