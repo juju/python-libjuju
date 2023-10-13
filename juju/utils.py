@@ -394,7 +394,7 @@ def base_channel_to_series(channel):
     return get_version_series(origin.Channel.parse(channel).track)
 
 
-def should_upgrade_resource(available_resource, existing_resources, arg_resources):
+def should_upgrade_resource(available_resource, existing_resources, arg_resources={}):
     """Called in the context of upgrade_charm. Given a resource R, takes a look at the resources we
     already have and decides if we need to refresh R.
 
