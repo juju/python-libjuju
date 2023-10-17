@@ -232,6 +232,18 @@ async def test_upgrade_charm_resource(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_refresh_with_resource_argument(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy('juju-qa-test', resources={'foo-file': 2})
+        res2 = await app.get_resources()
+        assert res2['foo-file'].revision == 2
+        await app.refresh(resources={'foo-file': 4})
+        res4 = await app.get_resources()
+        assert res4['foo-file'].revision == 4
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_upgrade_charm_resource_same_rev_no_update(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('keystone', channel='victoria/stable')
