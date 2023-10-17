@@ -10,8 +10,10 @@ import juju.client.client as jujuclient
 import yaml
 from juju import tag
 from juju.client.gocookies import GoCookieJar
-from juju.errors import JujuError
+from juju.errors import JujuError, PylibjujuProgrammingError
 from juju.utils import juju_config_dir
+
+API_ENDPOINTS_KEY = 'api-endpoints'
 
 
 class NoModelException(Exception):
@@ -125,6 +127,23 @@ class FileJujuData(JujuData):
             )
         except (KeyError, FileNotFoundError):
             return None, None
+
+    def controller_name_by_endpoint(self, endpoint):
+        """Finds the controller that has the given endpoints, returns the name.
+
+        :param str endpoint: The endpoint of the controller we're looking for
+        """
+        for controller_name, controller in self.controllers().items():
+            if isinstance(endpoint, str):
+                if endpoint in controller[API_ENDPOINTS_KEY]:
+                    return controller_name
+            elif isinstance(endpoint, list):
+                for e in endpoint:
+                    if e in controller[API_ENDPOINTS_KEY]:
+                        return controller_name
+            else:
+                raise PylibjujuProgrammingError()
+        raise JujuError(f'Unable to find controller with endpoint {endpoint}')
 
     def controllers(self):
         return self._load_yaml('controllers.yaml', 'controllers')

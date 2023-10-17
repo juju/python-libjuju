@@ -86,6 +86,10 @@ class JujuBackupError(JujuError):
     pass
 
 
+class PylibjujuProgrammingError(Exception):
+    pass
+
+
 class JujuConfigError(JujuError):
     """Exception raised during processing a configuration key-value pair
     in a config set for an application.
