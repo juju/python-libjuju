@@ -280,3 +280,19 @@ async def test_subordinate_units(event_loop):
         assert n_unit.principal_unit == 'ubuntu/0'
         assert u_unit.principal_unit == ''
         assert [u.name for u in u_unit.get_subordinates()] == [n_unit.name]
+
+
+@base.bootstrapped
+async def test_destroy_unit(event_loop):
+    async with base.CleanModel() as model:
+        app = await model.deploy(
+            'juju-qa-test',
+            application_name='test',
+            num_units=3,
+        )
+        # wait for the units to come up
+        await model.block_until(lambda: app.units, timeout=480)
+
+        await app.units[0].destroy()
+        await asyncio.sleep(5)
+        assert len(app.units) == 2
