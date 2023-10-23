@@ -166,3 +166,14 @@ class TestUnExposeApplication(unittest.IsolatedAsyncioTestCase):
             application="panther",
             exposed_endpoints=["alpha", "beta"]
         )
+
+
+class TestRefreshApplication(unittest.IsolatedAsyncioTestCase):
+    @mock.patch("juju.model.Model.connection")
+    async def test_refresh_mutually_exclusive_kwargs(self, mock_conn):
+        app = Application(entity_id="app-id", model=Model())
+        with self.assertRaises(ValueError):
+            await app.refresh(switch="charm1", revision=10)
+
+        with self.assertRaises(ValueError):
+            await app.refresh(switch="charm1", path="/path/to/charm2")

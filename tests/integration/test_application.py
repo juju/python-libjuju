@@ -219,6 +219,21 @@ async def test_upgrade_charm_resource_same_rev_no_update(event_loop):
 
 
 @base.bootstrapped
+@pytest.mark.asyncio
+async def test_refresh_charmhub_to_local(event_loop):
+    charm_path = INTEGRATION_TEST_DIR / 'charm'
+    async with base.CleanModel() as model:
+        app = await model.deploy('ubuntu', application_name='ubu-path')
+        await app.refresh(path=str(charm_path))
+        assert app.data['charm-url'].startswith('local:')
+
+        app = await model.deploy('ubuntu', application_name='ubu-switch')
+        await app.refresh(switch=str(charm_path))
+        assert app.data['charm-url'].startswith('local:')
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_trusted(event_loop):
     async with base.CleanModel() as model:
         await model.deploy('ubuntu', trust=True)
