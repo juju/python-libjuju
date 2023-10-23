@@ -2157,7 +2157,12 @@ class Model:
         """Destroy units by name.
 
         """
-        await self.destroy_units(unit_id, destroy_storage, dry_run, force, max_wait)
+        return await self.destroy_units(unit_id,
+                                        destroy_storage=destroy_storage,
+                                        dry_run=dry_run,
+                                        force=force,
+                                        max_wait=max_wait
+                                        )
 
     async def destroy_units(self, *unit_names, destroy_storage=False, dry_run=False, force=False, max_wait=None):
         """Destroy several units at once.
