@@ -452,43 +452,34 @@ class LocalDeployType:
     """LocalDeployType deals with local only deployments.
     """
 
-    async def resolve(self, url, architecture, app_name=None, channel=None, series=None, revision=None,
+    async def resolve(self, charm_path, architecture, app_name=None, channel=None, series=None, revision=None,
                       entity_url=None, force=False):
         """resolve attempts to resolve a local charm or bundle using the url
         and architecture. If information is missing, it will attempt to backfill
         that information, before sending the result back.
         """
 
-        entity_url = url.path()
-        entity_path = Path(entity_url)
-        bundle_path = entity_path / 'bundle.yaml'
+        entity_path = Path(charm_path)
+        if entity_path.suffix == '.yaml':
+            bundle_path = entity_path
+        else:
+            bundle_path = entity_path / 'bundle.yaml'
 
-        identifier = entity_url
         origin = client.CharmOrigin(source="local", architecture=architecture)
         if not (entity_path.is_dir() or entity_path.is_file()):
             raise JujuError('{} path not found'.format(entity_url))
 
-        is_bundle = (
-            (entity_path.suffix == ".yaml" and entity_path.exists()) or
-            bundle_path.exists()
-        )
+        is_bundle = bundle_path.exists()
 
         if app_name is None:
-            app_name = url.name
-
-            if not is_bundle:
-                entity_url = url.path()
-                entity_path = Path(entity_url)
-                if entity_path.suffix == '.charm':
-                    with zipfile.ZipFile(str(entity_path), 'r') as charm_file:
-                        metadata = yaml.load(charm_file.read('metadata.yaml'), Loader=yaml.FullLoader)
-                else:
-                    metadata_path = entity_path / 'metadata.yaml'
-                    metadata = yaml.load(metadata_path.read_text(), Loader=yaml.FullLoader)
-                app_name = metadata['name']
+            if is_bundle:
+                bundle_with_overlays = [b for b in yaml.safe_load_all(bundle_path.read_text())]
+                app_name = bundle_with_overlays[0].get('name', '')
+            else:
+                app_name = utils.get_local_charm_metadata(entity_path)["name"]
 
         return DeployTypeResult(
-            identifier=identifier,
+            identifier=charm_path,
             origin=origin,
             app_name=app_name,
             is_local=True,
@@ -521,7 +512,7 @@ class CharmStoreDeployType:
                                               include_stats=False)
 
         identifier = result['Id']
-        is_bundle = url.series == "bundle" or url.parse(identifier).series == "bundle"
+        is_bundle = URL.parse(url).series == "bundle" or URL.parse(identifier).series == "bundle"
         if not series:
             series = "bundle" if is_bundle else self.get_series(entity_url, result)
 
@@ -578,7 +569,7 @@ class CharmhubDeployType:
         charm_url = URL.parse(charm_url_str)
 
         if app_name is None:
-            app_name = url.name
+            app_name = charm_url.name
 
         return DeployTypeResult(
             identifier=str(charm_url),
@@ -629,9 +620,9 @@ class Model:
         self._charmstore = CharmStore()
 
         self.deploy_types = {
-            "local": LocalDeployType(),
-            "cs": CharmStoreDeployType(self._charmstore, self._get_series),
-            "ch": CharmhubDeployType(self._resolve_charm),
+            Schema.LOCAL: LocalDeployType(),
+            Schema.CHARM_STORE: CharmStoreDeployType(self._charmstore, self._get_series),
+            Schema.CHARM_HUB: CharmhubDeployType(self._charmhub_resolve_charm),
         }
 
     def is_connected(self):
@@ -1603,7 +1594,7 @@ class Model:
             storage=None, to=None, devices=None, trust=False):
         """Deploy a new service or bundle.
 
-        :param str entity_url: Charm or bundle url
+        :param str entity_url: Charm or bundle to deploy. Charm url or file path
         :param str application_name: Name to give the service
         :param dict bind: <charm endpoint>:<network space> pairs
         :param str channel: Charm store channel from which to retrieve
@@ -1646,23 +1637,30 @@ class Model:
             raise NotImplementedError("trusted is not supported on model version {}".format(self.info.agent_version))
 
         # Ensure what we pass in, is a string.
-        entity_url = str(entity_url)
-        if is_local_charm(entity_url) and not entity_url.startswith("local:"):
-            entity_url = "local:{}".format(entity_url)
+        entity = str(entity_url)
+        if is_local_charm(entity):
+            if entity.startswith("local:"):
+                entity = entity[6:]
+            architecture = await self._resolve_architecture()
+            schema = Schema.LOCAL
 
-        if client.CharmsFacade.best_facade_version(self.connection()) < 3:
-            url = URL.parse(str(entity_url), default_store=Schema.CHARM_STORE)
         else:
-            url = URL.parse(str(entity_url))
+            if client.CharmsFacade.best_facade_version(self.connection()) < 3:
+                url = URL.parse(entity, default_store=Schema.CHARM_STORE)
+            else:
+                url = URL.parse(entity)
+            entity = str(url)
 
-        architecture = await self._resolve_architecture(url)
+            architecture = await self._resolve_architecture(url)
+            schema = url.schema
+            name = url.name
 
-        if str(url.schema) not in self.deploy_types:
-            raise JujuError("unknown deploy type {}, expected charmhub, charmstore or local".format(url.schema))
+        if schema not in self.deploy_types:
+            raise JujuError("unknown deploy type {}, expected charmhub, charmstore or local".format(schema))
 
-        res = await self.deploy_types[str(url.schema)].resolve(url, architecture,
-                                                               application_name, channel, series,
-                                                               revision, entity_url, force)
+        res = await self.deploy_types[schema].resolve(entity, architecture,
+                                                      application_name, channel, series,
+                                                      revision, entity_url, force)
 
         if res.identifier is None:
             raise JujuError('unknown charm or bundle {}'.format(entity_url))
@@ -1672,7 +1670,7 @@ class Model:
         charm_series = series
         if res.is_bundle:
             handler = BundleHandler(self, trusted=trust, forced=force)
-            await handler.fetch_plan(url, res.origin, overlays=overlays)
+            await handler.fetch_plan(entity, res.origin, overlays=overlays)
             await handler.execute_plan()
             extant_apps = {app for app in self.applications}
             pending_apps = handler.applications - extant_apps
@@ -1700,11 +1698,11 @@ class Model:
                 else:
                     charm_origin = add_charm_res.charm_origin
 
-                if Schema.CHARM_HUB.matches(url.schema):
+                if Schema.CHARM_HUB.matches(schema):
                     resources = await self._add_charmhub_resources(res.app_name,
                                                                    identifier,
                                                                    add_charm_res.charm_origin)
-                    charm_info = await self.charmhub.info(url.name)
+                    charm_info = await self.charmhub.info(name)
                     is_subordinate = False
                     try:
                         is_subordinate = charm_info.result.charm.subordinate
@@ -1715,7 +1713,7 @@ class Model:
                             raise JujuError("cannot use num_units with subordinate application")
                         num_units = 0
 
-                if Schema.CHARM_STORE.matches(url.schema):
+                if Schema.CHARM_STORE.matches(schema):
                     resources = await self._add_store_resources(res.app_name,
                                                                 identifier)
             else:
@@ -1777,23 +1775,18 @@ class Model:
         client_facade = client.ClientFacade.from_connection(self.connection())
         return await client_facade.AddCharm(channel=str(origin.risk), url=charm_url, force=False)
 
-    async def _resolve_charm(self, url, origin, force=False):
+    async def _charmhub_resolve_charm(self, url, origin, force=False):
         charms_cls = client.CharmsFacade
         if charms_cls.best_facade_version(self.connection()) < 3:
             raise JujuError("resolve charm")
 
         charms_facade = charms_cls.from_connection(self.connection())
 
-        if Schema.CHARM_STORE.matches(url.schema):
-            source = "charm-store"
-        else:
-            source = "charm-hub"
-
         resp = await charms_facade.ResolveCharms(resolve=[{
             'reference': str(url),
             'charm-origin': {
                 'series': origin.series,
-                'source': source,
+                'source': "charm-hub",
                 'architecture': origin.architecture,
                 'track': origin.track,
                 'risk': origin.risk,
@@ -1820,8 +1813,8 @@ class Model:
 
         return result.url, result.charm_origin
 
-    async def _resolve_architecture(self, url):
-        if url.architecture:
+    async def _resolve_architecture(self, url=None):
+        if url is not None and url.architecture:
             return url.architecture
 
         constraints = await self.get_constraints()
