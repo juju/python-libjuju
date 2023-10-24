@@ -421,7 +421,6 @@ def base_channel_to_series(channel):
     return get_version_series(origin.Channel.parse(channel).track)
 
 
-<<<<<<< HEAD
 def parse_base_arg(base):
     """Parses a given base into a Client.Base object
     :param base str : The base to deploy a charm (e.g. ubuntu@22.04)

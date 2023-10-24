@@ -686,9 +686,6 @@ class Application(model.ModelEntity):
                                      force_units, path or switch, resources)
             return
 
-        if resources is not None:
-            raise NotImplementedError("resources option is not implemented")
-
         # If switch is not None at this point, that means it's a switch to a store charm
         charm_url = switch or charm_url_origin_result.url
         parsed_url = URL.parse(charm_url)
