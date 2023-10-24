@@ -2157,32 +2157,35 @@ class Model:
         """Destroy units by name.
 
         """
-        connection = self.connection()
-        app_facade = client.ApplicationFacade.from_connection(connection)
-
-        # Get the corresponding unit tag
-        unit_tag = tag.unit(unit_id)
-        if unit_tag is None:
-            log.error("Error converting %s to a valid unit tag", unit_id)
-            return JujuUnitError("Error converting %s to a valid unit tag", unit_id)
-
-        log.debug(
-            'Destroying unit %s', unit_id)
-
-        return await app_facade.DestroyUnit(units=[{
-            'unit-tag': unit_tag,
-            'destroy-storage': destroy_storage,
-            'force': force,
-            'max-wait': max_wait,
-            'dry-run': dry_run,
-        }])
+        return await self.destroy_units(unit_id,
+                                        destroy_storage=destroy_storage,
+                                        dry_run=dry_run,
+                                        force=force,
+                                        max_wait=max_wait
+                                        )
 
     async def destroy_units(self, *unit_names, destroy_storage=False, dry_run=False, force=False, max_wait=None):
         """Destroy several units at once.
 
         """
-        for u in unit_names:
-            await self.destroy_unit(u, destroy_storage, dry_run, force, max_wait)
+        connection = self.connection()
+        app_facade = client.ApplicationFacade.from_connection(connection)
+
+        units_to_destroy = []
+        for unit_id in unit_names:
+            unit_tag = tag.unit(unit_id)
+            if unit_tag is None:
+                log.error("Error converting %s to a valid unit tag", unit_id)
+                raise JujuUnitError("Error converting %s to a valid unit tag", unit_id)
+            units_to_destroy.append({
+                'unit-tag': unit_tag,
+                'destroy-storage': destroy_storage,
+                'force': force,
+                'max-wait': max_wait,
+                'dry-run': dry_run,
+            })
+        log.debug('Destroying units %s', unit_names)
+        return await app_facade.DestroyUnit(units=units_to_destroy)
 
     def download_backup(self, archive_id, target_filename=None):
         """Download a backup archive file.
