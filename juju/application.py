@@ -4,7 +4,7 @@
 import hashlib
 import json
 import logging
-import pathlib
+from pathlib import Path
 
 from . import model, tag, utils, jasyncio
 from .url import URL, Schema
@@ -12,7 +12,7 @@ from .status import derive_status
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
 from .errors import JujuError, JujuApplicationConfigError
-from .bundle import get_charm_series
+from .bundle import get_charm_series, is_local_charm
 from .placement import parse as parse_placement
 from .origin import Channel
 
@@ -620,7 +620,7 @@ class Application(model.ModelEntity):
 
     async def refresh(
             self, channel=None, force=False, force_series=False, force_units=False,
-            path=None, resources={}, revision=None, switch=None):
+            path=None, resources=None, revision=None, switch=None):
         """Refresh the charm for this application.
 
         :param str channel: Channel to use when getting the charm from the
@@ -635,6 +635,9 @@ class Application(model.ModelEntity):
         :param str switch: Crossgrade charm url
 
         """
+        if switch is not None and path is not None:
+            raise ValueError("switch and path parameters are mutually exclusive in application refresh")
+
         if switch is not None and revision is not None:
             raise ValueError("switch and revision parameters are mutually exclusive in application refresh")
 
@@ -651,14 +654,15 @@ class Application(model.ModelEntity):
         if charm_url_origin_result.error is not None:
             err = charm_url_origin_result.error
             raise JujuError("%s : %s" % (err.code, err.message))
-        charm_url = switch or charm_url_origin_result.url
         origin = charm_url_origin_result.charm_origin
 
-        if path is not None:
+        if path is not None or (switch is not None and is_local_charm(switch)):
             await self.local_refresh(origin, force, force_series,
-                                     force_units, path, resources)
+                                     force_units, path or switch, resources)
             return
 
+        # If switch is not None at this point, that means it's a switch to a store charm
+        charm_url = switch or charm_url_origin_result.url
         parsed_url = URL.parse(charm_url)
         charm_name = parsed_url.name
 
@@ -726,7 +730,7 @@ class Application(model.ModelEntity):
 
         # user supplied resources to be used in refresh,
         # will override the default values if there's any
-        arg_resources = resources
+        arg_resources = resources or {}
 
         # need to process the given resources, as they can be
         # paths or revisions
@@ -809,22 +813,22 @@ class Application(model.ModelEntity):
             path=None, resources=None):
         """Refresh the charm for this application with a local charm.
 
-        :param str channel: Channel to use when getting the charm from the
-            charm store, e.g. 'development'
+        :param dict charm_origin: The charm origin of the destination charm
+            we're refreshing to
+        :param bool force: Refresh even if validation checks fail
         :param bool force_series: Refresh even if series of deployed
             application is not supported by the new charm
         :param bool force_units: Refresh all units immediately, even if in
             error state
         :param str path: Refresh to a charm located at path
         :param dict resources: Dictionary of resource name/filepath pairs
-        :param int revision: Explicit refresh revision
-        :param str switch: Crossgrade charm url
 
         """
         app_facade = self._facade()
 
-        if not isinstance(path, pathlib.Path):
-            path = pathlib.Path(path)
+        if isinstance(path, str) and path.startswith("local:"):
+            path = path[6:]
+        path = Path(path)
         charm_dir = path.expanduser().resolve()
         model_config = await self.get_config()
 
