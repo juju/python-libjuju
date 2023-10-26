@@ -733,8 +733,6 @@ class Application(model.ModelEntity):
             err = charm_origin_result.error
             raise JujuError(f'{err.code} : {err.message}')
 
-<<<<<<< HEAD
-=======
         # Now take care of the resources:
 
         # user supplied resources to be used in refresh,
@@ -751,7 +749,6 @@ class Application(model.ModelEntity):
             else:
                 _arg_res_filenames[res] = filename_or_rev
 
->>>>>>> 5fbf5bc (Avoid trying to pass revision unless provided by user in app refresh)
         # Already prepped the charm_resources
         # Now get the existing resources from the ResourcesFacade
         request_data = [client.Entity(self.tag)]
