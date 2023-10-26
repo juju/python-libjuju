@@ -10,6 +10,7 @@ from .. import base
 from ..utils import INTEGRATION_TEST_DIR
 from juju import errors
 from juju.url import URL, Schema
+from juju.client import client
 
 MB = 1
 
@@ -265,6 +266,22 @@ async def test_refresh_charmhub_to_local(event_loop):
         app = await model.deploy('ubuntu', application_name='ubu-switch')
         await app.refresh(switch=str(charm_path))
         assert app.data['charm-url'].startswith('local:')
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_local_refresh(event_loop):
+    charm_path = INTEGRATION_TEST_DIR / 'charm'
+    async with base.CleanModel() as model:
+        app = await model.deploy('ubuntu')
+        origin = client.CharmOrigin(source="charm-hub", track="20.04", risk="stable",
+                                    branch="deadbeef", hash_="hash", id_="id", revision=12,
+                                    base=client.Base("20.04", "ubuntu"))
+
+        await app.local_refresh(charm_origin=origin, path=charm_path)
+
+        assert origin == client.CharmOrigin(source="local", revision=0,
+                                            base=client.Base("20.04", "ubuntu"))
 
 
 @base.bootstrapped
