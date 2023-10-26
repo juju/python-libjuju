@@ -849,6 +849,17 @@ class Application(model.ModelEntity):
                                                              metadata,
                                                              resources=resources)
 
+        # We know this charm is a local charm, but this charm origin could be
+        # the charm origin of a charmhub charm. Ensure that we update/remove
+        # the appropriate fields.
+        charm_origin.source = "local"
+        charm_origin.track = None
+        charm_origin.risk = None
+        charm_origin.branch = None
+        charm_origin.hash_ = None
+        charm_origin.id_ = None
+        charm_origin.revision = URL.parse(charm_url).revision
+
         # Update application
         await app_facade.SetCharm(
             application=self.entity_id,
