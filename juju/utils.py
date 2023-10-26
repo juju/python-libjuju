@@ -48,19 +48,17 @@ def juju_config_dir():
 
     """
     # Check $JUJU_DATA first
-    config_dir = os.environ.get('JUJU_DATA', None)
+    config_dir = Path(os.environ.get('JUJU_DATA', None))
 
     # Second option: $XDG_DATA_HOME for ~/.local/share
-    if not config_dir:
-        base_dir = os.environ.get('XDG_DATA_HOME', None)
-        if base_dir is not None:
-            config_dir = base_dir + '/juju'
+    if not config_dir.exists():
+        config_dir = Path(os.environ.get('XDG_DATA_HOME', '')) / 'juju'
 
     # Third option: just set it to ~/.local/share/juju
-    if not config_dir:
-        config_dir = '~/.local/share/juju'
+    if not config_dir.exists():
+        config_dir = Path('~/.local/share/juju')
 
-    return os.path.abspath(os.path.expanduser(config_dir))
+    return str(config_dir.expanduser().resolve())
 
 
 def juju_ssh_key_paths():
