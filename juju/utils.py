@@ -52,7 +52,9 @@ def juju_config_dir():
 
     # Second option: $XDG_DATA_HOME for ~/.local/share
     if not config_dir:
-        config_dir = os.environ.get('XDG_DATA_HOME', None)
+        base_dir = os.environ.get('XDG_DATA_HOME', None)
+        if base_dir is not None:
+            config_dir = base_dir + '/juju'
 
     # Third option: just set it to ~/.local/share/juju
     if not config_dir:
