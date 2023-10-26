@@ -1,12 +1,25 @@
 Changelog
 ---------
 
+2.9.45.0
+^^^^^^^^
+
+Thursday Oct 26 2023
+
+## What's Changed
+
+* Deploy by revision on 2.9 by @cderici in https://github.com/juju/python-libjuju/pull/957
+* Application refresh with resources by @cderici in https://github.com/juju/python-libjuju/pull/960
+* Improve jujudata to find controller name by endpoint by @cderici in https://github.com/juju/python-libjuju/pull/964
+* Allow switch kwarg in refresh to switch to local charms by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/968
+* Parse charm URLs consistantly for local charms by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/969
+* Fix juju config directory location pointed by XDG_DATA_HOME by @cderici in https://github.com/juju/python-libjuju/pull/975
+* [JUJU-4779] Switch to local properly by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/977
+
 2.9.44.1
 ^^^^^^^^
 
 Tuesday Sep 5 2023
-
-## What's Changed
 
 * Cleanup release process by @cderici in https://github.com/juju/python-libjuju/pull/921
 * [JUJU-4488] Add licence headers to source files by @cderici in https://github.com/juju/python-libjuju/pull/933
