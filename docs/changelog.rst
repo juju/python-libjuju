@@ -1,14 +1,46 @@
 Changelog
 ---------
 
+3.2.3.0
+^^^^^^^
+
+## What's Changed
+
+Thursday 26th Oct 2023
+
+* Repository Maintenance Improvements by @cderici in https://github.com/juju/python-libjuju/pull/922
+* Stale bot to not bother feature requests by @cderici in https://github.com/juju/python-libjuju/pull/926
+* Fix linter issues by @cderici in https://github.com/juju/python-libjuju/pull/928
+* Fix docstring typo by @DanielArndt in https://github.com/juju/python-libjuju/pull/927
+* Fix asyncio on README by @marceloneppel in https://github.com/juju/python-libjuju/pull/930
+* Fix integration/test_application.test_action by @cderici in https://github.com/juju/python-libjuju/pull/932
+* Update 3.2 facade clients by @cderici in https://github.com/juju/python-libjuju/pull/931
+* [JUJU-4488] Add licence headers to source files on 3.x by @cderici in https://github.com/juju/python-libjuju/pull/934
+* Update async tests to use builtin python suite by @DanielArndt in https://github.com/juju/python-libjuju/pull/935
+* Pass correct charm url to series selector by @cderici in https://github.com/juju/python-libjuju/pull/942
+* Green CI cleanup for python-libjuju by @cderici in https://github.com/juju/python-libjuju/pull/939
+* Bring forward support for nested assumes expressions on 3x by @cderici in https://github.com/juju/python-libjuju/pull/943
+* Release 3.2.2.0 notes by @cderici in https://github.com/juju/python-libjuju/pull/945
+* Cleanup release process for 3.x by @cderici in https://github.com/juju/python-libjuju/pull/946
+* Use new DeployFromRepository endpoint for deploy by @cderici in https://github.com/juju/python-libjuju/pull/949
+* Handle pending upload resources deployfromrepository by @cderici in https://github.com/juju/python-libjuju/pull/953
+* Optimize connection teardown by @cderici in https://github.com/juju/python-libjuju/pull/952
+* Use `log.warning` instead of the deprecated `warn` by @sed-i in https://github.com/juju/python-libjuju/pull/954
+* Find controller name by endpoint on 3.x track by @cderici in https://github.com/juju/python-libjuju/pull/966
+* Optimize & fix unit removal by @cderici in https://github.com/juju/python-libjuju/pull/967
+* Allow switch kwarg in refresh to switch to local charms by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/971
+* Parse charm URLs consistantly for local charms by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/974
+* Juju config directory location fix on 3.x by @cderici in https://github.com/juju/python-libjuju/pull/976
+* [JUJU-4779] Ensure valid charm origin for local charm switches by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/978
+* Application refresh with resources on 3.x by @cderici in https://github.com/juju/python-libjuju/pull/973
+
+
 3.2.2.0
 ^^^^^^^
 
 Wednesday 6th September 2023
 
 This is a minor release on the 3.x track, works with any Juju 3.x controller.
-
-## What's Changed
 
 * Repository Maintenance Improvements by @cderici in https://github.com/juju/python-libjuju/pull/922
 * Stale bot to not bother feature requests by @cderici in https://github.com/juju/python-libjuju/pull/926
