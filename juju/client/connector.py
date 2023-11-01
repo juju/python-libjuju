@@ -9,7 +9,7 @@ from juju.client.connection import Connection
 from juju.client.gocookies import GoCookieJar, go_to_py_cookie
 from juju.client.jujudata import FileJujuData, API_ENDPOINTS_KEY
 from juju.client.proxy.factory import proxy_from_config
-from juju.errors import JujuConnectionError, JujuError, PylibjujuProgrammingError
+from juju.errors import JujuConnectionError, JujuError
 from juju.client import client
 from juju.version import SUPPORTED_MAJOR_VERSION, TARGET_JUJU_VERSION
 
@@ -38,7 +38,6 @@ class Connector:
         self.bakery_client = bakery_client
         self._connection = None
         self._log_connection = None
-        self.controller_name = None
         self.controller_uuid = None
         self.model_name = None
         self.jujudata = jujudata or FileJujuData()
@@ -82,11 +81,6 @@ class Connector:
             if self._connection:
                 await self._connection.close()
             self._connection = await Connection.connect(**kwargs)
-
-        if not self.controller_name:
-            if 'endpoint' not in kwargs:
-                raise PylibjujuProgrammingError("Please report this error to the maintainers.")
-            self.controller_name = self.jujudata.controller_name_by_endpoint(kwargs['endpoint'])
 
         # Check if we support the target controller
         juju_server_version = self._connection.info['server-version']
@@ -132,7 +126,6 @@ class Connector:
             specified_facades=specified_facades,
             proxy=proxy,
         )
-        self.controller_name = controller_name
         self.controller_uuid = controller["uuid"]
 
     async def connect_model(self, _model_name=None, **kwargs):
@@ -188,9 +181,8 @@ class Connector:
         await self.connect(**kwargs)
         # TODO this might be a good spot to trigger refreshing the
         # local cache (the connection to the model might help)
-        self.controller_name = controller_name
         self.model_name = controller_name + ':' + _model_name
-        return self.controller_name, model_uuid
+        return model_uuid
 
     def bakery_client_for_controller(self, controller_name):
         '''Make a copy of the bakery client with a the appropriate controller's
