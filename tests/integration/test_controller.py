@@ -5,7 +5,7 @@ import asyncio
 import uuid
 import hvac
 
-from juju import access
+from juju import access, controller
 from juju.client.connection import Connection
 from juju.client import client
 from juju.errors import JujuAPIError, JujuError
@@ -296,6 +296,22 @@ async def test_grant_revoke_controller_access(event_loop):
                 pass
             else:
                 raise
+
+
+@base.bootstrapped
+async def test_connection_lazy_jujudata(event_loop):
+    async with base.CleanController() as cont1:
+        conn = cont1.connection()
+        new_controller = controller.Controller()
+        await new_controller.connect(endpoint=conn.endpoints[0][0],
+                                     cacert=conn.cacert,
+                                     username=conn.usertag,
+                                     password=conn.password,
+                                     )
+        assert new_controller._controller_name is None
+        new_controller.controller_name
+        assert new_controller._controller_name is not None
+        await new_controller.disconnect()
 
 
 @base.bootstrapped

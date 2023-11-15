@@ -663,7 +663,7 @@ class Model:
                 model_name = args[0]
             else:
                 model_name = kwargs.pop('model_name', None)
-            _, model_uuid = await self._connector.connect_model(model_name, **kwargs)
+            model_uuid = await self._connector.connect_model(model_name, **kwargs)
         else:
             # Then we're using the endpoint to pick the model
             if 'model_name' in kwargs:
