@@ -123,6 +123,10 @@ class JujuModelConfigError(JujuConfigError):
     pass
 
 
+class JujuControllerNotFoundError(JujuError):
+    pass
+
+
 class AbstractMethodError(Exception):
     pass
 
