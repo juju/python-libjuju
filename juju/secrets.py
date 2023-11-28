@@ -7,8 +7,11 @@ This module contains utility logic for secrets such as reading secret data from 
 
 
 import base64
-from pathlib import Path
+import json
 import re
+import yaml
+from pathlib import Path
+from . import errors
 
 file_suffix = "#file"
 max_value_size_bytes = 5 * 1024
@@ -50,7 +53,7 @@ def create_secret_data(args):
         except Exception as e:
             raise ValueError(f"Error processing key {key}: {e}")
 
-    return encodeValuesBase64(data)
+    return encode_values_base64(data)
 
 
 def read_secret_data(file):
@@ -60,14 +63,40 @@ def read_secret_data(file):
 
     :return []str: bag of key value pairs for a secret
     """
-    return {}
+    data = {}
+    path = Path(file).resolve()
+
+    try:
+        fs = path.stat()
+        if fs.st_size > max_content_size_bytes:
+            raise ValueError(f"Secret content in file {path} too large: {fs.st_size} bytes")
+    except FileNotFoundError:
+        raise FileNotFoundError(f"The file {path} does not exist.")
+    except OSError:
+        raise
+
+    try:
+        with open(path, 'r', encoding='utf-8') as file:
+            data = file.read()
+    except Exception:
+        raise
+
+    try:
+        data = json.loads(data)
+    except json.JSONDecodeError:
+        try:
+            data = yaml.safe_load(data)
+        except yaml.YAMLError:
+            raise errors.JujuNotValid(f"Invalid data file at: {file}")
+
+    return encode_values_base64(data)
 
 
 base64_suffix = "#base64"
 key_reg_exp = re.compile("^([a-z](?:-?[a-z0-9]){2,})$")
 
 
-def encodeValuesBase64(data):
+def encode_values_base64(data):
     """Encodes the values in the given data bag for a secret
 
     If a key has the #base64 suffix, then the value is already base64 encoded,otherwise the value is base64 encoded as it is added to the data bag.
