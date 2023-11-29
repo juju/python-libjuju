@@ -94,6 +94,10 @@ class PylibjujuProgrammingError(Exception):
     pass
 
 
+class JujuNotSupportedError(JujuError):
+    pass
+
+
 class JujuNotValid(JujuError):
     def __init__(self, entity_type, entity_name):
         self.entity_type = entity_type
