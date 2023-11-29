@@ -611,13 +611,13 @@ async def test_relate(event_loop):
         await model.deploy(
             'ubuntu',
             application_name='ubuntu',
-            series='bionic',
+            base='ubuntu@20.04/stable',
             channel='stable',
         )
         await model.deploy(
             'nrpe',
             application_name='nrpe',
-            series='bionic',
+            base='ubuntu@20.04/stable',
             channel='stable',
             # subordinates must be deployed without units
             num_units=0,
@@ -1291,5 +1291,5 @@ async def test_list_secrets(event_loop):
         assert model.units['charm-secret/0'].workload_status == 'active'
 
         secrets = await model.list_secrets(show_secrets=True)
-        assert secrets.results is not None
+        assert secrets is not None
         assert len(secrets.results) == 1
