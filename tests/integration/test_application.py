@@ -211,6 +211,7 @@ async def test_upgrade_local_charm_resource(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
+@pytest.mark.skip('Update charm')
 async def test_upgrade_charm_resource(event_loop):
     async with base.CleanModel() as model:
         app = await model.deploy('cs:~juju-qa/bionic/upgrade-charm-resource-test-0')
@@ -233,7 +234,7 @@ async def test_upgrade_charm_resource(event_loop):
 @pytest.mark.asyncio
 async def test_refresh_with_resource_argument(event_loop):
     async with base.CleanModel() as model:
-        app = await model.deploy('juju-qa-test', resources={'foo-file': 2})
+        app = await model.deploy('juju-qa-test', resources={'foo-file': '2'})
         res2 = await app.get_resources()
         assert res2['foo-file'].revision == 2
         await app.refresh(resources={'foo-file': 4})

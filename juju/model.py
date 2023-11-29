@@ -1825,7 +1825,7 @@ class Model:
             if config is None:
                 config = {}
             if trust:
-                config["trust"] = "true"
+                config["trust"] = True
 
             return await self._deploy(
                 charm_url=identifier,
