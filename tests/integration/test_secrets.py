@@ -36,4 +36,4 @@ async def test_list_secrets(event_loop):
 
         secrets = await model.list_secrets(show_secrets=True)
         assert secrets is not None
-        assert len(secrets.results) == 1
+        assert len(secrets) == 1
