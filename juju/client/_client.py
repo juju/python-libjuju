@@ -554,6 +554,14 @@ class UserManagerFacade(TypeFactory):
     pass
 
 
+class UserSecretsDrainFacade(TypeFactory):
+    pass
+
+
+class UserSecretsManagerFacade(TypeFactory):
+    pass
+
+
 class VolumeAttachmentPlansWatcherFacade(TypeFactory):
     pass
 

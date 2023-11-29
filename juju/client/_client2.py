@@ -5130,10 +5130,11 @@ class SecretsFacade(Type):
                                           'required': ['args'],
                                           'type': 'object'},
                      'DeleteSecretArg': {'additionalProperties': False,
-                                         'properties': {'revisions': {'items': {'type': 'integer'},
+                                         'properties': {'label': {'type': 'string'},
+                                                        'revisions': {'items': {'type': 'integer'},
                                                                       'type': 'array'},
                                                         'uri': {'type': 'string'}},
-                                         'required': ['uri'],
+                                         'required': ['uri', 'label'],
                                          'type': 'object'},
                      'DeleteSecretArgs': {'additionalProperties': False,
                                           'properties': {'args': {'items': {'$ref': '#/definitions/DeleteSecretArg'},
@@ -5159,8 +5160,10 @@ class SecretsFacade(Type):
                      'GrantRevokeUserSecretArg': {'additionalProperties': False,
                                                   'properties': {'applications': {'items': {'type': 'string'},
                                                                                   'type': 'array'},
+                                                                 'label': {'type': 'string'},
                                                                  'uri': {'type': 'string'}},
                                                   'required': ['uri',
+                                                               'label',
                                                                'applications'],
                                                   'type': 'object'},
                      'ListSecretResult': {'additionalProperties': False,
@@ -5228,7 +5231,8 @@ class SecretsFacade(Type):
                                                           'error': {'$ref': '#/definitions/Error'}},
                                            'type': 'object'},
                      'SecretsFilter': {'additionalProperties': False,
-                                       'properties': {'owner-tag': {'type': 'string'},
+                                       'properties': {'label': {'type': 'string'},
+                                                      'owner-tag': {'type': 'string'},
                                                       'revision': {'type': 'integer'},
                                                       'uri': {'type': 'string'}},
                                        'type': 'object'},
@@ -5247,6 +5251,7 @@ class SecretsFacade(Type):
                                                             'auto-prune': {'type': 'boolean'},
                                                             'content': {'$ref': '#/definitions/SecretContentParams'},
                                                             'description': {'type': 'string'},
+                                                            'existing-label': {'type': 'string'},
                                                             'expire-time': {'format': 'date-time',
                                                                             'type': 'string'},
                                                             'label': {'type': 'string'},
@@ -5255,7 +5260,9 @@ class SecretsFacade(Type):
                                                                        'type': 'object'},
                                                             'rotate-policy': {'type': 'string'},
                                                             'uri': {'type': 'string'}},
-                                             'required': ['UpsertSecretArg', 'uri'],
+                                             'required': ['UpsertSecretArg',
+                                                          'uri',
+                                                          'existing-label'],
                                              'type': 'object'},
                      'UpdateUserSecretArgs': {'additionalProperties': False,
                                               'properties': {'args': {'items': {'$ref': '#/definitions/UpdateUserSecretArg'},
@@ -5330,16 +5337,20 @@ class SecretsFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def GrantSecret(self, applications=None, uri=None):
+    async def GrantSecret(self, applications=None, label=None, uri=None):
         '''
         GrantSecret grants access to a user secret.
 
         applications : typing.Sequence[str]
+        label : str
         uri : str
         Returns -> ErrorResults
         '''
         if applications is not None and not isinstance(applications, (bytes, str, list)):
             raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
+
+        if label is not None and not isinstance(label, (bytes, str)):
+            raise Exception("Expected label to be a str, received: {}".format(type(label)))
 
         if uri is not None and not isinstance(uri, (bytes, str)):
             raise Exception("Expected uri to be a str, received: {}".format(type(uri)))
@@ -5351,6 +5362,7 @@ class SecretsFacade(Type):
                    version=2,
                    params=_params)
         _params['applications'] = applications
+        _params['label'] = label
         _params['uri'] = uri
         reply = await self.rpc(msg)
         return reply
@@ -5409,16 +5421,20 @@ class SecretsFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
-    async def RevokeSecret(self, applications=None, uri=None):
+    async def RevokeSecret(self, applications=None, label=None, uri=None):
         '''
         RevokeSecret revokes access to a user secret.
 
         applications : typing.Sequence[str]
+        label : str
         uri : str
         Returns -> ErrorResults
         '''
         if applications is not None and not isinstance(applications, (bytes, str, list)):
             raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
+
+        if label is not None and not isinstance(label, (bytes, str)):
+            raise Exception("Expected label to be a str, received: {}".format(type(label)))
 
         if uri is not None and not isinstance(uri, (bytes, str)):
             raise Exception("Expected uri to be a str, received: {}".format(type(uri)))
@@ -5430,6 +5446,7 @@ class SecretsFacade(Type):
                    version=2,
                    params=_params)
         _params['applications'] = applications
+        _params['label'] = label
         _params['uri'] = uri
         reply = await self.rpc(msg)
         return reply
@@ -5488,10 +5505,11 @@ class SecretsManagerFacade(Type):
                                              'required': ['count'],
                                              'type': 'object'},
                      'DeleteSecretArg': {'additionalProperties': False,
-                                         'properties': {'revisions': {'items': {'type': 'integer'},
+                                         'properties': {'label': {'type': 'string'},
+                                                        'revisions': {'items': {'type': 'integer'},
                                                                       'type': 'array'},
                                                         'uri': {'type': 'string'}},
-                                         'required': ['uri'],
+                                         'required': ['uri', 'label'],
                                          'type': 'object'},
                      'DeleteSecretArgs': {'additionalProperties': False,
                                           'properties': {'args': {'items': {'$ref': '#/definitions/DeleteSecretArg'},

@@ -120,7 +120,7 @@ client_facades = {
     'ResourcesHookContext': {'versions': [1]},
     'Resumer': {'versions': [2]},
     'RetryStrategy': {'versions': [1]},
-    'Secrets': {'versions': [1]},
+    'Secrets': {'versions': [1, 2]},
     'SecretsManager': {'versions': [1, 2]},
     'SecretBackends': {'versions': [1]},
     'SecretBackendsManager': {'versions': [1]},
@@ -144,6 +144,8 @@ client_facades = {
     'UpgradeSeries': {'versions': [1, 3]},
     'UpgradeSteps': {'versions': [1, 2]},
     'UserManager': {'versions': [1, 2, 3]},
+    'UserSecretsDrain': {'versions': [1]},
+    'UserSecretsManager': {'versions': [1]},
     'VolumeAttachmentsWatcher': {'versions': [2]},
     'VolumeAttachmentPlansWatcher': {'versions': [1]},
 }
