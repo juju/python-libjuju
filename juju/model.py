@@ -2614,18 +2614,18 @@ class Model:
         except IOError:
             raise
 
-    async def add_secret(self, name, dataArgs, file="", info=""):
+    async def add_secret(self, name, data_args, file="", info=""):
         """Adds a secret with a list of key values
 
         Equivalent to the cli command:
         juju add-secret [options] <name> [key[#base64|#file]=value...]
 
         :param name str: The name of the secret to be added.
-        :param dataArgs []str: The key value pairs to be added into the secret.
+        :param data_args []str: The key value pairs to be added into the secret.
         :param file str: A path to a yaml file containing secret key values.
         :param info str: The secret description.
         """
-        data = create_secret_data(dataArgs)
+        data = create_secret_data(data_args)
 
         if file:
             data_from_file = read_secret_data(file)
@@ -2648,6 +2648,39 @@ class Model:
         if result.error is not None:
             raise JujuAPIError(result.error.message)
         return result.result
+
+    async def update_secret(self, name, data_args=[], new_name="", file="", info=""):
+        """Update a secret with a list of key values, or info.
+
+        Equivalent to the cli command:
+        juju add-secret [options] <name> [key[#base64|#file]=value...]
+
+        :param name str: The name of the secret to be added.
+        :param data_args []str: The key value pairs to be added into the secret.
+        :param file str: A path to a yaml file containing secret key values.
+        :param info str: The secret description.
+        """
+        data = create_secret_data(data_args)
+        if file:
+            data_from_file = read_secret_data(file)
+            for k, v in data_from_file.items():
+                # Caution: key/value pairs in files overwrite the ones in the args.
+                data[k] = v
+
+        if client.SecretsFacade.best_facade_version(self.connection()) < 2:
+            raise JujuNotSupportedError("user secrets")
+        secretsFacade = client.SecretsFacade.from_connection(self.connection())
+        results = await secretsFacade.UpdateSecrets([{
+            'content': {'data': data},
+            'description': info,
+            'existing-label': name,
+            'label': new_name,
+        }])
+        if len(results.results) != 1:
+            raise JujuAPIError(f"expected 1 result, got {len(results.results)}")
+        result_error = results.results[0]
+        if result_error.error is not None:
+            raise JujuAPIError(result_error.error)
 
     async def list_secrets(self, filter="", show_secrets=False):
         """

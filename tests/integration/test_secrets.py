@@ -9,9 +9,8 @@ from ..utils import TESTS_DIR
 @base.bootstrapped
 @pytest.mark.bundle
 async def test_add_secret(event_loop):
-
     async with base.CleanModel() as model:
-        secret = await model.add_secret(name='my-apitoken', dataArgs=['token=34ae35facd4'])
+        secret = await model.add_secret(name='my-apitoken', data_args=['token=34ae35facd4'])
         assert secret.startswith('secret:')
 
         secrets = await model.list_secrets()
@@ -37,3 +36,17 @@ async def test_list_secrets(event_loop):
         secrets = await model.list_secrets(show_secrets=True)
         assert secrets is not None
         assert len(secrets) == 1
+
+
+@base.bootstrapped
+@pytest.mark.bundle
+async def test_update_secret(event_loop):
+    async with base.CleanModel() as model:
+        secret = await model.add_secret(name='my-apitoken', data_args=['token=34ae35facd4'])
+        assert secret.startswith('secret:')
+
+        await model.update_secret(name='my-apitoken', new_name='new-token')
+
+        secrets = await model.list_secrets()
+        assert len(secrets) == 1
+        assert secrets[0].label == 'new-token'
