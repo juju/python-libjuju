@@ -2734,6 +2734,27 @@ class Model:
         if result_error.error is not None:
             raise JujuAPIError(result_error.error)
 
+    async def revoke_secret(self, secret_name, application, *applications):
+        """Revoke access to a secret.
+
+        Revoke applications' access to view the value of a specified secret.
+
+        :param secret_name str: ID|name of the secret.
+        :param application str: name of an application for which the access to the secret is revoked
+        :param applications []str: names of more applications to disassociate the secret with
+        """
+        if client.SecretsFacade.best_facade_version(self.connection()) < 2:
+            raise JujuNotSupportedError("user secrets")
+        secretsFacade = client.SecretsFacade.from_connection(self.connection())
+        results = await secretsFacade.RevokeSecret(
+            applications=[application] + list(applications),
+            label=secret_name)
+        if len(results.results) != 1:
+            raise JujuAPIError(f"expected 1 result, got {len(results.results)}")
+        result_error = results.results[0]
+        if result_error.error is not None:
+            raise JujuAPIError(result_error.error)
+
     async def _get_source_api(self, url, controller_name=None):
         controller = Controller()
         if url.has_empty_source():
