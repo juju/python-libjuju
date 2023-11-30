@@ -50,3 +50,16 @@ async def test_update_secret(event_loop):
         secrets = await model.list_secrets()
         assert len(secrets) == 1
         assert secrets[0].label == 'new-token'
+
+
+@base.bootstrapped
+@pytest.mark.bundle
+async def test_remove_secret(event_loop):
+    async with base.CleanModel() as model:
+        secret = await model.add_secret(name='my-apitoken', data_args=['token=34ae35facd4'])
+        assert secret.startswith('secret:')
+
+        await model.remove_secret('my-apitoken')
+
+        secrets = await model.list_secrets()
+        assert len(secrets) == 0

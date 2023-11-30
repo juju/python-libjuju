@@ -2693,6 +2693,28 @@ class Model:
         })
         return results.results
 
+    async def remove_secret(self, secret_name, revision=-1):
+        """Remove an existing secret.
+
+        :param secret_name str: ID|name of the secret to remove.
+        :param revision int: remove the specified revision.
+        """
+        if client.SecretsFacade.best_facade_version(self.connection()) < 2:
+            raise JujuNotSupportedError("user secrets")
+        remove_secret_arg = {
+            'label': secret_name,
+        }
+        if revision >= 0:
+            remove_secret_arg['revisions'] = [revision]
+
+        secretsFacade = client.SecretsFacade.from_connection(self.connection())
+        results = await secretsFacade.RemoveSecrets([remove_secret_arg])
+        if len(results.results) != 1:
+            raise JujuAPIError(f"expected 1 result, got {len(results.results)}")
+        result_error = results.results[0]
+        if result_error.error is not None:
+            raise JujuAPIError(result_error.error)
+
     async def _get_source_api(self, url, controller_name=None):
         controller = Controller()
         if url.has_empty_source():
