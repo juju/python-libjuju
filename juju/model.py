@@ -2715,6 +2715,25 @@ class Model:
         if result_error.error is not None:
             raise JujuAPIError(result_error.error)
 
+    async def grant_secret(self, secret_name, application, *applications):
+        """Grants access to a secret to the specified applications.
+
+        :param secret_name str: ID|name of the secret.
+        :param application str: name of an application for which the access is granted
+        :param applications []str: names of more applications to associate the secret with
+        """
+        if client.SecretsFacade.best_facade_version(self.connection()) < 2:
+            raise JujuNotSupportedError("user secrets")
+        secretsFacade = client.SecretsFacade.from_connection(self.connection())
+        results = await secretsFacade.GrantSecret(
+            applications=[application] + list(applications),
+            label=secret_name)
+        if len(results.results) != 1:
+            raise JujuAPIError(f"expected 1 result, got {len(results.results)}")
+        result_error = results.results[0]
+        if result_error.error is not None:
+            raise JujuAPIError(result_error.error)
+
     async def _get_source_api(self, url, controller_name=None):
         controller = Controller()
         if url.has_empty_source():
