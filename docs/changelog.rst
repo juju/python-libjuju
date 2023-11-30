@@ -1,10 +1,22 @@
 Changelog
 ---------
 
-3.2.3.0
+3.3.0.0
 ^^^^^^^
 
 ## What's Changed
+
+The main contribution of this release is the user secrets that's released as a part of Juju 3.3.
+
+Thursday 30th Nov 2023
+
+* Free pyblijuju from relying on juju client when connecting to a controller by @cderici in https://github.com/juju/python-libjuju/pull/984
+* Handle FileNotFoundError on current_controller() by @DanielArndt in https://github.com/juju/python-libjuju/pull/937
+* Add support for adding user secrets by @cderici in https://github.com/juju/python-libjuju/pull/986
+* Complete support for user secrets by @cderici in https://github.com/juju/python-libjuju/pull/987
+
+3.2.3.0
+^^^^^^^
 
 Thursday 26th Oct 2023
 
@@ -33,7 +45,6 @@ Thursday 26th Oct 2023
 * Juju config directory location fix on 3.x by @cderici in https://github.com/juju/python-libjuju/pull/976
 * [JUJU-4779] Ensure valid charm origin for local charm switches by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/978
 * Application refresh with resources on 3.x by @cderici in https://github.com/juju/python-libjuju/pull/973
-
 
 3.2.2.0
 ^^^^^^^
