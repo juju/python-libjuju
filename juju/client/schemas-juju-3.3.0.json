@@ -10497,6 +10497,14 @@
                             "$ref": "#/definitions/ControllerConfigResult"
                         }
                     }
+                },
+                "WatchControllerConfig": {
+                    "type": "object",
+                    "properties": {
+                        "Result": {
+                            "$ref": "#/definitions/NotifyWatchResult"
+                        }
+                    }
                 }
             },
             "definitions": {
@@ -10516,6 +10524,46 @@
                     "additionalProperties": false,
                     "required": [
                         "config"
+                    ]
+                },
+                "Error": {
+                    "type": "object",
+                    "properties": {
+                        "code": {
+                            "type": "string"
+                        },
+                        "info": {
+                            "type": "object",
+                            "patternProperties": {
+                                ".*": {
+                                    "type": "object",
+                                    "additionalProperties": true
+                                }
+                            }
+                        },
+                        "message": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "message",
+                        "code"
+                    ]
+                },
+                "NotifyWatchResult": {
+                    "type": "object",
+                    "properties": {
+                        "NotifyWatcherId": {
+                            "type": "string"
+                        },
+                        "error": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "NotifyWatcherId"
                     ]
                 }
             }
@@ -10590,6 +10638,15 @@
                         }
                     },
                     "description": "WatchAPIHostPorts watches the API server addresses."
+                },
+                "WatchModelOperatorProvisioningInfo": {
+                    "type": "object",
+                    "properties": {
+                        "Result": {
+                            "$ref": "#/definitions/NotifyWatchResult"
+                        }
+                    },
+                    "description": "WatchModelOperatorProvisioningInfo provides a watcher for changes that affect the\ninformation returned by ModelOperatorProvisioningInfo."
                 }
             },
             "definitions": {
@@ -16216,7 +16273,7 @@
     {
         "Name": "Client",
         "Description": "Client serves client-specific API methods.",
-        "Version": 6,
+        "Version": 7,
         "AvailableTo": [
             "controller-machine-agent",
             "machine-agent",
@@ -16593,6 +16650,36 @@
                         "subordinate"
                     ]
                 },
+                "EntityStatus": {
+                    "type": "object",
+                    "properties": {
+                        "data": {
+                            "type": "object",
+                            "patternProperties": {
+                                ".*": {
+                                    "type": "object",
+                                    "additionalProperties": true
+                                }
+                            }
+                        },
+                        "info": {
+                            "type": "string"
+                        },
+                        "since": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "status": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "status",
+                        "info",
+                        "since"
+                    ]
+                },
                 "Error": {
                     "type": "object",
                     "properties": {
@@ -16635,6 +16722,104 @@
                         }
                     },
                     "additionalProperties": false
+                },
+                "FilesystemAttachmentDetails": {
+                    "type": "object",
+                    "properties": {
+                        "FilesystemAttachmentInfo": {
+                            "$ref": "#/definitions/FilesystemAttachmentInfo"
+                        },
+                        "life": {
+                            "type": "string"
+                        },
+                        "mount-point": {
+                            "type": "string"
+                        },
+                        "read-only": {
+                            "type": "boolean"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "FilesystemAttachmentInfo"
+                    ]
+                },
+                "FilesystemAttachmentInfo": {
+                    "type": "object",
+                    "properties": {
+                        "mount-point": {
+                            "type": "string"
+                        },
+                        "read-only": {
+                            "type": "boolean"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "FilesystemDetails": {
+                    "type": "object",
+                    "properties": {
+                        "filesystem-tag": {
+                            "type": "string"
+                        },
+                        "info": {
+                            "$ref": "#/definitions/FilesystemInfo"
+                        },
+                        "life": {
+                            "type": "string"
+                        },
+                        "machine-attachments": {
+                            "type": "object",
+                            "patternProperties": {
+                                ".*": {
+                                    "$ref": "#/definitions/FilesystemAttachmentDetails"
+                                }
+                            }
+                        },
+                        "status": {
+                            "$ref": "#/definitions/EntityStatus"
+                        },
+                        "storage": {
+                            "$ref": "#/definitions/StorageDetails"
+                        },
+                        "unit-attachments": {
+                            "type": "object",
+                            "patternProperties": {
+                                ".*": {
+                                    "$ref": "#/definitions/FilesystemAttachmentDetails"
+                                }
+                            }
+                        },
+                        "volume-tag": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "filesystem-tag",
+                        "info",
+                        "status"
+                    ]
+                },
+                "FilesystemInfo": {
+                    "type": "object",
+                    "properties": {
+                        "filesystem-id": {
+                            "type": "string"
+                        },
+                        "pool": {
+                            "type": "string"
+                        },
+                        "size": {
+                            "type": "integer"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "filesystem-id",
+                        "pool",
+                        "size"
+                    ]
                 },
                 "FindToolsParams": {
                     "type": "object",
@@ -16705,6 +16890,12 @@
                             "type": "string",
                             "format": "date-time"
                         },
+                        "filesystems": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/FilesystemDetails"
+                            }
+                        },
                         "machines": {
                             "type": "object",
                             "patternProperties": {
@@ -16736,6 +16927,18 @@
                                 ".*": {
                                     "$ref": "#/definitions/RemoteApplicationStatus"
                                 }
+                            }
+                        },
+                        "storage": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/StorageDetails"
+                            }
+                        },
+                        "volumes": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/VolumeDetails"
                             }
                         }
                     },
@@ -17231,6 +17434,9 @@
                 "StatusParams": {
                     "type": "object",
                     "properties": {
+                        "include-storage": {
+                            "type": "boolean"
+                        },
                         "patterns": {
                             "type": "array",
                             "items": {
@@ -17241,6 +17447,71 @@
                     "additionalProperties": false,
                     "required": [
                         "patterns"
+                    ]
+                },
+                "StorageAttachmentDetails": {
+                    "type": "object",
+                    "properties": {
+                        "life": {
+                            "type": "string"
+                        },
+                        "location": {
+                            "type": "string"
+                        },
+                        "machine-tag": {
+                            "type": "string"
+                        },
+                        "storage-tag": {
+                            "type": "string"
+                        },
+                        "unit-tag": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "storage-tag",
+                        "unit-tag",
+                        "machine-tag"
+                    ]
+                },
+                "StorageDetails": {
+                    "type": "object",
+                    "properties": {
+                        "attachments": {
+                            "type": "object",
+                            "patternProperties": {
+                                ".*": {
+                                    "$ref": "#/definitions/StorageAttachmentDetails"
+                                }
+                            }
+                        },
+                        "kind": {
+                            "type": "integer"
+                        },
+                        "life": {
+                            "type": "string"
+                        },
+                        "owner-tag": {
+                            "type": "string"
+                        },
+                        "persistent": {
+                            "type": "boolean"
+                        },
+                        "status": {
+                            "$ref": "#/definitions/EntityStatus"
+                        },
+                        "storage-tag": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "storage-tag",
+                        "owner-tag",
+                        "kind",
+                        "status",
+                        "persistent"
                     ]
                 },
                 "Tools": {
@@ -17321,6 +17592,145 @@
                         "public-address",
                         "charm",
                         "subordinates"
+                    ]
+                },
+                "VolumeAttachmentDetails": {
+                    "type": "object",
+                    "properties": {
+                        "VolumeAttachmentInfo": {
+                            "$ref": "#/definitions/VolumeAttachmentInfo"
+                        },
+                        "bus-address": {
+                            "type": "string"
+                        },
+                        "device-link": {
+                            "type": "string"
+                        },
+                        "device-name": {
+                            "type": "string"
+                        },
+                        "life": {
+                            "type": "string"
+                        },
+                        "plan-info": {
+                            "$ref": "#/definitions/VolumeAttachmentPlanInfo"
+                        },
+                        "read-only": {
+                            "type": "boolean"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "VolumeAttachmentInfo"
+                    ]
+                },
+                "VolumeAttachmentInfo": {
+                    "type": "object",
+                    "properties": {
+                        "bus-address": {
+                            "type": "string"
+                        },
+                        "device-link": {
+                            "type": "string"
+                        },
+                        "device-name": {
+                            "type": "string"
+                        },
+                        "plan-info": {
+                            "$ref": "#/definitions/VolumeAttachmentPlanInfo"
+                        },
+                        "read-only": {
+                            "type": "boolean"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "VolumeAttachmentPlanInfo": {
+                    "type": "object",
+                    "properties": {
+                        "device-attributes": {
+                            "type": "object",
+                            "patternProperties": {
+                                ".*": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "device-type": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "VolumeDetails": {
+                    "type": "object",
+                    "properties": {
+                        "info": {
+                            "$ref": "#/definitions/VolumeInfo"
+                        },
+                        "life": {
+                            "type": "string"
+                        },
+                        "machine-attachments": {
+                            "type": "object",
+                            "patternProperties": {
+                                ".*": {
+                                    "$ref": "#/definitions/VolumeAttachmentDetails"
+                                }
+                            }
+                        },
+                        "status": {
+                            "$ref": "#/definitions/EntityStatus"
+                        },
+                        "storage": {
+                            "$ref": "#/definitions/StorageDetails"
+                        },
+                        "unit-attachments": {
+                            "type": "object",
+                            "patternProperties": {
+                                ".*": {
+                                    "$ref": "#/definitions/VolumeAttachmentDetails"
+                                }
+                            }
+                        },
+                        "volume-tag": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "volume-tag",
+                        "info",
+                        "status"
+                    ]
+                },
+                "VolumeInfo": {
+                    "type": "object",
+                    "properties": {
+                        "hardware-id": {
+                            "type": "string"
+                        },
+                        "persistent": {
+                            "type": "boolean"
+                        },
+                        "pool": {
+                            "type": "string"
+                        },
+                        "size": {
+                            "type": "integer"
+                        },
+                        "volume-id": {
+                            "type": "string"
+                        },
+                        "wwn": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "volume-id",
+                        "size",
+                        "persistent"
                     ]
                 }
             }
@@ -40022,6 +40432,9 @@
                 "DeleteSecretArg": {
                     "type": "object",
                     "properties": {
+                        "label": {
+                            "type": "string"
+                        },
                         "revisions": {
                             "type": "array",
                             "items": {
@@ -40034,7 +40447,8 @@
                     },
                     "additionalProperties": false,
                     "required": [
-                        "uri"
+                        "uri",
+                        "label"
                     ]
                 },
                 "DeleteSecretArgs": {
@@ -40110,6 +40524,9 @@
                                 "type": "string"
                             }
                         },
+                        "label": {
+                            "type": "string"
+                        },
                         "uri": {
                             "type": "string"
                         }
@@ -40117,6 +40534,7 @@
                     "additionalProperties": false,
                     "required": [
                         "uri",
+                        "label",
                         "applications"
                     ]
                 },
@@ -40295,6 +40713,9 @@
                 "SecretsFilter": {
                     "type": "object",
                     "properties": {
+                        "label": {
+                            "type": "string"
+                        },
                         "owner-tag": {
                             "type": "string"
                         },
@@ -40352,6 +40773,9 @@
                         "description": {
                             "type": "string"
                         },
+                        "existing-label": {
+                            "type": "string"
+                        },
                         "expire-time": {
                             "type": "string",
                             "format": "date-time"
@@ -40378,7 +40802,8 @@
                     "additionalProperties": false,
                     "required": [
                         "UpsertSecretArg",
-                        "uri"
+                        "uri",
+                        "existing-label"
                     ]
                 },
                 "UpdateUserSecretArgs": {
@@ -41010,6 +41435,9 @@
                 "DeleteSecretArg": {
                     "type": "object",
                     "properties": {
+                        "label": {
+                            "type": "string"
+                        },
                         "revisions": {
                             "type": "array",
                             "items": {
@@ -41022,7 +41450,8 @@
                     },
                     "additionalProperties": false,
                     "required": [
-                        "uri"
+                        "uri",
+                        "label"
                     ]
                 },
                 "DeleteSecretArgs": {
@@ -46470,7 +46899,7 @@
     {
         "Name": "Uniter",
         "Description": "UniterAPI implements the latest version (v18) of the Uniter API.",
-        "Version": 18,
+        "Version": 19,
         "AvailableTo": [
             "controller-machine-agent",
             "machine-agent",
@@ -46998,15 +47427,6 @@
                     },
                     "description": "ModelConfig returns the current model's configuration."
                 },
-                "ModelUUID": {
-                    "type": "object",
-                    "properties": {
-                        "Result": {
-                            "$ref": "#/definitions/StringResult"
-                        }
-                    },
-                    "description": "ModelUUID returns the model UUID that this unit resides in.\nIt is implemented here directly as a result of removing it from\nembedded APIAddresser *without* bumping the facade version.\nIt should be blanked when this facade version is next incremented."
-                },
                 "NetworkInfo": {
                     "type": "object",
                     "properties": {
@@ -47018,18 +47438,6 @@
                         }
                     },
                     "description": "NetworkInfo returns network interfaces/addresses for specified bindings."
-                },
-                "OpenedApplicationPortRangesByEndpoint": {
-                    "type": "object",
-                    "properties": {
-                        "Params": {
-                            "$ref": "#/definitions/Entity"
-                        },
-                        "Result": {
-                            "$ref": "#/definitions/ApplicationOpenedPortsResults"
-                        }
-                    },
-                    "description": "OpenedApplicationPortRangesByEndpoint returns the port ranges opened by each application."
                 },
                 "OpenedMachinePortRangesByEndpoint": {
                     "type": "object",
@@ -47930,58 +48338,6 @@
                         "scope"
                     ]
                 },
-                "ApplicationOpenedPorts": {
-                    "type": "object",
-                    "properties": {
-                        "endpoint": {
-                            "type": "string"
-                        },
-                        "port-ranges": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/PortRange"
-                            }
-                        }
-                    },
-                    "additionalProperties": false,
-                    "required": [
-                        "endpoint",
-                        "port-ranges"
-                    ]
-                },
-                "ApplicationOpenedPortsResult": {
-                    "type": "object",
-                    "properties": {
-                        "application-port-ranges": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/ApplicationOpenedPorts"
-                            }
-                        },
-                        "error": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "additionalProperties": false,
-                    "required": [
-                        "application-port-ranges"
-                    ]
-                },
-                "ApplicationOpenedPortsResults": {
-                    "type": "object",
-                    "properties": {
-                        "results": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/ApplicationOpenedPortsResult"
-                            }
-                        }
-                    },
-                    "additionalProperties": false,
-                    "required": [
-                        "results"
-                    ]
-                },
                 "ApplicationStatusResult": {
                     "type": "object",
                     "properties": {
@@ -48395,6 +48751,9 @@
                 "DeleteSecretArg": {
                     "type": "object",
                     "properties": {
+                        "label": {
+                            "type": "string"
+                        },
                         "revisions": {
                             "type": "array",
                             "items": {
@@ -48407,7 +48766,8 @@
                     },
                     "additionalProperties": false,
                     "required": [
-                        "uri"
+                        "uri",
+                        "label"
                     ]
                 },
                 "DeleteSecretArgs": {
@@ -52352,6 +52712,666 @@
                     "additionalProperties": false,
                     "required": [
                         "results"
+                    ]
+                }
+            }
+        }
+    },
+    {
+        "Name": "UserSecretsDrain",
+        "Description": "SecretsDrainAPI is the implementation for the SecretsDrain facade.",
+        "Version": 1,
+        "AvailableTo": [
+            "controller-machine-agent"
+        ],
+        "Schema": {
+            "type": "object",
+            "properties": {
+                "ChangeSecretBackend": {
+                    "type": "object",
+                    "properties": {
+                        "Params": {
+                            "$ref": "#/definitions/ChangeSecretBackendArgs"
+                        },
+                        "Result": {
+                            "$ref": "#/definitions/ErrorResults"
+                        }
+                    },
+                    "description": "ChangeSecretBackend updates the backend for the specified secret after migration done."
+                },
+                "GetSecretBackendConfigs": {
+                    "type": "object",
+                    "properties": {
+                        "Params": {
+                            "$ref": "#/definitions/SecretBackendArgs"
+                        },
+                        "Result": {
+                            "$ref": "#/definitions/SecretBackendConfigResults"
+                        }
+                    },
+                    "description": "GetSecretBackendConfigs gets the config needed to create a client to secret backends for the drain worker."
+                },
+                "GetSecretContentInfo": {
+                    "type": "object",
+                    "properties": {
+                        "Params": {
+                            "$ref": "#/definitions/GetSecretContentArgs"
+                        },
+                        "Result": {
+                            "$ref": "#/definitions/SecretContentResults"
+                        }
+                    },
+                    "description": "GetSecretContentInfo returns the secret values for the specified secrets."
+                },
+                "GetSecretRevisionContentInfo": {
+                    "type": "object",
+                    "properties": {
+                        "Params": {
+                            "$ref": "#/definitions/SecretRevisionArg"
+                        },
+                        "Result": {
+                            "$ref": "#/definitions/SecretContentResults"
+                        }
+                    },
+                    "description": "GetSecretRevisionContentInfo returns the secret values for the specified secret revisions."
+                },
+                "GetSecretsToDrain": {
+                    "type": "object",
+                    "properties": {
+                        "Result": {
+                            "$ref": "#/definitions/ListSecretResults"
+                        }
+                    },
+                    "description": "GetSecretsToDrain returns metadata for the secrets that need to be drained."
+                },
+                "WatchSecretBackendChanged": {
+                    "type": "object",
+                    "properties": {
+                        "Result": {
+                            "$ref": "#/definitions/NotifyWatchResult"
+                        }
+                    },
+                    "description": "WatchSecretBackendChanged sets up a watcher to notify of changes to the secret backend."
+                }
+            },
+            "definitions": {
+                "ChangeSecretBackendArg": {
+                    "type": "object",
+                    "properties": {
+                        "content": {
+                            "$ref": "#/definitions/SecretContentParams"
+                        },
+                        "revision": {
+                            "type": "integer"
+                        },
+                        "uri": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "uri",
+                        "revision"
+                    ]
+                },
+                "ChangeSecretBackendArgs": {
+                    "type": "object",
+                    "properties": {
+                        "args": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ChangeSecretBackendArg"
+                            }
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "args"
+                    ]
+                },
+                "Error": {
+                    "type": "object",
+                    "properties": {
+                        "code": {
+                            "type": "string"
+                        },
+                        "info": {
+                            "type": "object",
+                            "patternProperties": {
+                                ".*": {
+                                    "type": "object",
+                                    "additionalProperties": true
+                                }
+                            }
+                        },
+                        "message": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "message",
+                        "code"
+                    ]
+                },
+                "ErrorResult": {
+                    "type": "object",
+                    "properties": {
+                        "error": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "ErrorResults": {
+                    "type": "object",
+                    "properties": {
+                        "results": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ErrorResult"
+                            }
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "results"
+                    ]
+                },
+                "GetSecretContentArg": {
+                    "type": "object",
+                    "properties": {
+                        "label": {
+                            "type": "string"
+                        },
+                        "peek": {
+                            "type": "boolean"
+                        },
+                        "refresh": {
+                            "type": "boolean"
+                        },
+                        "uri": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "uri"
+                    ]
+                },
+                "GetSecretContentArgs": {
+                    "type": "object",
+                    "properties": {
+                        "args": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/GetSecretContentArg"
+                            }
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "args"
+                    ]
+                },
+                "ListSecretResult": {
+                    "type": "object",
+                    "properties": {
+                        "create-time": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "label": {
+                            "type": "string"
+                        },
+                        "latest-expire-time": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "latest-revision": {
+                            "type": "integer"
+                        },
+                        "next-rotate-time": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "owner-tag": {
+                            "type": "string"
+                        },
+                        "revisions": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/SecretRevision"
+                            }
+                        },
+                        "rotate-policy": {
+                            "type": "string"
+                        },
+                        "update-time": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "uri": {
+                            "type": "string"
+                        },
+                        "value": {
+                            "$ref": "#/definitions/SecretValueResult"
+                        },
+                        "version": {
+                            "type": "integer"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "uri",
+                        "version",
+                        "owner-tag",
+                        "latest-revision",
+                        "create-time",
+                        "update-time",
+                        "revisions"
+                    ]
+                },
+                "ListSecretResults": {
+                    "type": "object",
+                    "properties": {
+                        "results": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ListSecretResult"
+                            }
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "results"
+                    ]
+                },
+                "NotifyWatchResult": {
+                    "type": "object",
+                    "properties": {
+                        "NotifyWatcherId": {
+                            "type": "string"
+                        },
+                        "error": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "NotifyWatcherId"
+                    ]
+                },
+                "SecretBackendArgs": {
+                    "type": "object",
+                    "properties": {
+                        "backend-ids": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "for-drain": {
+                            "type": "boolean"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "for-drain",
+                        "backend-ids"
+                    ]
+                },
+                "SecretBackendConfig": {
+                    "type": "object",
+                    "properties": {
+                        "params": {
+                            "type": "object",
+                            "patternProperties": {
+                                ".*": {
+                                    "type": "object",
+                                    "additionalProperties": true
+                                }
+                            }
+                        },
+                        "type": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "type"
+                    ]
+                },
+                "SecretBackendConfigResult": {
+                    "type": "object",
+                    "properties": {
+                        "config": {
+                            "$ref": "#/definitions/SecretBackendConfig"
+                        },
+                        "draining": {
+                            "type": "boolean"
+                        },
+                        "model-controller": {
+                            "type": "string"
+                        },
+                        "model-name": {
+                            "type": "string"
+                        },
+                        "model-uuid": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "model-controller",
+                        "model-uuid",
+                        "model-name",
+                        "draining"
+                    ]
+                },
+                "SecretBackendConfigResults": {
+                    "type": "object",
+                    "properties": {
+                        "active-id": {
+                            "type": "string"
+                        },
+                        "results": {
+                            "type": "object",
+                            "patternProperties": {
+                                ".*": {
+                                    "$ref": "#/definitions/SecretBackendConfigResult"
+                                }
+                            }
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "active-id"
+                    ]
+                },
+                "SecretContentParams": {
+                    "type": "object",
+                    "properties": {
+                        "data": {
+                            "type": "object",
+                            "patternProperties": {
+                                ".*": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "value-ref": {
+                            "$ref": "#/definitions/SecretValueRef"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "SecretContentResult": {
+                    "type": "object",
+                    "properties": {
+                        "backend-config": {
+                            "$ref": "#/definitions/SecretBackendConfigResult"
+                        },
+                        "content": {
+                            "$ref": "#/definitions/SecretContentParams"
+                        },
+                        "error": {
+                            "$ref": "#/definitions/Error"
+                        },
+                        "latest-revision": {
+                            "type": "integer"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "content"
+                    ]
+                },
+                "SecretContentResults": {
+                    "type": "object",
+                    "properties": {
+                        "results": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/SecretContentResult"
+                            }
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "results"
+                    ]
+                },
+                "SecretRevision": {
+                    "type": "object",
+                    "properties": {
+                        "backend-name": {
+                            "type": "string"
+                        },
+                        "create-time": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "expire-time": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "revision": {
+                            "type": "integer"
+                        },
+                        "update-time": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "value-ref": {
+                            "$ref": "#/definitions/SecretValueRef"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "revision"
+                    ]
+                },
+                "SecretRevisionArg": {
+                    "type": "object",
+                    "properties": {
+                        "pending-delete": {
+                            "type": "boolean"
+                        },
+                        "revisions": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        },
+                        "uri": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "uri",
+                        "revisions",
+                        "pending-delete"
+                    ]
+                },
+                "SecretValueRef": {
+                    "type": "object",
+                    "properties": {
+                        "backend-id": {
+                            "type": "string"
+                        },
+                        "revision-id": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "backend-id",
+                        "revision-id"
+                    ]
+                },
+                "SecretValueResult": {
+                    "type": "object",
+                    "properties": {
+                        "data": {
+                            "type": "object",
+                            "patternProperties": {
+                                ".*": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "error": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            }
+        }
+    },
+    {
+        "Name": "UserSecretsManager",
+        "Description": "UserSecretsManager is the implementation for the usersecrets facade.",
+        "Version": 1,
+        "AvailableTo": [
+            "controller-machine-agent"
+        ],
+        "Schema": {
+            "type": "object",
+            "properties": {
+                "DeleteRevisions": {
+                    "type": "object",
+                    "properties": {
+                        "Params": {
+                            "$ref": "#/definitions/DeleteSecretArgs"
+                        },
+                        "Result": {
+                            "$ref": "#/definitions/ErrorResults"
+                        }
+                    },
+                    "description": "DeleteRevisions deletes the specified revisions of the specified secret."
+                },
+                "WatchRevisionsToPrune": {
+                    "type": "object",
+                    "properties": {
+                        "Result": {
+                            "$ref": "#/definitions/StringsWatchResult"
+                        }
+                    },
+                    "description": "WatchRevisionsToPrune returns a watcher for notifying when:\n  - a secret revision owned by the model no longer\n    has any consumers and should be pruned."
+                }
+            },
+            "definitions": {
+                "DeleteSecretArg": {
+                    "type": "object",
+                    "properties": {
+                        "label": {
+                            "type": "string"
+                        },
+                        "revisions": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        },
+                        "uri": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "uri",
+                        "label"
+                    ]
+                },
+                "DeleteSecretArgs": {
+                    "type": "object",
+                    "properties": {
+                        "args": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/DeleteSecretArg"
+                            }
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "args"
+                    ]
+                },
+                "Error": {
+                    "type": "object",
+                    "properties": {
+                        "code": {
+                            "type": "string"
+                        },
+                        "info": {
+                            "type": "object",
+                            "patternProperties": {
+                                ".*": {
+                                    "type": "object",
+                                    "additionalProperties": true
+                                }
+                            }
+                        },
+                        "message": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "message",
+                        "code"
+                    ]
+                },
+                "ErrorResult": {
+                    "type": "object",
+                    "properties": {
+                        "error": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "ErrorResults": {
+                    "type": "object",
+                    "properties": {
+                        "results": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ErrorResult"
+                            }
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "results"
+                    ]
+                },
+                "StringsWatchResult": {
+                    "type": "object",
+                    "properties": {
+                        "changes": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "error": {
+                            "$ref": "#/definitions/Error"
+                        },
+                        "watcher-id": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "watcher-id"
                     ]
                 }
             }

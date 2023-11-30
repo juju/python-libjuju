@@ -32,13 +32,14 @@ from .constraints import parse as parse_constraints
 from .controller import Controller, ConnectedController
 from .delta import get_entity_class, get_entity_delta
 from .errors import JujuAPIError, JujuError, JujuModelConfigError, JujuBackupError
-from .errors import JujuModelError, JujuAppError, JujuUnitError, JujuAgentError, JujuMachineError, PylibjujuError
+from .errors import JujuModelError, JujuAppError, JujuUnitError, JujuAgentError, JujuMachineError, PylibjujuError, JujuNotSupportedError
 from .exceptions import DeadEntityException
 from .names import is_valid_application
 from .offerendpoints import ParseError as OfferParseError
 from .offerendpoints import parse_local_endpoint, parse_offer_url
 from .origin import Channel, Source
 from .placement import parse as parse_placement
+from .secrets import create_secret_data, read_secret_data
 from .tag import application as application_tag
 from .url import URL, Schema
 from .version import DEFAULT_ARCHITECTURE
@@ -1824,7 +1825,7 @@ class Model:
             if config is None:
                 config = {}
             if trust:
-                config["trust"] = "true"
+                config["trust"] = True
 
             return await self._deploy(
                 charm_url=identifier,
@@ -2613,15 +2614,51 @@ class Model:
         except IOError:
             raise
 
+    async def add_secret(self, name, dataArgs, file="", info=""):
+        """Adds a secret with a list of key values
+
+        Equivalent to the cli command:
+        juju add-secret [options] <name> [key[#base64|#file]=value...]
+
+        :param name str: The name of the secret to be added.
+        :param dataArgs []str: The key value pairs to be added into the secret.
+        :param file str: A path to a yaml file containing secret key values.
+        :param info str: The secret description.
+        """
+        data = create_secret_data(dataArgs)
+
+        if file:
+            data_from_file = read_secret_data(file)
+            for k, v in data_from_file.items():
+                # Caution: key/value pairs in files overwrite the ones in the args.
+                data[k] = v
+
+        if client.SecretsFacade.best_facade_version(self.connection()) < 2:
+            raise JujuNotSupportedError("user secrets")
+
+        secretsFacade = client.SecretsFacade.from_connection(self.connection())
+        results = await secretsFacade.CreateSecrets([{
+            'content': {'data': data},
+            'description': info,
+            'label': name,
+        }])
+        if len(results.results) != 1:
+            raise JujuAPIError(f"expected 1 result, got {len(results.results)}")
+        result = results.results[0]
+        if result.error is not None:
+            raise JujuAPIError(result.error.message)
+        return result.result
+
     async def list_secrets(self, filter="", show_secrets=False):
         """
         Returns the list of available secrets.
         """
         facade = client.SecretsFacade.from_connection(self.connection())
-        return await facade.ListSecrets({
+        results = await facade.ListSecrets({
             'filter': filter,
             'show-secrets': show_secrets,
         })
+        return results.results
 
     async def _get_source_api(self, url, controller_name=None):
         controller = Controller()
