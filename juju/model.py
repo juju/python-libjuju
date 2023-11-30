@@ -2614,18 +2614,18 @@ class Model:
         except IOError:
             raise
 
-    async def add_secret(self, name, dataArgs, file="", info=""):
+    async def add_secret(self, name, data_args, file="", info=""):
         """Adds a secret with a list of key values
 
         Equivalent to the cli command:
         juju add-secret [options] <name> [key[#base64|#file]=value...]
 
         :param name str: The name of the secret to be added.
-        :param dataArgs []str: The key value pairs to be added into the secret.
+        :param data_args []str: The key value pairs to be added into the secret.
         :param file str: A path to a yaml file containing secret key values.
         :param info str: The secret description.
         """
-        data = create_secret_data(dataArgs)
+        data = create_secret_data(data_args)
 
         if file:
             data_from_file = read_secret_data(file)
@@ -2649,6 +2649,39 @@ class Model:
             raise JujuAPIError(result.error.message)
         return result.result
 
+    async def update_secret(self, name, data_args=[], new_name="", file="", info=""):
+        """Update a secret with a list of key values, or info.
+
+        Equivalent to the cli command:
+        juju add-secret [options] <name> [key[#base64|#file]=value...]
+
+        :param name str: The name of the secret to be added.
+        :param data_args []str: The key value pairs to be added into the secret.
+        :param file str: A path to a yaml file containing secret key values.
+        :param info str: The secret description.
+        """
+        data = create_secret_data(data_args)
+        if file:
+            data_from_file = read_secret_data(file)
+            for k, v in data_from_file.items():
+                # Caution: key/value pairs in files overwrite the ones in the args.
+                data[k] = v
+
+        if client.SecretsFacade.best_facade_version(self.connection()) < 2:
+            raise JujuNotSupportedError("user secrets")
+        secretsFacade = client.SecretsFacade.from_connection(self.connection())
+        results = await secretsFacade.UpdateSecrets([{
+            'content': {'data': data},
+            'description': info,
+            'existing-label': name,
+            'label': new_name,
+        }])
+        if len(results.results) != 1:
+            raise JujuAPIError(f"expected 1 result, got {len(results.results)}")
+        result_error = results.results[0]
+        if result_error.error is not None:
+            raise JujuAPIError(result_error.error)
+
     async def list_secrets(self, filter="", show_secrets=False):
         """
         Returns the list of available secrets.
@@ -2659,6 +2692,68 @@ class Model:
             'show-secrets': show_secrets,
         })
         return results.results
+
+    async def remove_secret(self, secret_name, revision=-1):
+        """Remove an existing secret.
+
+        :param secret_name str: ID|name of the secret to remove.
+        :param revision int: remove the specified revision.
+        """
+        if client.SecretsFacade.best_facade_version(self.connection()) < 2:
+            raise JujuNotSupportedError("user secrets")
+        remove_secret_arg = {
+            'label': secret_name,
+        }
+        if revision >= 0:
+            remove_secret_arg['revisions'] = [revision]
+
+        secretsFacade = client.SecretsFacade.from_connection(self.connection())
+        results = await secretsFacade.RemoveSecrets([remove_secret_arg])
+        if len(results.results) != 1:
+            raise JujuAPIError(f"expected 1 result, got {len(results.results)}")
+        result_error = results.results[0]
+        if result_error.error is not None:
+            raise JujuAPIError(result_error.error)
+
+    async def grant_secret(self, secret_name, application, *applications):
+        """Grants access to a secret to the specified applications.
+
+        :param secret_name str: ID|name of the secret.
+        :param application str: name of an application for which the access is granted
+        :param applications []str: names of more applications to associate the secret with
+        """
+        if client.SecretsFacade.best_facade_version(self.connection()) < 2:
+            raise JujuNotSupportedError("user secrets")
+        secretsFacade = client.SecretsFacade.from_connection(self.connection())
+        results = await secretsFacade.GrantSecret(
+            applications=[application] + list(applications),
+            label=secret_name)
+        if len(results.results) != 1:
+            raise JujuAPIError(f"expected 1 result, got {len(results.results)}")
+        result_error = results.results[0]
+        if result_error.error is not None:
+            raise JujuAPIError(result_error.error)
+
+    async def revoke_secret(self, secret_name, application, *applications):
+        """Revoke access to a secret.
+
+        Revoke applications' access to view the value of a specified secret.
+
+        :param secret_name str: ID|name of the secret.
+        :param application str: name of an application for which the access to the secret is revoked
+        :param applications []str: names of more applications to disassociate the secret with
+        """
+        if client.SecretsFacade.best_facade_version(self.connection()) < 2:
+            raise JujuNotSupportedError("user secrets")
+        secretsFacade = client.SecretsFacade.from_connection(self.connection())
+        results = await secretsFacade.RevokeSecret(
+            applications=[application] + list(applications),
+            label=secret_name)
+        if len(results.results) != 1:
+            raise JujuAPIError(f"expected 1 result, got {len(results.results)}")
+        result_error = results.results[0]
+        if result_error.error is not None:
+            raise JujuAPIError(result_error.error)
 
     async def _get_source_api(self, url, controller_name=None):
         controller = Controller()
