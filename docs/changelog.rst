@@ -1,12 +1,20 @@
 Changelog
 ---------
 
+2.9.46.0
+^^^^^^^^
+
+Tuesday Dec 5 2023
+
+## What's Changed
+
+* Pass websocket Close frame into ConnectionClosed by @cderici in https://github.com/juju/python-libjuju/pull/990
+
+
 2.9.45.0
 ^^^^^^^^
 
 Thursday Oct 26 2023
-
-## What's Changed
 
 * Deploy by revision on 2.9 by @cderici in https://github.com/juju/python-libjuju/pull/957
 * Application refresh with resources by @cderici in https://github.com/juju/python-libjuju/pull/960
