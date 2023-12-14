@@ -49,11 +49,11 @@ def juju_config_dir():
     config_dir = Path('~/.local/share/juju')
 
     # Check $JUJU_DATA
-    if juju_data := os.environ.get('JUJU_DATA'):
-        config_dir = Path(juju_data)
+    if os.environ.get('JUJU_DATA'):
+        config_dir = Path(os.environ.get('JUJU_DATA'))
     # Secondly check: $XDG_DATA_HOME for ~/.local/share
-    elif xdg_data_home := os.environ.get('XDG_DATA_HOME'):
-        config_dir = Path(xdg_data_home) / 'juju'
+    elif os.environ.get('XDG_DATA_HOME'):
+        config_dir = Path(os.environ.get('XDG_DATA_HOME')) / 'juju'
 
     return str(config_dir.expanduser().resolve())
 
