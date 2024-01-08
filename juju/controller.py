@@ -147,6 +147,7 @@ class Controller:
                 for e in info.results[0].addresses
             ]
         except errors.JujuPermissionError:
+            log.warning("This user doesn't have at least read access to the controller model, so endpoints are not updated after connection.")
             pass
 
     async def connect_current(self):
