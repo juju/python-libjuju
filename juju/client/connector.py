@@ -94,6 +94,9 @@ class Connector:
             if 'password' not in kwargs and account.get('password'):
                 kwargs.update(password=account.get('password'))
 
+            if not ({'username', 'password'}.issubset(kwargs)):
+                required = {'username', 'password'}.difference(kwargs)
+                raise ValueError(f'Some authentication parameters are required : {",".join(required)}')
             self._connection = await Connection.connect(**kwargs)
 
         # Check if we support the target controller
