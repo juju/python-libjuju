@@ -7,7 +7,7 @@ from .. import base
 
 
 @base.bootstrapped
-async def test_get_controllers(event_loop):
+async def test_get_controllers():
     async with base.CleanController() as controller:
         j = Juju()
 

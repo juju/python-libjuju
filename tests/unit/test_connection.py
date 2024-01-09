@@ -34,7 +34,7 @@ class WebsocketMock:
         self.closed = True
 
 
-async def test_out_of_order(event_loop):
+async def test_out_of_order():
     ws = WebsocketMock([
         {'request-id': 1},
         {'request-id': 3},
@@ -69,7 +69,7 @@ async def test_out_of_order(event_loop):
             await con.close()
 
 
-async def test_bubble_redirect_exception(event_loop):
+async def test_bubble_redirect_exception():
     ca_cert = """
 -----BEGIN CERTIFICATE-----
 SOMECERT
@@ -112,7 +112,7 @@ SOMECERT
     ]
 
 
-async def test_follow_redirect(event_loop):
+async def test_follow_redirect():
     ca_cert = """
 -----BEGIN CERTIFICATE-----
 SOMECERT
@@ -170,7 +170,7 @@ SOMECERT
             await con.close()
 
 
-async def test_rpc_none_results(event_loop):
+async def test_rpc_none_results():
     ws = WebsocketMock([
         {'request-id': 1, 'response': {'results': None}},
     ])

@@ -11,7 +11,7 @@ from .. import base
 
 @base.bootstrapped
 @pytest.mark.skip('Update charm')
-async def test_status(event_loop):
+async def test_status():
     async with base.CleanModel() as model:
         await model.deploy(
             'ubuntu',
@@ -40,10 +40,10 @@ async def test_status(event_loop):
 
 
 @base.bootstrapped
-async def test_scp(event_loop):
+async def test_scp():
     # ensure that asyncio.subprocess will work;
     try:
-        asyncio.get_child_watcher().attach_loop(event_loop)
+        asyncio.get_child_watcher().attach_loop()
     except RuntimeError:
         pytest.skip('test_scp will always fail outside of MainThread')
     async with base.CleanModel() as model:
