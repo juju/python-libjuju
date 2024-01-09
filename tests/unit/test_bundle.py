@@ -174,7 +174,7 @@ class TestAddApplicationChange(unittest.TestCase):
 class TestAddApplicationChangeRun:
 
     @pytest.mark.asyncio
-    async def test_run_with_charmstore_charm(self, event_loop):
+    async def test_run_with_charmstore_charm(self):
         change = AddApplicationChange(1, [], params={"charm": "cs:charm",
                                                      "series": "series",
                                                      "application": "application",
@@ -228,7 +228,7 @@ class TestAddApplicationChangeRun:
         model._deploy.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_run_with_charmstore_charm_no_channel(self, event_loop):
+    async def test_run_with_charmstore_charm_no_channel(self):
         """Test to verify if when the given channel is None, the channel defaults to "stable", which
             is the default channel value for the Chart Store
         """
@@ -286,7 +286,7 @@ class TestAddApplicationChangeRun:
         model._deploy.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_run_with_charmhub_charm(self, event_loop):
+    async def test_run_with_charmhub_charm(self):
         change = AddApplicationChange(1, [], params={"charm": "charm",
                                                      "series": "series",
                                                      "application": "application",
@@ -334,7 +334,7 @@ class TestAddApplicationChangeRun:
                                          num_units="num_units")
 
     @pytest.mark.asyncio
-    async def test_run_with_charmhub_charm_no_channel(self, event_loop):
+    async def test_run_with_charmhub_charm_no_channel(self):
         """Test to verify if when the given channel is None, the channel defaults to "local/stable", which
             is the default channel value for the Charm Hub
         """
@@ -386,7 +386,7 @@ class TestAddApplicationChangeRun:
                                          num_units="num_units")
 
     @pytest.mark.asyncio
-    async def test_run_local(self, event_loop):
+    async def test_run_local(self):
         change = AddApplicationChange(1, [], params={"charm": "local:charm",
                                                      "series": "series",
                                                      "application": "application",
@@ -425,7 +425,7 @@ class TestAddApplicationChangeRun:
                                          charm_origin=ANY)
 
     @pytest.mark.asyncio
-    async def test_run_no_series(self, event_loop):
+    async def test_run_no_series(self):
         change = AddApplicationChange(1, [], params={"charm": "cs:charm1",
                                                      "series": "",
                                                      "application": "application",
@@ -531,7 +531,7 @@ class TestAddCharmChange(unittest.TestCase):
 class TestAddCharmChangeRun:
 
     @pytest.mark.asyncio
-    async def test_run(self, event_loop):
+    async def test_run(self):
         change = AddCharmChange(1, [], params={"charm": "cs:charm",
                                                "series": "series",
                                                "channel": "channel"})
@@ -607,7 +607,7 @@ class TestAddMachineChange(unittest.TestCase):
 class TestAddMachineChangeRun:
 
     @pytest.mark.asyncio
-    async def test_run(self, event_loop):
+    async def test_run(self):
         change = AddMachineChange(1, [], params={"series": "series",
                                                  "constraints": "cores=1",
                                                  "container-type": "container_type",
@@ -664,7 +664,7 @@ class TestAddRelationChange(unittest.TestCase):
 class TestAddRelationChangeRun:
 
     @pytest.mark.asyncio
-    async def test_run(self, event_loop):
+    async def test_run(self):
         change = AddRelationChange(1, [], params={"endpoint1": "endpoint1",
                                                   "endpoint2": "endpoint2"})
 
@@ -736,7 +736,7 @@ class MockModel:
 class TestAddUnitChangeRun:
 
     @pytest.mark.asyncio
-    async def test_run(self, event_loop):
+    async def test_run(self):
         change = AddUnitChange(1, [], params={"application": "application",
                                               "to": "to"})
 
@@ -793,7 +793,7 @@ class TestCreateOfferChange(unittest.TestCase):
 class TestCreateOfferChangeRun:
 
     @pytest.mark.asyncio
-    async def test_run(self, event_loop):
+    async def test_run(self):
         change = CreateOfferChange(1, [], params={"application": "application",
                                                   "endpoints": ["endpoints"],
                                                   "offer-name": "offer_name"})
@@ -845,7 +845,7 @@ class TestConsumeOfferChange(unittest.TestCase):
 class TestConsumeOfferChangeRun:
 
     @pytest.mark.asyncio
-    async def test_run(self, event_loop):
+    async def test_run(self):
         change = ConsumeOfferChange(1, [], params={"url": "url",
                                                    "application-name": "application_name"})
 
@@ -923,7 +923,7 @@ class TestExposeChange(unittest.TestCase):
 class TestExposeChangeRun:
 
     @pytest.mark.asyncio
-    async def test_run(self, event_loop):
+    async def test_run(self):
         params = {
             "application": "application",
             "exposed-endpoints": {
@@ -995,7 +995,7 @@ class TestScaleChange(unittest.TestCase):
 class TestScaleChangeRun:
 
     @pytest.mark.asyncio
-    async def test_run(self, event_loop):
+    async def test_run(self):
         change = ScaleChange(1, [], params={"application": "application",
                                             "scale": 1})
 
@@ -1051,7 +1051,7 @@ class TestSetAnnotationsChange(unittest.TestCase):
 class TestSetAnnotationsChangeRun:
 
     @pytest.mark.asyncio
-    async def test_run(self, event_loop):
+    async def test_run(self):
         change = SetAnnotationsChange(1, [], params={"id": "id",
                                                      "entity-type": "entity_type",
                                                      "annotations": "annotations"})
@@ -1078,7 +1078,7 @@ class TestSetAnnotationsChangeRun:
 
 class TestBundleHandler:
     @pytest.mark.asyncio
-    async def test_fetch_plan_local_k8s_bundle(self, event_loop):
+    async def test_fetch_plan_local_k8s_bundle(self):
         class AsyncMock(mock.MagicMock):
             async def __call__(self, *args, **kwargs):
                 return super(AsyncMock, self).__call__(*args, **kwargs)

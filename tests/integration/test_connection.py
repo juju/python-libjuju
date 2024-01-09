@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_connection_happy_path(event_loop):
+async def test_connection_happy_path():
     async with base.CleanController() as contr:
         conn = contr.connection()
         new_cont = Controller()
@@ -40,7 +40,7 @@ async def test_connection_happy_path(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_monitor(event_loop):
+async def test_monitor():
     async with base.CleanModel() as model:
         conn = model.connection()
         assert conn.monitor.status == 'connected'
@@ -51,7 +51,7 @@ async def test_monitor(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_monitor_catches_error(event_loop):
+async def test_monitor_catches_error():
 
     async with base.CleanModel() as model:
         conn = model.connection()
@@ -72,7 +72,7 @@ async def test_monitor_catches_error(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_full_status(event_loop):
+async def test_full_status():
     async with base.CleanModel() as model:
         await model.deploy(
             'ubuntu',
@@ -88,7 +88,7 @@ async def test_full_status(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_reconnect(event_loop):
+async def test_reconnect():
     async with base.CleanModel() as model:
         kwargs = model.connection().connect_params()
         conn = await Connection.connect(**kwargs)
@@ -105,7 +105,7 @@ async def test_reconnect(event_loop):
 @base.bootstrapped
 @pytest.mark.asyncio
 @pytest.mark.skip('tests the websocket protocol, not pylibjuju, needs to be revised')
-async def test_redirect(event_loop):
+async def test_redirect():
     controller = Controller()
     await controller.connect()
     kwargs = controller.connection().connect_params()
@@ -258,7 +258,7 @@ class RedirectServer:
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_verify_controller_cert(event_loop):
+async def test_verify_controller_cert():
     jujudata = FileJujuData()
     controller_name = jujudata.current_controller()
     endpoint = jujudata.controllers()[controller_name]['api-endpoints'][0]

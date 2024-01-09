@@ -13,7 +13,7 @@ from .. import base
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_block_coroutine(event_loop):
+async def test_block_coroutine():
     async with base.CleanModel() as model:
         app = await model.deploy(
             'ch:ubuntu',
@@ -37,7 +37,7 @@ async def test_block_coroutine(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_unit_public_address(event_loop):
+async def test_unit_public_address():
     async with base.CleanModel() as model:
         app = await model.deploy(
             'ch:ubuntu',
@@ -70,7 +70,7 @@ async def test_unit_public_address(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_run(event_loop):
+async def test_run():
     from juju.action import Action
 
     async with base.CleanModel() as model:
@@ -102,7 +102,7 @@ async def test_run(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_run_action(event_loop):
+async def test_run_action():
     pytest.skip("This test takes so long that it fails in Github.")
 
     async def run_action(unit):
@@ -134,7 +134,7 @@ async def test_run_action(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_scp(event_loop):
+async def test_scp():
     # ensure that asyncio.subprocess will work;
     try:
         asyncio.get_child_watcher().attach_loop(jasyncio.get_running_loop())
@@ -168,7 +168,7 @@ async def test_scp(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_ssh(event_loop):
+async def test_ssh():
     # ensure that asyncio.subprocess will work;
     try:
         asyncio.get_child_watcher().attach_loop(jasyncio.get_running_loop())
@@ -196,7 +196,7 @@ async def test_ssh(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_resolve_local(event_loop):
+async def test_resolve_local():
     charm_file = Path(__file__).absolute().parent / 'charm.charm'
 
     async with base.CleanModel() as model:
@@ -221,7 +221,7 @@ async def test_resolve_local(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_subordinate_units(event_loop):
+async def test_subordinate_units():
     async with base.CleanModel() as model:
         u_app = await model.deploy('ubuntu')
         n_app = await model.deploy('ntp')
