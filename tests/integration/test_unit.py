@@ -6,7 +6,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 import pytest
 
-from juju import utils
+from juju import utils, jasyncio
 
 from .. import base
 
@@ -137,7 +137,7 @@ async def test_run_action(event_loop):
 async def test_scp(event_loop):
     # ensure that asyncio.subprocess will work;
     try:
-        asyncio.get_child_watcher().attach_loop(event_loop)
+        asyncio.get_child_watcher().attach_loop(jasyncio.get_running_loop())
     except RuntimeError:
         pytest.skip('test_scp will always fail outside of MainThread')
     async with base.CleanModel() as model:
@@ -171,7 +171,7 @@ async def test_scp(event_loop):
 async def test_ssh(event_loop):
     # ensure that asyncio.subprocess will work;
     try:
-        asyncio.get_child_watcher().attach_loop(event_loop)
+        asyncio.get_child_watcher().attach_loop(jasyncio.get_running_loop())
     except RuntimeError:
         pytest.skip('test_ssh will always fail outside of MainThread')
     async with base.CleanModel() as model:
