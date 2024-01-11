@@ -139,11 +139,15 @@ class Controller:
         await self.update_endpoints()
 
     async def update_endpoints(self):
-        info = await self.info()
-        self._connector._connection.endpoints = [
-            (e, info.results[0].cacert)
-            for e in info.results[0].addresses
-        ]
+        try:
+            info = await self.info()
+            self._connector._connection.endpoints = [
+                (e, info.results[0].cacert)
+                for e in info.results[0].addresses
+            ]
+        except errors.JujuPermissionError:
+            log.warning("This user doesn't have at least read access to the controller model, so endpoints are not updated after connection.")
+            pass
 
     async def connect_current(self):
         """
@@ -281,6 +285,8 @@ class Controller:
         """
         log.debug('Getting information')
         uuids = await self.model_uuids()
+        if 'controller' not in uuids:
+            raise errors.JujuPermissionError('Requires access to controller model.')
         controller_facade = client.ControllerFacade.from_connection(self.connection())
         params = [client.Entity(tag.model(uuids["controller"]))]
         return await controller_facade.ControllerAPIInfoForModels(entities=params)
