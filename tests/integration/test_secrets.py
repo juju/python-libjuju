@@ -8,7 +8,7 @@ from ..utils import TESTS_DIR
 
 @base.bootstrapped
 @pytest.mark.bundle
-async def test_add_secret(event_loop):
+async def test_add_secret():
     async with base.CleanModel() as model:
         secret = await model.add_secret(name='my-apitoken', data_args=['token=34ae35facd4'])
         assert secret.startswith('secret:')
@@ -21,7 +21,7 @@ async def test_add_secret(event_loop):
 # This test can only work if we can fully upgrade the whole charm
 # with the corresponding logic :)
 @base.bootstrapped
-async def test_list_secrets(event_loop):
+async def test_list_secrets():
     """Use the charm-secret charm definition and see if the
     arguments defined in the secret are correct or not."""
 
@@ -40,7 +40,7 @@ async def test_list_secrets(event_loop):
 
 @base.bootstrapped
 @pytest.mark.bundle
-async def test_update_secret(event_loop):
+async def test_update_secret():
     async with base.CleanModel() as model:
         secret = await model.add_secret(name='my-apitoken', data_args=['token=34ae35facd4'])
         assert secret.startswith('secret:')
@@ -54,7 +54,7 @@ async def test_update_secret(event_loop):
 
 @base.bootstrapped
 @pytest.mark.bundle
-async def test_remove_secret(event_loop):
+async def test_remove_secret():
     async with base.CleanModel() as model:
         secret = await model.add_secret(name='my-apitoken', data_args=['token=34ae35facd4'])
         assert secret.startswith('secret:')
@@ -67,7 +67,7 @@ async def test_remove_secret(event_loop):
 
 @base.bootstrapped
 @pytest.mark.bundle
-async def test_grant_secret(event_loop):
+async def test_grant_secret():
     async with base.CleanModel() as model:
         secret = await model.add_secret(name='my-apitoken', data_args=['token=34ae35facd4'])
         assert secret.startswith('secret:')
@@ -79,7 +79,7 @@ async def test_grant_secret(event_loop):
 
 @base.bootstrapped
 @pytest.mark.bundle
-async def test_revoke_secret(event_loop):
+async def test_revoke_secret():
     async with base.CleanModel() as model:
         secret = await model.add_secret(name='my-apitoken', data_args=['token=34ae35facd4'])
         assert secret.startswith('secret:')
