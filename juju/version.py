@@ -1,10 +1,14 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
+import re
 
 LTS_RELEASES = ["jammy", "focal", "bionic", "xenial", "trusty", "precise"]
 
 DEFAULT_ARCHITECTURE = 'amd64'
+
+VERSION_FILE_PATH = '../VERSION'
+CLIENT_VERSION = re.search(r'\d+\.\d+\.\d+', open(VERSION_FILE_PATH).read().strip()).group()
 
 # Juju server version we target. Depending on this value, the Juju server
 # may stop the connecting considering us not compatible.
