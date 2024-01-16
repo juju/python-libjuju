@@ -7,14 +7,12 @@ LTS_RELEASES = ["jammy", "focal", "bionic", "xenial", "trusty", "precise"]
 
 DEFAULT_ARCHITECTURE = 'amd64'
 
-VERSION_FILE_PATH = '../VERSION'
+# CLIENT_VERSION (that's read from the VERSION file) is the highest Juju server
+# version that this client supports.
+# Note that this is a ceiling. CLIENT_VERSION <= juju-controller-version works.
+# For CLIENT_VERSION < juju-controller-version (strictly smaller), we emit a warning
+# to update the client to the latest.
+# However, for any CLIENT_VERSION > juju-controller-version, a "client incompatible
+# with server" will be returned by the juju controller.
+VERSION_FILE_PATH = './VERSION'
 CLIENT_VERSION = re.search(r'\d+\.\d+\.\d+', open(VERSION_FILE_PATH).read().strip()).group()
-
-# Juju server version we target. Depending on this value, the Juju server
-# may stop the connecting considering us not compatible.
-TARGET_JUJU_VERSION = '3.2.0'
-
-# Used by connector to determine if we are compatible with the juju server
-SUPPORTED_MAJOR_VERSION = '3'
-
-SUPPORTED_MAJOR_MINOR_VERSION = '3.2'

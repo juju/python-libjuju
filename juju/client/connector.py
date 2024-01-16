@@ -4,6 +4,8 @@
 import copy
 import logging
 
+from packaging import version
+
 import macaroonbakery.httpbakery as httpbakery
 
 from juju.client import client
@@ -12,7 +14,7 @@ from juju.client.gocookies import GoCookieJar, go_to_py_cookie
 from juju.client.jujudata import API_ENDPOINTS_KEY, FileJujuData
 from juju.client.proxy.factory import proxy_from_config
 from juju.errors import JujuConnectionError, JujuError
-from juju.version import SUPPORTED_MAJOR_VERSION, TARGET_JUJU_VERSION
+from juju.version import CLIENT_VERSION
 
 log = logging.getLogger("connector")
 
@@ -86,18 +88,17 @@ class Connector:
             self._connection = await Connection.connect(**kwargs)
 
         # Check if we support the target controller
-        juju_server_version = self._connection.info["server-version"]
-        if not juju_server_version.startswith(TARGET_JUJU_VERSION):
-            log.debug(
-                "This version was tested using {} juju version {} may have compatibility issues".format(
-                    TARGET_JUJU_VERSION, juju_server_version
-                )
-            )
-        if not self._connection.info["server-version"].startswith(
-            SUPPORTED_MAJOR_VERSION
-        ):
+        juju_server_version = version.parse(self._connection.info["server-version"])
+        client_version = version.parse(CLIENT_VERSION)
+
+        if juju_server_version.major != client_version.major:
             raise JujuConnectionError(
                 "juju server-version %s not supported" % juju_server_version
+            )
+
+        if juju_server_version > client_version:
+            log.warning(
+                f"This client is tested up to the version {client_version} Juju controller. Detected a Juju controller version {juju_server_version} that's higher than the {client_version}. Some functionalities that the Juju {juju_server_version} offers may not be available. Please consider upgrading to pylibjuju {juju_server_version}."
             )
 
     async def disconnect(self, entity):
