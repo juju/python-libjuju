@@ -26,6 +26,20 @@ logger = logging.getLogger(__name__)
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_connection_happy_path(event_loop):
+    async with base.CleanController() as contr:
+        conn = contr.connection()
+        new_cont = Controller()
+        await new_cont.connect(endpoint=conn.endpoint,
+                               username=conn.username,
+                               password=conn.password,
+                               cacert=conn.cacert,
+                               )
+        await new_cont.disconnect()
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_monitor(event_loop):
     async with base.CleanModel() as model:
         conn = model.connection()
