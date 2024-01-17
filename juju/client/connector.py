@@ -96,11 +96,6 @@ class Connector:
                 "juju server-version %s not supported" % juju_server_version
             )
 
-        if juju_server_version > client_version:
-            log.warning(
-                f"This client is tested up to the version {client_version} Juju controller. Detected a Juju controller version {juju_server_version} that's higher than the {client_version}. Some functionalities that the Juju {juju_server_version} offers may not be available. Please consider upgrading to pylibjuju {juju_server_version}."
-            )
-
     async def disconnect(self, entity):
         """Shut down the watcher task and close websockets."""
         if self._connection:
