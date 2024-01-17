@@ -118,3 +118,7 @@ class JujuModelConfigError(JujuConfigError):
 
 class AbstractMethodError(Exception):
     pass
+
+
+class ControllerNameNotFound(Exception):
+    pass

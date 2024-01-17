@@ -10,7 +10,7 @@ import juju.client.client as jujuclient
 import yaml
 from juju import tag
 from juju.client.gocookies import GoCookieJar
-from juju.errors import JujuError, PylibjujuProgrammingError
+from juju.errors import JujuError, PylibjujuProgrammingError, ControllerNameNotFound
 from juju.utils import juju_config_dir
 
 API_ENDPOINTS_KEY = 'api-endpoints'
@@ -133,7 +133,11 @@ class FileJujuData(JujuData):
 
         :param str endpoint: The endpoint of the controller we're looking for
         """
-        for controller_name, controller in self.controllers().items():
+        try:
+            contrs = self.controllers()
+        except FileNotFoundError:
+            raise ControllerNameNotFound()
+        for controller_name, controller in contrs.items():
             if isinstance(endpoint, str):
                 if endpoint in controller[API_ENDPOINTS_KEY]:
                     return controller_name
