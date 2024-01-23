@@ -9,7 +9,7 @@ from juju.client.connection import Connection
 from juju.client.gocookies import GoCookieJar, go_to_py_cookie
 from juju.client.jujudata import FileJujuData, API_ENDPOINTS_KEY
 from juju.client.proxy.factory import proxy_from_config
-from juju.errors import JujuConnectionError, JujuError, PylibjujuProgrammingError
+from juju.errors import JujuConnectionError, JujuError, PylibjujuProgrammingError, ControllerNameNotFound
 from juju.client import client
 
 log = logging.getLogger('connector')
@@ -97,7 +97,11 @@ class Connector:
         if not self.controller_name:
             if 'endpoint' not in kwargs:
                 raise PylibjujuProgrammingError("Please report this error to the maintainers.")
-            self.controller_name = self.jujudata.controller_name_by_endpoint(kwargs['endpoint'])
+            try:
+                self.controller_name = self.jujudata.controller_name_by_endpoint(kwargs['endpoint'])
+            except ControllerNameNotFound:
+                # It's ok because we might not have the juju cli (controllers.yaml)
+                pass
 
         # Check if we support the target controller
         if not self._connection.info['server-version'].startswith(SUPPORTED_JUJU_API_PREFIX):
