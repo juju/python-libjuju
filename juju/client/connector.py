@@ -4,7 +4,7 @@
 import copy
 import logging
 
-from packaging import version, InvalidVersion
+from packaging import version
 
 import macaroonbakery.httpbakery as httpbakery
 
@@ -91,7 +91,7 @@ class Connector:
         server_version = self._connection.info["server-version"]
         try:
             juju_server_version = version.parse(server_version)
-        except InvalidVersion as err:
+        except version.InvalidVersion as err:
             # We're only interested in the major version, so
             # we attempt to clean up versions such as 3.4-rc1.2 as just 3.4
             if '-' not in server_version:
