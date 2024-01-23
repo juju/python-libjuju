@@ -425,9 +425,14 @@ class Connection:
             for task in jasyncio.all_tasks():
                 task.cancel()
 
-        loop = jasyncio.get_running_loop()
-        for sig in (signal.SIGINT, signal.SIGTERM):
-            loop.add_signal_handler(sig, _exit_tasks)
+        try:
+            loop = jasyncio.get_running_loop()
+            for sig in (signal.SIGINT, signal.SIGTERM):
+                loop.add_signal_handler(sig, _exit_tasks)
+        except (ValueError, OSError, RuntimeError) as e:
+            # add_signal_handler doesn't work in a thread
+            if 'main thread' not in str(e):
+                raise
 
         return (await websockets.connect(
             url,
@@ -474,9 +479,14 @@ class Connection:
             self.proxy.close()
 
         # Remove signal handlers
-        loop = jasyncio.get_running_loop()
-        for sig in (signal.SIGINT, signal.SIGTERM):
-            loop.remove_signal_handler(sig)
+        try:
+            loop = jasyncio.get_running_loop()
+            for sig in (signal.SIGINT, signal.SIGTERM):
+                loop.remove_signal_handler(sig)
+        except (ValueError, OSError, RuntimeError) as e:
+            # add_signal_handler doesn't work in a thread
+            if 'main thread' not in str(e):
+                raise
 
     async def _recv(self, request_id):
         if not self.is_open:
