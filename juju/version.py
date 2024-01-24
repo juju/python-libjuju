@@ -4,6 +4,9 @@
 import pathlib
 import re
 
+import pathlib
+import re
+
 LTS_RELEASES = ["jammy", "focal", "bionic", "xenial", "trusty", "precise"]
 
 DEFAULT_ARCHITECTURE = 'amd64'

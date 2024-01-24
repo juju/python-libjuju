@@ -45,6 +45,7 @@ class Connector:
         self._log_connection = None
         self.controller_uuid = None
         self.model_name = None
+        self.server_version = None
         self.jujudata = jujudata or FileJujuData()
 
     def is_connected(self):
@@ -87,24 +88,16 @@ class Connector:
                 await self._connection.close()
             self._connection = await Connection.connect(**kwargs)
 
-        # Check if we support the target controller
         server_version = self._connection.info["server-version"]
         try:
             juju_server_version = version.parse(server_version)
         except version.InvalidVersion as err:
-            # We're only interested in the major version, so
             # we attempt to clean up versions such as 3.4-rc1.2 as just 3.4
             if '-' not in server_version:
                 raise JujuUnknownVersion(err)
             juju_server_version = version.parse(server_version.split('-')[0])
 
-        # CLIENT_VERSION statically comes from the VERSION file in the repo
-        client_version = version.parse(CLIENT_VERSION)
-
-        if juju_server_version.major != client_version.major:
-            raise JujuConnectionError(
-                "juju server-version %s not supported" % juju_server_version
-            )
+        self.server_version = juju_server_version
 
     async def disconnect(self, entity):
         """Shut down the watcher task and close websockets."""
