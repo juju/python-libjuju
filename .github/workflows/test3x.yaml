@@ -1,4 +1,4 @@
-name: Testing
+name: Integration Testing against 3.x
 
 on: [push, pull_request]
 
