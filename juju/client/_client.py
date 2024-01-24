@@ -4,7 +4,7 @@
 from juju.client._definitions import *
 
 
-from juju.client import _client7, _client1, _client3, _client4, _client2, _client17, _client6, _client11, _client10, _client5, _client9, _client18, _client19
+from juju.client import _client7, _client1, _client3, _client4, _client2, _client15, _client6, _client5, _client11, _client9, _client18, _client17, _client10, _client19
 
 
 CLIENTS = {
@@ -13,13 +13,14 @@ CLIENTS = {
     "3": _client3,
     "4": _client4,
     "2": _client2,
-    "17": _client17,
+    "15": _client15,
     "6": _client6,
-    "11": _client11,
-    "10": _client10,
     "5": _client5,
+    "11": _client11,
     "9": _client9,
     "18": _client18,
+    "17": _client17,
+    "10": _client10,
     "19": _client19
 }
 
@@ -158,6 +159,10 @@ class CAASApplicationProvisionerFacade(TypeFactory):
     pass
 
 
+class CAASFirewallerEmbeddedFacade(TypeFactory):
+    pass
+
+
 class CAASFirewallerFacade(TypeFactory):
     pass
 
@@ -191,6 +196,10 @@ class CAASUnitProvisionerFacade(TypeFactory):
 
 
 class CharmDownloaderFacade(TypeFactory):
+    pass
+
+
+class CharmHubFacade(TypeFactory):
     pass
 
 
@@ -283,6 +292,10 @@ class HighAvailabilityFacade(TypeFactory):
 
 
 class HostKeyReporterFacade(TypeFactory):
+    pass
+
+
+class ImageManagerFacade(TypeFactory):
     pass
 
 
@@ -458,6 +471,10 @@ class ResourcesHookContextFacade(TypeFactory):
     pass
 
 
+class ResumerFacade(TypeFactory):
+    pass
+
+
 class RetryStrategyFacade(TypeFactory):
     pass
 
@@ -491,6 +508,10 @@ class SecretsManagerFacade(TypeFactory):
 
 
 class SecretsRevisionWatcherFacade(TypeFactory):
+    pass
+
+
+class SecretsRotationWatcherFacade(TypeFactory):
     pass
 
 

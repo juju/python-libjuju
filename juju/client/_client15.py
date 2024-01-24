@@ -78,9 +78,11 @@ class ApplicationFacade(Type):
                                                           'policy': {'type': 'string'},
                                                           'resources': {'patternProperties': {'.*': {'type': 'string'}},
                                                                         'type': 'object'},
+                                                          'series': {'type': 'string'},
                                                           'storage': {'patternProperties': {'.*': {'$ref': '#/definitions/Constraints'}},
                                                                       'type': 'object'}},
                                            'required': ['application',
+                                                        'series',
                                                         'charm-url',
                                                         'channel',
                                                         'num-units',
@@ -131,11 +133,13 @@ class ApplicationFacade(Type):
                                                                          'type': 'object'},
                                                               'constraints': {'$ref': '#/definitions/Value'},
                                                               'endpoint-bindings': {'patternProperties': {'.*': {'type': 'string'}},
-                                                                                    'type': 'object'}},
+                                                                                    'type': 'object'},
+                                                              'series': {'type': 'string'}},
                                                'required': ['application',
                                                             'charm',
                                                             'config',
                                                             'constraints',
+                                                            'series',
                                                             'base',
                                                             'channel'],
                                                'type': 'object'},
@@ -207,6 +211,7 @@ class ApplicationFacade(Type):
                                                           'life': {'type': 'string'},
                                                           'principal': {'type': 'boolean'},
                                                           'remote': {'type': 'boolean'},
+                                                          'series': {'type': 'string'},
                                                           'tag': {'type': 'string'}},
                                            'required': ['tag',
                                                         'principal',
@@ -214,6 +219,15 @@ class ApplicationFacade(Type):
                                                         'remote',
                                                         'life'],
                                            'type': 'object'},
+                     'ApplicationSet': {'additionalProperties': False,
+                                        'properties': {'application': {'type': 'string'},
+                                                       'branch': {'type': 'string'},
+                                                       'options': {'patternProperties': {'.*': {'type': 'string'}},
+                                                                   'type': 'object'}},
+                                        'required': ['application',
+                                                     'branch',
+                                                     'options'],
+                                        'type': 'object'},
                      'ApplicationSetCharm': {'additionalProperties': False,
                                              'properties': {'application': {'type': 'string'},
                                                             'channel': {'type': 'string'},
@@ -225,7 +239,7 @@ class ApplicationFacade(Type):
                                                             'endpoint-bindings': {'patternProperties': {'.*': {'type': 'string'}},
                                                                                   'type': 'object'},
                                                             'force': {'type': 'boolean'},
-                                                            'force-base': {'type': 'boolean'},
+                                                            'force-series': {'type': 'boolean'},
                                                             'force-units': {'type': 'boolean'},
                                                             'generation': {'type': 'string'},
                                                             'resource-ids': {'patternProperties': {'.*': {'type': 'string'}},
@@ -238,7 +252,7 @@ class ApplicationFacade(Type):
                                                           'channel',
                                                           'force',
                                                           'force-units',
-                                                          'force-base'],
+                                                          'force-series'],
                                              'type': 'object'},
                      'ApplicationUnexpose': {'additionalProperties': False,
                                              'properties': {'application': {'type': 'string'},
@@ -270,11 +284,14 @@ class ApplicationFacade(Type):
                                      'properties': {'architecture': {'type': 'string'},
                                                     'base': {'$ref': '#/definitions/Base'},
                                                     'branch': {'type': 'string'},
+                                                    'channel': {'type': 'string'},
                                                     'hash': {'type': 'string'},
                                                     'id': {'type': 'string'},
                                                     'instance-key': {'type': 'string'},
+                                                    'os': {'type': 'string'},
                                                     'revision': {'type': 'integer'},
                                                     'risk': {'type': 'string'},
+                                                    'series': {'type': 'string'},
                                                     'source': {'type': 'string'},
                                                     'track': {'type': 'string'},
                                                     'type': {'type': 'string'}},
@@ -649,8 +666,12 @@ class ApplicationFacade(Type):
                      'UpdateChannelArg': {'additionalProperties': False,
                                           'properties': {'channel': {'type': 'string'},
                                                          'force': {'type': 'boolean'},
+                                                         'series': {'type': 'string'},
                                                          'tag': {'$ref': '#/definitions/Entity'}},
-                                          'required': ['tag', 'force', 'channel'],
+                                          'required': ['tag',
+                                                       'force',
+                                                       'series',
+                                                       'channel'],
                                           'type': 'object'},
                      'UpdateChannelArgs': {'additionalProperties': False,
                                            'properties': {'args': {'items': {'$ref': '#/definitions/UpdateChannelArg'},
@@ -792,6 +813,12 @@ class ApplicationFacade(Type):
                             'properties': {'Params': {'$ref': '#/definitions/ApplicationGet'},
                                            'Result': {'$ref': '#/definitions/ApplicationGetResults'}},
                             'type': 'object'},
+                    'GetCharmURL': {'description': 'GetCharmURL returns the charm '
+                                                   'URL the given application is\n'
+                                                   'running at present.',
+                                    'properties': {'Params': {'$ref': '#/definitions/ApplicationGet'},
+                                                   'Result': {'$ref': '#/definitions/StringResult'}},
+                                    'type': 'object'},
                     'GetCharmURLOrigin': {'description': 'GetCharmURLOrigin '
                                                          'returns the charm URL '
                                                          'and charm origin the '
@@ -840,13 +867,20 @@ class ApplicationFacade(Type):
                                           'properties': {'Params': {'$ref': '#/definitions/ScaleApplicationsParams'},
                                                          'Result': {'$ref': '#/definitions/ScaleApplicationResults'}},
                                           'type': 'object'},
+                    'Set': {'description': 'Set implements the server side of '
+                                           'Application.Set.\n'
+                                           'It does not unset values that are set '
+                                           'to an empty string.\n'
+                                           'Unset should be used for that.',
+                            'properties': {'Params': {'$ref': '#/definitions/ApplicationSet'}},
+                            'type': 'object'},
                     'SetCharm': {'description': 'SetCharm sets the charm for a '
                                                 'given for the application.',
                                  'properties': {'Params': {'$ref': '#/definitions/ApplicationSetCharm'}},
                                  'type': 'object'},
-                    'SetConfigs': {'description': 'SetConfigs implements the '
-                                                  'server side of '
-                                                  'Application.SetConfig.  Both\n'
+                    'SetConfigs': {'description': 'SetConfig implements the server '
+                                                  'side of Application.SetConfig.  '
+                                                  'Both\n'
                                                   'application and charm config '
                                                   'are set. It does not unset '
                                                   'values in\n'
@@ -888,6 +922,10 @@ class ApplicationFacade(Type):
                                   'properties': {'Params': {'$ref': '#/definitions/Entities'},
                                                  'Result': {'$ref': '#/definitions/UnitInfoResults'}},
                                   'type': 'object'},
+                    'Unset': {'description': 'Unset implements the server side of '
+                                             'Client.Unset.',
+                              'properties': {'Params': {'$ref': '#/definitions/ApplicationUnset'}},
+                              'type': 'object'},
                     'UnsetApplicationsConfig': {'description': 'UnsetApplicationsConfig '
                                                                'implements the '
                                                                'server side of '
@@ -897,10 +935,10 @@ class ApplicationFacade(Type):
                                                 'type': 'object'},
                     'UpdateApplicationBase': {'description': 'UpdateApplicationBase '
                                                              'updates the '
-                                                             'application base.\n'
-                                                             'Base for '
-                                                             'subordinates is '
-                                                             'updated too.',
+                                                             'application series. '
+                                                             'Bases for\n'
+                                                             'subordinates updated '
+                                                             'too.',
                                               'properties': {'Params': {'$ref': '#/definitions/UpdateChannelArgs'},
                                                              'Result': {'$ref': '#/definitions/ErrorResults'}},
                                               'type': 'object'}},
@@ -1325,6 +1363,35 @@ class ApplicationFacade(Type):
 
 
 
+    @ReturnMapping(StringResult)
+    async def GetCharmURL(self, application=None, branch=None):
+        '''
+        GetCharmURL returns the charm URL the given application is
+        running at present.
+
+        application : str
+        branch : str
+        Returns -> StringResult
+        '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception("Expected application to be a str, received: {}".format(type(application)))
+
+        if branch is not None and not isinstance(branch, (bytes, str)):
+            raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='GetCharmURL',
+                   version=15,
+                   params=_params)
+        _params['application'] = application
+        _params['branch'] = branch
+        reply = await self.rpc(msg)
+        return reply
+
+
+
     @ReturnMapping(CharmURLOriginResult)
     async def GetCharmURLOrigin(self, application=None, branch=None):
         '''
@@ -1504,7 +1571,42 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(None)
-    async def SetCharm(self, application=None, channel=None, charm_origin=None, charm_url=None, config_settings=None, config_settings_yaml=None, endpoint_bindings=None, force=None, force_base=None, force_units=None, generation=None, resource_ids=None, storage_constraints=None):
+    async def Set(self, application=None, branch=None, options=None):
+        '''
+        Set implements the server side of Application.Set.
+        It does not unset values that are set to an empty string.
+        Unset should be used for that.
+
+        application : str
+        branch : str
+        options : typing.Mapping[str, str]
+        Returns -> None
+        '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception("Expected application to be a str, received: {}".format(type(application)))
+
+        if branch is not None and not isinstance(branch, (bytes, str)):
+            raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
+
+        if options is not None and not isinstance(options, dict):
+            raise Exception("Expected options to be a Mapping, received: {}".format(type(options)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Set',
+                   version=15,
+                   params=_params)
+        _params['application'] = application
+        _params['branch'] = branch
+        _params['options'] = options
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    async def SetCharm(self, application=None, channel=None, charm_origin=None, charm_url=None, config_settings=None, config_settings_yaml=None, endpoint_bindings=None, force=None, force_series=None, force_units=None, generation=None, resource_ids=None, storage_constraints=None):
         '''
         SetCharm sets the charm for a given for the application.
 
@@ -1516,7 +1618,7 @@ class ApplicationFacade(Type):
         config_settings_yaml : str
         endpoint_bindings : typing.Mapping[str, str]
         force : bool
-        force_base : bool
+        force_series : bool
         force_units : bool
         generation : str
         resource_ids : typing.Mapping[str, str]
@@ -1547,8 +1649,8 @@ class ApplicationFacade(Type):
         if force is not None and not isinstance(force, bool):
             raise Exception("Expected force to be a bool, received: {}".format(type(force)))
 
-        if force_base is not None and not isinstance(force_base, bool):
-            raise Exception("Expected force_base to be a bool, received: {}".format(type(force_base)))
+        if force_series is not None and not isinstance(force_series, bool):
+            raise Exception("Expected force_series to be a bool, received: {}".format(type(force_series)))
 
         if force_units is not None and not isinstance(force_units, bool):
             raise Exception("Expected force_units to be a bool, received: {}".format(type(force_units)))
@@ -1576,7 +1678,7 @@ class ApplicationFacade(Type):
         _params['config-settings-yaml'] = config_settings_yaml
         _params['endpoint-bindings'] = endpoint_bindings
         _params['force'] = force
-        _params['force-base'] = force_base
+        _params['force-series'] = force_series
         _params['force-units'] = force_units
         _params['generation'] = generation
         _params['resource-ids'] = resource_ids
@@ -1589,7 +1691,7 @@ class ApplicationFacade(Type):
     @ReturnMapping(ErrorResults)
     async def SetConfigs(self, args=None):
         '''
-        SetConfigs implements the server side of Application.SetConfig.  Both
+        SetConfig implements the server side of Application.SetConfig.  Both
         application and charm config are set. It does not unset values in
         Config map that are set to an empty string. Unset should be used for that.
 
@@ -1738,6 +1840,39 @@ class ApplicationFacade(Type):
 
 
 
+    @ReturnMapping(None)
+    async def Unset(self, application=None, branch=None, options=None):
+        '''
+        Unset implements the server side of Client.Unset.
+
+        application : str
+        branch : str
+        options : typing.Sequence[str]
+        Returns -> None
+        '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception("Expected application to be a str, received: {}".format(type(application)))
+
+        if branch is not None and not isinstance(branch, (bytes, str)):
+            raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
+
+        if options is not None and not isinstance(options, (bytes, str, list)):
+            raise Exception("Expected options to be a Sequence, received: {}".format(type(options)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Unset',
+                   version=15,
+                   params=_params)
+        _params['application'] = application
+        _params['branch'] = branch
+        _params['options'] = options
+        reply = await self.rpc(msg)
+        return reply
+
+
+
     @ReturnMapping(ErrorResults)
     async def UnsetApplicationsConfig(self, args=None):
         '''
@@ -1764,8 +1899,8 @@ class ApplicationFacade(Type):
     @ReturnMapping(ErrorResults)
     async def UpdateApplicationBase(self, args=None):
         '''
-        UpdateApplicationBase updates the application base.
-        Base for subordinates is updated too.
+        UpdateApplicationBase updates the application series. Bases for
+        subordinates updated too.
 
         args : typing.Sequence[~UpdateChannelArg]
         Returns -> ErrorResults
