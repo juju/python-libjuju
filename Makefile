@@ -24,7 +24,7 @@ run-unit-tests: lint .tox
 	tox -e py3
 
 .PHONY: run-integration-tests
-run-unit-tests: lint .tox
+run-integration-tests: lint .tox
 	tox -e integration
 
 .PHONY: run-all-tests
