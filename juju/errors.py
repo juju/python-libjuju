@@ -137,3 +137,7 @@ class AbstractMethodError(Exception):
 
 class PylibjujuError(JujuError):
     pass
+
+
+class JujuUnknownVersion(PylibjujuError):
+    pass
