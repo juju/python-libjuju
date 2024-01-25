@@ -17,7 +17,7 @@ import websockets
 from juju import errors, tag, utils, jasyncio
 from juju.client import client
 from juju.utils import IdQueue
-from juju.version import TARGET_JUJU_VERSION
+from juju.version import CLIENT_VERSION
 
 log = logging.getLogger('juju.client.connection')
 
@@ -973,7 +973,7 @@ class Connection:
     async def login(self):
         params = {}
         # Set the client version
-        params['client-version'] = TARGET_JUJU_VERSION
+        params['client-version'] = CLIENT_VERSION
         params['auth-tag'] = self.usertag
         if self.password:
             params['credentials'] = self.password
