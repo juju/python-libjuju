@@ -68,35 +68,48 @@ class CharmHub:
         if not name:
             raise JujuError("name expected")
 
-        if self.model.connection().is_using_old_client:
-            if channel is None:
-                channel = ""
-            facade = self._facade()
-            res = await facade.Info(tag="application-{}".format(name),
-                                    channel=channel)
-            err_code = res.errors.error_list.code
-            if err_code:
-                raise JujuError(f'charmhub.info - {err_code} :'
-                                f' {res.errors.error_list.message}')
-            result = res.result
-            result.channel_map = CharmHub._channel_map_to_dict(
-                result.channel_map,
-                name,
-                channel=channel)
-            result = result.serialize()
-        else:
-            charmhub_url = await self._charmhub_url()
-            url = "{}/v2/charms/info/{}?fields=channel-map".format(
+        charmhub_url = await self._charmhub_url()
+        url = "{}/v2/charms/info/{}?fields=channel-map".format(
                 charmhub_url.value, name)
-            try:
-                _response = await self.request_charmhub_with_retry(url, 5)
-            except JujuError as e:
-                if '404' in e.message:
-                    raise JujuError(f'{name} not found') from e
-            result = json.loads(_response.text)
-            result['channel-map'] = CharmHub._channel_list_to_map(result['channel-map'],
+        try:
+            _response = await self.request_charmhub_with_retry(url, 5)
+        except JujuError as e:
+            if '404' in e.message:
+                raise JujuError(f'{name} not found') from e
+        result = json.loads(_response.text)
+        result['channel-map'] = CharmHub._channel_list_to_map(result['channel-map'],
                                                                   name,
                                                                   channel=channel)
+
+        # if self.model.connection().is_using_old_client:
+        #     if channel is None:
+        #         channel = ""
+        #     facade = self._facade()
+        #     res = await facade.Info(tag="application-{}".format(name),
+        #                             channel=channel)
+        #     err_code = res.errors.error_list.code
+        #     if err_code:
+        #         raise JujuError(f'charmhub.info - {err_code} :'
+        #                         f' {res.errors.error_list.message}')
+        #     result = res.result
+        #     result.channel_map = CharmHub._channel_map_to_dict(
+        #         result.channel_map,
+        #         name,
+        #         channel=channel)
+        #     result = result.serialize()
+        # else:
+        #     charmhub_url = await self._charmhub_url()
+        #     url = "{}/v2/charms/info/{}?fields=channel-map".format(
+        #         charmhub_url.value, name)
+        #     try:
+        #         _response = await self.request_charmhub_with_retry(url, 5)
+        #     except JujuError as e:
+        #         if '404' in e.message:
+        #             raise JujuError(f'{name} not found') from e
+        #     result = json.loads(_response.text)
+        #     result['channel-map'] = CharmHub._channel_list_to_map(result['channel-map'],
+        #                                                           name,
+        #                                                           channel=channel)
         return result
 
     @staticmethod
@@ -132,25 +145,26 @@ class CharmHub:
                             f' {name}')
         return channel_map
 
-    @staticmethod
-    def _channel_map_to_dict(channel_map, name, channel=""):
-        """Converts the client.definitions.Channel objects into python maps
-        inside a channel map (for pylibjuju <3.0)
+    # @staticmethod
+    # def _channel_map_to_dict(channel_map, name, channel=""):
+    #     """Converts the client.definitions.Channel objects into python maps
+    #     inside a channel map (for pylibjuju <3.0)
 
-        :param channel_map: map[str][Channel]
-        :return: map[str][map[str][any]]
-        """
-        channel_dict = {}
-        for ch_name, ch_obj in channel_map.items():
-            # No need to worry about filtering channel
-            # Charmhub facade will take care of that
-            _ch = ch_obj.serialize()
-            _ch['platforms'] = [p.serialize() for p in _ch['platforms']]
-            channel_dict[ch_name] = _ch
-        if channel and channel not in channel_dict:
-            raise JujuError(f'Charmhub.info : channel {channel} not found for'
-                            f' {name}')
-        return channel_dict
+    #     :param channel_map: map[str][Channel]
+    #     :return: map[str][map[str][any]]
+    #     """
+    #     channel_dict = {}
+    #     import pdb;pdb.set_trace()
+    #     for ch_name, ch_obj in channel_map.items():
+    #         # No need to worry about filtering channel
+    #         # Charmhub facade will take care of that
+    #         _ch = ch_obj.serialize()
+    #         _ch['platforms'] = [p.serialize() for p in _ch['platforms']]
+    #         channel_dict[ch_name] = _ch
+    #     if channel and channel not in channel_dict:
+    #         raise JujuError(f'Charmhub.info : channel {channel} not found for'
+    #                         f' {name}')
+    #     return channel_dict
 
     async def find(self, query, category=None, channel=None,
                    charm_type=None, platforms=None, publisher=None,
