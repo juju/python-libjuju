@@ -69,8 +69,7 @@ class CharmHub:
             raise JujuError("name expected")
 
         charmhub_url = await self._charmhub_url()
-        url = "{}/v2/charms/info/{}?fields=channel-map".format(
-                charmhub_url.value, name)
+        url = "{}/v2/charms/info/{}?fields=channel-map".format(charmhub_url.value, name)
         try:
             _response = await self.request_charmhub_with_retry(url, 5)
         except JujuError as e:
@@ -78,8 +77,8 @@ class CharmHub:
                 raise JujuError(f'{name} not found') from e
         result = json.loads(_response.text)
         result['channel-map'] = CharmHub._channel_list_to_map(result['channel-map'],
-                                                                  name,
-                                                                  channel=channel)
+                                                              name,
+                                                              channel=channel)
 
         # if self.model.connection().is_using_old_client:
         #     if channel is None:
