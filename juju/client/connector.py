@@ -14,7 +14,6 @@ from juju.client.gocookies import GoCookieJar, go_to_py_cookie
 from juju.client.jujudata import API_ENDPOINTS_KEY, FileJujuData
 from juju.client.proxy.factory import proxy_from_config
 from juju.errors import JujuConnectionError, JujuError, JujuUnknownVersion
-from juju.version import CLIENT_VERSION
 
 log = logging.getLogger("connector")
 
