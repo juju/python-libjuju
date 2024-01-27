@@ -6,6 +6,7 @@ import asyncio
 import pytest
 
 from .. import base
+from juju.machine import Machine
 
 
 @base.bootstrapped
@@ -36,3 +37,11 @@ async def test_status():
                          machine.status_message.lower() == 'running' and
                          machine.agent_status == 'started')),
             timeout=480)
+
+async def test_machine_ssh():
+    async with base.CleanModel() as model:
+        machine: Machine = await model.add_machine()
+        await machine.wait()
+        out = await machine.ssh("echo hello world!")
+
+        assert out == "hello world!\n"
