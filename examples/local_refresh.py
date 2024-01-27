@@ -20,7 +20,7 @@ async def main():
 
     try:
         print('Get deployed application')
-        app = model.appplications["ubuntu"]
+        app = model.applications["ubuntu"]
 
         print('Refresh/Upgrade Ubuntu charm with local charm')
         await app.refresh(path="path/to/local/ubuntu.charm")

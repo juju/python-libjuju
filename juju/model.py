@@ -32,13 +32,14 @@ from .constraints import parse as parse_constraints
 from .controller import Controller, ConnectedController
 from .delta import get_entity_class, get_entity_delta
 from .errors import JujuAPIError, JujuError, JujuModelConfigError, JujuBackupError
-from .errors import JujuModelError, JujuAppError, JujuUnitError, JujuAgentError, JujuMachineError, PylibjujuError
+from .errors import JujuModelError, JujuAppError, JujuUnitError, JujuAgentError, JujuMachineError, PylibjujuError, JujuNotSupportedError
 from .exceptions import DeadEntityException
 from .names import is_valid_application
 from .offerendpoints import ParseError as OfferParseError
 from .offerendpoints import parse_local_endpoint, parse_offer_url
 from .origin import Channel, Source
 from .placement import parse as parse_placement
+from .secrets import create_secret_data, read_secret_data
 from .tag import application as application_tag
 from .url import URL, Schema
 from .version import DEFAULT_ARCHITECTURE
@@ -450,7 +451,7 @@ class LocalDeployType:
     """LocalDeployType deals with local only deployments.
     """
 
-    async def resolve(self, url, architecture,
+    async def resolve(self, charm_path, architecture,
                       app_name=None, channel=None, series=None,
                       revision=None, entity_url=None, force=False,
                       model_conf=None):
@@ -461,36 +462,27 @@ class LocalDeployType:
         -- revision flag is ignored for local charms
         """
 
-        entity_url = url.path()
-        entity_path = Path(entity_url)
-        bundle_path = entity_path / 'bundle.yaml'
+        entity_path = Path(charm_path)
+        if entity_path.suffix == '.yaml':
+            bundle_path = entity_path
+        else:
+            bundle_path = entity_path / 'bundle.yaml'
 
-        identifier = entity_url
         origin = client.CharmOrigin(source="local", architecture=architecture)
         if not (entity_path.is_dir() or entity_path.is_file()):
             raise JujuError('{} path not found'.format(entity_url))
 
-        is_bundle = (
-            (entity_path.suffix == ".yaml" and entity_path.exists()) or
-            bundle_path.exists()
-        )
+        is_bundle = bundle_path.exists()
 
         if app_name is None:
-            app_name = url.name
-
-            if not is_bundle:
-                entity_url = url.path()
-                entity_path = Path(entity_url)
-                if entity_path.suffix == '.charm':
-                    with zipfile.ZipFile(str(entity_path), 'r') as charm_file:
-                        metadata = yaml.load(charm_file.read('metadata.yaml'), Loader=yaml.FullLoader)
-                else:
-                    metadata_path = entity_path / 'metadata.yaml'
-                    metadata = yaml.load(metadata_path.read_text(), Loader=yaml.FullLoader)
-                app_name = metadata['name']
+            if is_bundle:
+                bundle_with_overlays = [b for b in yaml.safe_load_all(bundle_path.read_text())]
+                app_name = bundle_with_overlays[0].get('name', '')
+            else:
+                app_name = utils.get_local_charm_metadata(entity_path)["name"]
 
         return DeployTypeResult(
-            identifier=identifier,
+            identifier=charm_path,
             origin=origin,
             app_name=app_name,
             is_local=True,
@@ -541,7 +533,7 @@ class CharmhubDeployType:
             raise JujuError('revision and channel are mutually exclusive when deploying a bundle. Please choose one.')
 
         if app_name is None:
-            app_name = url.name
+            app_name = charm_url.name
 
         return DeployTypeResult(
             identifier=str(charm_url),
@@ -591,8 +583,8 @@ class Model:
         self._charmhub = CharmHub(self)
 
         self.deploy_types = {
-            "local": LocalDeployType(),
-            "ch": CharmhubDeployType(self._resolve_charm),
+            Schema.LOCAL: LocalDeployType(),
+            Schema.CHARM_HUB: CharmhubDeployType(self._resolve_charm),
         }
 
     def is_connected(self):
@@ -672,7 +664,7 @@ class Model:
                 model_name = args[0]
             else:
                 model_name = kwargs.pop('model_name', None)
-            _, model_uuid = await self._connector.connect_model(model_name, **kwargs)
+            model_uuid = await self._connector.connect_model(model_name, **kwargs)
         else:
             # Then we're using the endpoint to pick the model
             if 'model_name' in kwargs:
@@ -771,10 +763,14 @@ class Model:
                 raise JujuError("AllWatcher task is finished abruptly without an exception.")
             raise self._watcher_task.exception()
 
-        if self.info is None:
-            contr = await self.get_controller()
-            self._info = await contr.get_model_info(model_name, model_uuid)
-            log.debug('Got ModelInfo: %s', vars(self.info))
+        if self._info is None:
+            # TODO (cderici): See if this can be optimized away, or at least
+            # be done lazily (i.e. not everytime after_connect, but whenever
+            # self.info is needed -- which here can be bypassed if model_uuid
+            # is known)
+            async with ConnectedController(self.connection()) as contr:
+                self._info = await contr.get_model_info(model_name, model_uuid)
+                log.debug('Got ModelInfo: %s', vars(self.info))
 
         self.uuid = self.info.uuid
 
@@ -795,8 +791,7 @@ class Model:
             self._watch_stopping.clear()
 
         if self.is_connected():
-            log.debug('Closing model connection')
-            await self._connector.disconnect()
+            await self._connector.disconnect(entity='model')
             self._info = None
 
     async def add_local_charm_dir(self, charm_dir, series):
@@ -1555,7 +1550,7 @@ class Model:
 
         The logic is the same.
         """
-        log.warn("relate is deprecated and will be removed. Use integrate instead.")
+        log.warning("relate is deprecated and will be removed. Use integrate instead.")
         return await self.integrate(relation1, relation2)
 
     async def add_space(self, name, cidrs=None, public=True):
@@ -1667,7 +1662,7 @@ class Model:
             storage=None, to=None, devices=None, trust=False, attach_storage=[]):
         """Deploy a new service or bundle.
 
-        :param str entity_url: Charm or bundle url
+        :param str entity_url: Charm or bundle to deploy. Charm url or file path
         :param str application_name: Name to give the service
         :param dict bind: <charm endpoint>:<network space> pairs
         :param str channel: Charm store channel from which to retrieve
@@ -1713,26 +1708,33 @@ class Model:
             raise JujuError("Expected attach_storage to be a list of strings, given {}".format(attach_storage))
 
         # Ensure what we pass in, is a string.
-        entity_url = str(entity_url)
-        if is_local_charm(entity_url) and not entity_url.startswith("local:"):
-            entity_url = "local:{}".format(entity_url)
+        entity = str(entity_url)
+        if is_local_charm(entity):
+            if entity.startswith("local:"):
+                entity = entity[6:]
+            architecture = await self._resolve_architecture()
+            schema = Schema.LOCAL
 
-        if client.CharmsFacade.best_facade_version(self.connection()) < 3:
-            url = URL.parse(str(entity_url), default_store=Schema.CHARM_STORE)
         else:
-            url = URL.parse(str(entity_url))
+            if client.CharmsFacade.best_facade_version(self.connection()) < 3:
+                url = URL.parse(entity, default_store=Schema.CHARM_STORE)
+            else:
+                url = URL.parse(entity)
+            entity = str(url)
 
-        architecture = await self._resolve_architecture(url)
+            architecture = await self._resolve_architecture(url)
+            schema = url.schema
+            name = url.name
 
-        if str(url.schema) not in self.deploy_types:
-            raise JujuError("unknown deploy type {}, expected charmhub or local".format(url.schema))
+        if schema not in self.deploy_types:
+            raise JujuError("unknown deploy type {}, expected charmhub or local".format(schema))
 
         model_conf = await self.get_config()
-        res = await self.deploy_types[str(url.schema)].resolve(url, architecture,
-                                                               application_name, channel,
-                                                               series, revision,
-                                                               entity_url, force,
-                                                               model_conf)
+        res = await self.deploy_types[schema].resolve(entity, architecture,
+                                                      application_name, channel,
+                                                      series, revision,
+                                                      entity_url, force,
+                                                      model_conf)
 
         if res.identifier is None:
             raise JujuError('unknown charm or bundle {}'.format(entity_url))
@@ -1743,9 +1745,11 @@ class Model:
         if base:
             charm_origin.base = utils.parse_base_arg(base)
 
+        server_side_deploy = False
+
         if res.is_bundle:
             handler = BundleHandler(self, trusted=trust, forced=force)
-            await handler.fetch_plan(url, charm_origin, overlays=overlays)
+            await handler.fetch_plan(entity, charm_origin, overlays=overlays)
             await handler.execute_plan()
             extant_apps = {app for app in self.applications}
             pending_apps = handler.applications - extant_apps
@@ -1773,11 +1777,21 @@ class Model:
                                                      charm_origin)
                 else:
                     charm_origin = add_charm_res.charm_origin
-                if Schema.CHARM_HUB.matches(url.schema):
-                    resources = await self._add_charmhub_resources(res.app_name,
-                                                                   identifier,
-                                                                   add_charm_res.charm_origin)
-                    is_sub = await self.charmhub.is_subordinate(url.name)
+                if Schema.CHARM_HUB.matches(schema):
+                    if client.ApplicationFacade.best_facade_version(self.connection()) >= 19:
+                        server_side_deploy = True
+                    else:
+                        # TODO (cderici): this is an awkward workaround for basically not calling
+                        # the AddPendingResources in case this is a server side deploy.
+                        # If that's the case, then the store resources (and revisioned local
+                        # resources) are handled at the server side if this is a server side deploy
+                        # (local uploads are handled right after we get the pendingIDs returned
+                        # from the facade call).
+                        resources = await self._add_charmhub_resources(res.app_name,
+                                                                       identifier,
+                                                                       add_charm_res.charm_origin)
+
+                    is_sub = await self.charmhub.is_subordinate(name)
                     if is_sub:
                         if num_units > 1:
                             raise JujuError("cannot use num_units with subordinate application")
@@ -1811,7 +1825,7 @@ class Model:
             if config is None:
                 config = {}
             if trust:
-                config["trust"] = "true"
+                config["trust"] = True
 
             return await self._deploy(
                 charm_url=identifier,
@@ -1829,6 +1843,7 @@ class Model:
                 charm_origin=charm_origin,
                 attach_storage=attach_storage,
                 force=force,
+                server_side_deploy=server_side_deploy,
             )
 
     async def _add_charm(self, charm_url, origin):
@@ -1862,7 +1877,7 @@ class Model:
         Returns the confirmed origin returned by the Juju API to be used in
         calls like ApplicationFacade.Deploy
 
-        :returns str, client.CharmOrigin, [str]
+        :returns url.URL, client.CharmOrigin, [str]
         """
         charms_cls = client.CharmsFacade
         if charms_cls.best_facade_version(self.connection()) < 3:
@@ -1892,25 +1907,28 @@ class Model:
         if result.error:
             raise JujuError(f'resolving {url} : {result.error.message}')
 
-        supported_series = result.supported_series
+        # TODO (cderici) : supported_bases
+        supported_series = result.get('supported_series', result.unknown_fields['supported-series'])
         resolved_origin = result.charm_origin
         charm_url = URL.parse(result.url)
 
         # run the series selector to get a series for the base
-        selected_series = utils.series_selector(series, url, model_config, supported_series, force)
+        selected_series = utils.series_selector(series, charm_url, model_config, supported_series, force)
         result.charm_origin.base = utils.get_base_from_origin_or_channel(resolved_origin, selected_series)
         charm_url.series = selected_series
 
-        return str(charm_url), resolved_origin
+        return charm_url, resolved_origin
 
-    async def _resolve_architecture(self, url):
+    async def _resolve_architecture(self, url=None):
         """_resolve_architecture returns the architecture for a given charm url.
+        If the charm url is absent, or doesn't specific an arch, we return the
+        default architecture from the model.
+
         :param str url: the client.URL to determine the arch for
 
         :returns str architecture for the given url
         """
-
-        if url.architecture:
+        if url is not None and url.architecture:
             return url.architecture
 
         constraints = await self.get_constraints()
@@ -2028,107 +2046,146 @@ class Model:
                     'username': '',
                     'password': '',
                 }
-
                 data = yaml.dump(docker_image_details)
+            else:
+                p = Path(path)
+                data = p.read_text() if p.exists() else ''
 
-                hash_alg = hashlib.sha3_384
-
-                charmresource['fingerprint'] = hash_alg(bytes(data, 'utf-8')).digest()
-
-                conn, headers, path_prefix = self.connection().https_connection()
-
-                query = "?pendingid={}".format(pending_id)
-                url = "{}/applications/{}/resources/{}{}".format(
-                    path_prefix, application, name, query)
-                if resource_type == "oci-image":
-                    disp = "multipart/form-data; filename=\"{}\"".format(path)
-                else:
-                    disp = "form-data; filename=\"{}\"".format(path)
-
-                headers['Content-Type'] = 'application/octet-stream'
-                headers['Content-Length'] = len(data)
-                headers['Content-Sha384'] = charmresource['fingerprint'].hex()
-                headers['Content-Disposition'] = disp
-
-                conn.request('PUT', url, data, headers)
-
-                response = conn.getresponse()
-                result = response.read().decode()
-                if not response.status == 200:
-                    raise JujuError(result)
+            self._upload(data, path, application, name, resource_type, pending_id)
 
         return resource_map
+
+    def _upload(self, data, path, app_name, res_name, res_type, pending_id):
+        conn, headers, path_prefix = self.connection().https_connection()
+
+        query = "?pendingid={}".format(pending_id)
+        url = "{}/applications/{}/resources/{}{}".format(path_prefix, app_name, res_name, query)
+        if res_type == "oci-image":
+            disp = "multipart/form-data; filename=\"{}\"".format(path)
+        else:
+            disp = "form-data; filename=\"{}\"".format(path)
+
+        headers['Content-Type'] = 'application/octet-stream'
+        headers['Content-Length'] = len(data)
+        headers['Content-Sha384'] = hashlib.sha384(bytes(data, 'utf-8')).hexdigest()
+        headers['Content-Disposition'] = disp
+
+        conn.request('PUT', url, data, headers)
+
+        response = conn.getresponse()
+        result = response.read().decode()
+        if not response.status == 200:
+            raise JujuError(result)
 
     async def _deploy(self, charm_url, application, series, config,
                       constraints, endpoint_bindings, resources, storage,
                       channel=None, num_units=None, placement=None,
                       devices=None, charm_origin=None, attach_storage=[],
-                      force=False):
+                      force=False, server_side_deploy=False):
         """Logic shared between `Model.deploy` and `BundleHandler.deploy`.
         """
         log.info('Deploying %s', charm_url)
 
+        trust = config.get('trust', False)
         # stringify all config values for API, and convert to YAML
         config = {k: str(v) for k, v in config.items()}
         config = yaml.dump({application: config},
                            default_flow_style=False)
 
-        app_facade = client.ApplicationFacade.from_connection(
-            self.connection())
+        app_facade = client.ApplicationFacade.from_connection(self.connection())
 
-        app = client.ApplicationDeploy(
-            charm_url=charm_url,
-            application=application,
-            series=series,
-            channel=channel,
-            charm_origin=charm_origin,
-            config_yaml=config,
-            constraints=parse_constraints(constraints),
-            endpoint_bindings=endpoint_bindings,
-            num_units=num_units,
-            resources=resources,
-            storage=storage,
-            placement=placement,
-            devices=devices,
-            attach_storage=attach_storage,
-            force=force,
-        )
-        result = await app_facade.Deploy(applications=[app])
-        errors = [r.error.message for r in result.results if r.error]
+        if server_side_deploy:
+            # Call DeployFromRepository
+            app = client.DeployFromRepositoryArg(
+                applicationname=application,
+                attachstorage=attach_storage,
+                charmname=charm_url,
+                configyaml=config,
+                cons=parse_constraints(constraints),
+                devices=devices,
+                dryrun=False,
+                placement=placement,
+                storage=storage,
+                trust=trust,
+                base=charm_origin.base,
+                channel=channel,
+                endpoint_bindings=endpoint_bindings,
+                force=force,
+                num_units=num_units,
+                resources=resources,
+                revision=charm_origin.revision,
+            )
+            result = await app_facade.DeployFromRepository([app])
+            # Collect the errors
+            errors = []
+            for r in result.results:
+                if r.errors:
+                    errors.extend([e.message for e in r.errors])
+            # Upload pending local resources if any
+            for _result in result.results:
+                for pending_upload_resource in getattr(_result, 'pendingresourceuploads', []):
+                    _path = pending_upload_resource.filename
+                    p = Path(_path)
+                    data = p.read_text() if p.exists() else ''
+                    self._upload(data, _path, application, pending_upload_resource.name, 'file', '')
+        else:
+            app = client.ApplicationDeploy(
+                charm_url=charm_url,
+                application=application,
+                series=series,
+                channel=channel,
+                charm_origin=charm_origin,
+                config_yaml=config,
+                constraints=parse_constraints(constraints),
+                endpoint_bindings=endpoint_bindings,
+                num_units=num_units,
+                resources=resources,
+                storage=storage,
+                placement=placement,
+                devices=devices,
+                attach_storage=attach_storage,
+                force=force,
+            )
+            result = await app_facade.Deploy(applications=[app])
+            errors = [r.error.message for r in result.results if r.error]
         if errors:
             raise JujuError('\n'.join(errors))
+
         return await self._wait_for_new('application', application)
 
     async def destroy_unit(self, unit_id, destroy_storage=False, dry_run=False, force=False, max_wait=None):
         """Destroy units by name.
 
         """
-        connection = self.connection()
-        app_facade = client.ApplicationFacade.from_connection(connection)
-
-        # Get the corresponding unit tag
-        unit_tag = tag.unit(unit_id)
-        if unit_tag is None:
-            log.error("Error converting %s to a valid unit tag", unit_id)
-            return JujuUnitError("Error converting %s to a valid unit tag", unit_id)
-
-        log.debug(
-            'Destroying unit %s', unit_id)
-
-        return await app_facade.DestroyUnit(units=[{
-            'unit-tag': unit_tag,
-            'destroy-storage': destroy_storage,
-            'force': force,
-            'max-wait': max_wait,
-            'dry-run': dry_run,
-        }])
+        return await self.destroy_units(unit_id,
+                                        destroy_storage=destroy_storage,
+                                        dry_run=dry_run,
+                                        force=force,
+                                        max_wait=max_wait
+                                        )
 
     async def destroy_units(self, *unit_names, destroy_storage=False, dry_run=False, force=False, max_wait=None):
         """Destroy several units at once.
 
         """
-        for u in unit_names:
-            await self.destroy_unit(u, destroy_storage, dry_run, force, max_wait)
+        connection = self.connection()
+        app_facade = client.ApplicationFacade.from_connection(connection)
+
+        units_to_destroy = []
+        for unit_id in unit_names:
+            unit_tag = tag.unit(unit_id)
+            if unit_tag is None:
+                log.error("Error converting %s to a valid unit tag", unit_id)
+                raise JujuUnitError("Error converting %s to a valid unit tag", unit_id)
+            units_to_destroy.append({
+                'unit-tag': unit_tag,
+                'destroy-storage': destroy_storage,
+                'force': force,
+                'max-wait': max_wait,
+                'dry-run': dry_run,
+            })
+        log.debug('Destroying units %s', unit_names)
+        return await app_facade.DestroyUnit(units=units_to_destroy)
 
     def download_backup(self, archive_id, target_filename=None):
         """Download a backup archive file.
@@ -2557,15 +2614,146 @@ class Model:
         except IOError:
             raise
 
+    async def add_secret(self, name, data_args, file="", info=""):
+        """Adds a secret with a list of key values
+
+        Equivalent to the cli command:
+        juju add-secret [options] <name> [key[#base64|#file]=value...]
+
+        :param name str: The name of the secret to be added.
+        :param data_args []str: The key value pairs to be added into the secret.
+        :param file str: A path to a yaml file containing secret key values.
+        :param info str: The secret description.
+        """
+        data = create_secret_data(data_args)
+
+        if file:
+            data_from_file = read_secret_data(file)
+            for k, v in data_from_file.items():
+                # Caution: key/value pairs in files overwrite the ones in the args.
+                data[k] = v
+
+        if client.SecretsFacade.best_facade_version(self.connection()) < 2:
+            raise JujuNotSupportedError("user secrets")
+
+        secretsFacade = client.SecretsFacade.from_connection(self.connection())
+        results = await secretsFacade.CreateSecrets([{
+            'content': {'data': data},
+            'description': info,
+            'label': name,
+        }])
+        if len(results.results) != 1:
+            raise JujuAPIError(f"expected 1 result, got {len(results.results)}")
+        result = results.results[0]
+        if result.error is not None:
+            raise JujuAPIError(result.error.message)
+        return result.result
+
+    async def update_secret(self, name, data_args=[], new_name="", file="", info=""):
+        """Update a secret with a list of key values, or info.
+
+        Equivalent to the cli command:
+        juju add-secret [options] <name> [key[#base64|#file]=value...]
+
+        :param name str: The name of the secret to be added.
+        :param data_args []str: The key value pairs to be added into the secret.
+        :param file str: A path to a yaml file containing secret key values.
+        :param info str: The secret description.
+        """
+        data = create_secret_data(data_args)
+        if file:
+            data_from_file = read_secret_data(file)
+            for k, v in data_from_file.items():
+                # Caution: key/value pairs in files overwrite the ones in the args.
+                data[k] = v
+
+        if client.SecretsFacade.best_facade_version(self.connection()) < 2:
+            raise JujuNotSupportedError("user secrets")
+        secretsFacade = client.SecretsFacade.from_connection(self.connection())
+        results = await secretsFacade.UpdateSecrets([{
+            'content': {'data': data},
+            'description': info,
+            'existing-label': name,
+            'label': new_name,
+        }])
+        if len(results.results) != 1:
+            raise JujuAPIError(f"expected 1 result, got {len(results.results)}")
+        result_error = results.results[0]
+        if result_error.error is not None:
+            raise JujuAPIError(result_error.error)
+
     async def list_secrets(self, filter="", show_secrets=False):
         """
         Returns the list of available secrets.
         """
         facade = client.SecretsFacade.from_connection(self.connection())
-        return await facade.ListSecrets({
+        results = await facade.ListSecrets({
             'filter': filter,
             'show-secrets': show_secrets,
         })
+        return results.results
+
+    async def remove_secret(self, secret_name, revision=-1):
+        """Remove an existing secret.
+
+        :param secret_name str: ID|name of the secret to remove.
+        :param revision int: remove the specified revision.
+        """
+        if client.SecretsFacade.best_facade_version(self.connection()) < 2:
+            raise JujuNotSupportedError("user secrets")
+        remove_secret_arg = {
+            'label': secret_name,
+        }
+        if revision >= 0:
+            remove_secret_arg['revisions'] = [revision]
+
+        secretsFacade = client.SecretsFacade.from_connection(self.connection())
+        results = await secretsFacade.RemoveSecrets([remove_secret_arg])
+        if len(results.results) != 1:
+            raise JujuAPIError(f"expected 1 result, got {len(results.results)}")
+        result_error = results.results[0]
+        if result_error.error is not None:
+            raise JujuAPIError(result_error.error)
+
+    async def grant_secret(self, secret_name, application, *applications):
+        """Grants access to a secret to the specified applications.
+
+        :param secret_name str: ID|name of the secret.
+        :param application str: name of an application for which the access is granted
+        :param applications []str: names of more applications to associate the secret with
+        """
+        if client.SecretsFacade.best_facade_version(self.connection()) < 2:
+            raise JujuNotSupportedError("user secrets")
+        secretsFacade = client.SecretsFacade.from_connection(self.connection())
+        results = await secretsFacade.GrantSecret(
+            applications=[application] + list(applications),
+            label=secret_name)
+        if len(results.results) != 1:
+            raise JujuAPIError(f"expected 1 result, got {len(results.results)}")
+        result_error = results.results[0]
+        if result_error.error is not None:
+            raise JujuAPIError(result_error.error)
+
+    async def revoke_secret(self, secret_name, application, *applications):
+        """Revoke access to a secret.
+
+        Revoke applications' access to view the value of a specified secret.
+
+        :param secret_name str: ID|name of the secret.
+        :param application str: name of an application for which the access to the secret is revoked
+        :param applications []str: names of more applications to disassociate the secret with
+        """
+        if client.SecretsFacade.best_facade_version(self.connection()) < 2:
+            raise JujuNotSupportedError("user secrets")
+        secretsFacade = client.SecretsFacade.from_connection(self.connection())
+        results = await secretsFacade.RevokeSecret(
+            applications=[application] + list(applications),
+            label=secret_name)
+        if len(results.results) != 1:
+            raise JujuAPIError(f"expected 1 result, got {len(results.results)}")
+        result_error = results.results[0]
+        if result_error.error is not None:
+            raise JujuAPIError(result_error.error)
 
     async def _get_source_api(self, url, controller_name=None):
         controller = Controller()
@@ -2701,10 +2889,10 @@ class Model:
                     # errors to raise at the end
                     break
                 for unit in app.units:
-                    if unit.machine is not None and unit.machine.status == "error":
+                    if raise_on_error and unit.machine is not None and unit.machine.status == "error":
                         errors.setdefault("Machine", []).append(unit.machine.id)
                         continue
-                    if unit.agent_status == "error":
+                    if raise_on_error and unit.agent_status == "error":
                         errors.setdefault("Agent", []).append(unit.name)
                         continue
                     if raise_on_error and unit.workload_status == "error":

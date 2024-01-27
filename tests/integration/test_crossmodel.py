@@ -12,7 +12,7 @@ from juju import jasyncio
 
 @base.bootstrapped
 @pytest.mark.skip('Update charm')
-async def test_offer(event_loop):
+async def test_offer():
     async with base.CleanModel() as model:
         await model.deploy(
             'ubuntu',
@@ -33,7 +33,7 @@ async def test_offer(event_loop):
 
 @base.bootstrapped
 @pytest.mark.skip('Update charm')
-async def test_consume(event_loop):
+async def test_consume():
     async with base.CleanModel() as model_1:
         await model_1.deploy(
             'ubuntu',
@@ -63,7 +63,7 @@ async def test_consume(event_loop):
 
 @base.bootstrapped
 @pytest.mark.skip('Update charm')
-async def test_remove_saas(event_loop):
+async def test_remove_saas():
     async with base.CleanModel() as model_1:
         await model_1.deploy(
             'ubuntu',
@@ -95,7 +95,7 @@ async def test_remove_saas(event_loop):
 
 
 @base.bootstrapped
-async def test_relate_with_offer(event_loop):
+async def test_relate_with_offer():
     # pytest.skip('Revise: intermittent problem with the remove_saas call')
     async with base.CleanModel() as model_1:
         application = await model_1.deploy(
@@ -104,7 +104,7 @@ async def test_relate_with_offer(event_loop):
             channel='14/stable',
         )
         assert 'postgresql' in model_1.applications
-        await model_1.wait_for_idle(status="active")
+        await model_1.wait_for_idle()
         await model_1.create_offer("postgresql:db")
 
         offers = await model_1.list_offers()
@@ -141,7 +141,7 @@ async def test_relate_with_offer(event_loop):
 
 @base.bootstrapped
 @pytest.mark.bundle
-async def test_add_bundle(event_loop):
+async def test_add_bundle():
     pytest.skip("skip until we have a faster example to test")
     tests_dir = Path(__file__).absolute().parent
     bundle_path = tests_dir / 'bundle'

@@ -10,7 +10,7 @@ GB = 1024
 
 
 @base.bootstrapped
-async def test_juju_api_error(event_loop):
+async def test_juju_api_error():
     '''
     Verify that we raise a JujuAPIError for responses with an error in
     a top level key (for completely invalid requests).
@@ -24,7 +24,7 @@ async def test_juju_api_error(event_loop):
 
 
 @base.bootstrapped
-async def test_juju_error_in_results_list(event_loop):
+async def test_juju_error_in_results_list():
     '''
     Replicate the code that caused
     https://github.com/juju/python-libjuju/issues/67, and verify that
@@ -52,7 +52,7 @@ async def test_juju_error_in_results_list(event_loop):
 
 
 @base.bootstrapped
-async def test_juju_error_in_result(event_loop):
+async def test_juju_error_in_result():
     '''
     Verify that we raise a JujuError when appropriate when we are
     looking at a single result coming back.

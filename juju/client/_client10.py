@@ -140,7 +140,6 @@ class MachineManagerFacade(Type):
                                                                 'type': 'array'},
                                                      'cost': {'type': 'integer'},
                                                      'cpu-cores': {'type': 'integer'},
-                                                     'deprecated': {'type': 'boolean'},
                                                      'memory': {'type': 'integer'},
                                                      'name': {'type': 'string'},
                                                      'root-disk': {'type': 'integer'},

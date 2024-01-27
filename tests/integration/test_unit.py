@@ -6,13 +6,13 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 import pytest
 
-from juju import utils
+from juju import utils, jasyncio
 
 from .. import base
 
 
 @base.bootstrapped
-async def test_block_coroutine(event_loop):
+async def test_block_coroutine():
     async with base.CleanModel() as model:
         app = await model.deploy(
             'ubuntu',
@@ -26,11 +26,12 @@ async def test_block_coroutine(event_loop):
             return any([await u.is_leader_from_status() for u in app.units])
 
         await utils.block_until_with_coroutine(is_leader_elected,
-                                               timeout=480)
+                                               timeout=480,
+                                               wait_period=5)
 
 
 @base.bootstrapped
-async def test_unit_public_address(event_loop):
+async def test_unit_public_address():
     async with base.CleanModel() as model:
         app = await model.deploy(
             'ubuntu',
@@ -62,7 +63,7 @@ async def test_unit_public_address(event_loop):
 
 
 @base.bootstrapped
-async def test_run(event_loop):
+async def test_run():
     from juju.action import Action
 
     async with base.CleanModel() as model:
@@ -108,7 +109,7 @@ async def test_run(event_loop):
 
 
 @base.bootstrapped
-async def test_run_action(event_loop):
+async def test_run_action():
     pytest.skip('Find a better charm for this test')
 
     async def run_action(unit):
@@ -156,10 +157,10 @@ async def test_run_action(event_loop):
 
 
 @base.bootstrapped
-async def test_scp(event_loop):
+async def test_scp():
     # ensure that asyncio.subprocess will work;
     try:
-        asyncio.get_child_watcher().attach_loop(event_loop)
+        asyncio.get_child_watcher().attach_loop(jasyncio.get_running_loop())
     except RuntimeError:
         pytest.skip('test_scp will always fail outside of MainThread')
     async with base.CleanModel() as model:
@@ -189,10 +190,10 @@ async def test_scp(event_loop):
 
 
 @base.bootstrapped
-async def test_ssh(event_loop):
+async def test_ssh():
     # ensure that asyncio.subprocess will work;
     try:
-        asyncio.get_child_watcher().attach_loop(event_loop)
+        asyncio.get_child_watcher().attach_loop(jasyncio.get_running_loop())
     except RuntimeError:
         pytest.skip('test_ssh will always fail outside of MainThread')
     async with base.CleanModel() as model:
@@ -216,7 +217,7 @@ async def test_ssh(event_loop):
 
 
 @base.bootstrapped
-async def test_resolve_local(event_loop):
+async def test_resolve_local():
     charm_file = Path(__file__).absolute().parent / 'charm.charm'
 
     async with base.CleanModel() as model:
@@ -240,7 +241,7 @@ async def test_resolve_local(event_loop):
 
 
 @base.bootstrapped
-async def test_unit_introspect(event_loop):
+async def test_unit_introspect():
     async with base.CleanModel() as model:
         await model.deploy('ubuntu', series='jammy')
         await model.wait_for_idle(status="active")
@@ -253,7 +254,7 @@ async def test_unit_introspect(event_loop):
 
 
 @base.bootstrapped
-async def test_subordinate_units(event_loop):
+async def test_subordinate_units():
     async with base.CleanModel() as model:
         u_app = await model.deploy('ubuntu')
         n_app = await model.deploy('ntp')
@@ -279,3 +280,19 @@ async def test_subordinate_units(event_loop):
         assert n_unit.principal_unit == 'ubuntu/0'
         assert u_unit.principal_unit == ''
         assert [u.name for u in u_unit.get_subordinates()] == [n_unit.name]
+
+
+@base.bootstrapped
+async def test_destroy_unit():
+    async with base.CleanModel() as model:
+        app = await model.deploy(
+            'juju-qa-test',
+            application_name='test',
+            num_units=3,
+        )
+        # wait for the units to come up
+        await model.block_until(lambda: app.units, timeout=480)
+
+        await app.units[0].destroy()
+        await asyncio.sleep(5)
+        assert len(app.units) == 2

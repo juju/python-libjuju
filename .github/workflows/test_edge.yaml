@@ -54,7 +54,7 @@ jobs:
         uses: charmed-kubernetes/actions-operator@main
         with:
           provider: lxd
-          juju-channel: 3.2/edge
+          juju-channel: 3.3/edge
       - name: Setup Python
         if: ${{ env.next-test != 'NA' }}
         uses: actions/setup-python@v4

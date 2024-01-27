@@ -47,18 +47,17 @@ def juju_config_dir():
     * ~/.local/share/juju
 
     """
-    # Check $JUJU_DATA first
-    config_dir = os.environ.get('JUJU_DATA', None)
+    # Set it to ~/.local/share/juju as default
+    config_dir = Path('~/.local/share/juju')
 
-    # Second option: $XDG_DATA_HOME for ~/.local/share
-    if not config_dir:
-        config_dir = os.environ.get('XDG_DATA_HOME', None)
+    # Check $JUJU_DATA
+    if juju_data := os.environ.get('JUJU_DATA'):
+        config_dir = Path(juju_data)
+    # Secondly check: $XDG_DATA_HOME for ~/.local/share
+    elif xdg_data_home := os.environ.get('XDG_DATA_HOME'):
+        config_dir = Path(xdg_data_home) / 'juju'
 
-    # Third option: just set it to ~/.local/share/juju
-    if not config_dir:
-        config_dir = '~/.local/share/juju'
-
-    return os.path.abspath(os.path.expanduser(config_dir))
+    return str(config_dir.expanduser().resolve())
 
 
 def juju_ssh_key_paths():
@@ -128,7 +127,7 @@ async def block_until(*conditions, timeout=None, wait_period=0.5):
     async def _block():
         while not all(c() for c in conditions):
             await jasyncio.sleep(wait_period)
-    await jasyncio.wait_for(_block(), timeout)
+    await jasyncio.shield(jasyncio.wait_for(_block(), timeout))
 
 
 async def block_until_with_coroutine(condition_coroutine, timeout=None, wait_period=0.5):
@@ -139,7 +138,7 @@ async def block_until_with_coroutine(condition_coroutine, timeout=None, wait_per
     async def _block():
         while not await condition_coroutine():
             await jasyncio.sleep(wait_period)
-    await jasyncio.wait_for(_block(), timeout=timeout)
+    await jasyncio.shield(jasyncio.wait_for(_block(), timeout=timeout))
 
 
 async def wait_for_bundle(model, bundle, **kwargs):
@@ -181,6 +180,11 @@ async def run_with_interrupt(task, *events, log=None):
                                         return_when=jasyncio.FIRST_COMPLETED)
     for f in pending:
         f.cancel()  # cancel unfinished tasks
+    for f in pending:
+        try:
+            await f
+        except jasyncio.CancelledError:
+            pass
     for f in done:
         f.exception()  # prevent "exception was not retrieved" errors
     if task in done:
@@ -528,7 +532,7 @@ def series_selector(series_arg='', charm_url=None, model_config=None, supported_
     return DEFAULT_SUPPORTED_LTS
 
 
-def should_upgrade_resource(available_resource, existing_resources):
+def should_upgrade_resource(available_resource, existing_resources, arg_resources={}):
     """Called in the context of upgrade_charm. Given a resource R, takes a look at the resources we
     already have and decides if we need to refresh R.
 
@@ -536,17 +540,23 @@ def should_upgrade_resource(available_resource, existing_resources):
     charmhub api. We're considering if we need to refresh this during upgrade_charm.
     :param dict[str] existing_resources: The dict coming from resources_facade.ListResources
     representing the resources of the currently deployed charm.
+    :param dict[str] arg_resources: user provided resources to be refreshed
 
     :result bool: The decision to refresh the given resource
     """
+
     # should upgrade resource?
     res_name = available_resource.get('Name', available_resource.get('name'))
-    # no, if it's upload
-    if existing_resources[res_name].origin == 'upload':
-        return False
 
-    # no, if we already have it (and upstream doesn't have a newer res available)
+    if res_name in arg_resources:
+        return True
+
+    # do we have it already?
     if res_name in existing_resources:
+        # no upgrade, if it's upload
+        if existing_resources[res_name].origin == 'upload':
+            return False
+        # no upgrade, if upstream doesn't have a newer revision of the resource available
         available_rev = available_resource.get('Revision', available_resource.get('revision', -1))
         u_fields = existing_resources[res_name].unknown_fields
         existing_rev = u_fields.get('Revision', u_fields.get('revision', -1))

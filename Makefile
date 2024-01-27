@@ -19,10 +19,16 @@ client:
 	tox -r --notest -e lint,py3
 	$(PY) -m juju.client.facade -s "juju/client/schemas*" -o juju/client/
 
-.PHONY: test
-test: lint
+.PHONY: run-unit-tests
+run-unit-tests: lint .tox
 	tox -e py3
+
+.PHONY: run-integration-tests
+run-unit-tests: lint .tox
 	tox -e integration
+
+.PHONY: run-all-tests
+test: run-unit-tests run-integration-tests
 
 .PHONY: lint
 lint:
@@ -39,7 +45,8 @@ release:
 	git fetch --tags
 	rm dist/*.tar.gz || true
 	$(PY) setup.py sdist
-	$(BIN)/twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
+	$(BIN)/twine check dist/*
+	$(BIN)/twine upload --repository juju dist/*
 	git tag ${VERSION}
 	git push --tags
 

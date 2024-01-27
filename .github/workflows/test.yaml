@@ -65,7 +65,7 @@ jobs:
         uses: charmed-kubernetes/actions-operator@main
         with:
           provider: lxd
-          juju-channel: 3.2/stable
+          juju-channel: 3.3/stable
       # 2023-01-11 Commented until we discover a
       # clear approach for this.
       # - name: Set proxy in controller
@@ -102,4 +102,4 @@ jobs:
         run: pip install tox
       - name: Run integration
         # Force one single concurrent test
-        run: tox -e integration -- -n 1
+        run: tox -e integration

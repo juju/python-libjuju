@@ -21,7 +21,7 @@ from asyncio import Event, TimeoutError, Queue, ensure_future, \
     gather, sleep, wait_for, create_subprocess_exec, subprocess, \
     wait, FIRST_COMPLETED, Lock, as_completed, new_event_loop, \
     get_event_loop_policy, CancelledError, get_running_loop, \
-    create_task     # noqa
+    create_task, ALL_COMPLETED, all_tasks, current_task, shield     # noqa
 
 
 def create_task_with_handler(coro, task_name, logger=ROOT_LOGGER):

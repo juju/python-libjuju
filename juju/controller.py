@@ -49,6 +49,7 @@ class Controller:
             bakery_client=bakery_client,
             jujudata=jujudata,
         )
+        self._controller_name = None
 
     async def __aenter__(self):
         await self.connect()
@@ -174,7 +175,13 @@ class Controller:
 
     @property
     def controller_name(self):
-        return self._connector.controller_name
+        if not self._controller_name:
+            try:
+                self._controller_name = self._connector.jujudata.controller_name_by_endpoint(
+                    self._connector.connection().endpoint)
+            except FileNotFoundError:
+                raise errors.PylibjujuError("Unable to determine controller name. controllers.yaml not found.")
+        return self._controller_name
 
     @property
     def controller_uuid(self):
@@ -193,7 +200,7 @@ class Controller:
         """Shut down the watcher task and close websockets.
 
         """
-        await self._connector.disconnect()
+        await self._connector.disconnect(entity='controller')
 
     async def add_credential(self, name=None, credential=None, cloud=None,
                              owner=None, force=False):
