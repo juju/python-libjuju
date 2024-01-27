@@ -2,7 +2,7 @@
 # Licensed under the Apache V2, see LICENCE file for details.
 
 import logging
-from typing import Literal
+from typing import Literal, Union
 
 from .client import client
 
