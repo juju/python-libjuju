@@ -6,11 +6,11 @@ import logging
 
 import pyrfc3339
 
-from . import model, tag, jasyncio
+from . import jasyncio, model, tag
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
 from .errors import JujuError
-from juju.utils import juju_ssh_key_paths
+from juju.utils import juju_ssh_key_paths, block_until
 
 log = logging.getLogger(__name__)
 
@@ -82,7 +82,8 @@ class Machine(model.ModelEntity):
         """
         if proxy:
             raise NotImplementedError('proxy option is not implemented')
-
+        if not self.dns_name:
+            raise JujuError("Machine address not yet ready, please call await machine.wait()")
         try:
             # if dns_name is an IP address format it appropriately
             address = self._format_addr(self.dns_name)
@@ -105,7 +106,8 @@ class Machine(model.ModelEntity):
         """
         if proxy:
             raise NotImplementedError('proxy option is not implemented')
-
+        if not self.dns_name:
+            raise JujuError("Machine address not yet ready, please call await machine.wait()")
         try:
             # if dns_name is an IP address format it appropriately
             address = self._format_addr(self.dns_name)
@@ -147,6 +149,8 @@ class Machine(model.ModelEntity):
         if proxy:
             raise NotImplementedError('proxy option is not implemented')
         address = self.dns_name
+        if not address:
+            raise JujuError("Machine address not yet ready, please call await machine.wait()")
         destination = "{}@{}".format(user, address)
         _, id_path = juju_ssh_key_paths()
         cmd = [
@@ -166,6 +170,14 @@ class Machine(model.ModelEntity):
             raise JujuError("command failed: %s with %s" % (cmd, stderr.decode()))
         # stdout is a bytes-like object, returning a string might be more useful
         return stdout.decode()
+
+    async def wait(self, timeout: int=300) -> None:
+        """Waits until the machie is ready to take ssh/scp commands.
+        
+        :param int timeout: Timeout in seconds to wait for.
+        """
+        await block_until(lambda: self.safe_data["addresses"] and 
+                          self.agent_status == "started", timeout=timeout)
 
     @property
     def agent_status(self):
