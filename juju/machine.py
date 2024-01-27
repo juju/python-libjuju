@@ -176,9 +176,9 @@ class Machine(model.ModelEntity):
         return stdout.decode()
 
     async def wait(self, timeout: int = 300) -> None:
-        """Waits until the machie is ready to take ssh/scp commands.
+        """Waits until the machine is ready to take ssh/scp commands.
 
-        :param int timeout: Timeout in seconds to wait for.
+        :param int timeout: Timeout in seconds.
         """
         await block_until(lambda: self.safe_data["addresses"] and
                           self.agent_status == "started", timeout=timeout)
