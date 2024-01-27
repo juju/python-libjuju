@@ -7,6 +7,7 @@ from tempfile import NamedTemporaryFile
 import pytest
 
 from .. import base
+from juju.machine import Machine
 
 
 @base.bootstrapped
@@ -65,3 +66,12 @@ async def test_scp(event_loop):
         with NamedTemporaryFile() as f:
             await machine.scp_from('testfile', f.name, scp_opts='-p')
             assert f.read() == b'testcontents'
+
+
+async def test_machine_ssh():
+    async with base.CleanModel() as model:
+        machine: Machine = await model.add_machine()
+        await machine.wait()
+        out = await machine.ssh("echo hello world!")
+
+        assert out == "hello world!\n"
