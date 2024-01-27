@@ -171,12 +171,12 @@ class Machine(model.ModelEntity):
         # stdout is a bytes-like object, returning a string might be more useful
         return stdout.decode()
 
-    async def wait(self, timeout: int=300) -> None:
+    async def wait(self, timeout: int = 300) -> None:
         """Waits until the machie is ready to take ssh/scp commands.
-        
+
         :param int timeout: Timeout in seconds to wait for.
         """
-        await block_until(lambda: self.safe_data["addresses"] and 
+        await block_until(lambda: self.safe_data["addresses"] and
                           self.agent_status == "started", timeout=timeout)
 
     @property
