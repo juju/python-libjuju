@@ -3,7 +3,7 @@
 
 import ipaddress
 import logging
-
+import typing
 import pyrfc3339
 
 from juju.utils import juju_ssh_key_paths, block_until
@@ -72,7 +72,7 @@ class Machine(model.ModelEntity):
         return fmt.format(ipaddr)
 
     async def scp_to(self, source: str, destination: str, user:str ='ubuntu', proxy: bool=False,
-                     scp_opts: str | list[str]=''):
+                     scp_opts: typing.Union[str, typing.List[str]] =''):
         """Transfer files to this machine.
 
         :param str source: Local path of file(s) to transfer
@@ -96,7 +96,7 @@ class Machine(model.ModelEntity):
         await self._scp(source, destination, scp_opts)
 
     async def scp_from(self, source: str, destination: str, user: str = 'ubuntu',
-                       proxy: bool = False, scp_opts: str | list[str] = ''):
+                       proxy: bool = False, scp_opts: typing.Union[str, typing.List[str]] = ''):
         """Transfer files from this machine.
 
         :param str source: Remote path of file(s) to transfer
@@ -119,7 +119,7 @@ class Machine(model.ModelEntity):
         source = '{}@{}:{}'.format(user, address, source)
         await self._scp(source, destination, scp_opts)
 
-    async def _scp(self, source: str, destination: str, scp_opts: str | list[str]):
+    async def _scp(self, source: str, destination: str, scp_opts: typing.Union[str, typing.List[str]]):
         """ Execute an scp command. Requires a fully qualified source and
         destination.
         """
@@ -140,7 +140,7 @@ class Machine(model.ModelEntity):
 
     async def ssh(
             self, command: str, user: str = 'ubuntu', proxy: bool = False,
-            ssh_opts: str | list[str] = None):
+            ssh_opts: typing.Optional[typing.Union[str, typing.List[str]]] = None):
         """Execute a command over SSH on this machine.
 
         :param str command: Command to execute
@@ -230,7 +230,7 @@ class Machine(model.ModelEntity):
         return pyrfc3339.parse(self.safe_data['instance-status']['since'])
 
     @property
-    def dns_name(self) -> str | None:
+    def dns_name(self) -> typing.Optional[str]:
         """Get the DNS name for this machine. This is a best guess based on the
         addresses available in current data.
 
@@ -251,7 +251,7 @@ class Machine(model.ModelEntity):
         return None
 
     @property
-    def hostname(self) -> str | None:
+    def hostname(self) -> typing.Optional[str]:
         """Get the hostname for this machine as reported by the machine agent
         running on it. This is only supported on 2.8.10+ controllers.
 
