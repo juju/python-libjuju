@@ -3,6 +3,7 @@
 
 import logging
 from pathlib import Path
+import asyncio
 
 import pytest
 
@@ -324,6 +325,16 @@ async def test_app_remove_wait_flag():
 
         await model.remove_application(app.name, block_until_done=True)
         assert a_name not in model.applications
+
+
+@base.bootstrapped
+async def test_app_remove_timeout():
+    async with base.CleanModel() as model:
+        app = await model.deploy('ubuntu')
+        await model.wait_for_idle(status="active")
+
+        with pytest.raises(asyncio.TimeoutError):
+            await model.remove_application(app.name, block_until_done=True, timeout=1)
 
 
 @base.bootstrapped
