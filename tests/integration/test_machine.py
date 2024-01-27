@@ -38,6 +38,7 @@ async def test_status():
                          machine.agent_status == 'started')),
             timeout=480)
 
+
 async def test_machine_ssh():
     async with base.CleanModel() as model:
         machine: Machine = await model.add_machine()
