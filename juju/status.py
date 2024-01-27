@@ -32,7 +32,7 @@ STARTED: CommonStatusT = 'started'
 
 
 # Status values specific to machine agents.
-MachineAgentStatusT = Literal['pending', 'stopped', 'down'] | CommonStatusT
+MachineAgentStatusT = Union[Literal['pending', 'stopped', 'down'], CommonStatusT]
 
 # Pending is set when:
 # The machine is not yet participating in the model.
@@ -50,10 +50,10 @@ DOWN: MachineAgentStatusT = 'down'
 
 
 # Status values specific to unit agents.
-UnitAgentStatusT = (
-    Literal['allocating', 'rebooting', 'executing', 'idle', 'failed', 'lost']
-    | CommonStatusT
-)
+UnitAgentStatusT = Union[
+    Literal['allocating', 'rebooting', 'executing', 'idle', 'failed', 'lost'],
+    CommonStatusT,
+]
 
 # Allocating is set when:
 # The machine on which a unit is to be hosted is still being
