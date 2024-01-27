@@ -39,14 +39,14 @@ class Machine(model.ModelEntity):
         return await self.model._wait('machine', self.id, 'remove')
     remove = destroy
 
-    async def get_annotations(self) -> dict[str,str]:
+    async def get_annotations(self) -> typing.Dict[str,str]:
         """Get annotations on this machine.
 
         :return dict: The annotations for this application
         """
         return await _get_annotations(self.tag, self.connection)
 
-    async def set_annotations(self, annotations: dict[str,str]):
+    async def set_annotations(self, annotations: typing.Dict[str,str]):
         """Set annotations on this machine.
 
         :param annotations map[string]string: the annotations as key/value
