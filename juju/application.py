@@ -4,17 +4,20 @@
 import hashlib
 import json
 import logging
+import typing
 from pathlib import Path
 
-from . import model, tag, utils, jasyncio
-from .url import URL
-from .status import derive_status
+from . import jasyncio, model, tag, utils
 from .annotationhelper import _get_annotations, _set_annotations
-from .client import client
-from .errors import JujuError, JujuApplicationConfigError
 from .bundle import get_charm_series, is_local_charm
-from .placement import parse as parse_placement
+from .client import client
+from .errors import JujuApplicationConfigError, JujuError
 from .origin import Channel, Source
+from .placement import parse as parse_placement
+from .relation import Relation
+from .status import derive_status
+from .url import URL
+from .utils import block_until
 
 log = logging.getLogger(__name__)
 
@@ -59,14 +62,14 @@ class Application(model.ModelEntity):
         return [u for u in self.units if u.is_subordinate]
 
     @property
-    def relations(self):
+    def relations(self) -> typing.List[Relation]:
         return [rel for rel in self.model.relations if rel.matches(self.name)]
 
     def related_applications(self, endpoint_name=None):
         apps = {}
         for rel in self.relations:
             if rel.is_peer:
-                local_ep, remote_ep = rel.endpoints[0]
+                local_ep, remote_ep = rel.endpoints
             else:
                 def is_us(ep):
                     return ep.application.name == self.name
@@ -191,12 +194,13 @@ class Application(model.ModelEntity):
                                           scale_change=scale_change)
         ])
 
-    async def destroy_relation(self, local_relation, remote_relation):
+    async def destroy_relation(self, local_relation, remote_relation, block_until_done: bool = False):
         """Remove a relation to another application.
 
         :param str local_relation: Name of relation on this application
         :param str remote_relation: Name of relation on the other
             application in the form '<application>[:<relation_name>]'
+        :param bool block_until_done: Wait until the relation is completely removed.
 
         """
         if ':' not in local_relation:
@@ -207,8 +211,16 @@ class Application(model.ModelEntity):
         log.debug(
             'Destroying relation %s <-> %s', local_relation, remote_relation)
 
-        return await app_facade.DestroyRelation(endpoints=[
+        await app_facade.DestroyRelation(endpoints=[
             local_relation, remote_relation])
+        if block_until_done:
+            await block_until(
+                not any(
+                    relation.matches(local_relation, remote_relation)
+                    for relation in self.relations
+                )
+            )
+
     remove_relation = destroy_relation
 
     async def destroy_unit(self, *unit_names):
