@@ -215,7 +215,7 @@ class Application(model.ModelEntity):
             local_relation, remote_relation])
         if block_until_done:
             await block_until(
-                not any(
+                lambda: not any(
                     relation.matches(local_relation, remote_relation)
                     for relation in self.relations
                 )
