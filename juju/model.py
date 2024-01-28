@@ -1008,7 +1008,7 @@ class Model:
         destroy_storage=False,
         no_wait=False,
         timeout=None
-    ):        
+    ):
         """Removes the given application from the model.
 
         :param str app_name: Name of the application
