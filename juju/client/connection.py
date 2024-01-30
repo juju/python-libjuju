@@ -5,7 +5,6 @@ import base64
 import json
 import logging
 import ssl
-import signal
 import urllib.request
 import weakref
 from http.client import HTTPSConnection
@@ -425,10 +424,6 @@ class Connection:
             for task in jasyncio.all_tasks():
                 task.cancel()
 
-        loop = jasyncio.get_running_loop()
-        for sig in (signal.SIGINT, signal.SIGTERM):
-            loop.add_signal_handler(sig, _exit_tasks)
-
         return (await websockets.connect(
             url,
             ssl=self._get_ssl(cacert),
@@ -472,11 +467,6 @@ class Connection:
 
         if self.proxy is not None:
             self.proxy.close()
-
-        # Remove signal handlers
-        loop = jasyncio.get_running_loop()
-        for sig in (signal.SIGINT, signal.SIGTERM):
-            loop.remove_signal_handler(sig)
 
     async def _recv(self, request_id):
         if not self.is_open:
