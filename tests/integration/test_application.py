@@ -328,7 +328,7 @@ async def test_app_remove_wait_flag():
 @base.bootstrapped
 async def test_app_remove_timeout():
     async with base.CleanModel() as model:
-        app = await model.deploy('ubuntu')
+        app = await model.deploy('juju-qa-test')
         await model.wait_for_idle(status="active")
 
         with pytest.raises(asyncio.TimeoutError):
