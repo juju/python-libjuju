@@ -70,7 +70,7 @@ class Machine(model.ModelEntity):
         return fmt.format(ipaddr)
 
     async def scp_to(self, source, destination, user='ubuntu', proxy=False,
-                     scp_opts=''):
+                     scp_opts='', wait_for_active=True, timeout=None):
         """Transfer files to this machine.
 
         :param str source: Local path of file(s) to transfer
@@ -79,11 +79,13 @@ class Machine(model.ModelEntity):
         :param bool proxy: Proxy through the Juju API server
         :param scp_opts: Additional options to the `scp` command
         :type scp_opts: str or list
+        :param bool wait_for_active: Wait until the machine is ready to take in ssh commands.
+        :param int timeout: Time in seconds to wait until the machine becomes ready.
         """
         if proxy:
             raise NotImplementedError('proxy option is not implemented')
-        if not self.dns_name:
-            raise JujuError("Machine address not yet ready, please call await machine.wait()")
+        if wait_for_active:
+            await block_until(lambda: self.addresses, timeout=timeout)
         try:
             # if dns_name is an IP address format it appropriately
             address = self._format_addr(self.dns_name)
@@ -94,7 +96,7 @@ class Machine(model.ModelEntity):
         await self._scp(source, destination, scp_opts)
 
     async def scp_from(self, source, destination, user='ubuntu', proxy=False,
-                       scp_opts=''):
+                       scp_opts='', wait_for_active=True, timeout=None):
         """Transfer files from this machine.
 
         :param str source: Remote path of file(s) to transfer
@@ -103,11 +105,13 @@ class Machine(model.ModelEntity):
         :param bool proxy: Proxy through the Juju API server
         :param scp_opts: Additional options to the `scp` command
         :type scp_opts: str or list
+        :param bool wait_for_active: Wait until the machine is ready to take in ssh commands.
+        :param int timeout: Time in seconds to wait until the machine becomes ready.
         """
         if proxy:
             raise NotImplementedError('proxy option is not implemented')
-        if not self.dns_name:
-            raise JujuError("Machine address not yet ready, please call await machine.wait()")
+        if wait_for_active:
+            await block_until(lambda: self.addresses, timeout=timeout)
         try:
             # if dns_name is an IP address format it appropriately
             address = self._format_addr(self.dns_name)
@@ -137,20 +141,21 @@ class Machine(model.ModelEntity):
             raise JujuError("command failed: %s" % cmd)
 
     async def ssh(
-            self, command, user='ubuntu', proxy=False, ssh_opts=None):
+            self, command, user='ubuntu', proxy=False, ssh_opts=None,wait_for_active=True, timeout=None):
         """Execute a command over SSH on this machine.
 
         :param str command: Command to execute
         :param str user: Remote username
         :param bool proxy: Proxy through the Juju API server
         :param str ssh_opts: Additional options to the `ssh` command
-
+        :param bool wait_for_active: Wait until the machine is ready to take in ssh commands.
+        :param int timeout: Time in seconds to wait until the machine becomes ready.
         """
         if proxy:
             raise NotImplementedError('proxy option is not implemented')
         address = self.dns_name
-        if not address:
-            raise JujuError("Machine address not yet ready, please call await machine.wait()")
+        if wait_for_active:
+            await block_until(lambda: self.addresses, timeout=timeout)
         destination = "{}@{}".format(user, address)
         _, id_path = juju_ssh_key_paths()
         cmd = [
@@ -171,13 +176,14 @@ class Machine(model.ModelEntity):
         # stdout is a bytes-like object, returning a string might be more useful
         return stdout.decode()
 
-    async def wait(self, timeout: int = 300) -> None:
-        """Waits until the machine is ready to take ssh/scp commands.
-
-        :param int timeout: Timeout in seconds.
+    
+    @property
+    def addresses(self) -> typing.List[str]:
+        """Returns the machine addresses.
+        
         """
-        await block_until(lambda: self.safe_data["addresses"] and
-                          self.agent_status == "started", timeout=timeout)
+        return self.safe_data['addresses'] or []
+
 
     @property
     def agent_status(self):
@@ -233,11 +239,10 @@ class Machine(model.ModelEntity):
 
         May return None if no suitable address is found.
         """
-        addresses = self.safe_data['addresses'] or []
         ordered_addresses = []
         ordered_scopes = ['public', 'local-cloud', 'local-fan']
         for scope in ordered_scopes:
-            for address in addresses:
+            for address in self.addresses:
                 if scope == address['scope']:
                     ordered_addresses.append(address)
         for address in ordered_addresses:
