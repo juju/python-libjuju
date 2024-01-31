@@ -340,7 +340,7 @@ async def test_app_relation_destroy_block_until_done():
     async with base.CleanModel() as model:
         app: Application = await model.deploy('docker-registry')
         rsa: Application = await model.deploy("easyrsa")
-        await app.relate("cert-provider", rsa.name)
+        relation = await app.relate('cert-provider', rsa.name)
         await model.wait_for_idle(status="active")
-        await app.destroy_relation("cert-provider", rsa.name, block_until_done=True)
-        await app.relate("cert-provider", rsa.name)
+        await app.destroy_relation('cert-provider', rsa.name, block_until_done=True)
+        assert relation not in app.relations
