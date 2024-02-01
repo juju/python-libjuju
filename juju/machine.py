@@ -142,7 +142,7 @@ class Machine(model.ModelEntity):
             raise JujuError("command failed: %s" % cmd)
 
     async def ssh(
-            self, command, user='ubuntu', proxy=False, ssh_opts=None,wait_for_active=True, timeout=None):
+            self, command, user='ubuntu', proxy=False, ssh_opts=None, wait_for_active=True, timeout=None):
         """Execute a command over SSH on this machine.
 
         :param str command: Command to execute
@@ -177,14 +177,12 @@ class Machine(model.ModelEntity):
         # stdout is a bytes-like object, returning a string might be more useful
         return stdout.decode()
 
-    
     @property
     def addresses(self) -> typing.List[str]:
         """Returns the machine addresses.
-        
+
         """
         return self.safe_data['addresses'] or []
-
 
     @property
     def agent_status(self):
