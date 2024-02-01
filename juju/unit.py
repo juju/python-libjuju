@@ -102,7 +102,7 @@ class Unit(model.ModelEntity):
         return [u for u_name, u in self.model.units.items() if u.is_subordinate and
                 u.principal_unit == self.name]
 
-    async def destroy(self):
+    async def destroy(self, destroy_storage=False, dry_run=False, force=False, max_wait=None):
         """Destroy this unit.
 
         """
@@ -111,7 +111,12 @@ class Unit(model.ModelEntity):
         log.debug(
             'Destroying %s', self.name)
 
-        return await app_facade.DestroyUnit(units=[{"unit-tag": self.name}])
+        return await app_facade.DestroyUnit(units=[{"unit-tag": self.tag,
+                                                    'destroy-storage': destroy_storage,
+                                                    'force': force,
+                                                    'max-wait': max_wait,
+                                                    'dry-run': dry_run,
+                                                    }])
     remove = destroy
 
     async def get_public_address(self):

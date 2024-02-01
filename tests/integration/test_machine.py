@@ -2,7 +2,6 @@
 # Licensed under the Apache V2, see LICENCE file for details.
 
 import asyncio
-from tempfile import NamedTemporaryFile
 
 import pytest
 
@@ -12,7 +11,7 @@ from juju.machine import Machine
 
 @base.bootstrapped
 @pytest.mark.skip('Update charm')
-async def test_status(event_loop):
+async def test_status():
     async with base.CleanModel() as model:
         await model.deploy(
             'ubuntu',

@@ -9,7 +9,7 @@ from juju import jasyncio
 
 
 @base.bootstrapped
-async def test_info(event_loop):
+async def test_info():
     async with base.CleanModel() as model:
         _, name = await model.charmhub.get_charm_id("ubuntu")
         assert name == "ubuntu"
@@ -30,7 +30,7 @@ async def test_info(event_loop):
 
 
 @base.bootstrapped
-async def test_info_with_channel(event_loop):
+async def test_info_with_channel():
     async with base.CleanModel() as model:
         charm_info = await model.charmhub.info("juju-qa-test", "2.0/stable")
         assert charm_info['name'] == 'juju-qa-test'
@@ -48,7 +48,7 @@ async def test_info_with_channel(event_loop):
 
 
 @base.bootstrapped
-async def test_info_not_found(event_loop):
+async def test_info_not_found():
     async with base.CleanModel() as model:
         with pytest.raises(JujuError) as err:
             await model.charmhub.info("badnameforapp")
@@ -57,7 +57,7 @@ async def test_info_not_found(event_loop):
 
 @base.bootstrapped
 @pytest.mark.skip('CharmHub facade no longer exists')
-async def test_find(event_loop):
+async def test_find():
     async with base.CleanModel() as model:
         result = await model.charmhub.find("kube")
 
@@ -69,7 +69,7 @@ async def test_find(event_loop):
 
 @base.bootstrapped
 @pytest.mark.skip('CharmHub facade no longer exists')
-async def test_find_bundles(event_loop):
+async def test_find_bundles():
     async with base.CleanModel() as model:
         result = await model.charmhub.find("kube", charm_type="bundle")
 
@@ -81,7 +81,7 @@ async def test_find_bundles(event_loop):
 
 @base.bootstrapped
 @pytest.mark.skip('CharmHub facade no longer exists')
-async def test_find_all(event_loop):
+async def test_find_all():
     async with base.CleanModel() as model:
         result = await model.charmhub.find("")
 
@@ -93,7 +93,7 @@ async def test_find_all(event_loop):
 
 @base.bootstrapped
 @pytest.mark.skip('This tries to test juju controller logic')
-async def test_subordinate_charm_zero_units(event_loop):
+async def test_subordinate_charm_zero_units():
     # normally in pylibjuju deploy num_units defaults to 1, we switch
     # that to 0 behind the scenes if we see that the charmhub charm
     # we're deploying is a subordinate charm
@@ -119,14 +119,14 @@ async def test_subordinate_charm_zero_units(event_loop):
 
 
 @base.bootstrapped
-async def test_subordinate_false_field_exists(event_loop):
+async def test_subordinate_false_field_exists():
     async with base.CleanModel() as model:
         assert await model.charmhub.is_subordinate("rsyslog-forwarder-ha")
         assert not await model.charmhub.is_subordinate("mysql-innodb-cluster")
 
 
 @base.bootstrapped
-async def test_list_resources(event_loop):
+async def test_list_resources():
     async with base.CleanModel() as model:
         resources = await model.charmhub.list_resources('hello-kubecon')
         assert isinstance(resources, list) and len(resources) > 0

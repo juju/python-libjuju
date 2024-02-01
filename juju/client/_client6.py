@@ -60,7 +60,8 @@ class BundleFacade(Type):
                                'required': ['message', 'code'],
                                'type': 'object'},
                      'ExportBundleParams': {'additionalProperties': False,
-                                            'properties': {'include-charm-defaults': {'type': 'boolean'}},
+                                            'properties': {'include-charm-defaults': {'type': 'boolean'},
+                                                           'include-series': {'type': 'boolean'}},
                                             'type': 'object'},
                      'StringResult': {'additionalProperties': False,
                                       'properties': {'error': {'$ref': '#/definitions/Error'},
@@ -109,15 +110,19 @@ class BundleFacade(Type):
     
 
     @ReturnMapping(StringResult)
-    async def ExportBundle(self, include_charm_defaults=None):
+    async def ExportBundle(self, include_charm_defaults=None, include_series=None):
         '''
         ExportBundle exports the current model configuration as bundle.
 
         include_charm_defaults : bool
+        include_series : bool
         Returns -> StringResult
         '''
         if include_charm_defaults is not None and not isinstance(include_charm_defaults, bool):
             raise Exception("Expected include_charm_defaults to be a bool, received: {}".format(type(include_charm_defaults)))
+
+        if include_series is not None and not isinstance(include_series, bool):
+            raise Exception("Expected include_series to be a bool, received: {}".format(type(include_series)))
 
         # map input types to rpc msg
         _params = dict()
@@ -126,6 +131,7 @@ class BundleFacade(Type):
                    version=6,
                    params=_params)
         _params['include-charm-defaults'] = include_charm_defaults
+        _params['include-series'] = include_series
         reply = await self.rpc(msg)
         return reply
 

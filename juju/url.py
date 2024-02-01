@@ -43,13 +43,11 @@ class URL:
         if u.query != "" or u.fragment != "" or u.username or u.password:
             raise JujuError("charm or bundle URL {} has unrecognized parts".format(u))
 
-        if Schema.LOCAL.matches(u.scheme):
-            c = URL(Schema.LOCAL, name=u.path)
-        elif Schema.CHARM_STORE.matches(u.scheme) or \
+        if Schema.CHARM_STORE.matches(u.scheme) or \
                 (u.scheme == "" and Schema.CHARM_STORE.matches(default_store)):
             c = parse_v1_url(Schema.CHARM_STORE, u, s)
         else:
-            c = parse_v2_url(u, s)
+            c = parse_v2_url(u, s, default_store)
 
         if not c or not c.schema:
             raise JujuError("expected schema for charm or bundle URL {}".format(u))
@@ -121,8 +119,15 @@ def parse_v1_url(schema, u, s):
     return c
 
 
-def parse_v2_url(u, s):
-    c = URL(Schema.CHARM_HUB)
+def parse_v2_url(u, s, default_store):
+    if not u.scheme:
+        c = URL(default_store)
+    elif Schema.CHARM_HUB.matches(u.scheme):
+        c = URL(Schema.CHARM_HUB)
+    elif Schema.LOCAL.matches(u.scheme):
+        c = URL(Schema.LOCAL)
+    else:
+        raise JujuError("invalid charm url schema {}".format(u.scheme))
 
     parts = u.path.split("/")
     num = len(parts)

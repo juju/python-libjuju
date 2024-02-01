@@ -1,15 +1,77 @@
 Changelog
 ---------
 
+3.3.0.0
+^^^^^^^
+
+## What's Changed
+
+The main contribution of this release is the user secrets that's released as a part of Juju 3.3.
+
+Thursday 30th Nov 2023
+
+* Free pyblijuju from relying on juju client when connecting to a controller by @cderici in https://github.com/juju/python-libjuju/pull/984
+* Handle FileNotFoundError on current_controller() by @DanielArndt in https://github.com/juju/python-libjuju/pull/937
+* Add support for adding user secrets by @cderici in https://github.com/juju/python-libjuju/pull/986
+* Complete support for user secrets by @cderici in https://github.com/juju/python-libjuju/pull/987
+
+3.2.3.0
+^^^^^^^
+
+Thursday 26th Oct 2023
+
+* Repository Maintenance Improvements by @cderici in https://github.com/juju/python-libjuju/pull/922
+* Stale bot to not bother feature requests by @cderici in https://github.com/juju/python-libjuju/pull/926
+* Fix linter issues by @cderici in https://github.com/juju/python-libjuju/pull/928
+* Fix docstring typo by @DanielArndt in https://github.com/juju/python-libjuju/pull/927
+* Fix asyncio on README by @marceloneppel in https://github.com/juju/python-libjuju/pull/930
+* Fix integration/test_application.test_action by @cderici in https://github.com/juju/python-libjuju/pull/932
+* Update 3.2 facade clients by @cderici in https://github.com/juju/python-libjuju/pull/931
+* [JUJU-4488] Add licence headers to source files on 3.x by @cderici in https://github.com/juju/python-libjuju/pull/934
+* Update async tests to use builtin python suite by @DanielArndt in https://github.com/juju/python-libjuju/pull/935
+* Pass correct charm url to series selector by @cderici in https://github.com/juju/python-libjuju/pull/942
+* Green CI cleanup for python-libjuju by @cderici in https://github.com/juju/python-libjuju/pull/939
+* Bring forward support for nested assumes expressions on 3x by @cderici in https://github.com/juju/python-libjuju/pull/943
+* Release 3.2.2.0 notes by @cderici in https://github.com/juju/python-libjuju/pull/945
+* Cleanup release process for 3.x by @cderici in https://github.com/juju/python-libjuju/pull/946
+* Use new DeployFromRepository endpoint for deploy by @cderici in https://github.com/juju/python-libjuju/pull/949
+* Handle pending upload resources deployfromrepository by @cderici in https://github.com/juju/python-libjuju/pull/953
+* Optimize connection teardown by @cderici in https://github.com/juju/python-libjuju/pull/952
+* Use `log.warning` instead of the deprecated `warn` by @sed-i in https://github.com/juju/python-libjuju/pull/954
+* Find controller name by endpoint on 3.x track by @cderici in https://github.com/juju/python-libjuju/pull/966
+* Optimize & fix unit removal by @cderici in https://github.com/juju/python-libjuju/pull/967
+* Allow switch kwarg in refresh to switch to local charms by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/971
+* Parse charm URLs consistantly for local charms by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/974
+* Juju config directory location fix on 3.x by @cderici in https://github.com/juju/python-libjuju/pull/976
+* [JUJU-4779] Ensure valid charm origin for local charm switches by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/978
+* Application refresh with resources on 3.x by @cderici in https://github.com/juju/python-libjuju/pull/973
+
+3.2.2.0
+^^^^^^^
+
+Wednesday 6th September 2023
+
+This is a minor release on the 3.x track, works with any Juju 3.x controller.
+
+* Repository Maintenance Improvements by @cderici in https://github.com/juju/python-libjuju/pull/922
+* Stale bot to not bother feature requests by @cderici in https://github.com/juju/python-libjuju/pull/926
+* Fix linter issues by @cderici in https://github.com/juju/python-libjuju/pull/928
+* Fix docstring typo by @DanielArndt in https://github.com/juju/python-libjuju/pull/927
+* Fix asyncio on README by @marceloneppel in https://github.com/juju/python-libjuju/pull/930
+* Fix integration/test_application.test_action by @cderici in https://github.com/juju/python-libjuju/pull/932
+* Update 3.2 facade clients by @cderici in https://github.com/juju/python-libjuju/pull/931
+* [JUJU-4488] Add licence headers to source files on 3.x by @cderici in https://github.com/juju/python-libjuju/pull/934
+* Update async tests to use builtin python suite by @DanielArndt in https://github.com/juju/python-libjuju/pull/935
+* Pass correct charm url to series selector by @cderici in https://github.com/juju/python-libjuju/pull/942
+* Green CI cleanup for python-libjuju by @cderici in https://github.com/juju/python-libjuju/pull/939
+* Bring forward support for nested assumes expressions on 3x by @cderici in https://github.com/juju/python-libjuju/pull/943
+
 3.2.0.1
 ^^^^^^^
 
 Thursday 20th July 2023
 
 This is a point release on the 3.x track, works with any Juju 3.x controller.
-
-What's Changed
-==============
 
 * Update readme and add some docstrings for functions by @cderici in https://github.com/juju/python-libjuju/pull/873
 * Forward port subordinate utils by @cderici in https://github.com/juju/python-libjuju/pull/880
@@ -81,8 +143,7 @@ This version is only tested using Juju 3.1.0.
 * Add compatibility for juju 3.1.0 by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/799
 * Replace schemas.json with a wellformed version. by @juanmanuel-tirado in https://github.com/juju/python-libjuju/pull/800
 
-New Contributors
-================
+## New Contributors
 
 * @mert-kirpici made their first contribution in https://github.com/juju/python-libjuju/pull/731
 
@@ -97,8 +158,7 @@ Wednesday 26th October
 * [JUJU-2026] Improve resolve charm by @cderici in https://github.com/juju/python-libjuju/pull/761
 * Add owner and data to license file by @arturo-seijas in https://github.com/juju/python-libjuju/pull/760
 
-New Contributors
-================
+## New Contributors
 
 * @arturo-seijas made their first contribution in https://github.com/juju/python-libjuju/pull/760
 

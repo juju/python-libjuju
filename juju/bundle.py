@@ -229,7 +229,7 @@ class BundleHandler:
 
         return self.bundle, self.overlays
 
-    async def fetch_plan(self, bundle_url, origin, overlays=[]):
+    async def fetch_plan(self, bundle, origin, overlays=[]):
         """fetch_plan is called by the model.deploy(). It gathers the information about the
         bundle to be deployed (whether local or CharmHub), straightens it up, applies overlays
         if any overlays are given. Validates the bundle against known issues. Resolves and adds
@@ -245,19 +245,21 @@ class BundleHandler:
 
         :returns: None
         """
-        entity_id = bundle_url.path()
-        is_local = Schema.LOCAL.matches(bundle_url.schema)
         bundle_dir = None
 
-        if is_local and os.path.isfile(entity_id):
-            bundle_yaml = Path(entity_id).read_text()
-            bundle_dir = Path(entity_id).parent
-        elif is_local and os.path.isdir(entity_id):
-            bundle_yaml = (Path(entity_id) / "bundle.yaml").read_text()
-            bundle_dir = Path(entity_id)
+        if is_local_bundle(str(bundle)):
+            path = str(bundle)
+            if path.startswith("local:"):
+                path = path[6:]
+            bundle_yaml, bundle_dir = read_local_bundle(path)
 
-        if Schema.CHARM_HUB.matches(bundle_url.schema):
-            bundle_yaml = await self._download_bundle(bundle_url, origin)
+        else:
+            if client.CharmsFacade.best_facade_version(self.model.connection()) < 3:
+                url = URL.parse(bundle, default_store=Schema.CHARM_STORE)
+            else:
+                url = URL.parse(bundle)
+            path = url.path()
+            bundle_yaml = await self._download_bundle(bundle, origin)
 
         if not bundle_yaml:
             raise JujuError('empty bundle, nothing to deploy')
@@ -284,7 +286,7 @@ class BundleHandler:
 
         self.bundle = await self._validate_bundle(self.bundle)
 
-        if is_local:
+        if is_local_bundle(path):
             self.bundle = await self._handle_local_charms(self.bundle, bundle_dir)
 
         self.bundle, self.overlays = self._resolve_include_file_config(bundle_dir)
@@ -295,10 +297,10 @@ class BundleHandler:
         yaml_data = "---\n".join(_yaml_data)
 
         self.plan = await self.bundle_facade.GetChangesMapArgs(
-            bundleurl=entity_id,
+            bundleurl=path,
             yaml=yaml_data)
 
-        if self.plan.errors:
+        if self.plan.errors and any(self.plan.errors):
             raise JujuError(self.plan.errors)
 
     async def _download_bundle(self, charm_url, origin):
@@ -389,7 +391,6 @@ class BundleHandler:
                                             track=track,
                                             base=base,
                                             )
-
                 charm_url, charm_origin = await self.model._resolve_charm(charm_url, origin)
                 spec['charm'] = str(charm_url)
             else:
@@ -441,6 +442,21 @@ class BundleHandler:
 
 def is_local_charm(charm_url):
     return charm_url.startswith('.') or charm_url.startswith('local:') or os.path.isabs(charm_url)
+
+
+is_local_bundle = is_local_charm
+
+
+def read_local_bundle(path):
+    path = Path(path)
+    if os.path.isfile(path):
+        bundle_yaml = path.read_text()
+        bundle_dir = path.parent
+    elif os.path.isdir(path):
+        bundle_yaml = (path / "bundle.yaml").read_text()
+        bundle_dir = path
+
+    return (bundle_yaml, bundle_dir)
 
 
 async def get_charm_series(metadata, model):
@@ -676,12 +692,12 @@ class AddCharmChange(ChangeInfo):
 
         # We don't add local charms because they've already been added
         # by self._handle_local_charms
+        if is_local_charm(str(self.charm)):
+            return self.charm
+
         url = URL.parse(str(self.charm))
         ch = None
         identifier = None
-        if Schema.LOCAL.matches(url.schema):
-            return self.charm
-
         if Schema.CHARM_HUB.matches(url.schema):
             ch = Channel('latest', 'stable')
             if self.channel:
@@ -700,7 +716,7 @@ class AddCharmChange(ChangeInfo):
         if identifier is None:
             raise JujuError('unknown charm {}'.format(self.charm))
 
-        await context.model._add_charm(identifier, origin)
+        await context.model._add_charm(str(identifier), origin)
 
         if str(ch) not in context.origins:
             context.origins[str(identifier)] = {}

@@ -7,7 +7,7 @@ from .. import base
 
 
 @base.bootstrapped
-async def test_user_info(event_loop):
+async def test_user_info():
     async with base.CleanModel() as model:
         controller_conn = await model.connection().controller()
 

@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 @base.bootstrapped
 @pytest.mark.serial
 @pytest.mark.skip('one of old macaroon_auth tests, needs to be revised')
-async def test_macaroon_auth_serial(event_loop):
+async def test_macaroon_auth_serial():
     jujudata = FileJujuData()
     account = jujudata.accounts()[jujudata.current_controller()]
     with base.patch_file('~/.local/share/juju/accounts.yaml'):
@@ -51,7 +51,7 @@ async def test_macaroon_auth_serial(event_loop):
 @base.bootstrapped
 # @pytest.mark.xfail
 @pytest.mark.skip('one of old macaroon_auth tests, needs to be revised')
-async def test_macaroon_auth(event_loop):
+async def test_macaroon_auth():
     auth_info, username = agent_auth_info()
     # Create a bakery client that can do agent authentication.
     client = httpbakery.Client(
@@ -72,7 +72,7 @@ async def test_macaroon_auth(event_loop):
 @base.bootstrapped
 # @pytest.mark.xfail
 @pytest.mark.skip('one of old macaroon_auth tests, needs to be revised')
-async def test_macaroon_auth_with_bad_key(event_loop):
+async def test_macaroon_auth_with_bad_key():
     auth_info, username = agent_auth_info()
     # Use a random key rather than the correct key.
     auth_info = auth_info._replace(key=bakery.generate_key())
@@ -100,7 +100,7 @@ async def test_macaroon_auth_with_bad_key(event_loop):
 @base.bootstrapped
 # @pytest.mark.xfail
 @pytest.mark.skip('one of old macaroon_auth tests, needs to be revised')
-async def test_macaroon_auth_with_unauthorized_user(event_loop):
+async def test_macaroon_auth_with_unauthorized_user():
     auth_info, username = agent_auth_info()
     # Create a bakery client can do agent authentication.
     client = httpbakery.Client(

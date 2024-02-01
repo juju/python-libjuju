@@ -1,22 +1,28 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
+import logging
 from pathlib import Path
+import asyncio
 
 import pytest
-import logging
+
+from juju import errors, jasyncio
+from juju.application import Application
+from juju.client import client
+from juju.url import URL, Schema
 
 from .. import base
-from juju import jasyncio, errors
-from juju.url import URL, Schema
 
 MB = 1
 
 logger = logging.getLogger(__name__)
 
+from ..utils import INTEGRATION_TEST_DIR
+
 
 @base.bootstrapped
-async def test_action(event_loop):
+async def test_action():
     async with base.CleanModel() as model:
         app = await model.deploy('juju-qa-test')
         await jasyncio.sleep(10)
@@ -25,7 +31,7 @@ async def test_action(event_loop):
 
 
 @base.bootstrapped
-async def test_get_set_config(event_loop):
+async def test_get_set_config():
     async with base.CleanModel() as model:
         app = await model.deploy(
             'ubuntu',
@@ -50,7 +56,7 @@ async def test_get_set_config(event_loop):
 
 @base.bootstrapped
 @pytest.mark.skip('Update charm')
-async def test_status_is_not_unset(event_loop):
+async def test_status_is_not_unset():
     async with base.CleanModel() as model:
         app = await model.deploy(
             'ubuntu-0',
@@ -64,7 +70,7 @@ async def test_status_is_not_unset(event_loop):
 
 @base.bootstrapped
 @pytest.mark.skip('Update charm')
-async def test_status(event_loop):
+async def test_status():
     async with base.CleanModel() as model:
         app = await model.deploy('ch:juju-qa-test')
 
@@ -79,7 +85,7 @@ async def test_status(event_loop):
 
 @base.bootstrapped
 @pytest.mark.skip('Update charm')
-async def test_add_units(event_loop):
+async def test_add_units():
     from juju.unit import Unit
 
     async with base.CleanModel() as model:
@@ -97,7 +103,7 @@ async def test_add_units(event_loop):
 
 
 @base.bootstrapped
-async def test_deploy_charmhub_charm(event_loop):
+async def test_deploy_charmhub_charm():
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu')
         await model.block_until(lambda: (len(app.units) > 0 and
@@ -107,7 +113,7 @@ async def test_deploy_charmhub_charm(event_loop):
 
 @base.bootstrapped
 @pytest.mark.skip('Skip until a similar k8s solution is found')
-async def test_upgrade_charm_switch_channel(event_loop):
+async def test_upgrade_charm_switch_channel():
     # Note for future:
     # This test requires a charm that has different
     # revisions for different channels/risks.
@@ -151,7 +157,7 @@ async def test_upgrade_charm_switch_channel(event_loop):
 
 @base.bootstrapped
 @pytest.mark.skip('Update charm')
-async def test_upgrade_charm_revision(event_loop):
+async def test_upgrade_charm_revision():
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu')
         await model.block_until(lambda: (len(app.units) > 0 and
@@ -163,7 +169,7 @@ async def test_upgrade_charm_revision(event_loop):
 
 @base.bootstrapped
 @pytest.mark.skip('Update charm')
-async def test_upgrade_charm_switch(event_loop):
+async def test_upgrade_charm_switch():
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu')
         await model.block_until(lambda: (len(app.units) > 0 and
@@ -176,7 +182,7 @@ async def test_upgrade_charm_switch(event_loop):
 
 
 @base.bootstrapped
-async def test_upgrade_local_charm(event_loop):
+async def test_upgrade_local_charm():
     async with base.CleanModel() as model:
         tests_dir = Path(__file__).absolute().parent
         charm_path = tests_dir / 'upgrade-charm'
@@ -189,26 +195,59 @@ async def test_upgrade_local_charm(event_loop):
 
 
 @base.bootstrapped
-async def test_upgrade_local_charm_resource(event_loop):
+async def test_upgrade_local_charm_resource():
     async with base.CleanModel() as model:
-        tests_dir = Path(__file__).absolute().parent
-        charm_path = tests_dir / 'file-resource-charm'
+        charm_path = INTEGRATION_TEST_DIR / 'file-resource-charm'
         resources = {"file-res": "test.file"}
 
         app = await model.deploy(str(charm_path), resources=resources)
         assert 'file-resource-charm' in model.applications
-        await model.wait_for_idle()
+        await model.wait_for_idle(raise_on_error=False)
         assert app.units[0].agent_status == 'idle'
 
         await app.upgrade_charm(path=charm_path, resources=resources)
-        await model.wait_for_idle()
+        await model.wait_for_idle(raise_on_error=False)
         ress = await app.get_resources()
         assert 'file-res' in ress
         assert ress['file-res']
 
 
 @base.bootstrapped
-async def test_upgrade_charm_resource_same_rev_no_update(event_loop):
+@pytest.mark.asyncio
+@pytest.mark.skip('Update charm')
+async def test_upgrade_charm_resource():
+    async with base.CleanModel() as model:
+        app = await model.deploy('cs:~juju-qa/bionic/upgrade-charm-resource-test-0')
+
+        await model.wait_for_idle(wait_for_units=1)
+        unit = app.units[0]
+        expected_message = 'I have no resource.'
+        assert unit.workload_status_message == expected_message
+
+        await app.upgrade_charm(revision=1)
+        await model.block_until(
+            lambda: unit.workload_status_message != 'I have no resource.',
+            timeout=60,
+        )
+        expected_message = 'My resource: I am the resource.'
+        assert app.units[0].workload_status_message == expected_message
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_refresh_with_resource_argument():
+    async with base.CleanModel() as model:
+        app = await model.deploy('juju-qa-test', resources={'foo-file': '2'})
+        res2 = await app.get_resources()
+        assert res2['foo-file'].revision == 2
+        await app.refresh(resources={'foo-file': 4})
+        res4 = await app.get_resources()
+        assert res4['foo-file'].revision == 4
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_upgrade_charm_resource_same_rev_no_update():
     async with base.CleanModel() as model:
         app = await model.deploy('keystone', channel='victoria/stable')
         ress = await app.get_resources()
@@ -218,7 +257,38 @@ async def test_upgrade_charm_resource_same_rev_no_update(event_loop):
 
 
 @base.bootstrapped
-async def test_trusted(event_loop):
+@pytest.mark.asyncio
+async def test_refresh_charmhub_to_local():
+    charm_path = INTEGRATION_TEST_DIR / 'charm'
+    async with base.CleanModel() as model:
+        app = await model.deploy('ubuntu', application_name='ubu-path')
+        await app.refresh(path=str(charm_path))
+        assert app.data['charm-url'].startswith('local:')
+
+        app = await model.deploy('ubuntu', application_name='ubu-switch')
+        await app.refresh(switch=str(charm_path))
+        assert app.data['charm-url'].startswith('local:')
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_local_refresh():
+    charm_path = INTEGRATION_TEST_DIR / 'charm'
+    async with base.CleanModel() as model:
+        app = await model.deploy('ubuntu')
+        origin = client.CharmOrigin(source="charm-hub", track="20.04", risk="stable",
+                                    branch="deadbeef", hash_="hash", id_="id", revision=12,
+                                    base=client.Base("20.04", "ubuntu"))
+
+        await app.local_refresh(charm_origin=origin, path=charm_path)
+
+        assert origin == client.CharmOrigin(source="local", revision=0,
+                                            base=client.Base("20.04", "ubuntu"))
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
+async def test_trusted():
     async with base.CleanModel() as model:
         await model.deploy('ubuntu', trust=True)
 
@@ -232,7 +302,7 @@ async def test_trusted(event_loop):
 
 
 @base.bootstrapped
-async def test_app_destroy(event_loop):
+async def test_app_destroy():
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu')
         a_name = app.name  # accessing name is impossible after the app is destroyed
@@ -247,7 +317,7 @@ async def test_app_destroy(event_loop):
 
 
 @base.bootstrapped
-async def test_app_remove_wait_flag(event_loop):
+async def test_app_remove_wait_flag():
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu')
         a_name = app.name
@@ -258,9 +328,30 @@ async def test_app_remove_wait_flag(event_loop):
 
 
 @base.bootstrapped
-async def test_app_charm_name(event_loop):
+async def test_app_remove_timeout():
+    async with base.CleanModel() as model:
+        app = await model.deploy('juju-qa-test')
+        await model.wait_for_idle(status="active")
+
+        with pytest.raises(asyncio.TimeoutError):
+            await model.remove_application(app.name, block_until_done=True, timeout=1)
+
+
+@base.bootstrapped
+async def test_app_charm_name():
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu')
         await model.wait_for_idle(status="active")
         assert 'ubuntu' in app.charm_url
         assert 'ubuntu' == app.charm_name
+
+
+@base.bootstrapped
+async def test_app_relation_destroy_block_until_done():
+    async with base.CleanModel() as model:
+        app: Application = await model.deploy('docker-registry')
+        rsa: Application = await model.deploy("easyrsa")
+        relation = await app.relate('cert-provider', rsa.name)
+        await model.wait_for_idle(status="active")
+        await app.destroy_relation('cert-provider', rsa.name, block_until_done=True)
+        assert relation not in app.relations
