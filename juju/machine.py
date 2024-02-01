@@ -154,9 +154,9 @@ class Machine(model.ModelEntity):
         """
         if proxy:
             raise NotImplementedError('proxy option is not implemented')
-        address = self.dns_name
         if wait_for_active:
             await block_until(lambda: self.addresses, timeout=timeout)
+        address = self.dns_name
         destination = "{}@{}".format(user, address)
         _, id_path = juju_ssh_key_paths()
         cmd = [

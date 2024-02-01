@@ -71,7 +71,6 @@ async def test_scp(event_loop):
 async def test_machine_ssh():
     async with base.CleanModel() as model:
         machine: Machine = await model.add_machine()
-        await machine.wait()
         out = await machine.ssh("echo hello world!")
 
         assert out == "hello world!\n"
