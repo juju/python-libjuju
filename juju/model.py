@@ -1000,7 +1000,15 @@ class Model:
         if ret.results[0].error:
             raise JujuError(ret.results[0].error.message)
 
-    async def remove_application(self, app_name, block_until_done=False, force=False, destroy_storage=False, no_wait=False):
+    async def remove_application(
+        self,
+        app_name,
+        block_until_done=False,
+        force=False,
+        destroy_storage=False,
+        no_wait=False,
+        timeout=None
+    ):
         """Removes the given application from the model.
 
         :param str app_name: Name of the application
@@ -1009,6 +1017,8 @@ class Model:
         :param bool no_wait: Rush through application removal without waiting for each individual step to complete (=false)
         :param bool block_until_done: Ensure the app is removed from the
         model when returned
+        :param int timeout: Raise asyncio.exceptions.TimeoutError if the application is not removed
+        within the timeout period.
         """
         if app_name not in self.applications:
             raise JujuError("Given application doesn't seem to appear in the\
@@ -1019,7 +1029,7 @@ class Model:
                                                  no_wait=no_wait,
                                                  )
         if block_until_done:
-            await self.block_until(lambda: app_name not in self.applications)
+            await self.block_until(lambda: app_name not in self.applications, timeout=timeout)
 
     async def block_until(self, *conditions, timeout=None, wait_period=0.5):
         """Return only after all conditions are true.

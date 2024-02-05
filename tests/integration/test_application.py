@@ -1,15 +1,18 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
+import logging
 from pathlib import Path
+import asyncio
 
 import pytest
-import logging
+
+from juju import errors, jasyncio
+from juju.application import Application
+from juju.client import client
+from juju.url import URL, Schema
 
 from .. import base
-from juju import jasyncio, errors
-from juju.url import URL, Schema
-from juju.client import client
 
 MB = 1
 
@@ -325,9 +328,30 @@ async def test_app_remove_wait_flag():
 
 
 @base.bootstrapped
+async def test_app_remove_timeout():
+    async with base.CleanModel() as model:
+        app = await model.deploy('juju-qa-test')
+        await model.wait_for_idle(status="active")
+
+        with pytest.raises(asyncio.TimeoutError):
+            await model.remove_application(app.name, block_until_done=True, timeout=1)
+
+
+@base.bootstrapped
 async def test_app_charm_name():
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu')
         await model.wait_for_idle(status="active")
         assert 'ubuntu' in app.charm_url
         assert 'ubuntu' == app.charm_name
+
+
+@base.bootstrapped
+async def test_app_relation_destroy_block_until_done():
+    async with base.CleanModel() as model:
+        app: Application = await model.deploy('docker-registry')
+        rsa: Application = await model.deploy("easyrsa")
+        relation = await app.relate('cert-provider', rsa.name)
+        await model.wait_for_idle(status="active")
+        await app.destroy_relation('cert-provider', rsa.name, block_until_done=True)
+        assert relation not in app.relations
