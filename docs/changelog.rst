@@ -1,12 +1,22 @@
 Changelog
 ---------
 
+2.9.46.1
+^^^^^^^^
+
+Thursday Feb 8 2024
+
+## What's Changed
+
+* Drop use of walrus operator by @freyes in https://github.com/juju/python-libjuju/pull/993
+* No controller model access needed for connection with a non-admin user by @cderici in https://github.com/juju/python-libjuju/pull/1003
+* Password resolution in connector by @cderici in https://github.com/juju/python-libjuju/pull/1002
+* Remove dependency to juju-cli for controller_name by @cderici in https://github.com/juju/python-libjuju/pull/1009
+
 2.9.46.0
 ^^^^^^^^
 
 Tuesday Dec 5 2023
-
-## What's Changed
 
 * Pass websocket Close frame into ConnectionClosed by @cderici in https://github.com/juju/python-libjuju/pull/990
 
