@@ -1,10 +1,25 @@
 Changelog
 ---------
 
-3.3.0.0
+3.3.1.0
 ^^^^^^^
 
+Thursday 8th Feb 2024
+
 ## What's Changed
+
+* Remove paramiko upper-bound by @gboutry in https://github.com/juju/python-libjuju/pull/1005
+* Remove explicit passing of event_loop into tests by @cderici in https://github.com/juju/python-libjuju/pull/1006
+* chore: remove the upper restrictions on the websockets dependency by @tonyandrewmeyer in https://github.com/juju/python-libjuju/pull/1007
+* Target ceiling version by @cderici in https://github.com/juju/python-libjuju/pull/1008
+* Make it easier to run tests using `make` by @cderici in https://github.com/juju/python-libjuju/pull/1012
+* Avoid installing signal handlers to the event loop by @cderici in https://github.com/juju/python-libjuju/pull/1014
+* feat: remove app block until done by @yanksyoon in https://github.com/juju/python-libjuju/pull/1017
+* feat: remove app timeout by @yanksyoon in https://github.com/juju/python-libjuju/pull/1018
+* Forward port latest changes from 2.9 onto 3.x by @cderici in https://github.com/juju/python-libjuju/pull/1022
+
+3.3.0.0
+^^^^^^^
 
 The main contribution of this release is the user secrets that's released as a part of Juju 3.3.
 
