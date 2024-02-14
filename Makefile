@@ -1,7 +1,7 @@
 BIN := .tox/py3/bin
 PY := $(BIN)/python3
 PIP := $(BIN)/pip3
-VERSION := $(shell $(PY) -c "from version import CLIENT_VERSION; print(CLIENT_VERSION)")
+VERSION := $(shell $(PY) -c "from juju.version import CLIENT_VERSION; print(CLIENT_VERSION)")
 
 .PHONY: clean
 clean:
