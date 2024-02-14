@@ -5,6 +5,8 @@ from pathlib import Path
 
 from setuptools import find_packages, setup
 
+from juju.version import CLIENT_VERSION
+
 here = Path(__file__).absolute().parent
 readme = here / 'docs' / 'readme.rst'
 changelog = here / 'docs' / 'changelog.rst'
@@ -13,11 +15,10 @@ long_description = '{}\n\n{}'.format(
     changelog.read_text()
 )
 long_description_content_type = 'text/x-rst'
-version = here / 'VERSION'
 
 setup(
     name='juju',
-    version=version.read_text().strip(),
+    version=CLIENT_VERSION.strip(),
     packages=find_packages(
         exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     package_data={'juju': ['py.typed']},
