@@ -32,6 +32,7 @@ setup(
         'typing_inspect>=0.6.0',
         'kubernetes>=12.0.1',
         'hvac',
+        'packaging',
     ],
     include_package_data=True,
     maintainer='Juju Ecosystem Engineering',
