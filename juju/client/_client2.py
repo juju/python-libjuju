@@ -2872,6 +2872,114 @@ class HighAvailabilityFacade(Type):
 
 
 
+class ImageManagerFacade(Type):
+    name = 'ImageManager'
+    version = 2
+    schema =     {'definitions': {'Error': {'additionalProperties': False,
+                               'properties': {'code': {'type': 'string'},
+                                              'info': {'patternProperties': {'.*': {'additionalProperties': True,
+                                                                                    'type': 'object'}},
+                                                       'type': 'object'},
+                                              'message': {'type': 'string'}},
+                               'required': ['message', 'code'],
+                               'type': 'object'},
+                     'ErrorResult': {'additionalProperties': False,
+                                     'properties': {'error': {'$ref': '#/definitions/Error'}},
+                                     'type': 'object'},
+                     'ErrorResults': {'additionalProperties': False,
+                                      'properties': {'results': {'items': {'$ref': '#/definitions/ErrorResult'},
+                                                                 'type': 'array'}},
+                                      'required': ['results'],
+                                      'type': 'object'},
+                     'ImageFilterParams': {'additionalProperties': False,
+                                           'properties': {'images': {'items': {'$ref': '#/definitions/ImageSpec'},
+                                                                     'type': 'array'}},
+                                           'required': ['images'],
+                                           'type': 'object'},
+                     'ImageMetadata': {'additionalProperties': False,
+                                       'properties': {'arch': {'type': 'string'},
+                                                      'created': {'format': 'date-time',
+                                                                  'type': 'string'},
+                                                      'kind': {'type': 'string'},
+                                                      'series': {'type': 'string'},
+                                                      'url': {'type': 'string'}},
+                                       'required': ['kind',
+                                                    'arch',
+                                                    'series',
+                                                    'url',
+                                                    'created'],
+                                       'type': 'object'},
+                     'ImageSpec': {'additionalProperties': False,
+                                   'properties': {'arch': {'type': 'string'},
+                                                  'kind': {'type': 'string'},
+                                                  'series': {'type': 'string'}},
+                                   'required': ['kind', 'arch', 'series'],
+                                   'type': 'object'},
+                     'ListImageResult': {'additionalProperties': False,
+                                         'properties': {'result': {'items': {'$ref': '#/definitions/ImageMetadata'},
+                                                                   'type': 'array'}},
+                                         'required': ['result'],
+                                         'type': 'object'}},
+     'properties': {'DeleteImages': {'description': 'DeleteImages deletes the '
+                                                    'images matching the specified '
+                                                    'filter.',
+                                     'properties': {'Params': {'$ref': '#/definitions/ImageFilterParams'},
+                                                    'Result': {'$ref': '#/definitions/ErrorResults'}},
+                                     'type': 'object'},
+                    'ListImages': {'description': 'ListImages returns images '
+                                                  'matching the specified filter.',
+                                   'properties': {'Params': {'$ref': '#/definitions/ImageFilterParams'},
+                                                  'Result': {'$ref': '#/definitions/ListImageResult'}},
+                                   'type': 'object'}},
+     'type': 'object'}
+    
+
+    @ReturnMapping(ErrorResults)
+    async def DeleteImages(self, images=None):
+        '''
+        DeleteImages deletes the images matching the specified filter.
+
+        images : typing.Sequence[~ImageSpec]
+        Returns -> ErrorResults
+        '''
+        if images is not None and not isinstance(images, (bytes, str, list)):
+            raise Exception("Expected images to be a Sequence, received: {}".format(type(images)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ImageManager',
+                   request='DeleteImages',
+                   version=2,
+                   params=_params)
+        _params['images'] = images
+        reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ListImageResult)
+    async def ListImages(self, images=None):
+        '''
+        ListImages returns images matching the specified filter.
+
+        images : typing.Sequence[~ImageSpec]
+        Returns -> ListImageResult
+        '''
+        if images is not None and not isinstance(images, (bytes, str, list)):
+            raise Exception("Expected images to be a Sequence, received: {}".format(type(images)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ImageManager',
+                   request='ListImages',
+                   version=2,
+                   params=_params)
+        _params['images'] = images
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class LeadershipServiceFacade(Type):
     name = 'LeadershipService'
     version = 2
@@ -5105,10 +5213,41 @@ class RemoteRelationsFacade(Type):
 
 
 
+class ResumerFacade(Type):
+    name = 'Resumer'
+    version = 2
+    schema =     {'properties': {'ResumeTransactions': {'type': 'object'}}, 'type': 'object'}
+    
+
+    @ReturnMapping(None)
+    async def ResumeTransactions(self):
+        '''
+
+        Returns -> None
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Resumer',
+                   request='ResumeTransactions',
+                   version=2,
+                   params=_params)
+
+        reply = await self.rpc(msg)
+        return reply
+
+
+
 class SecretsFacade(Type):
     name = 'Secrets'
     version = 2
-    schema =     {'definitions': {'CreateSecretArg': {'additionalProperties': False,
+    schema =     {'definitions': {'AccessInfo': {'additionalProperties': False,
+                                    'properties': {'role': {'type': 'string'},
+                                                   'scope-tag': {'type': 'string'},
+                                                   'target-tag': {'type': 'string'}},
+                                    'required': ['target-tag', 'scope-tag', 'role'],
+                                    'type': 'object'},
+                     'CreateSecretArg': {'additionalProperties': False,
                                          'properties': {'UpsertSecretArg': {'$ref': '#/definitions/UpsertSecretArg'},
                                                         'content': {'$ref': '#/definitions/SecretContentParams'},
                                                         'description': {'type': 'string'},
@@ -5167,7 +5306,9 @@ class SecretsFacade(Type):
                                                                'applications'],
                                                   'type': 'object'},
                      'ListSecretResult': {'additionalProperties': False,
-                                          'properties': {'create-time': {'format': 'date-time',
+                                          'properties': {'access': {'items': {'$ref': '#/definitions/AccessInfo'},
+                                                                    'type': 'array'},
+                                                         'create-time': {'format': 'date-time',
                                                                          'type': 'string'},
                                                          'description': {'type': 'string'},
                                                          'label': {'type': 'string'},
@@ -5479,7 +5620,13 @@ class SecretsFacade(Type):
 class SecretsManagerFacade(Type):
     name = 'SecretsManager'
     version = 2
-    schema =     {'definitions': {'CreateSecretArg': {'additionalProperties': False,
+    schema =     {'definitions': {'AccessInfo': {'additionalProperties': False,
+                                    'properties': {'role': {'type': 'string'},
+                                                   'scope-tag': {'type': 'string'},
+                                                   'target-tag': {'type': 'string'}},
+                                    'required': ['target-tag', 'scope-tag', 'role'],
+                                    'type': 'object'},
+                     'CreateSecretArg': {'additionalProperties': False,
                                          'properties': {'UpsertSecretArg': {'$ref': '#/definitions/UpsertSecretArg'},
                                                         'content': {'$ref': '#/definitions/SecretContentParams'},
                                                         'description': {'type': 'string'},
@@ -5577,7 +5724,9 @@ class SecretsManagerFacade(Type):
                                                'required': ['args'],
                                                'type': 'object'},
                      'ListSecretResult': {'additionalProperties': False,
-                                          'properties': {'create-time': {'format': 'date-time',
+                                          'properties': {'access': {'items': {'$ref': '#/definitions/AccessInfo'},
+                                                                    'type': 'array'},
+                                                         'create-time': {'format': 'date-time',
                                                                          'type': 'string'},
                                                          'description': {'type': 'string'},
                                                          'label': {'type': 'string'},

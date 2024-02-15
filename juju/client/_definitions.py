@@ -22,6 +22,36 @@ class APIHostPortsResult(Type):
 
 
 
+class AccessInfo(Type):
+    _toSchema = {'role': 'role', 'scope_tag': 'scope-tag', 'target_tag': 'target-tag'}
+    _toPy = {'role': 'role', 'scope-tag': 'scope_tag', 'target-tag': 'target_tag'}
+    def __init__(self, role=None, scope_tag=None, target_tag=None, **unknown_fields):
+        '''
+        role : str
+        scope_tag : str
+        target_tag : str
+        '''
+        role_ = role
+        scope_tag_ = scope_tag
+        target_tag_ = target_tag
+
+        # Validate arguments against known Juju API types.
+        if role_ is not None and not isinstance(role_, (bytes, str)):
+            raise Exception("Expected role_ to be a str, received: {}".format(type(role_)))
+
+        if scope_tag_ is not None and not isinstance(scope_tag_, (bytes, str)):
+            raise Exception("Expected scope_tag_ to be a str, received: {}".format(type(scope_tag_)))
+
+        if target_tag_ is not None and not isinstance(target_tag_, (bytes, str)):
+            raise Exception("Expected target_tag_ to be a str, received: {}".format(type(target_tag_)))
+
+        self.role = role_
+        self.scope_tag = scope_tag_
+        self.target_tag = target_tag_
+        self.unknown_fields = unknown_fields
+
+
+
 class Action(Type):
     _toSchema = {'execution_group': 'execution-group', 'name': 'name', 'parallel': 'parallel', 'parameters': 'parameters', 'receiver': 'receiver', 'tag': 'tag'}
     _toPy = {'execution-group': 'execution_group', 'name': 'name', 'parallel': 'parallel', 'parameters': 'parameters', 'receiver': 'receiver', 'tag': 'tag'}
@@ -316,6 +346,54 @@ class Actions(Type):
 
 
 
+class ActionsByName(Type):
+    _toSchema = {'actions': 'actions', 'error': 'error', 'name': 'name'}
+    _toPy = {'actions': 'actions', 'error': 'error', 'name': 'name'}
+    def __init__(self, actions=None, error=None, name=None, **unknown_fields):
+        '''
+        actions : typing.Sequence[~ActionResult]
+        error : Error
+        name : str
+        '''
+        actions_ = [ActionResult.from_json(o) for o in actions or []]
+        error_ = Error.from_json(error) if error else None
+        name_ = name
+
+        # Validate arguments against known Juju API types.
+        if actions_ is not None and not isinstance(actions_, (bytes, str, list)):
+            raise Exception("Expected actions_ to be a Sequence, received: {}".format(type(actions_)))
+
+        if error_ is not None and not isinstance(error_, (dict, Error)):
+            raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
+
+        if name_ is not None and not isinstance(name_, (bytes, str)):
+            raise Exception("Expected name_ to be a str, received: {}".format(type(name_)))
+
+        self.actions = actions_
+        self.error = error_
+        self.name = name_
+        self.unknown_fields = unknown_fields
+
+
+
+class ActionsByNames(Type):
+    _toSchema = {'actions': 'actions'}
+    _toPy = {'actions': 'actions'}
+    def __init__(self, actions=None, **unknown_fields):
+        '''
+        actions : typing.Sequence[~ActionsByName]
+        '''
+        actions_ = [ActionsByName.from_json(o) for o in actions or []]
+
+        # Validate arguments against known Juju API types.
+        if actions_ is not None and not isinstance(actions_, (bytes, str, list)):
+            raise Exception("Expected actions_ to be a Sequence, received: {}".format(type(actions_)))
+
+        self.actions = actions_
+        self.unknown_fields = unknown_fields
+
+
+
 class ActionsByReceiver(Type):
     _toSchema = {'actions': 'actions', 'error': 'error', 'receiver': 'receiver'}
     _toPy = {'actions': 'actions', 'error': 'error', 'receiver': 'receiver'}
@@ -534,6 +612,114 @@ class AddApplicationUnitsResults(Type):
             raise Exception("Expected units_ to be a Sequence, received: {}".format(type(units_)))
 
         self.units = units_
+        self.unknown_fields = unknown_fields
+
+
+
+class AddCharm(Type):
+    _toSchema = {'channel': 'channel', 'force': 'force', 'url': 'url'}
+    _toPy = {'channel': 'channel', 'force': 'force', 'url': 'url'}
+    def __init__(self, channel=None, force=None, url=None, **unknown_fields):
+        '''
+        channel : str
+        force : bool
+        url : str
+        '''
+        channel_ = channel
+        force_ = force
+        url_ = url
+
+        # Validate arguments against known Juju API types.
+        if channel_ is not None and not isinstance(channel_, (bytes, str)):
+            raise Exception("Expected channel_ to be a str, received: {}".format(type(channel_)))
+
+        if force_ is not None and not isinstance(force_, bool):
+            raise Exception("Expected force_ to be a bool, received: {}".format(type(force_)))
+
+        if url_ is not None and not isinstance(url_, (bytes, str)):
+            raise Exception("Expected url_ to be a str, received: {}".format(type(url_)))
+
+        self.channel = channel_
+        self.force = force_
+        self.url = url_
+        self.unknown_fields = unknown_fields
+
+
+
+class AddCharmWithAuth(Type):
+    _toSchema = {'charm_origin': 'charm-origin', 'force': 'force', 'macaroon': 'macaroon', 'series': 'series', 'url': 'url'}
+    _toPy = {'charm-origin': 'charm_origin', 'force': 'force', 'macaroon': 'macaroon', 'series': 'series', 'url': 'url'}
+    def __init__(self, charm_origin=None, force=None, macaroon=None, series=None, url=None, **unknown_fields):
+        '''
+        charm_origin : CharmOrigin
+        force : bool
+        macaroon : Macaroon
+        series : str
+        url : str
+        '''
+        charm_origin_ = CharmOrigin.from_json(charm_origin) if charm_origin else None
+        force_ = force
+        macaroon_ = Macaroon.from_json(macaroon) if macaroon else None
+        series_ = series
+        url_ = url
+
+        # Validate arguments against known Juju API types.
+        if charm_origin_ is not None and not isinstance(charm_origin_, (dict, CharmOrigin)):
+            raise Exception("Expected charm_origin_ to be a CharmOrigin, received: {}".format(type(charm_origin_)))
+
+        if force_ is not None and not isinstance(force_, bool):
+            raise Exception("Expected force_ to be a bool, received: {}".format(type(force_)))
+
+        if macaroon_ is not None and not isinstance(macaroon_, (dict, Macaroon)):
+            raise Exception("Expected macaroon_ to be a Macaroon, received: {}".format(type(macaroon_)))
+
+        if series_ is not None and not isinstance(series_, (bytes, str)):
+            raise Exception("Expected series_ to be a str, received: {}".format(type(series_)))
+
+        if url_ is not None and not isinstance(url_, (bytes, str)):
+            raise Exception("Expected url_ to be a str, received: {}".format(type(url_)))
+
+        self.charm_origin = charm_origin_
+        self.force = force_
+        self.macaroon = macaroon_
+        self.series = series_
+        self.url = url_
+        self.unknown_fields = unknown_fields
+
+
+
+class AddCharmWithAuthorization(Type):
+    _toSchema = {'channel': 'channel', 'force': 'force', 'macaroon': 'macaroon', 'url': 'url'}
+    _toPy = {'channel': 'channel', 'force': 'force', 'macaroon': 'macaroon', 'url': 'url'}
+    def __init__(self, channel=None, force=None, macaroon=None, url=None, **unknown_fields):
+        '''
+        channel : str
+        force : bool
+        macaroon : Macaroon
+        url : str
+        '''
+        channel_ = channel
+        force_ = force
+        macaroon_ = Macaroon.from_json(macaroon) if macaroon else None
+        url_ = url
+
+        # Validate arguments against known Juju API types.
+        if channel_ is not None and not isinstance(channel_, (bytes, str)):
+            raise Exception("Expected channel_ to be a str, received: {}".format(type(channel_)))
+
+        if force_ is not None and not isinstance(force_, bool):
+            raise Exception("Expected force_ to be a bool, received: {}".format(type(force_)))
+
+        if macaroon_ is not None and not isinstance(macaroon_, (dict, Macaroon)):
+            raise Exception("Expected macaroon_ to be a Macaroon, received: {}".format(type(macaroon_)))
+
+        if url_ is not None and not isinstance(url_, (bytes, str)):
+            raise Exception("Expected url_ to be a str, received: {}".format(type(url_)))
+
+        self.channel = channel_
+        self.force = force_
+        self.macaroon = macaroon_
+        self.url = url_
         self.unknown_fields = unknown_fields
 
 
@@ -1216,6 +1402,24 @@ class AgentGetEntitiesResults(Type):
 
 
 
+class AgentVersionResult(Type):
+    _toSchema = {'version': 'version'}
+    _toPy = {'version': 'version'}
+    def __init__(self, version=None, **unknown_fields):
+        '''
+        version : Number
+        '''
+        version_ = Number.from_json(version) if version else None
+
+        # Validate arguments against known Juju API types.
+        if version_ is not None and not isinstance(version_, (dict, Number)):
+            raise Exception("Expected version_ to be a Number, received: {}".format(type(version_)))
+
+        self.version = version_
+        self.unknown_fields = unknown_fields
+
+
+
 class AllWatcherId(Type):
     _toSchema = {'watcher_id': 'watcher-id'}
     _toPy = {'watcher-id': 'watcher_id'}
@@ -1656,6 +1860,24 @@ class ApplicationDeploy(Type):
         self.policy = policy_
         self.resources = resources_
         self.storage = storage_
+        self.unknown_fields = unknown_fields
+
+
+
+class ApplicationDestroy(Type):
+    _toSchema = {'application': 'application'}
+    _toPy = {'application': 'application'}
+    def __init__(self, application=None, **unknown_fields):
+        '''
+        application : str
+        '''
+        application_ = application
+
+        # Validate arguments against known Juju API types.
+        if application_ is not None and not isinstance(application_, (bytes, str)):
+            raise Exception("Expected application_ to be a str, received: {}".format(type(application_)))
+
+        self.application = application_
         self.unknown_fields = unknown_fields
 
 
@@ -2350,6 +2572,36 @@ class ApplicationResult(Type):
 
 
 
+class ApplicationSet(Type):
+    _toSchema = {'application': 'application', 'branch': 'branch', 'options': 'options'}
+    _toPy = {'application': 'application', 'branch': 'branch', 'options': 'options'}
+    def __init__(self, application=None, branch=None, options=None, **unknown_fields):
+        '''
+        application : str
+        branch : str
+        options : typing.Mapping[str, str]
+        '''
+        application_ = application
+        branch_ = branch
+        options_ = options
+
+        # Validate arguments against known Juju API types.
+        if application_ is not None and not isinstance(application_, (bytes, str)):
+            raise Exception("Expected application_ to be a str, received: {}".format(type(application_)))
+
+        if branch_ is not None and not isinstance(branch_, (bytes, str)):
+            raise Exception("Expected branch_ to be a str, received: {}".format(type(branch_)))
+
+        if options_ is not None and not isinstance(options_, dict):
+            raise Exception("Expected options_ to be a Mapping, received: {}".format(type(options_)))
+
+        self.application = application_
+        self.branch = branch_
+        self.options = options_
+        self.unknown_fields = unknown_fields
+
+
+
 class ApplicationSetCharm(Type):
     _toSchema = {'application': 'application', 'channel': 'channel', 'charm_origin': 'charm-origin', 'charm_url': 'charm-url', 'config_settings': 'config-settings', 'config_settings_yaml': 'config-settings-yaml', 'endpoint_bindings': 'endpoint-bindings', 'force': 'force', 'force_base': 'force-base', 'force_units': 'force-units', 'generation': 'generation', 'resource_ids': 'resource-ids', 'storage_constraints': 'storage-constraints'}
     _toPy = {'application': 'application', 'channel': 'channel', 'charm-origin': 'charm_origin', 'charm-url': 'charm_url', 'config-settings': 'config_settings', 'config-settings-yaml': 'config_settings_yaml', 'endpoint-bindings': 'endpoint_bindings', 'force': 'force', 'force-base': 'force_base', 'force-units': 'force_units', 'generation': 'generation', 'resource-ids': 'resource_ids', 'storage-constraints': 'storage_constraints'}
@@ -2890,6 +3142,53 @@ class BackupsCreateArgs(Type):
 
 
 
+class BackupsInfoArgs(Type):
+    _toSchema = {'id_': 'id'}
+    _toPy = {'id': 'id_'}
+    def __init__(self, id_=None, **unknown_fields):
+        '''
+        id_ : str
+        '''
+        id__ = id_
+
+        # Validate arguments against known Juju API types.
+        if id__ is not None and not isinstance(id__, (bytes, str)):
+            raise Exception("Expected id__ to be a str, received: {}".format(type(id__)))
+
+        self.id_ = id__
+        self.unknown_fields = unknown_fields
+
+
+
+class BackupsListArgs(Type):
+    _toSchema = {}
+    _toPy = {}
+    def __init__(self, **unknown_fields):
+        '''
+
+        '''
+        self.unknown_fields = unknown_fields
+
+
+
+class BackupsListResult(Type):
+    _toSchema = {'list_': 'list'}
+    _toPy = {'list': 'list_'}
+    def __init__(self, list_=None, **unknown_fields):
+        '''
+        list_ : typing.Sequence[~BackupsMetadataResult]
+        '''
+        list__ = [BackupsMetadataResult.from_json(o) for o in list_ or []]
+
+        # Validate arguments against known Juju API types.
+        if list__ is not None and not isinstance(list__, (bytes, str, list)):
+            raise Exception("Expected list__ to be a Sequence, received: {}".format(type(list__)))
+
+        self.list_ = list__
+        self.unknown_fields = unknown_fields
+
+
+
 class BackupsMetadataResult(Type):
     _toSchema = {'base': 'base', 'checksum': 'checksum', 'checksum_format': 'checksum-format', 'controller_machine_id': 'controller-machine-id', 'controller_machine_inst_id': 'controller-machine-inst-id', 'controller_uuid': 'controller-uuid', 'filename': 'filename', 'finished': 'finished', 'format_version': 'format-version', 'ha_nodes': 'ha-nodes', 'hostname': 'hostname', 'id_': 'id', 'machine': 'machine', 'model': 'model', 'notes': 'notes', 'size': 'size', 'started': 'started', 'stored': 'stored', 'version': 'version'}
     _toPy = {'base': 'base', 'checksum': 'checksum', 'checksum-format': 'checksum_format', 'controller-machine-id': 'controller_machine_id', 'controller-machine-inst-id': 'controller_machine_inst_id', 'controller-uuid': 'controller_uuid', 'filename': 'filename', 'finished': 'finished', 'format-version': 'format_version', 'ha-nodes': 'ha_nodes', 'hostname': 'hostname', 'id': 'id_', 'machine': 'machine', 'model': 'model', 'notes': 'notes', 'size': 'size', 'started': 'started', 'stored': 'stored', 'version': 'version'}
@@ -3012,6 +3311,24 @@ class BackupsMetadataResult(Type):
         self.started = started_
         self.stored = stored_
         self.version = version_
+        self.unknown_fields = unknown_fields
+
+
+
+class BackupsRemoveArgs(Type):
+    _toSchema = {'ids': 'ids'}
+    _toPy = {'ids': 'ids'}
+    def __init__(self, ids=None, **unknown_fields):
+        '''
+        ids : typing.Sequence[str]
+        '''
+        ids_ = ids
+
+        # Validate arguments against known Juju API types.
+        if ids_ is not None and not isinstance(ids_, (bytes, str, list)):
+            raise Exception("Expected ids_ to be a Sequence, received: {}".format(type(ids_)))
+
+        self.ids = ids_
         self.unknown_fields = unknown_fields
 
 
@@ -3654,6 +3971,30 @@ class BundleChangesResults(Type):
 
         self.changes = changes_
         self.errors = errors_
+        self.unknown_fields = unknown_fields
+
+
+
+class BundleCharm(Type):
+    _toSchema = {'name': 'name', 'package_id': 'package-id'}
+    _toPy = {'name': 'name', 'package-id': 'package_id'}
+    def __init__(self, name=None, package_id=None, **unknown_fields):
+        '''
+        name : str
+        package_id : str
+        '''
+        name_ = name
+        package_id_ = package_id
+
+        # Validate arguments against known Juju API types.
+        if name_ is not None and not isinstance(name_, (bytes, str)):
+            raise Exception("Expected name_ to be a str, received: {}".format(type(name_)))
+
+        if package_id_ is not None and not isinstance(package_id_, (bytes, str)):
+            raise Exception("Expected package_id_ to be a str, received: {}".format(type(package_id_)))
+
+        self.name = name_
+        self.package_id = package_id_
         self.unknown_fields = unknown_fields
 
 
@@ -4560,6 +4901,132 @@ class CharmDevice(Type):
         self.description = description_
         self.name = name_
         self.type_ = type__
+        self.unknown_fields = unknown_fields
+
+
+
+class CharmHubBundle(Type):
+    _toSchema = {'charms': 'charms'}
+    _toPy = {'charms': 'charms'}
+    def __init__(self, charms=None, **unknown_fields):
+        '''
+        charms : typing.Sequence[~BundleCharm]
+        '''
+        charms_ = [BundleCharm.from_json(o) for o in charms or []]
+
+        # Validate arguments against known Juju API types.
+        if charms_ is not None and not isinstance(charms_, (bytes, str, list)):
+            raise Exception("Expected charms_ to be a Sequence, received: {}".format(type(charms_)))
+
+        self.charms = charms_
+        self.unknown_fields = unknown_fields
+
+
+
+class CharmHubCharm(Type):
+    _toSchema = {'config': 'config', 'relations': 'relations', 'subordinate': 'subordinate', 'used_by': 'used-by'}
+    _toPy = {'config': 'config', 'relations': 'relations', 'subordinate': 'subordinate', 'used-by': 'used_by'}
+    def __init__(self, config=None, relations=None, subordinate=None, used_by=None, **unknown_fields):
+        '''
+        config : typing.Mapping[str, ~CharmOption]
+        relations : typing.Mapping[str, typing.Any]
+        subordinate : bool
+        used_by : typing.Sequence[str]
+        '''
+        config_ = {k: CharmOption.from_json(v) for k, v in (config or dict()).items()}
+        relations_ = relations
+        subordinate_ = subordinate
+        used_by_ = used_by
+
+        # Validate arguments against known Juju API types.
+        if config_ is not None and not isinstance(config_, dict):
+            raise Exception("Expected config_ to be a Mapping, received: {}".format(type(config_)))
+
+        if relations_ is not None and not isinstance(relations_, dict):
+            raise Exception("Expected relations_ to be a Mapping, received: {}".format(type(relations_)))
+
+        if subordinate_ is not None and not isinstance(subordinate_, bool):
+            raise Exception("Expected subordinate_ to be a bool, received: {}".format(type(subordinate_)))
+
+        if used_by_ is not None and not isinstance(used_by_, (bytes, str, list)):
+            raise Exception("Expected used_by_ to be a Sequence, received: {}".format(type(used_by_)))
+
+        self.config = config_
+        self.relations = relations_
+        self.subordinate = subordinate_
+        self.used_by = used_by_
+        self.unknown_fields = unknown_fields
+
+
+
+class CharmHubEntityFindResult(Type):
+    _toSchema = {'errors': 'errors', 'result': 'result'}
+    _toPy = {'errors': 'errors', 'result': 'result'}
+    def __init__(self, errors=None, result=None, **unknown_fields):
+        '''
+        errors : ErrorResponse
+        result : typing.Sequence[~FindResponse]
+        '''
+        errors_ = ErrorResponse.from_json(errors) if errors else None
+        result_ = [FindResponse.from_json(o) for o in result or []]
+
+        # Validate arguments against known Juju API types.
+        if errors_ is not None and not isinstance(errors_, (dict, ErrorResponse)):
+            raise Exception("Expected errors_ to be a ErrorResponse, received: {}".format(type(errors_)))
+
+        if result_ is not None and not isinstance(result_, (bytes, str, list)):
+            raise Exception("Expected result_ to be a Sequence, received: {}".format(type(result_)))
+
+        self.errors = errors_
+        self.result = result_
+        self.unknown_fields = unknown_fields
+
+
+
+class CharmHubEntityInfoResult(Type):
+    _toSchema = {'errors': 'errors', 'result': 'result'}
+    _toPy = {'errors': 'errors', 'result': 'result'}
+    def __init__(self, errors=None, result=None, **unknown_fields):
+        '''
+        errors : ErrorResponse
+        result : InfoResponse
+        '''
+        errors_ = ErrorResponse.from_json(errors) if errors else None
+        result_ = InfoResponse.from_json(result) if result else None
+
+        # Validate arguments against known Juju API types.
+        if errors_ is not None and not isinstance(errors_, (dict, ErrorResponse)):
+            raise Exception("Expected errors_ to be a ErrorResponse, received: {}".format(type(errors_)))
+
+        if result_ is not None and not isinstance(result_, (dict, InfoResponse)):
+            raise Exception("Expected result_ to be a InfoResponse, received: {}".format(type(result_)))
+
+        self.errors = errors_
+        self.result = result_
+        self.unknown_fields = unknown_fields
+
+
+
+class CharmHubError(Type):
+    _toSchema = {'code': 'code', 'message': 'message'}
+    _toPy = {'code': 'code', 'message': 'message'}
+    def __init__(self, code=None, message=None, **unknown_fields):
+        '''
+        code : str
+        message : str
+        '''
+        code_ = code
+        message_ = message
+
+        # Validate arguments against known Juju API types.
+        if code_ is not None and not isinstance(code_, (bytes, str)):
+            raise Exception("Expected code_ to be a str, received: {}".format(type(code_)))
+
+        if message_ is not None and not isinstance(message_, (bytes, str)):
+            raise Exception("Expected message_ to be a str, received: {}".format(type(message_)))
+
+        self.code = code_
+        self.message = message_
         self.unknown_fields = unknown_fields
 
 
@@ -6254,9 +6721,9 @@ class CloudsResult(Type):
 
 
 class CommitHookChangesArg(Type):
-    _toSchema = {'add_storage': 'add-storage', 'close_ports': 'close-ports', 'open_ports': 'open-ports', 'pod_spec': 'pod-spec', 'relation_unit_settings': 'relation-unit-settings', 'secret_creates': 'secret-creates', 'secret_deletes': 'secret-deletes', 'secret_grants': 'secret-grants', 'secret_revokes': 'secret-revokes', 'secret_updates': 'secret-updates', 'set_raw_k8s_spec': 'set-raw-k8s-spec', 'tag': 'tag', 'unit_state': 'unit-state', 'update_network_info': 'update-network-info'}
-    _toPy = {'add-storage': 'add_storage', 'close-ports': 'close_ports', 'open-ports': 'open_ports', 'pod-spec': 'pod_spec', 'relation-unit-settings': 'relation_unit_settings', 'secret-creates': 'secret_creates', 'secret-deletes': 'secret_deletes', 'secret-grants': 'secret_grants', 'secret-revokes': 'secret_revokes', 'secret-updates': 'secret_updates', 'set-raw-k8s-spec': 'set_raw_k8s_spec', 'tag': 'tag', 'unit-state': 'unit_state', 'update-network-info': 'update_network_info'}
-    def __init__(self, add_storage=None, close_ports=None, open_ports=None, pod_spec=None, relation_unit_settings=None, secret_creates=None, secret_deletes=None, secret_grants=None, secret_revokes=None, secret_updates=None, set_raw_k8s_spec=None, tag=None, unit_state=None, update_network_info=None, **unknown_fields):
+    _toSchema = {'add_storage': 'add-storage', 'close_ports': 'close-ports', 'open_ports': 'open-ports', 'pod_spec': 'pod-spec', 'relation_unit_settings': 'relation-unit-settings', 'secret_creates': 'secret-creates', 'secret_deletes': 'secret-deletes', 'secret_grants': 'secret-grants', 'secret_revokes': 'secret-revokes', 'secret_track_latest': 'secret-track-latest', 'secret_updates': 'secret-updates', 'set_raw_k8s_spec': 'set-raw-k8s-spec', 'tag': 'tag', 'unit_state': 'unit-state', 'update_network_info': 'update-network-info'}
+    _toPy = {'add-storage': 'add_storage', 'close-ports': 'close_ports', 'open-ports': 'open_ports', 'pod-spec': 'pod_spec', 'relation-unit-settings': 'relation_unit_settings', 'secret-creates': 'secret_creates', 'secret-deletes': 'secret_deletes', 'secret-grants': 'secret_grants', 'secret-revokes': 'secret_revokes', 'secret-track-latest': 'secret_track_latest', 'secret-updates': 'secret_updates', 'set-raw-k8s-spec': 'set_raw_k8s_spec', 'tag': 'tag', 'unit-state': 'unit_state', 'update-network-info': 'update_network_info'}
+    def __init__(self, add_storage=None, close_ports=None, open_ports=None, pod_spec=None, relation_unit_settings=None, secret_creates=None, secret_deletes=None, secret_grants=None, secret_revokes=None, secret_track_latest=None, secret_updates=None, set_raw_k8s_spec=None, tag=None, unit_state=None, update_network_info=None, **unknown_fields):
         '''
         add_storage : typing.Sequence[~StorageAddParams]
         close_ports : typing.Sequence[~EntityPortRange]
@@ -6267,6 +6734,7 @@ class CommitHookChangesArg(Type):
         secret_deletes : typing.Sequence[~DeleteSecretArg]
         secret_grants : typing.Sequence[~GrantRevokeSecretArg]
         secret_revokes : typing.Sequence[~GrantRevokeSecretArg]
+        secret_track_latest : typing.Sequence[str]
         secret_updates : typing.Sequence[~UpdateSecretArg]
         set_raw_k8s_spec : PodSpec
         tag : str
@@ -6282,6 +6750,7 @@ class CommitHookChangesArg(Type):
         secret_deletes_ = [DeleteSecretArg.from_json(o) for o in secret_deletes or []]
         secret_grants_ = [GrantRevokeSecretArg.from_json(o) for o in secret_grants or []]
         secret_revokes_ = [GrantRevokeSecretArg.from_json(o) for o in secret_revokes or []]
+        secret_track_latest_ = secret_track_latest
         secret_updates_ = [UpdateSecretArg.from_json(o) for o in secret_updates or []]
         set_raw_k8s_spec_ = PodSpec.from_json(set_raw_k8s_spec) if set_raw_k8s_spec else None
         tag_ = tag
@@ -6316,6 +6785,9 @@ class CommitHookChangesArg(Type):
         if secret_revokes_ is not None and not isinstance(secret_revokes_, (bytes, str, list)):
             raise Exception("Expected secret_revokes_ to be a Sequence, received: {}".format(type(secret_revokes_)))
 
+        if secret_track_latest_ is not None and not isinstance(secret_track_latest_, (bytes, str, list)):
+            raise Exception("Expected secret_track_latest_ to be a Sequence, received: {}".format(type(secret_track_latest_)))
+
         if secret_updates_ is not None and not isinstance(secret_updates_, (bytes, str, list)):
             raise Exception("Expected secret_updates_ to be a Sequence, received: {}".format(type(secret_updates_)))
 
@@ -6340,6 +6812,7 @@ class CommitHookChangesArg(Type):
         self.secret_deletes = secret_deletes_
         self.secret_grants = secret_grants_
         self.secret_revokes = secret_revokes_
+        self.secret_track_latest = secret_track_latest_
         self.secret_updates = secret_updates_
         self.set_raw_k8s_spec = set_raw_k8s_spec_
         self.tag = tag_
@@ -8041,6 +8514,24 @@ class DestroyApplicationResults(Type):
 
 
 
+class DestroyApplicationUnits(Type):
+    _toSchema = {'unit_names': 'unit-names'}
+    _toPy = {'unit-names': 'unit_names'}
+    def __init__(self, unit_names=None, **unknown_fields):
+        '''
+        unit_names : typing.Sequence[str]
+        '''
+        unit_names_ = unit_names
+
+        # Validate arguments against known Juju API types.
+        if unit_names_ is not None and not isinstance(unit_names_, (bytes, str, list)):
+            raise Exception("Expected unit_names_ to be a Sequence, received: {}".format(type(unit_names_)))
+
+        self.unit_names = unit_names_
+        self.unknown_fields = unknown_fields
+
+
+
 class DestroyApplicationsParams(Type):
     _toSchema = {'applications': 'applications'}
     _toPy = {'applications': 'applications'}
@@ -8229,6 +8720,30 @@ class DestroyMachineResults(Type):
             raise Exception("Expected results_ to be a Sequence, received: {}".format(type(results_)))
 
         self.results = results_
+        self.unknown_fields = unknown_fields
+
+
+
+class DestroyMachines(Type):
+    _toSchema = {'force': 'force', 'machine_names': 'machine-names'}
+    _toPy = {'force': 'force', 'machine-names': 'machine_names'}
+    def __init__(self, force=None, machine_names=None, **unknown_fields):
+        '''
+        force : bool
+        machine_names : typing.Sequence[str]
+        '''
+        force_ = force
+        machine_names_ = machine_names
+
+        # Validate arguments against known Juju API types.
+        if force_ is not None and not isinstance(force_, bool):
+            raise Exception("Expected force_ to be a bool, received: {}".format(type(force_)))
+
+        if machine_names_ is not None and not isinstance(machine_names_, (bytes, str, list)):
+            raise Exception("Expected machine_names_ to be a Sequence, received: {}".format(type(machine_names_)))
+
+        self.force = force_
+        self.machine_names = machine_names_
         self.unknown_fields = unknown_fields
 
 
@@ -8923,6 +9438,30 @@ class EnqueuedActions(Type):
 
 
 
+class EnqueuedActionsV2(Type):
+    _toSchema = {'actions': 'actions', 'operation': 'operation'}
+    _toPy = {'actions': 'actions', 'operation': 'operation'}
+    def __init__(self, actions=None, operation=None, **unknown_fields):
+        '''
+        actions : typing.Sequence[~ActionResult]
+        operation : str
+        '''
+        actions_ = [ActionResult.from_json(o) for o in actions or []]
+        operation_ = operation
+
+        # Validate arguments against known Juju API types.
+        if actions_ is not None and not isinstance(actions_, (bytes, str, list)):
+            raise Exception("Expected actions_ to be a Sequence, received: {}".format(type(actions_)))
+
+        if operation_ is not None and not isinstance(operation_, (bytes, str)):
+            raise Exception("Expected operation_ to be a str, received: {}".format(type(operation_)))
+
+        self.actions = actions_
+        self.operation = operation_
+        self.unknown_fields = unknown_fields
+
+
+
 class Entities(Type):
     _toSchema = {'entities': 'entities'}
     _toPy = {'entities': 'entities'}
@@ -8949,6 +9488,24 @@ class EntitiesCharmURL(Type):
         entities : typing.Sequence[~EntityCharmURL]
         '''
         entities_ = [EntityCharmURL.from_json(o) for o in entities or []]
+
+        # Validate arguments against known Juju API types.
+        if entities_ is not None and not isinstance(entities_, (bytes, str, list)):
+            raise Exception("Expected entities_ to be a Sequence, received: {}".format(type(entities_)))
+
+        self.entities = entities_
+        self.unknown_fields = unknown_fields
+
+
+
+class EntitiesPortRanges(Type):
+    _toSchema = {'entities': 'entities'}
+    _toPy = {'entities': 'entities'}
+    def __init__(self, entities=None, **unknown_fields):
+        '''
+        entities : typing.Sequence[~EntityPortRange]
+        '''
+        entities_ = [EntityPortRange.from_json(o) for o in entities or []]
 
         # Validate arguments against known Juju API types.
         if entities_ is not None and not isinstance(entities_, (bytes, str, list)):
@@ -9453,6 +10010,24 @@ class Error(Type):
         self.code = code_
         self.info = info_
         self.message = message_
+        self.unknown_fields = unknown_fields
+
+
+
+class ErrorResponse(Type):
+    _toSchema = {'error_list': 'error-list'}
+    _toPy = {'error-list': 'error_list'}
+    def __init__(self, error_list=None, **unknown_fields):
+        '''
+        error_list : CharmHubError
+        '''
+        error_list_ = CharmHubError.from_json(error_list) if error_list else None
+
+        # Validate arguments against known Juju API types.
+        if error_list_ is not None and not isinstance(error_list_, (dict, CharmHubError)):
+            raise Exception("Expected error_list_ to be a CharmHubError, received: {}".format(type(error_list_)))
+
+        self.error_list = error_list_
         self.unknown_fields = unknown_fields
 
 
@@ -10320,6 +10895,132 @@ class Filesystems(Type):
             raise Exception("Expected filesystems_ to be a Sequence, received: {}".format(type(filesystems_)))
 
         self.filesystems = filesystems_
+        self.unknown_fields = unknown_fields
+
+
+
+class FindActionsByNames(Type):
+    _toSchema = {'names': 'names'}
+    _toPy = {'names': 'names'}
+    def __init__(self, names=None, **unknown_fields):
+        '''
+        names : typing.Sequence[str]
+        '''
+        names_ = names
+
+        # Validate arguments against known Juju API types.
+        if names_ is not None and not isinstance(names_, (bytes, str, list)):
+            raise Exception("Expected names_ to be a Sequence, received: {}".format(type(names_)))
+
+        self.names = names_
+        self.unknown_fields = unknown_fields
+
+
+
+class FindResponse(Type):
+    _toSchema = {'architectures': 'architectures', 'id_': 'id', 'name': 'name', 'os': 'os', 'publisher': 'publisher', 'series': 'series', 'store_url': 'store-url', 'summary': 'summary', 'type_': 'type', 'version': 'version'}
+    _toPy = {'architectures': 'architectures', 'id': 'id_', 'name': 'name', 'os': 'os', 'publisher': 'publisher', 'series': 'series', 'store-url': 'store_url', 'summary': 'summary', 'type': 'type_', 'version': 'version'}
+    def __init__(self, architectures=None, id_=None, name=None, os=None, publisher=None, series=None, store_url=None, summary=None, type_=None, version=None, **unknown_fields):
+        '''
+        architectures : typing.Sequence[str]
+        id_ : str
+        name : str
+        os : typing.Sequence[str]
+        publisher : str
+        series : typing.Sequence[str]
+        store_url : str
+        summary : str
+        type_ : str
+        version : str
+        '''
+        architectures_ = architectures
+        id__ = id_
+        name_ = name
+        os_ = os
+        publisher_ = publisher
+        series_ = series
+        store_url_ = store_url
+        summary_ = summary
+        type__ = type_
+        version_ = version
+
+        # Validate arguments against known Juju API types.
+        if architectures_ is not None and not isinstance(architectures_, (bytes, str, list)):
+            raise Exception("Expected architectures_ to be a Sequence, received: {}".format(type(architectures_)))
+
+        if id__ is not None and not isinstance(id__, (bytes, str)):
+            raise Exception("Expected id__ to be a str, received: {}".format(type(id__)))
+
+        if name_ is not None and not isinstance(name_, (bytes, str)):
+            raise Exception("Expected name_ to be a str, received: {}".format(type(name_)))
+
+        if os_ is not None and not isinstance(os_, (bytes, str, list)):
+            raise Exception("Expected os_ to be a Sequence, received: {}".format(type(os_)))
+
+        if publisher_ is not None and not isinstance(publisher_, (bytes, str)):
+            raise Exception("Expected publisher_ to be a str, received: {}".format(type(publisher_)))
+
+        if series_ is not None and not isinstance(series_, (bytes, str, list)):
+            raise Exception("Expected series_ to be a Sequence, received: {}".format(type(series_)))
+
+        if store_url_ is not None and not isinstance(store_url_, (bytes, str)):
+            raise Exception("Expected store_url_ to be a str, received: {}".format(type(store_url_)))
+
+        if summary_ is not None and not isinstance(summary_, (bytes, str)):
+            raise Exception("Expected summary_ to be a str, received: {}".format(type(summary_)))
+
+        if type__ is not None and not isinstance(type__, (bytes, str)):
+            raise Exception("Expected type__ to be a str, received: {}".format(type(type__)))
+
+        if version_ is not None and not isinstance(version_, (bytes, str)):
+            raise Exception("Expected version_ to be a str, received: {}".format(type(version_)))
+
+        self.architectures = architectures_
+        self.id_ = id__
+        self.name = name_
+        self.os = os_
+        self.publisher = publisher_
+        self.series = series_
+        self.store_url = store_url_
+        self.summary = summary_
+        self.type_ = type__
+        self.version = version_
+        self.unknown_fields = unknown_fields
+
+
+
+class FindTags(Type):
+    _toSchema = {'prefixes': 'prefixes'}
+    _toPy = {'prefixes': 'prefixes'}
+    def __init__(self, prefixes=None, **unknown_fields):
+        '''
+        prefixes : typing.Sequence[str]
+        '''
+        prefixes_ = prefixes
+
+        # Validate arguments against known Juju API types.
+        if prefixes_ is not None and not isinstance(prefixes_, (bytes, str, list)):
+            raise Exception("Expected prefixes_ to be a Sequence, received: {}".format(type(prefixes_)))
+
+        self.prefixes = prefixes_
+        self.unknown_fields = unknown_fields
+
+
+
+class FindTagsResults(Type):
+    _toSchema = {'matches': 'matches'}
+    _toPy = {'matches': 'matches'}
+    def __init__(self, matches=None, **unknown_fields):
+        '''
+        matches : typing.Mapping[str, typing.Sequence[~Entity]]
+        '''
+        matches_ = {k: Entity.from_json(v) for k, v in (matches or dict()).items()}
+
+        # Validate arguments against known Juju API types.
+        if matches_ is not None and not isinstance(matches_, dict):
+            raise Exception("Expected matches_ to be a Mapping, received: {}".format(type(matches_)))
+
+        self.matches = matches_
         self.unknown_fields = unknown_fields
 
 
@@ -11392,6 +12093,66 @@ class HostedModelConfigsResults(Type):
 
 
 
+class ImageFilterParams(Type):
+    _toSchema = {'images': 'images'}
+    _toPy = {'images': 'images'}
+    def __init__(self, images=None, **unknown_fields):
+        '''
+        images : typing.Sequence[~ImageSpec]
+        '''
+        images_ = [ImageSpec.from_json(o) for o in images or []]
+
+        # Validate arguments against known Juju API types.
+        if images_ is not None and not isinstance(images_, (bytes, str, list)):
+            raise Exception("Expected images_ to be a Sequence, received: {}".format(type(images_)))
+
+        self.images = images_
+        self.unknown_fields = unknown_fields
+
+
+
+class ImageMetadata(Type):
+    _toSchema = {'arch': 'arch', 'created': 'created', 'kind': 'kind', 'series': 'series', 'url': 'url'}
+    _toPy = {'arch': 'arch', 'created': 'created', 'kind': 'kind', 'series': 'series', 'url': 'url'}
+    def __init__(self, arch=None, created=None, kind=None, series=None, url=None, **unknown_fields):
+        '''
+        arch : str
+        created : str
+        kind : str
+        series : str
+        url : str
+        '''
+        arch_ = arch
+        created_ = created
+        kind_ = kind
+        series_ = series
+        url_ = url
+
+        # Validate arguments against known Juju API types.
+        if arch_ is not None and not isinstance(arch_, (bytes, str)):
+            raise Exception("Expected arch_ to be a str, received: {}".format(type(arch_)))
+
+        if created_ is not None and not isinstance(created_, (bytes, str)):
+            raise Exception("Expected created_ to be a str, received: {}".format(type(created_)))
+
+        if kind_ is not None and not isinstance(kind_, (bytes, str)):
+            raise Exception("Expected kind_ to be a str, received: {}".format(type(kind_)))
+
+        if series_ is not None and not isinstance(series_, (bytes, str)):
+            raise Exception("Expected series_ to be a str, received: {}".format(type(series_)))
+
+        if url_ is not None and not isinstance(url_, (bytes, str)):
+            raise Exception("Expected url_ to be a str, received: {}".format(type(url_)))
+
+        self.arch = arch_
+        self.created = created_
+        self.kind = kind_
+        self.series = series_
+        self.url = url_
+        self.unknown_fields = unknown_fields
+
+
+
 class ImageMetadataFilter(Type):
     _toSchema = {'arches': 'arches', 'region': 'region', 'root_storage_type': 'root-storage-type', 'stream': 'stream', 'versions': 'versions', 'virt_type': 'virt-type'}
     _toPy = {'arches': 'arches', 'region': 'region', 'root-storage-type': 'root_storage_type', 'stream': 'stream', 'versions': 'versions', 'virt-type': 'virt_type'}
@@ -11436,6 +12197,36 @@ class ImageMetadataFilter(Type):
         self.stream = stream_
         self.versions = versions_
         self.virt_type = virt_type_
+        self.unknown_fields = unknown_fields
+
+
+
+class ImageSpec(Type):
+    _toSchema = {'arch': 'arch', 'kind': 'kind', 'series': 'series'}
+    _toPy = {'arch': 'arch', 'kind': 'kind', 'series': 'series'}
+    def __init__(self, arch=None, kind=None, series=None, **unknown_fields):
+        '''
+        arch : str
+        kind : str
+        series : str
+        '''
+        arch_ = arch
+        kind_ = kind
+        series_ = series
+
+        # Validate arguments against known Juju API types.
+        if arch_ is not None and not isinstance(arch_, (bytes, str)):
+            raise Exception("Expected arch_ to be a str, received: {}".format(type(arch_)))
+
+        if kind_ is not None and not isinstance(kind_, (bytes, str)):
+            raise Exception("Expected kind_ to be a str, received: {}".format(type(kind_)))
+
+        if series_ is not None and not isinstance(series_, (bytes, str)):
+            raise Exception("Expected series_ to be a str, received: {}".format(type(series_)))
+
+        self.arch = arch_
+        self.kind = kind_
+        self.series = series_
         self.unknown_fields = unknown_fields
 
 
@@ -11532,6 +12323,120 @@ class ImportStorageResults(Type):
             raise Exception("Expected results_ to be a Sequence, received: {}".format(type(results_)))
 
         self.results = results_
+        self.unknown_fields = unknown_fields
+
+
+
+class Info(Type):
+    _toSchema = {'channel': 'channel', 'tag': 'tag'}
+    _toPy = {'channel': 'channel', 'tag': 'tag'}
+    def __init__(self, channel=None, tag=None, **unknown_fields):
+        '''
+        channel : str
+        tag : str
+        '''
+        channel_ = channel
+        tag_ = tag
+
+        # Validate arguments against known Juju API types.
+        if channel_ is not None and not isinstance(channel_, (bytes, str)):
+            raise Exception("Expected channel_ to be a str, received: {}".format(type(channel_)))
+
+        if tag_ is not None and not isinstance(tag_, (bytes, str)):
+            raise Exception("Expected tag_ to be a str, received: {}".format(type(tag_)))
+
+        self.channel = channel_
+        self.tag = tag_
+        self.unknown_fields = unknown_fields
+
+
+
+class InfoResponse(Type):
+    _toSchema = {'bundle': 'bundle', 'channel_map': 'channel-map', 'charm': 'charm', 'description': 'description', 'id_': 'id', 'name': 'name', 'publisher': 'publisher', 'series': 'series', 'store_url': 'store-url', 'summary': 'summary', 'tags': 'tags', 'tracks': 'tracks', 'type_': 'type'}
+    _toPy = {'bundle': 'bundle', 'channel-map': 'channel_map', 'charm': 'charm', 'description': 'description', 'id': 'id_', 'name': 'name', 'publisher': 'publisher', 'series': 'series', 'store-url': 'store_url', 'summary': 'summary', 'tags': 'tags', 'tracks': 'tracks', 'type': 'type_'}
+    def __init__(self, bundle=None, channel_map=None, charm=None, description=None, id_=None, name=None, publisher=None, series=None, store_url=None, summary=None, tags=None, tracks=None, type_=None, **unknown_fields):
+        '''
+        bundle : CharmHubBundle
+        channel_map : typing.Mapping[str, ~Channel]
+        charm : CharmHubCharm
+        description : str
+        id_ : str
+        name : str
+        publisher : str
+        series : typing.Sequence[str]
+        store_url : str
+        summary : str
+        tags : typing.Sequence[str]
+        tracks : typing.Sequence[str]
+        type_ : str
+        '''
+        bundle_ = CharmHubBundle.from_json(bundle) if bundle else None
+        channel_map_ = {k: Channel.from_json(v) for k, v in (channel_map or dict()).items()}
+        charm_ = CharmHubCharm.from_json(charm) if charm else None
+        description_ = description
+        id__ = id_
+        name_ = name
+        publisher_ = publisher
+        series_ = series
+        store_url_ = store_url
+        summary_ = summary
+        tags_ = tags
+        tracks_ = tracks
+        type__ = type_
+
+        # Validate arguments against known Juju API types.
+        if bundle_ is not None and not isinstance(bundle_, (dict, CharmHubBundle)):
+            raise Exception("Expected bundle_ to be a CharmHubBundle, received: {}".format(type(bundle_)))
+
+        if channel_map_ is not None and not isinstance(channel_map_, dict):
+            raise Exception("Expected channel_map_ to be a Mapping, received: {}".format(type(channel_map_)))
+
+        if charm_ is not None and not isinstance(charm_, (dict, CharmHubCharm)):
+            raise Exception("Expected charm_ to be a CharmHubCharm, received: {}".format(type(charm_)))
+
+        if description_ is not None and not isinstance(description_, (bytes, str)):
+            raise Exception("Expected description_ to be a str, received: {}".format(type(description_)))
+
+        if id__ is not None and not isinstance(id__, (bytes, str)):
+            raise Exception("Expected id__ to be a str, received: {}".format(type(id__)))
+
+        if name_ is not None and not isinstance(name_, (bytes, str)):
+            raise Exception("Expected name_ to be a str, received: {}".format(type(name_)))
+
+        if publisher_ is not None and not isinstance(publisher_, (bytes, str)):
+            raise Exception("Expected publisher_ to be a str, received: {}".format(type(publisher_)))
+
+        if series_ is not None and not isinstance(series_, (bytes, str, list)):
+            raise Exception("Expected series_ to be a Sequence, received: {}".format(type(series_)))
+
+        if store_url_ is not None and not isinstance(store_url_, (bytes, str)):
+            raise Exception("Expected store_url_ to be a str, received: {}".format(type(store_url_)))
+
+        if summary_ is not None and not isinstance(summary_, (bytes, str)):
+            raise Exception("Expected summary_ to be a str, received: {}".format(type(summary_)))
+
+        if tags_ is not None and not isinstance(tags_, (bytes, str, list)):
+            raise Exception("Expected tags_ to be a Sequence, received: {}".format(type(tags_)))
+
+        if tracks_ is not None and not isinstance(tracks_, (bytes, str, list)):
+            raise Exception("Expected tracks_ to be a Sequence, received: {}".format(type(tracks_)))
+
+        if type__ is not None and not isinstance(type__, (bytes, str)):
+            raise Exception("Expected type__ to be a str, received: {}".format(type(type__)))
+
+        self.bundle = bundle_
+        self.channel_map = channel_map_
+        self.charm = charm_
+        self.description = description_
+        self.id_ = id__
+        self.name = name_
+        self.publisher = publisher_
+        self.series = series_
+        self.store_url = store_url_
+        self.summary = summary_
+        self.tags = tags_
+        self.tracks = tracks_
+        self.type_ = type__
         self.unknown_fields = unknown_fields
 
 
@@ -12922,6 +13827,24 @@ class ListFirewallRulesResults(Type):
 
 
 
+class ListImageResult(Type):
+    _toSchema = {'result': 'result'}
+    _toPy = {'result': 'result'}
+    def __init__(self, result=None, **unknown_fields):
+        '''
+        result : typing.Sequence[~ImageMetadata]
+        '''
+        result_ = [ImageMetadata.from_json(o) for o in result or []]
+
+        # Validate arguments against known Juju API types.
+        if result_ is not None and not isinstance(result_, (bytes, str, list)):
+            raise Exception("Expected result_ to be a Sequence, received: {}".format(type(result_)))
+
+        self.result = result_
+        self.unknown_fields = unknown_fields
+
+
+
 class ListResourcesArgs(Type):
     _toSchema = {'entities': 'entities'}
     _toPy = {'entities': 'entities'}
@@ -13007,10 +13930,11 @@ class ListSecretBackendsResults(Type):
 
 
 class ListSecretResult(Type):
-    _toSchema = {'create_time': 'create-time', 'description': 'description', 'label': 'label', 'latest_expire_time': 'latest-expire-time', 'latest_revision': 'latest-revision', 'next_rotate_time': 'next-rotate-time', 'owner_tag': 'owner-tag', 'revisions': 'revisions', 'rotate_policy': 'rotate-policy', 'update_time': 'update-time', 'uri': 'uri', 'value': 'value', 'version': 'version'}
-    _toPy = {'create-time': 'create_time', 'description': 'description', 'label': 'label', 'latest-expire-time': 'latest_expire_time', 'latest-revision': 'latest_revision', 'next-rotate-time': 'next_rotate_time', 'owner-tag': 'owner_tag', 'revisions': 'revisions', 'rotate-policy': 'rotate_policy', 'update-time': 'update_time', 'uri': 'uri', 'value': 'value', 'version': 'version'}
-    def __init__(self, create_time=None, description=None, label=None, latest_expire_time=None, latest_revision=None, next_rotate_time=None, owner_tag=None, revisions=None, rotate_policy=None, update_time=None, uri=None, value=None, version=None, **unknown_fields):
+    _toSchema = {'access': 'access', 'create_time': 'create-time', 'description': 'description', 'label': 'label', 'latest_expire_time': 'latest-expire-time', 'latest_revision': 'latest-revision', 'next_rotate_time': 'next-rotate-time', 'owner_tag': 'owner-tag', 'revisions': 'revisions', 'rotate_policy': 'rotate-policy', 'update_time': 'update-time', 'uri': 'uri', 'value': 'value', 'version': 'version'}
+    _toPy = {'access': 'access', 'create-time': 'create_time', 'description': 'description', 'label': 'label', 'latest-expire-time': 'latest_expire_time', 'latest-revision': 'latest_revision', 'next-rotate-time': 'next_rotate_time', 'owner-tag': 'owner_tag', 'revisions': 'revisions', 'rotate-policy': 'rotate_policy', 'update-time': 'update_time', 'uri': 'uri', 'value': 'value', 'version': 'version'}
+    def __init__(self, access=None, create_time=None, description=None, label=None, latest_expire_time=None, latest_revision=None, next_rotate_time=None, owner_tag=None, revisions=None, rotate_policy=None, update_time=None, uri=None, value=None, version=None, **unknown_fields):
         '''
+        access : typing.Sequence[~AccessInfo]
         create_time : str
         description : str
         label : str
@@ -13025,6 +13949,7 @@ class ListSecretResult(Type):
         value : SecretValueResult
         version : int
         '''
+        access_ = [AccessInfo.from_json(o) for o in access or []]
         create_time_ = create_time
         description_ = description
         label_ = label
@@ -13040,6 +13965,9 @@ class ListSecretResult(Type):
         version_ = version
 
         # Validate arguments against known Juju API types.
+        if access_ is not None and not isinstance(access_, (bytes, str, list)):
+            raise Exception("Expected access_ to be a Sequence, received: {}".format(type(access_)))
+
         if create_time_ is not None and not isinstance(create_time_, (bytes, str)):
             raise Exception("Expected create_time_ to be a str, received: {}".format(type(create_time_)))
 
@@ -13079,6 +14007,7 @@ class ListSecretResult(Type):
         if version_ is not None and not isinstance(version_, int):
             raise Exception("Expected version_ to be a int, received: {}".format(type(version_)))
 
+        self.access = access_
         self.create_time = create_time_
         self.description = description_
         self.label = label_
@@ -13857,6 +14786,78 @@ class MachineNetworkConfigResults(Type):
 
 
 
+class MachinePortRange(Type):
+    _toSchema = {'port_range': 'port-range', 'relation_tag': 'relation-tag', 'unit_tag': 'unit-tag'}
+    _toPy = {'port-range': 'port_range', 'relation-tag': 'relation_tag', 'unit-tag': 'unit_tag'}
+    def __init__(self, port_range=None, relation_tag=None, unit_tag=None, **unknown_fields):
+        '''
+        port_range : PortRange
+        relation_tag : str
+        unit_tag : str
+        '''
+        port_range_ = PortRange.from_json(port_range) if port_range else None
+        relation_tag_ = relation_tag
+        unit_tag_ = unit_tag
+
+        # Validate arguments against known Juju API types.
+        if port_range_ is not None and not isinstance(port_range_, (dict, PortRange)):
+            raise Exception("Expected port_range_ to be a PortRange, received: {}".format(type(port_range_)))
+
+        if relation_tag_ is not None and not isinstance(relation_tag_, (bytes, str)):
+            raise Exception("Expected relation_tag_ to be a str, received: {}".format(type(relation_tag_)))
+
+        if unit_tag_ is not None and not isinstance(unit_tag_, (bytes, str)):
+            raise Exception("Expected unit_tag_ to be a str, received: {}".format(type(unit_tag_)))
+
+        self.port_range = port_range_
+        self.relation_tag = relation_tag_
+        self.unit_tag = unit_tag_
+        self.unknown_fields = unknown_fields
+
+
+
+class MachinePortsResult(Type):
+    _toSchema = {'error': 'error', 'ports': 'ports'}
+    _toPy = {'error': 'error', 'ports': 'ports'}
+    def __init__(self, error=None, ports=None, **unknown_fields):
+        '''
+        error : Error
+        ports : typing.Sequence[~MachinePortRange]
+        '''
+        error_ = Error.from_json(error) if error else None
+        ports_ = [MachinePortRange.from_json(o) for o in ports or []]
+
+        # Validate arguments against known Juju API types.
+        if error_ is not None and not isinstance(error_, (dict, Error)):
+            raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
+
+        if ports_ is not None and not isinstance(ports_, (bytes, str, list)):
+            raise Exception("Expected ports_ to be a Sequence, received: {}".format(type(ports_)))
+
+        self.error = error_
+        self.ports = ports_
+        self.unknown_fields = unknown_fields
+
+
+
+class MachinePortsResults(Type):
+    _toSchema = {'results': 'results'}
+    _toPy = {'results': 'results'}
+    def __init__(self, results=None, **unknown_fields):
+        '''
+        results : typing.Sequence[~MachinePortsResult]
+        '''
+        results_ = [MachinePortsResult.from_json(o) for o in results or []]
+
+        # Validate arguments against known Juju API types.
+        if results_ is not None and not isinstance(results_, (bytes, str, list)):
+            raise Exception("Expected results_ to be a Sequence, received: {}".format(type(results_)))
+
+        self.results = results_
+        self.unknown_fields = unknown_fields
+
+
+
 class MachineStatus(Type):
     _toSchema = {'agent_status': 'agent-status', 'base': 'base', 'constraints': 'constraints', 'containers': 'containers', 'display_name': 'display-name', 'dns_name': 'dns-name', 'hardware': 'hardware', 'has_vote': 'has-vote', 'hostname': 'hostname', 'id_': 'id', 'instance_id': 'instance-id', 'instance_status': 'instance-status', 'ip_addresses': 'ip-addresses', 'jobs': 'jobs', 'lxd_profiles': 'lxd-profiles', 'modification_status': 'modification-status', 'network_interfaces': 'network-interfaces', 'primary_controller_machine': 'primary-controller-machine', 'wants_vote': 'wants-vote'}
     _toPy = {'agent-status': 'agent_status', 'base': 'base', 'constraints': 'constraints', 'containers': 'containers', 'display-name': 'display_name', 'dns-name': 'dns_name', 'hardware': 'hardware', 'has-vote': 'has_vote', 'hostname': 'hostname', 'id': 'id_', 'instance-id': 'instance_id', 'instance-status': 'instance_status', 'ip-addresses': 'ip_addresses', 'jobs': 'jobs', 'lxd-profiles': 'lxd_profiles', 'modification-status': 'modification_status', 'network-interfaces': 'network_interfaces', 'primary-controller-machine': 'primary_controller_machine', 'wants-vote': 'wants_vote'}
@@ -14530,18 +15531,20 @@ class MetricResults(Type):
 
 
 class MigrationModelInfo(Type):
-    _toSchema = {'agent_version': 'agent-version', 'controller_agent_version': 'controller-agent-version', 'name': 'name', 'owner_tag': 'owner-tag', 'uuid': 'uuid'}
-    _toPy = {'agent-version': 'agent_version', 'controller-agent-version': 'controller_agent_version', 'name': 'name', 'owner-tag': 'owner_tag', 'uuid': 'uuid'}
-    def __init__(self, agent_version=None, controller_agent_version=None, name=None, owner_tag=None, uuid=None, **unknown_fields):
+    _toSchema = {'agent_version': 'agent-version', 'controller_agent_version': 'controller-agent-version', 'facade_versions': 'facade-versions', 'name': 'name', 'owner_tag': 'owner-tag', 'uuid': 'uuid'}
+    _toPy = {'agent-version': 'agent_version', 'controller-agent-version': 'controller_agent_version', 'facade-versions': 'facade_versions', 'name': 'name', 'owner-tag': 'owner_tag', 'uuid': 'uuid'}
+    def __init__(self, agent_version=None, controller_agent_version=None, facade_versions=None, name=None, owner_tag=None, uuid=None, **unknown_fields):
         '''
         agent_version : Number
         controller_agent_version : Number
+        facade_versions : typing.Mapping[str, typing.Sequence[int]]
         name : str
         owner_tag : str
         uuid : str
         '''
         agent_version_ = Number.from_json(agent_version) if agent_version else None
         controller_agent_version_ = Number.from_json(controller_agent_version) if controller_agent_version else None
+        facade_versions_ = facade_versions
         name_ = name
         owner_tag_ = owner_tag
         uuid_ = uuid
@@ -14552,6 +15555,9 @@ class MigrationModelInfo(Type):
 
         if controller_agent_version_ is not None and not isinstance(controller_agent_version_, (dict, Number)):
             raise Exception("Expected controller_agent_version_ to be a Number, received: {}".format(type(controller_agent_version_)))
+
+        if facade_versions_ is not None and not isinstance(facade_versions_, dict):
+            raise Exception("Expected facade_versions_ to be a Mapping, received: {}".format(type(facade_versions_)))
 
         if name_ is not None and not isinstance(name_, (bytes, str)):
             raise Exception("Expected name_ to be a str, received: {}".format(type(name_)))
@@ -14564,6 +15570,7 @@ class MigrationModelInfo(Type):
 
         self.agent_version = agent_version_
         self.controller_agent_version = controller_agent_version_
+        self.facade_versions = facade_versions_
         self.name = name_
         self.owner_tag = owner_tag_
         self.uuid = uuid_
@@ -18272,6 +19279,42 @@ class Placement(Type):
 
 
 
+class Platform(Type):
+    _toSchema = {'architecture': 'architecture', 'channel': 'channel', 'os': 'os', 'series': 'series'}
+    _toPy = {'architecture': 'architecture', 'channel': 'channel', 'os': 'os', 'series': 'series'}
+    def __init__(self, architecture=None, channel=None, os=None, series=None, **unknown_fields):
+        '''
+        architecture : str
+        channel : str
+        os : str
+        series : str
+        '''
+        architecture_ = architecture
+        channel_ = channel
+        os_ = os
+        series_ = series
+
+        # Validate arguments against known Juju API types.
+        if architecture_ is not None and not isinstance(architecture_, (bytes, str)):
+            raise Exception("Expected architecture_ to be a str, received: {}".format(type(architecture_)))
+
+        if channel_ is not None and not isinstance(channel_, (bytes, str)):
+            raise Exception("Expected channel_ to be a str, received: {}".format(type(channel_)))
+
+        if os_ is not None and not isinstance(os_, (bytes, str)):
+            raise Exception("Expected os_ to be a str, received: {}".format(type(os_)))
+
+        if series_ is not None and not isinstance(series_, (bytes, str)):
+            raise Exception("Expected series_ to be a str, received: {}".format(type(series_)))
+
+        self.architecture = architecture_
+        self.channel = channel_
+        self.os = os_
+        self.series = series_
+        self.unknown_fields = unknown_fields
+
+
+
 class PodSpec(Type):
     _toSchema = {'spec': 'spec', 'tag': 'tag'}
     _toPy = {'spec': 'spec', 'tag': 'tag'}
@@ -18340,6 +19383,42 @@ class PrechecksArgs(Type):
             raise Exception("Expected target_controller_version_ to be a Number, received: {}".format(type(target_controller_version_)))
 
         self.target_controller_version = target_controller_version_
+        self.unknown_fields = unknown_fields
+
+
+
+class PrivateAddress(Type):
+    _toSchema = {'target': 'target'}
+    _toPy = {'target': 'target'}
+    def __init__(self, target=None, **unknown_fields):
+        '''
+        target : str
+        '''
+        target_ = target
+
+        # Validate arguments against known Juju API types.
+        if target_ is not None and not isinstance(target_, (bytes, str)):
+            raise Exception("Expected target_ to be a str, received: {}".format(type(target_)))
+
+        self.target = target_
+        self.unknown_fields = unknown_fields
+
+
+
+class PrivateAddressResults(Type):
+    _toSchema = {'private_address': 'private-address'}
+    _toPy = {'private-address': 'private_address'}
+    def __init__(self, private_address=None, **unknown_fields):
+        '''
+        private_address : str
+        '''
+        private_address_ = private_address
+
+        # Validate arguments against known Juju API types.
+        if private_address_ is not None and not isinstance(private_address_, (bytes, str)):
+            raise Exception("Expected private_address_ to be a str, received: {}".format(type(private_address_)))
+
+        self.private_address = private_address_
         self.unknown_fields = unknown_fields
 
 
@@ -18608,6 +19687,102 @@ class ProvisioningInfo(Type):
 
 
 
+class ProvisioningInfoBase(Type):
+    _toSchema = {'base': 'base', 'charm_lxd_profiles': 'charm-lxd-profiles', 'cloudinit_userdata': 'cloudinit-userdata', 'constraints': 'constraints', 'controller_config': 'controller-config', 'endpoint_bindings': 'endpoint-bindings', 'image_metadata': 'image-metadata', 'jobs': 'jobs', 'placement': 'placement', 'root_disk': 'root-disk', 'series': 'series', 'tags': 'tags', 'volume_attachments': 'volume-attachments', 'volumes': 'volumes'}
+    _toPy = {'base': 'base', 'charm-lxd-profiles': 'charm_lxd_profiles', 'cloudinit-userdata': 'cloudinit_userdata', 'constraints': 'constraints', 'controller-config': 'controller_config', 'endpoint-bindings': 'endpoint_bindings', 'image-metadata': 'image_metadata', 'jobs': 'jobs', 'placement': 'placement', 'root-disk': 'root_disk', 'series': 'series', 'tags': 'tags', 'volume-attachments': 'volume_attachments', 'volumes': 'volumes'}
+    def __init__(self, base=None, charm_lxd_profiles=None, cloudinit_userdata=None, constraints=None, controller_config=None, endpoint_bindings=None, image_metadata=None, jobs=None, placement=None, root_disk=None, series=None, tags=None, volume_attachments=None, volumes=None, **unknown_fields):
+        '''
+        base : Base
+        charm_lxd_profiles : typing.Sequence[str]
+        cloudinit_userdata : typing.Mapping[str, typing.Any]
+        constraints : Value
+        controller_config : typing.Mapping[str, typing.Any]
+        endpoint_bindings : typing.Mapping[str, str]
+        image_metadata : typing.Sequence[~CloudImageMetadata]
+        jobs : typing.Sequence[str]
+        placement : str
+        root_disk : VolumeParams
+        series : str
+        tags : typing.Mapping[str, str]
+        volume_attachments : typing.Sequence[~VolumeAttachmentParams]
+        volumes : typing.Sequence[~VolumeParams]
+        '''
+        base_ = Base.from_json(base) if base else None
+        charm_lxd_profiles_ = charm_lxd_profiles
+        cloudinit_userdata_ = cloudinit_userdata
+        constraints_ = Value.from_json(constraints) if constraints else None
+        controller_config_ = controller_config
+        endpoint_bindings_ = endpoint_bindings
+        image_metadata_ = [CloudImageMetadata.from_json(o) for o in image_metadata or []]
+        jobs_ = jobs
+        placement_ = placement
+        root_disk_ = VolumeParams.from_json(root_disk) if root_disk else None
+        series_ = series
+        tags_ = tags
+        volume_attachments_ = [VolumeAttachmentParams.from_json(o) for o in volume_attachments or []]
+        volumes_ = [VolumeParams.from_json(o) for o in volumes or []]
+
+        # Validate arguments against known Juju API types.
+        if base_ is not None and not isinstance(base_, (dict, Base)):
+            raise Exception("Expected base_ to be a Base, received: {}".format(type(base_)))
+
+        if charm_lxd_profiles_ is not None and not isinstance(charm_lxd_profiles_, (bytes, str, list)):
+            raise Exception("Expected charm_lxd_profiles_ to be a Sequence, received: {}".format(type(charm_lxd_profiles_)))
+
+        if cloudinit_userdata_ is not None and not isinstance(cloudinit_userdata_, dict):
+            raise Exception("Expected cloudinit_userdata_ to be a Mapping, received: {}".format(type(cloudinit_userdata_)))
+
+        if constraints_ is not None and not isinstance(constraints_, (dict, Value)):
+            raise Exception("Expected constraints_ to be a Value, received: {}".format(type(constraints_)))
+
+        if controller_config_ is not None and not isinstance(controller_config_, dict):
+            raise Exception("Expected controller_config_ to be a Mapping, received: {}".format(type(controller_config_)))
+
+        if endpoint_bindings_ is not None and not isinstance(endpoint_bindings_, dict):
+            raise Exception("Expected endpoint_bindings_ to be a Mapping, received: {}".format(type(endpoint_bindings_)))
+
+        if image_metadata_ is not None and not isinstance(image_metadata_, (bytes, str, list)):
+            raise Exception("Expected image_metadata_ to be a Sequence, received: {}".format(type(image_metadata_)))
+
+        if jobs_ is not None and not isinstance(jobs_, (bytes, str, list)):
+            raise Exception("Expected jobs_ to be a Sequence, received: {}".format(type(jobs_)))
+
+        if placement_ is not None and not isinstance(placement_, (bytes, str)):
+            raise Exception("Expected placement_ to be a str, received: {}".format(type(placement_)))
+
+        if root_disk_ is not None and not isinstance(root_disk_, (dict, VolumeParams)):
+            raise Exception("Expected root_disk_ to be a VolumeParams, received: {}".format(type(root_disk_)))
+
+        if series_ is not None and not isinstance(series_, (bytes, str)):
+            raise Exception("Expected series_ to be a str, received: {}".format(type(series_)))
+
+        if tags_ is not None and not isinstance(tags_, dict):
+            raise Exception("Expected tags_ to be a Mapping, received: {}".format(type(tags_)))
+
+        if volume_attachments_ is not None and not isinstance(volume_attachments_, (bytes, str, list)):
+            raise Exception("Expected volume_attachments_ to be a Sequence, received: {}".format(type(volume_attachments_)))
+
+        if volumes_ is not None and not isinstance(volumes_, (bytes, str, list)):
+            raise Exception("Expected volumes_ to be a Sequence, received: {}".format(type(volumes_)))
+
+        self.base = base_
+        self.charm_lxd_profiles = charm_lxd_profiles_
+        self.cloudinit_userdata = cloudinit_userdata_
+        self.constraints = constraints_
+        self.controller_config = controller_config_
+        self.endpoint_bindings = endpoint_bindings_
+        self.image_metadata = image_metadata_
+        self.jobs = jobs_
+        self.placement = placement_
+        self.root_disk = root_disk_
+        self.series = series_
+        self.tags = tags_
+        self.volume_attachments = volume_attachments_
+        self.volumes = volumes_
+        self.unknown_fields = unknown_fields
+
+
+
 class ProvisioningInfoResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
@@ -18632,6 +19807,30 @@ class ProvisioningInfoResult(Type):
 
 
 
+class ProvisioningInfoResultV10(Type):
+    _toSchema = {'error': 'error', 'result': 'result'}
+    _toPy = {'error': 'error', 'result': 'result'}
+    def __init__(self, error=None, result=None, **unknown_fields):
+        '''
+        error : Error
+        result : ProvisioningInfoV10
+        '''
+        error_ = Error.from_json(error) if error else None
+        result_ = ProvisioningInfoV10.from_json(result) if result else None
+
+        # Validate arguments against known Juju API types.
+        if error_ is not None and not isinstance(error_, (dict, Error)):
+            raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
+
+        if result_ is not None and not isinstance(result_, (dict, ProvisioningInfoV10)):
+            raise Exception("Expected result_ to be a ProvisioningInfoV10, received: {}".format(type(result_)))
+
+        self.error = error_
+        self.result = result_
+        self.unknown_fields = unknown_fields
+
+
+
 class ProvisioningInfoResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
@@ -18646,6 +19845,144 @@ class ProvisioningInfoResults(Type):
             raise Exception("Expected results_ to be a Sequence, received: {}".format(type(results_)))
 
         self.results = results_
+        self.unknown_fields = unknown_fields
+
+
+
+class ProvisioningInfoResultsV10(Type):
+    _toSchema = {'results': 'results'}
+    _toPy = {'results': 'results'}
+    def __init__(self, results=None, **unknown_fields):
+        '''
+        results : typing.Sequence[~ProvisioningInfoResultV10]
+        '''
+        results_ = [ProvisioningInfoResultV10.from_json(o) for o in results or []]
+
+        # Validate arguments against known Juju API types.
+        if results_ is not None and not isinstance(results_, (bytes, str, list)):
+            raise Exception("Expected results_ to be a Sequence, received: {}".format(type(results_)))
+
+        self.results = results_
+        self.unknown_fields = unknown_fields
+
+
+
+class ProvisioningInfoV10(Type):
+    _toSchema = {'base': 'base', 'charm_lxd_profiles': 'charm-lxd-profiles', 'cloudinit_userdata': 'cloudinit-userdata', 'constraints': 'constraints', 'controller_config': 'controller-config', 'endpoint_bindings': 'endpoint-bindings', 'image_metadata': 'image-metadata', 'jobs': 'jobs', 'placement': 'placement', 'provisioninginfobase': 'ProvisioningInfoBase', 'provisioningnetworktopology': 'ProvisioningNetworkTopology', 'root_disk': 'root-disk', 'series': 'series', 'space_subnets': 'space-subnets', 'subnet_zones': 'subnet-zones', 'tags': 'tags', 'volume_attachments': 'volume-attachments', 'volumes': 'volumes'}
+    _toPy = {'ProvisioningInfoBase': 'provisioninginfobase', 'ProvisioningNetworkTopology': 'provisioningnetworktopology', 'base': 'base', 'charm-lxd-profiles': 'charm_lxd_profiles', 'cloudinit-userdata': 'cloudinit_userdata', 'constraints': 'constraints', 'controller-config': 'controller_config', 'endpoint-bindings': 'endpoint_bindings', 'image-metadata': 'image_metadata', 'jobs': 'jobs', 'placement': 'placement', 'root-disk': 'root_disk', 'series': 'series', 'space-subnets': 'space_subnets', 'subnet-zones': 'subnet_zones', 'tags': 'tags', 'volume-attachments': 'volume_attachments', 'volumes': 'volumes'}
+    def __init__(self, provisioninginfobase=None, provisioningnetworktopology=None, base=None, charm_lxd_profiles=None, cloudinit_userdata=None, constraints=None, controller_config=None, endpoint_bindings=None, image_metadata=None, jobs=None, placement=None, root_disk=None, series=None, space_subnets=None, subnet_zones=None, tags=None, volume_attachments=None, volumes=None, **unknown_fields):
+        '''
+        provisioninginfobase : ProvisioningInfoBase
+        provisioningnetworktopology : ProvisioningNetworkTopology
+        base : Base
+        charm_lxd_profiles : typing.Sequence[str]
+        cloudinit_userdata : typing.Mapping[str, typing.Any]
+        constraints : Value
+        controller_config : typing.Mapping[str, typing.Any]
+        endpoint_bindings : typing.Mapping[str, str]
+        image_metadata : typing.Sequence[~CloudImageMetadata]
+        jobs : typing.Sequence[str]
+        placement : str
+        root_disk : VolumeParams
+        series : str
+        space_subnets : typing.Mapping[str, typing.Sequence[str]]
+        subnet_zones : typing.Mapping[str, typing.Sequence[str]]
+        tags : typing.Mapping[str, str]
+        volume_attachments : typing.Sequence[~VolumeAttachmentParams]
+        volumes : typing.Sequence[~VolumeParams]
+        '''
+        provisioninginfobase_ = ProvisioningInfoBase.from_json(provisioninginfobase) if provisioninginfobase else None
+        provisioningnetworktopology_ = ProvisioningNetworkTopology.from_json(provisioningnetworktopology) if provisioningnetworktopology else None
+        base_ = Base.from_json(base) if base else None
+        charm_lxd_profiles_ = charm_lxd_profiles
+        cloudinit_userdata_ = cloudinit_userdata
+        constraints_ = Value.from_json(constraints) if constraints else None
+        controller_config_ = controller_config
+        endpoint_bindings_ = endpoint_bindings
+        image_metadata_ = [CloudImageMetadata.from_json(o) for o in image_metadata or []]
+        jobs_ = jobs
+        placement_ = placement
+        root_disk_ = VolumeParams.from_json(root_disk) if root_disk else None
+        series_ = series
+        space_subnets_ = space_subnets
+        subnet_zones_ = subnet_zones
+        tags_ = tags
+        volume_attachments_ = [VolumeAttachmentParams.from_json(o) for o in volume_attachments or []]
+        volumes_ = [VolumeParams.from_json(o) for o in volumes or []]
+
+        # Validate arguments against known Juju API types.
+        if provisioninginfobase_ is not None and not isinstance(provisioninginfobase_, (dict, ProvisioningInfoBase)):
+            raise Exception("Expected provisioninginfobase_ to be a ProvisioningInfoBase, received: {}".format(type(provisioninginfobase_)))
+
+        if provisioningnetworktopology_ is not None and not isinstance(provisioningnetworktopology_, (dict, ProvisioningNetworkTopology)):
+            raise Exception("Expected provisioningnetworktopology_ to be a ProvisioningNetworkTopology, received: {}".format(type(provisioningnetworktopology_)))
+
+        if base_ is not None and not isinstance(base_, (dict, Base)):
+            raise Exception("Expected base_ to be a Base, received: {}".format(type(base_)))
+
+        if charm_lxd_profiles_ is not None and not isinstance(charm_lxd_profiles_, (bytes, str, list)):
+            raise Exception("Expected charm_lxd_profiles_ to be a Sequence, received: {}".format(type(charm_lxd_profiles_)))
+
+        if cloudinit_userdata_ is not None and not isinstance(cloudinit_userdata_, dict):
+            raise Exception("Expected cloudinit_userdata_ to be a Mapping, received: {}".format(type(cloudinit_userdata_)))
+
+        if constraints_ is not None and not isinstance(constraints_, (dict, Value)):
+            raise Exception("Expected constraints_ to be a Value, received: {}".format(type(constraints_)))
+
+        if controller_config_ is not None and not isinstance(controller_config_, dict):
+            raise Exception("Expected controller_config_ to be a Mapping, received: {}".format(type(controller_config_)))
+
+        if endpoint_bindings_ is not None and not isinstance(endpoint_bindings_, dict):
+            raise Exception("Expected endpoint_bindings_ to be a Mapping, received: {}".format(type(endpoint_bindings_)))
+
+        if image_metadata_ is not None and not isinstance(image_metadata_, (bytes, str, list)):
+            raise Exception("Expected image_metadata_ to be a Sequence, received: {}".format(type(image_metadata_)))
+
+        if jobs_ is not None and not isinstance(jobs_, (bytes, str, list)):
+            raise Exception("Expected jobs_ to be a Sequence, received: {}".format(type(jobs_)))
+
+        if placement_ is not None and not isinstance(placement_, (bytes, str)):
+            raise Exception("Expected placement_ to be a str, received: {}".format(type(placement_)))
+
+        if root_disk_ is not None and not isinstance(root_disk_, (dict, VolumeParams)):
+            raise Exception("Expected root_disk_ to be a VolumeParams, received: {}".format(type(root_disk_)))
+
+        if series_ is not None and not isinstance(series_, (bytes, str)):
+            raise Exception("Expected series_ to be a str, received: {}".format(type(series_)))
+
+        if space_subnets_ is not None and not isinstance(space_subnets_, dict):
+            raise Exception("Expected space_subnets_ to be a Mapping, received: {}".format(type(space_subnets_)))
+
+        if subnet_zones_ is not None and not isinstance(subnet_zones_, dict):
+            raise Exception("Expected subnet_zones_ to be a Mapping, received: {}".format(type(subnet_zones_)))
+
+        if tags_ is not None and not isinstance(tags_, dict):
+            raise Exception("Expected tags_ to be a Mapping, received: {}".format(type(tags_)))
+
+        if volume_attachments_ is not None and not isinstance(volume_attachments_, (bytes, str, list)):
+            raise Exception("Expected volume_attachments_ to be a Sequence, received: {}".format(type(volume_attachments_)))
+
+        if volumes_ is not None and not isinstance(volumes_, (bytes, str, list)):
+            raise Exception("Expected volumes_ to be a Sequence, received: {}".format(type(volumes_)))
+
+        self.provisioninginfobase = provisioninginfobase_
+        self.provisioningnetworktopology = provisioningnetworktopology_
+        self.base = base_
+        self.charm_lxd_profiles = charm_lxd_profiles_
+        self.cloudinit_userdata = cloudinit_userdata_
+        self.constraints = constraints_
+        self.controller_config = controller_config_
+        self.endpoint_bindings = endpoint_bindings_
+        self.image_metadata = image_metadata_
+        self.jobs = jobs_
+        self.placement = placement_
+        self.root_disk = root_disk_
+        self.series = series_
+        self.space_subnets = space_subnets_
+        self.subnet_zones = subnet_zones_
+        self.tags = tags_
+        self.volume_attachments = volume_attachments_
+        self.volumes = volumes_
         self.unknown_fields = unknown_fields
 
 
@@ -18868,6 +20205,102 @@ class ProxyConfigResults(Type):
             raise Exception("Expected results_ to be a Sequence, received: {}".format(type(results_)))
 
         self.results = results_
+        self.unknown_fields = unknown_fields
+
+
+
+class PublicAddress(Type):
+    _toSchema = {'target': 'target'}
+    _toPy = {'target': 'target'}
+    def __init__(self, target=None, **unknown_fields):
+        '''
+        target : str
+        '''
+        target_ = target
+
+        # Validate arguments against known Juju API types.
+        if target_ is not None and not isinstance(target_, (bytes, str)):
+            raise Exception("Expected target_ to be a str, received: {}".format(type(target_)))
+
+        self.target = target_
+        self.unknown_fields = unknown_fields
+
+
+
+class PublicAddressResults(Type):
+    _toSchema = {'public_address': 'public-address'}
+    _toPy = {'public-address': 'public_address'}
+    def __init__(self, public_address=None, **unknown_fields):
+        '''
+        public_address : str
+        '''
+        public_address_ = public_address
+
+        # Validate arguments against known Juju API types.
+        if public_address_ is not None and not isinstance(public_address_, (bytes, str)):
+            raise Exception("Expected public_address_ to be a str, received: {}".format(type(public_address_)))
+
+        self.public_address = public_address_
+        self.unknown_fields = unknown_fields
+
+
+
+class Query(Type):
+    _toSchema = {'category': 'category', 'channel': 'channel', 'platforms': 'platforms', 'publisher': 'publisher', 'query': 'query', 'relation_provides': 'relation-provides', 'relation_requires': 'relation-requires', 'type_': 'type'}
+    _toPy = {'category': 'category', 'channel': 'channel', 'platforms': 'platforms', 'publisher': 'publisher', 'query': 'query', 'relation-provides': 'relation_provides', 'relation-requires': 'relation_requires', 'type': 'type_'}
+    def __init__(self, category=None, channel=None, platforms=None, publisher=None, query=None, relation_provides=None, relation_requires=None, type_=None, **unknown_fields):
+        '''
+        category : str
+        channel : str
+        platforms : str
+        publisher : str
+        query : str
+        relation_provides : str
+        relation_requires : str
+        type_ : str
+        '''
+        category_ = category
+        channel_ = channel
+        platforms_ = platforms
+        publisher_ = publisher
+        query_ = query
+        relation_provides_ = relation_provides
+        relation_requires_ = relation_requires
+        type__ = type_
+
+        # Validate arguments against known Juju API types.
+        if category_ is not None and not isinstance(category_, (bytes, str)):
+            raise Exception("Expected category_ to be a str, received: {}".format(type(category_)))
+
+        if channel_ is not None and not isinstance(channel_, (bytes, str)):
+            raise Exception("Expected channel_ to be a str, received: {}".format(type(channel_)))
+
+        if platforms_ is not None and not isinstance(platforms_, (bytes, str)):
+            raise Exception("Expected platforms_ to be a str, received: {}".format(type(platforms_)))
+
+        if publisher_ is not None and not isinstance(publisher_, (bytes, str)):
+            raise Exception("Expected publisher_ to be a str, received: {}".format(type(publisher_)))
+
+        if query_ is not None and not isinstance(query_, (bytes, str)):
+            raise Exception("Expected query_ to be a str, received: {}".format(type(query_)))
+
+        if relation_provides_ is not None and not isinstance(relation_provides_, (bytes, str)):
+            raise Exception("Expected relation_provides_ to be a str, received: {}".format(type(relation_provides_)))
+
+        if relation_requires_ is not None and not isinstance(relation_requires_, (bytes, str)):
+            raise Exception("Expected relation_requires_ to be a str, received: {}".format(type(relation_requires_)))
+
+        if type__ is not None and not isinstance(type__, (bytes, str)):
+            raise Exception("Expected type__ to be a str, received: {}".format(type(type__)))
+
+        self.category = category_
+        self.channel = channel_
+        self.platforms = platforms_
+        self.publisher = publisher_
+        self.query = query_
+        self.relation_provides = relation_provides_
+        self.relation_requires = relation_requires_
+        self.type_ = type__
         self.unknown_fields = unknown_fields
 
 
@@ -19723,6 +21156,24 @@ class RelationUnitsChange(Type):
         self.app_changed = app_changed_
         self.changed = changed_
         self.departed = departed_
+        self.unknown_fields = unknown_fields
+
+
+
+class RelationUnitsSettings(Type):
+    _toSchema = {'relation_units': 'relation-units'}
+    _toPy = {'relation-units': 'relation_units'}
+    def __init__(self, relation_units=None, **unknown_fields):
+        '''
+        relation_units : typing.Sequence[~RelationUnitSettings]
+        '''
+        relation_units_ = [RelationUnitSettings.from_json(o) for o in relation_units or []]
+
+        # Validate arguments against known Juju API types.
+        if relation_units_ is not None and not isinstance(relation_units_, (bytes, str, list)):
+            raise Exception("Expected relation_units_ to be a Sequence, received: {}".format(type(relation_units_)))
+
+        self.relation_units = relation_units_
         self.unknown_fields = unknown_fields
 
 
@@ -20921,6 +22372,48 @@ class RenameSpacesParams(Type):
 
 
 
+class ResolveCharmResult(Type):
+    _toSchema = {'error': 'error', 'url': 'url'}
+    _toPy = {'error': 'error', 'url': 'url'}
+    def __init__(self, error=None, url=None, **unknown_fields):
+        '''
+        error : str
+        url : str
+        '''
+        error_ = error
+        url_ = url
+
+        # Validate arguments against known Juju API types.
+        if error_ is not None and not isinstance(error_, (bytes, str)):
+            raise Exception("Expected error_ to be a str, received: {}".format(type(error_)))
+
+        if url_ is not None and not isinstance(url_, (bytes, str)):
+            raise Exception("Expected url_ to be a str, received: {}".format(type(url_)))
+
+        self.error = error_
+        self.url = url_
+        self.unknown_fields = unknown_fields
+
+
+
+class ResolveCharmResults(Type):
+    _toSchema = {'urls': 'urls'}
+    _toPy = {'urls': 'urls'}
+    def __init__(self, urls=None, **unknown_fields):
+        '''
+        urls : typing.Sequence[~ResolveCharmResult]
+        '''
+        urls_ = [ResolveCharmResult.from_json(o) for o in urls or []]
+
+        # Validate arguments against known Juju API types.
+        if urls_ is not None and not isinstance(urls_, (bytes, str, list)):
+            raise Exception("Expected urls_ to be a Sequence, received: {}".format(type(urls_)))
+
+        self.urls = urls_
+        self.unknown_fields = unknown_fields
+
+
+
 class ResolveCharmWithChannel(Type):
     _toSchema = {'charm_origin': 'charm-origin', 'reference': 'reference', 'switch_charm': 'switch-charm'}
     _toPy = {'charm-origin': 'charm_origin', 'reference': 'reference', 'switch-charm': 'switch_charm'}
@@ -21005,6 +22498,24 @@ class ResolveCharmWithChannelResults(Type):
 
 
 
+class ResolveCharms(Type):
+    _toSchema = {'references': 'references'}
+    _toPy = {'references': 'references'}
+    def __init__(self, references=None, **unknown_fields):
+        '''
+        references : typing.Sequence[str]
+        '''
+        references_ = references
+
+        # Validate arguments against known Juju API types.
+        if references_ is not None and not isinstance(references_, (bytes, str, list)):
+            raise Exception("Expected references_ to be a Sequence, received: {}".format(type(references_)))
+
+        self.references = references_
+        self.unknown_fields = unknown_fields
+
+
+
 class ResolveCharmsWithChannel(Type):
     _toSchema = {'macaroon': 'macaroon', 'resolve': 'resolve'}
     _toPy = {'macaroon': 'macaroon', 'resolve': 'resolve'}
@@ -21025,6 +22536,30 @@ class ResolveCharmsWithChannel(Type):
 
         self.macaroon = macaroon_
         self.resolve = resolve_
+        self.unknown_fields = unknown_fields
+
+
+
+class Resolved(Type):
+    _toSchema = {'retry': 'retry', 'unit_name': 'unit-name'}
+    _toPy = {'retry': 'retry', 'unit-name': 'unit_name'}
+    def __init__(self, retry=None, unit_name=None, **unknown_fields):
+        '''
+        retry : bool
+        unit_name : str
+        '''
+        retry_ = retry
+        unit_name_ = unit_name
+
+        # Validate arguments against known Juju API types.
+        if retry_ is not None and not isinstance(retry_, bool):
+            raise Exception("Expected retry_ to be a bool, received: {}".format(type(retry_)))
+
+        if unit_name_ is not None and not isinstance(unit_name_, (bytes, str)):
+            raise Exception("Expected unit_name_ to be a str, received: {}".format(type(unit_name_)))
+
+        self.retry = retry_
+        self.unit_name = unit_name_
         self.unknown_fields = unknown_fields
 
 
@@ -21223,6 +22758,24 @@ class ResourcesResults(Type):
             raise Exception("Expected results_ to be a Sequence, received: {}".format(type(results_)))
 
         self.results = results_
+        self.unknown_fields = unknown_fields
+
+
+
+class RestoreArgs(Type):
+    _toSchema = {'backup_id': 'backup-id'}
+    _toPy = {'backup-id': 'backup_id'}
+    def __init__(self, backup_id=None, **unknown_fields):
+        '''
+        backup_id : str
+        '''
+        backup_id_ = backup_id
+
+        # Validate arguments against known Juju API types.
+        if backup_id_ is not None and not isinstance(backup_id_, (bytes, str)):
+            raise Exception("Expected backup_id_ to be a str, received: {}".format(type(backup_id_)))
+
+        self.backup_id = backup_id_
         self.unknown_fields = unknown_fields
 
 
@@ -22337,6 +23890,90 @@ class SecretRotatedArgs(Type):
 
 
 
+class SecretRotationChange(Type):
+    _toSchema = {'last_rotate_time': 'last-rotate-time', 'rotate_interval': 'rotate-interval', 'secret_id': 'secret-id', 'url': 'url'}
+    _toPy = {'last-rotate-time': 'last_rotate_time', 'rotate-interval': 'rotate_interval', 'secret-id': 'secret_id', 'url': 'url'}
+    def __init__(self, last_rotate_time=None, rotate_interval=None, secret_id=None, url=None, **unknown_fields):
+        '''
+        last_rotate_time : str
+        rotate_interval : int
+        secret_id : int
+        url : str
+        '''
+        last_rotate_time_ = last_rotate_time
+        rotate_interval_ = rotate_interval
+        secret_id_ = secret_id
+        url_ = url
+
+        # Validate arguments against known Juju API types.
+        if last_rotate_time_ is not None and not isinstance(last_rotate_time_, (bytes, str)):
+            raise Exception("Expected last_rotate_time_ to be a str, received: {}".format(type(last_rotate_time_)))
+
+        if rotate_interval_ is not None and not isinstance(rotate_interval_, int):
+            raise Exception("Expected rotate_interval_ to be a int, received: {}".format(type(rotate_interval_)))
+
+        if secret_id_ is not None and not isinstance(secret_id_, int):
+            raise Exception("Expected secret_id_ to be a int, received: {}".format(type(secret_id_)))
+
+        if url_ is not None and not isinstance(url_, (bytes, str)):
+            raise Exception("Expected url_ to be a str, received: {}".format(type(url_)))
+
+        self.last_rotate_time = last_rotate_time_
+        self.rotate_interval = rotate_interval_
+        self.secret_id = secret_id_
+        self.url = url_
+        self.unknown_fields = unknown_fields
+
+
+
+class SecretRotationWatchResult(Type):
+    _toSchema = {'changes': 'changes', 'error': 'error', 'watcher_id': 'watcher-id'}
+    _toPy = {'changes': 'changes', 'error': 'error', 'watcher-id': 'watcher_id'}
+    def __init__(self, changes=None, error=None, watcher_id=None, **unknown_fields):
+        '''
+        changes : typing.Sequence[~SecretRotationChange]
+        error : Error
+        watcher_id : str
+        '''
+        changes_ = [SecretRotationChange.from_json(o) for o in changes or []]
+        error_ = Error.from_json(error) if error else None
+        watcher_id_ = watcher_id
+
+        # Validate arguments against known Juju API types.
+        if changes_ is not None and not isinstance(changes_, (bytes, str, list)):
+            raise Exception("Expected changes_ to be a Sequence, received: {}".format(type(changes_)))
+
+        if error_ is not None and not isinstance(error_, (dict, Error)):
+            raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
+
+        if watcher_id_ is not None and not isinstance(watcher_id_, (bytes, str)):
+            raise Exception("Expected watcher_id_ to be a str, received: {}".format(type(watcher_id_)))
+
+        self.changes = changes_
+        self.error = error_
+        self.watcher_id = watcher_id_
+        self.unknown_fields = unknown_fields
+
+
+
+class SecretRotationWatchResults(Type):
+    _toSchema = {'results': 'results'}
+    _toPy = {'results': 'results'}
+    def __init__(self, results=None, **unknown_fields):
+        '''
+        results : typing.Sequence[~SecretRotationWatchResult]
+        '''
+        results_ = [SecretRotationWatchResult.from_json(o) for o in results or []]
+
+        # Validate arguments against known Juju API types.
+        if results_ is not None and not isinstance(results_, (bytes, str, list)):
+            raise Exception("Expected results_ to be a Sequence, received: {}".format(type(results_)))
+
+        self.results = results_
+        self.unknown_fields = unknown_fields
+
+
+
 class SecretTriggerChange(Type):
     _toSchema = {'next_trigger_time': 'next-trigger-time', 'revision': 'revision', 'uri': 'uri'}
     _toPy = {'next-trigger-time': 'next_trigger_time', 'revision': 'revision', 'uri': 'uri'}
@@ -22801,6 +24438,36 @@ class SetMigrationStatusMessageArgs(Type):
             raise Exception("Expected message_ to be a str, received: {}".format(type(message_)))
 
         self.message = message_
+        self.unknown_fields = unknown_fields
+
+
+
+class SetModelAgentVersion(Type):
+    _toSchema = {'agent_stream': 'agent-stream', 'force': 'force', 'version': 'version'}
+    _toPy = {'agent-stream': 'agent_stream', 'force': 'force', 'version': 'version'}
+    def __init__(self, agent_stream=None, force=None, version=None, **unknown_fields):
+        '''
+        agent_stream : str
+        force : bool
+        version : Number
+        '''
+        agent_stream_ = agent_stream
+        force_ = force
+        version_ = Number.from_json(version) if version else None
+
+        # Validate arguments against known Juju API types.
+        if agent_stream_ is not None and not isinstance(agent_stream_, (bytes, str)):
+            raise Exception("Expected agent_stream_ to be a str, received: {}".format(type(agent_stream_)))
+
+        if force_ is not None and not isinstance(force_, bool):
+            raise Exception("Expected force_ to be a bool, received: {}".format(type(force_)))
+
+        if version_ is not None and not isinstance(version_, (dict, Number)):
+            raise Exception("Expected version_ to be a Number, received: {}".format(type(version_)))
+
+        self.agent_stream = agent_stream_
+        self.force = force_
+        self.version = version_
         self.unknown_fields = unknown_fields
 
 
@@ -26928,6 +28595,30 @@ class UserModelList(Type):
             raise Exception("Expected user_models_ to be a Sequence, received: {}".format(type(user_models_)))
 
         self.user_models = user_models_
+        self.unknown_fields = unknown_fields
+
+
+
+class ValidateModelUpgradeParams(Type):
+    _toSchema = {'force': 'force', 'model': 'model'}
+    _toPy = {'force': 'force', 'model': 'model'}
+    def __init__(self, force=None, model=None, **unknown_fields):
+        '''
+        force : bool
+        model : typing.Sequence[~ModelParam]
+        '''
+        force_ = force
+        model_ = [ModelParam.from_json(o) for o in model or []]
+
+        # Validate arguments against known Juju API types.
+        if force_ is not None and not isinstance(force_, bool):
+            raise Exception("Expected force_ to be a bool, received: {}".format(type(force_)))
+
+        if model_ is not None and not isinstance(model_, (bytes, str, list)):
+            raise Exception("Expected model_ to be a Sequence, received: {}".format(type(model_)))
+
+        self.force = force_
+        self.model = model_
         self.unknown_fields = unknown_fields
 
 

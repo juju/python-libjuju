@@ -2643,7 +2643,8 @@ class Model:
                 # Caution: key/value pairs in files overwrite the ones in the args.
                 data[k] = v
 
-        if client.SecretsFacade.best_facade_version(self.connection()) < 2:
+        secrets_facade_version = client.SecretsFacade.best_facade_version(self.connection())
+        if not secrets_facade_version or secrets_facade_version < 2:
             raise JujuNotSupportedError("user secrets")
 
         secretsFacade = client.SecretsFacade.from_connection(self.connection())
@@ -2677,8 +2678,10 @@ class Model:
                 # Caution: key/value pairs in files overwrite the ones in the args.
                 data[k] = v
 
-        if client.SecretsFacade.best_facade_version(self.connection()) < 2:
+        secrets_facade_version = client.SecretsFacade.best_facade_version(self.connection())
+        if not secrets_facade_version or secrets_facade_version < 2:
             raise JujuNotSupportedError("user secrets")
+
         secretsFacade = client.SecretsFacade.from_connection(self.connection())
         results = await secretsFacade.UpdateSecrets([{
             'content': {'data': data},
@@ -2696,6 +2699,10 @@ class Model:
         """
         Returns the list of available secrets.
         """
+        secrets_facade_version = client.SecretsFacade.best_facade_version(self.connection())
+        if not secrets_facade_version or secrets_facade_version < 2:
+            raise JujuNotSupportedError("user secrets")
+
         facade = client.SecretsFacade.from_connection(self.connection())
         results = await facade.ListSecrets({
             'filter': filter,
@@ -2709,8 +2716,10 @@ class Model:
         :param secret_name str: ID|name of the secret to remove.
         :param revision int: remove the specified revision.
         """
-        if client.SecretsFacade.best_facade_version(self.connection()) < 2:
+        secrets_facade_version = client.SecretsFacade.best_facade_version(self.connection())
+        if not secrets_facade_version or secrets_facade_version < 2:
             raise JujuNotSupportedError("user secrets")
+
         remove_secret_arg = {
             'label': secret_name,
         }
@@ -2732,8 +2741,10 @@ class Model:
         :param application str: name of an application for which the access is granted
         :param applications []str: names of more applications to associate the secret with
         """
-        if client.SecretsFacade.best_facade_version(self.connection()) < 2:
+        secrets_facade_version = client.SecretsFacade.best_facade_version(self.connection())
+        if not secrets_facade_version or secrets_facade_version < 2:
             raise JujuNotSupportedError("user secrets")
+
         secretsFacade = client.SecretsFacade.from_connection(self.connection())
         results = await secretsFacade.GrantSecret(
             applications=[application] + list(applications),
@@ -2753,8 +2764,10 @@ class Model:
         :param application str: name of an application for which the access to the secret is revoked
         :param applications []str: names of more applications to disassociate the secret with
         """
-        if client.SecretsFacade.best_facade_version(self.connection()) < 2:
+        secrets_facade_version = client.SecretsFacade.best_facade_version(self.connection())
+        if not secrets_facade_version or secrets_facade_version < 2:
             raise JujuNotSupportedError("user secrets")
+
         secretsFacade = client.SecretsFacade.from_connection(self.connection())
         results = await secretsFacade.RevokeSecret(
             applications=[application] + list(applications),

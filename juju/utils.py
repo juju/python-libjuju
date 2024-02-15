@@ -511,11 +511,16 @@ def series_selector(series_arg='', charm_url=None, model_config=None, supported_
 
     # No series explicitly requested by the user.
     # Use model default series, if explicitly set and supported by the charm.
-    if model_config and model_config['default-base'].value:
-        default_base = model_config['default-base'].value
-        base = parse_base_arg(default_base)
-        series = base_channel_to_series(base.channel)
-        return user_requested(series, supported_series, force)
+    if model_config:
+        if 'default-base' in model_config and model_config['default-base'].value:
+            default_base = model_config['default-base'].value
+            base = parse_base_arg(default_base)
+            series = base_channel_to_series(base.channel)
+            return user_requested(series, supported_series, force)
+        elif 'default-series' in model_config and model_config['default-series'].value:
+            default_series = model_config['default-series'].value
+            if default_series:
+                return user_requested(default_series, supported_series, force)
 
     # Next fall back to the charm's list of series, filtered to what's supported
     # by Juju. Preserve the order of the supported series from the charm
