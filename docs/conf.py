@@ -21,12 +21,15 @@ import os
 from pathlib import Path
 
 here = Path(__file__).absolute().parent
-version = (here.parent / 'VERSION').read_text().strip()
+
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('..'))
+
+from juju.version import CLIENT_VERSION
+version = CLIENT_VERSION
 
 # -- General configuration ------------------------------------------------
 
