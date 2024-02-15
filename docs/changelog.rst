@@ -1,12 +1,21 @@
 Changelog
 ---------
 
+3.3.1.1
+^^^^^^^
+
+Thursday 15th Feb 2024
+
+## What's Changed
+
+This is a patch release for fixing some build problems in the 3.3.1.0 release that rendered it unusable in some scenarios.
+
+* Resolve build problems in 3.3.1.0 by @cderici in https://github.com/juju/python-libjuju/pull/1026
+
 3.3.1.0
 ^^^^^^^
 
 Thursday 8th Feb 2024
-
-## What's Changed
 
 * Remove paramiko upper-bound by @gboutry in https://github.com/juju/python-libjuju/pull/1005
 * Remove explicit passing of event_loop into tests by @cderici in https://github.com/juju/python-libjuju/pull/1006
