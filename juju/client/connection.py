@@ -470,7 +470,9 @@ class Connection:
 
     async def _recv(self, request_id):
         if not self.is_open:
-            raise websockets.exceptions.ConnectionClosed(0, 'websocket closed')
+            raise websockets.exceptions.ConnectionClosed(
+                websockets.frames.Close(websockets.frames.CloseCode.NORMAL_CLOSURE,
+                                        'websocket closed'))
         try:
             return await self.messages.get(request_id)
         except GeneratorExit:
@@ -641,7 +643,8 @@ class Connection:
             if self.monitor.status == Monitor.DISCONNECTED:
                 # closed cleanly; shouldn't try to reconnect
                 raise websockets.exceptions.ConnectionClosed(
-                    0, 'websocket closed')
+                    websockets.frames.Close(websockets.frames.CloseCode.NORMAL_CLOSURE,
+                                            'websocket closed'))
             try:
                 await self._ws.send(outgoing)
                 break
