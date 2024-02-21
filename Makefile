@@ -40,6 +40,16 @@ lint:
 docs:
 	tox -e docs
 
+.PHONY: build-test
+build-test:
+	rm -rf venv
+	python -m venv venv
+	. venv/bin/activate
+	$(PY) setup.py sdist
+	pip install dist/juju-${VERSION}.tar.gz
+	python3 -c "from juju.controller import Controller"
+	rm dist/juju-${VERSION}.tar.gz
+
 .PHONY: release
 release:
 	git fetch --tags
