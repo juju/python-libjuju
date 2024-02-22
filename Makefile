@@ -41,13 +41,13 @@ docs:
 	tox -e docs
 
 .PHONY: build-test
-build-test: .tox
+build-test:
 	rm -rf venv
-	$(PY) -m venv venv
+	python3 -m venv venv
 	. venv/bin/activate
-	$(PY) setup.py sdist
+	python3 setup.py sdist
 	pip install ./dist/juju-${VERSION}.tar.gz
-	$(PY) -c "from juju.controller import Controller"
+	python3 -c "from juju.controller import Controller"
 	rm ./dist/juju-${VERSION}.tar.gz
 
 .PHONY: release
