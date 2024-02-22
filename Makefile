@@ -46,9 +46,9 @@ build-test: .tox
 	$(PY) -m venv venv
 	. venv/bin/activate
 	$(PY) setup.py sdist
-	pip install dist/juju-${VERSION}.tar.gz
+	pip install ./dist/juju-${VERSION}.tar.gz
 	$(PY) -c "from juju.controller import Controller"
-	rm dist/juju-${VERSION}.tar.gz
+	rm ./dist/juju-${VERSION}.tar.gz
 
 .PHONY: release
 release:
