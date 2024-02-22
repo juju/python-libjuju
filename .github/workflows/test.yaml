@@ -25,6 +25,24 @@ jobs:
           tox -e lint
           ./scripts/copyright.sh
 
+  build-test:
+    name: Build test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python:
+          - "3.10"
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Run build test target
+        run: |
+          make build-test
+
   unit-tests:
     needs: lint
     name: Unit tests
