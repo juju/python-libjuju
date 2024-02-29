@@ -1,7 +1,7 @@
 BIN := .tox/py3/bin
 PY := $(BIN)/python3
 PIP := $(BIN)/pip3
-VERSION := $(shell $(PY) -c "from juju.version import CLIENT_VERSION; print(CLIENT_VERSION)")
+VERSION := $(shell python3 -c "from juju.version import CLIENT_VERSION; print(CLIENT_VERSION)")
 
 .PHONY: clean
 clean:
@@ -39,6 +39,16 @@ lint:
 .PHONY: docs
 docs:
 	tox -e docs
+
+.PHONY: build-test
+build-test:
+	rm -rf venv
+	python3 -m venv venv
+	. venv/bin/activate
+	python3 setup.py sdist
+	pip install ./dist/juju-${VERSION}.tar.gz
+	python3 -c "from juju.controller import Controller"
+	rm ./dist/juju-${VERSION}.tar.gz
 
 .PHONY: release
 release:
