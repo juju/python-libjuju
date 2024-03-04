@@ -1,4 +1,4 @@
-include *.py CONTRIBUTORS LICENSE README.rst VERSION
+include *.py CONTRIBUTORS LICENSE README.rst
 recursive-include juju *.py
 recursive-include examples *.py
 recursive-include docs *.rst

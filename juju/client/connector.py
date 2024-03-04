@@ -85,6 +85,18 @@ class Connector:
             # connected to.
             if self._connection:
                 await self._connection.close()
+
+            account = kwargs.pop('account', {})
+            # Prioritize the username and password that user provided
+            # If not enough, try to patch it with info from accounts.yaml
+            if 'username' not in kwargs and account.get('user'):
+                kwargs.update(username=account.get('user'))
+            if 'password' not in kwargs and account.get('password'):
+                kwargs.update(password=account.get('password'))
+
+            if not ({'username', 'password'}.issubset(kwargs)):
+                required = {'username', 'password'}.difference(kwargs)
+                raise ValueError(f'Some authentication parameters are required : {",".join(required)}')
             self._connection = await Connection.connect(**kwargs)
 
         # Check if we support the target controller
@@ -117,7 +129,7 @@ class Connector:
             await self._log_connection.close()
             self._log_connection = None
 
-    async def connect_controller(self, controller_name=None, specified_facades=None):
+    async def connect_controller(self, controller_name=None, specified_facades=None, **kwargs):
         """Connect to a controller by name. If the name is empty, it
         connect to the current controller.
         """
@@ -130,16 +142,16 @@ class Connector:
 
         proxy = proxy_from_config(controller.get("proxy-config", None))
 
-        await self.connect(
-            endpoint=endpoints,
-            uuid=None,
-            username=accounts.get("user"),
-            password=accounts.get("password"),
-            cacert=controller.get("ca-cert"),
-            bakery_client=self.bakery_client_for_controller(controller_name),
-            specified_facades=specified_facades,
-            proxy=proxy,
-        )
+        kwargs.update(endpoint=endpoints,
+                      uuid=None,
+                      account=accounts,
+                      cacert=controller.get('ca-cert'),
+                      bakery_client=self.bakery_client_for_controller(controller_name),
+                      specified_facades=specified_facades,
+                      proxy=proxy,
+                      )
+        await self.connect(**kwargs)
+        self.controller_name = controller_name
         self.controller_uuid = controller["uuid"]
 
     async def connect_model(self, _model_name=None, **kwargs):
@@ -184,15 +196,12 @@ class Connector:
 
         # TODO remove the need for base.CleanModel to subclass
         # JujuData.
-        kwargs.update(
-            endpoint=endpoints,
-            uuid=model_uuid,
-            username=account.get("user"),
-            password=account.get("password"),
-            cacert=controller.get("ca-cert"),
-            bakery_client=self.bakery_client_for_controller(controller_name),
-            proxy=proxy,
-        )
+        kwargs.update(endpoint=endpoints,
+                      uuid=model_uuid,
+                      account=account,
+                      cacert=controller.get('ca-cert'),
+                      bakery_client=self.bakery_client_for_controller(controller_name),
+                      proxy=proxy)
         await self.connect(**kwargs)
         # TODO this might be a good spot to trigger refreshing the
         # local cache (the connection to the model might help)

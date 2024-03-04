@@ -48,7 +48,9 @@ body:
     id: info
     attributes:
       label: "Reproduce / Test"
-      description: "Please add valid Python code to reproduce the bug. This will be used as a test for QAing later on."
+      description: "Please add valid Python code to reproduce the bug. This will be used as a test for QAing later on.
+
+      Please provide a simplified reproducer, and if it's possible please refrain from providing a "clone this repository and run the integration tests to see the problem" type of a reproducer. Thanks!"
       render: python
     validations:
       required: true

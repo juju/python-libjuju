@@ -86,6 +86,10 @@ class JujuUnitError(JujuError):
     pass
 
 
+class JujuPermissionError(JujuError):
+    pass
+
+
 class JujuBackupError(JujuError):
     pass
 
