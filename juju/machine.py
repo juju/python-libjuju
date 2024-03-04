@@ -136,10 +136,21 @@ class Machine(model.ModelEntity):
         ]
         cmd.extend(scp_opts.split() if isinstance(scp_opts, str) else scp_opts)
         cmd.extend([source, destination])
-        process = await jasyncio.create_subprocess_exec(*cmd)
-        await process.wait()
+        # There's a bit of a gap between the time that the machine is assigned an IP and the ssh
+        # service is up and listening, which creates a race for the ssh command. So we retry a
+        # couple of times until either we run out of attempts, or the ssh command succeeds to
+        # mitigate that effect.
+        # TODO (cderici): refactor the ssh and scp subcommand processing into a single method.
+        retry_backoff = 1
+        retries = 10
+        for _ in range(retries):
+            process = await jasyncio.create_subprocess_exec(*cmd)
+            await process.wait()
+            if process.returncode == 0:
+                break
+            await jasyncio.sleep(retry_backoff)
         if process.returncode != 0:
-            raise JujuError("command failed: %s" % cmd)
+            raise JujuError(f"command failed after {retries} attempts: {cmd}")
 
     async def ssh(
             self, command, user='ubuntu', proxy=False, ssh_opts=None, wait_for_active=False, timeout=None):
@@ -169,11 +180,22 @@ class Machine(model.ModelEntity):
         if ssh_opts:
             cmd.extend(ssh_opts.split() if isinstance(ssh_opts, str) else ssh_opts)
         cmd.extend([command])
-        process = await jasyncio.create_subprocess_exec(
-            *cmd, stdout=jasyncio.subprocess.PIPE, stderr=jasyncio.subprocess.PIPE)
-        stdout, stderr = await process.communicate()
+
+        # There's a bit of a gap between the time that the machine is assigned an IP and the ssh
+        # service is up and listening, which creates a race for the ssh command. So we retry a
+        # couple of times until either we run out of attempts, or the ssh command succeeds to
+        # mitigate that effect.
+        retry_backoff = 1
+        retries = 10
+        for _ in range(retries):
+            process = await jasyncio.create_subprocess_exec(
+                *cmd, stdout=jasyncio.subprocess.PIPE, stderr=jasyncio.subprocess.PIPE)
+            stdout, stderr = await process.communicate()
+            if process.returncode == 0:
+                break
+            await jasyncio.sleep(retry_backoff)
         if process.returncode != 0:
-            raise JujuError("command failed: %s with %s" % (cmd, stderr.decode()))
+            raise JujuError(f"command failed: {cmd} after {retries} attempts, with {stderr.decode()}")
         # stdout is a bytes-like object, returning a string might be more useful
         return stdout.decode()
 
