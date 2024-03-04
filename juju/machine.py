@@ -71,7 +71,7 @@ class Machine(model.ModelEntity):
         return fmt.format(ipaddr)
 
     async def scp_to(self, source, destination, user='ubuntu', proxy=False,
-                     scp_opts='', wait_for_active=True, timeout=None):
+                     scp_opts='', wait_for_active=False, timeout=None):
         """Transfer files to this machine.
 
         :param str source: Local path of file(s) to transfer
@@ -97,7 +97,7 @@ class Machine(model.ModelEntity):
         await self._scp(source, destination, scp_opts)
 
     async def scp_from(self, source, destination, user='ubuntu', proxy=False,
-                       scp_opts='', wait_for_active=True, timeout=None):
+                       scp_opts='', wait_for_active=False, timeout=None):
         """Transfer files from this machine.
 
         :param str source: Remote path of file(s) to transfer
@@ -142,7 +142,7 @@ class Machine(model.ModelEntity):
             raise JujuError("command failed: %s" % cmd)
 
     async def ssh(
-            self, command, user='ubuntu', proxy=False, ssh_opts=None, wait_for_active=True, timeout=None):
+            self, command, user='ubuntu', proxy=False, ssh_opts=None, wait_for_active=False, timeout=None):
         """Execute a command over SSH on this machine.
 
         :param str command: Command to execute
