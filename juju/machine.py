@@ -3,14 +3,16 @@
 
 import ipaddress
 import logging
-
+import typing
 import pyrfc3339
 
-from . import model, tag, jasyncio
+from juju.utils import juju_ssh_key_paths
+
+from . import jasyncio, model, tag
 from .annotationhelper import _get_annotations, _set_annotations
 from .client import client
 from .errors import JujuError
-from juju.utils import juju_ssh_key_paths
+from .status import InstanceStatusT, MachineAgentStatusT
 
 log = logging.getLogger(__name__)
 
@@ -37,14 +39,14 @@ class Machine(model.ModelEntity):
         return await self.model._wait('machine', self.id, 'remove')
     remove = destroy
 
-    async def get_annotations(self):
+    async def get_annotations(self) -> typing.Dict[str, str]:
         """Get annotations on this machine.
 
         :return dict: The annotations for this application
         """
         return await _get_annotations(self.tag, self.connection)
 
-    async def set_annotations(self, annotations):
+    async def set_annotations(self, annotations: typing.Dict[str, str]):
         """Set annotations on this machine.
 
         :param annotations map[string]string: the annotations as key/value
@@ -53,7 +55,7 @@ class Machine(model.ModelEntity):
         """
         return await _set_annotations(self.tag, annotations, self.connection)
 
-    def _format_addr(self, addr):
+    def _format_addr(self, addr: str):
         """Validate and format IP address.
 
         :param addr: IPv6 or IPv4 address
@@ -69,8 +71,8 @@ class Machine(model.ModelEntity):
             fmt = '{}'
         return fmt.format(ipaddr)
 
-    async def scp_to(self, source, destination, user='ubuntu', proxy=False,
-                     scp_opts=''):
+    async def scp_to(self, source: str, destination: str, user: str = 'ubuntu', proxy: bool = False,
+                     scp_opts: typing.Union[str, typing.List[str]] = ''):
         """Transfer files to this machine.
 
         :param str source: Local path of file(s) to transfer
@@ -92,8 +94,8 @@ class Machine(model.ModelEntity):
         destination = '{}@{}:{}'.format(user, address, destination)
         await self._scp(source, destination, scp_opts)
 
-    async def scp_from(self, source, destination, user='ubuntu', proxy=False,
-                       scp_opts=''):
+    async def scp_from(self, source: str, destination: str, user: str = 'ubuntu',
+                       proxy: bool = False, scp_opts: typing.Union[str, typing.List[str]] = ''):
         """Transfer files from this machine.
 
         :param str source: Remote path of file(s) to transfer
@@ -115,7 +117,7 @@ class Machine(model.ModelEntity):
         source = '{}@{}:{}'.format(user, address, source)
         await self._scp(source, destination, scp_opts)
 
-    async def _scp(self, source, destination, scp_opts):
+    async def _scp(self, source: str, destination: str, scp_opts: typing.Union[str, typing.List[str]]):
         """ Execute an scp command. Requires a fully qualified source and
         destination.
         """
@@ -135,7 +137,8 @@ class Machine(model.ModelEntity):
             raise JujuError("command failed: %s" % cmd)
 
     async def ssh(
-            self, command, user='ubuntu', proxy=False, ssh_opts=None):
+            self, command: str, user: str = 'ubuntu', proxy: bool = False,
+            ssh_opts: typing.Optional[typing.Union[str, typing.List[str]]] = None):
         """Execute a command over SSH on this machine.
 
         :param str command: Command to execute
@@ -168,7 +171,7 @@ class Machine(model.ModelEntity):
         return stdout.decode()
 
     @property
-    def agent_status(self):
+    def agent_status(self) -> MachineAgentStatusT:
         """Returns the current Juju agent status string.
 
         """
@@ -182,7 +185,7 @@ class Machine(model.ModelEntity):
         return pyrfc3339.parse(self.safe_data['agent-status']['since'])
 
     @property
-    def agent_version(self):
+    def agent_version(self) -> str:
         """Get the version of the Juju machine agent.
 
         May return None if the agent is not yet available.
@@ -194,7 +197,7 @@ class Machine(model.ModelEntity):
             return None
 
     @property
-    def status(self):
+    def status(self) -> InstanceStatusT:
         """Returns the current machine provisioning status string.
 
         """
@@ -215,7 +218,7 @@ class Machine(model.ModelEntity):
         return pyrfc3339.parse(self.safe_data['instance-status']['since'])
 
     @property
-    def dns_name(self):
+    def dns_name(self) -> typing.Optional[str]:
         """Get the DNS name for this machine. This is a best guess based on the
         addresses available in current data.
 
@@ -236,7 +239,7 @@ class Machine(model.ModelEntity):
         return None
 
     @property
-    def hostname(self):
+    def hostname(self) -> typing.Optional[str]:
         """Get the hostname for this machine as reported by the machine agent
         running on it. This is only supported on 2.8.10+ controllers.
 
