@@ -141,7 +141,7 @@ class Machine(model.ModelEntity):
         # couple of times until either we run out of attempts, or the ssh command succeeds to
         # mitigate that effect.
         # TODO (cderici): refactor the ssh and scp subcommand processing into a single method.
-        retry_backoff = 1
+        retry_backoff = 2
         retries = 10
         for _ in range(retries):
             process = await jasyncio.create_subprocess_exec(*cmd)
@@ -185,7 +185,7 @@ class Machine(model.ModelEntity):
         # service is up and listening, which creates a race for the ssh command. So we retry a
         # couple of times until either we run out of attempts, or the ssh command succeeds to
         # mitigate that effect.
-        retry_backoff = 1
+        retry_backoff = 2
         retries = 10
         for _ in range(retries):
             process = await jasyncio.create_subprocess_exec(
