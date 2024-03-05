@@ -39,6 +39,7 @@ async def test_status():
             timeout=480)
 
 
+@base.bootstrapped
 async def test_machine_ssh():
     async with base.CleanModel() as model:
         machine: Machine = await model.add_machine()
