@@ -15,3 +15,4 @@ pytestdebug.log
 .vscode/
 deb_dist
 *.tar.gz
+.idea/
