@@ -15,7 +15,7 @@ from .. import base
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_add_remove_user(event_loop):
+async def test_add_remove_user():
     async with base.CleanController() as controller:
         username = 'test{}'.format(uuid.uuid4())
         user = await controller.get_user(username)
@@ -35,7 +35,7 @@ async def test_add_remove_user(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_disable_enable_user(event_loop):
+async def test_disable_enable_user():
     async with base.CleanController() as controller:
         username = 'test-disable{}'.format(uuid.uuid4())
         user = await controller.add_user(username)
@@ -59,7 +59,7 @@ async def test_disable_enable_user(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_change_user_password(event_loop):
+async def test_change_user_password():
     async with base.CleanController() as controller:
         username = 'test-password{}'.format(uuid.uuid4())
         user = await controller.add_user(username)
@@ -80,7 +80,7 @@ async def test_change_user_password(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_reset_user_password(event_loop):
+async def test_reset_user_password():
     async with base.CleanController() as controller:
         username = 'test{}'.format(uuid.uuid4())
         user = await controller.add_user(username)
@@ -109,7 +109,7 @@ async def test_reset_user_password(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_grant_revoke(event_loop):
+async def test_grant_revoke():
     async with base.CleanController() as controller:
         username = 'test-grant{}'.format(uuid.uuid4())
         user = await controller.add_user(username)
@@ -129,7 +129,7 @@ async def test_grant_revoke(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_list_models(event_loop):
+async def test_list_models():
     async with base.CleanController() as controller:
         async with base.CleanModel() as model:
             result = await controller.list_models()
@@ -138,7 +138,7 @@ async def test_list_models(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_list_models_user_access(event_loop):
+async def test_list_models_user_access():
     async with base.CleanController() as controller:
         username = 'test-grant{}'.format(uuid.uuid4())
         user = await controller.add_user(username)
@@ -157,7 +157,7 @@ async def test_list_models_user_access(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_get_model(event_loop):
+async def test_get_model():
     async with base.CleanController() as controller:
         by_name, by_uuid = None, None
         model_name = 'test-{}'.format(uuid.uuid4())
@@ -191,7 +191,7 @@ async def _wait_for_model_gone(controller, model_name):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_destroy_model_by_name(event_loop):
+async def test_destroy_model_by_name():
     async with base.CleanController() as controller:
         model_name = 'test-{}'.format(uuid.uuid4())
         model = await controller.add_model(model_name)
@@ -207,7 +207,7 @@ async def test_destroy_model_by_name(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_add_destroy_model_by_uuid(event_loop):
+async def test_add_destroy_model_by_uuid():
     async with base.CleanController() as controller:
         model_name = 'test-{}'.format(uuid.uuid4())
         model = await controller.add_model(model_name)
@@ -224,7 +224,7 @@ async def test_add_destroy_model_by_uuid(event_loop):
 
 @base.bootstrapped
 @pytest.mark.asyncio
-async def test_add_remove_cloud(event_loop):
+async def test_add_remove_cloud():
     async with base.CleanController() as controller:
         cloud_name = 'test-{}'.format(uuid.uuid4())
         cloud = client.Cloud(

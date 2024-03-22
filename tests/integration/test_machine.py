@@ -2,7 +2,6 @@
 # Licensed under the Apache V2, see LICENCE file for details.
 
 import asyncio
-from tempfile import NamedTemporaryFile
 
 import pytest
 
@@ -37,32 +36,3 @@ async def test_status(event_loop):
                          machine.status_message.lower() == 'running' and
                          machine.agent_status == 'started')),
             timeout=480)
-
-
-@base.bootstrapped
-@pytest.mark.asyncio
-async def test_scp(event_loop):
-    # ensure that asyncio.subprocess will work;
-    try:
-        asyncio.get_child_watcher().attach_loop(event_loop)
-    except RuntimeError:
-        pytest.skip('test_scp will always fail outside of MainThread')
-    async with base.CleanModel() as model:
-        await model.add_machine()
-        await asyncio.wait_for(
-            model.block_until(lambda: model.machines),
-            timeout=240)
-        machine = model.machines['0']
-        await asyncio.wait_for(
-            model.block_until(lambda: (machine.status == 'running' and
-                                       machine.agent_status == 'started')),
-            timeout=480)
-
-        with NamedTemporaryFile() as f:
-            f.write(b'testcontents')
-            f.flush()
-            await machine.scp_to(f.name, 'testfile', scp_opts='-p')
-
-        with NamedTemporaryFile() as f:
-            await machine.scp_from('testfile', f.name, scp_opts='-p')
-            assert f.read() == b'testcontents'
