@@ -1204,7 +1204,8 @@ class Model:
                     try:
                         results = await utils.run_with_interrupt(
                             allwatcher.Next(),
-                            self._watch_stopping)
+                            self._watch_stopping,
+                            log=log)
                     except JujuAPIError as e:
                         if 'watcher was stopped' not in str(e):
                             raise

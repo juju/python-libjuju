@@ -854,7 +854,8 @@ class Controller:
                     try:
                         results = await utils.run_with_interrupt(
                             watcher.Next(),
-                            stop_event)
+                            stop_event,
+                            log=log)
                     except JujuAPIError as e:
                         if 'watcher was stopped' not in str(e):
                             raise
