@@ -1526,8 +1526,7 @@ class Model:
                     remote_endpoint.source = current.controller_name
             # consume the remote endpoint
             await self.consume(remote_endpoint.string(),
-                               application_alias=remote_endpoint.application,
-                               controller_name=remote_endpoint.source)
+                               application_alias=remote_endpoint.application)
 
         log.debug(
             'Adding relation %s <-> %s', endpoints[0], endpoints[1])
@@ -2535,7 +2534,15 @@ class Model:
         """
         Adds a remote offer to the model. Relations can be created later using
         "juju relate".
+
+        If consuming a relation from a model on different controller the
+        controller name must be included in the endpoint. The controller_name
+        argument is being deprecated.
         """
+        if controller_name:
+            log.warning(
+                'controller_name argument will soon be deprecated, controller '
+                'should be specified in endpoint url')
         if controller and controller_name:
             raise JujuError("cannot set both controller_name and controller")
         try:
@@ -2549,9 +2556,8 @@ class Model:
             offer.user = self.info.username
             endpoint = offer.string()
 
-        source = None
-        if controller_name:
-            source = await self._get_source_api(offer, controller_name=controller_name)
+        if offer.source:
+            source = await self._get_source_api(offer)
         else:
             if controller:
                 source = controller
@@ -2766,12 +2772,15 @@ class Model:
         if result_error.error is not None:
             raise JujuAPIError(result_error.error)
 
-    async def _get_source_api(self, url, controller_name=None):
+    async def _get_source_api(self, url):
         controller = Controller()
         if url.has_empty_source():
             async with ConnectedController(self.connection()) as current:
                 if current.controller_name is not None:
                     controller_name = current.controller_name
+        else:
+            controller_name = url.source
+
         await controller.connect(controller_name=controller_name)
         return controller
 
