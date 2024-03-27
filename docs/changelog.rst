@@ -1,6 +1,17 @@
 Changelog
 ---------
 
+3.4.0.0
+^^^^^^^
+
+Monday 25th Mar 2024
+
+## What's Changed
+
+* Add build test and update issue template by @cderici in https://github.com/juju/python-libjuju/pull/1030
+* fix: machine scp & ssh by @yanksyoon in https://github.com/juju/python-libjuju/pull/1020
+* Bugfix none type on master by @Aflynn50 in https://github.com/juju/python-libjuju/pull/1036
+
 3.3.1.1
 ^^^^^^^
 
