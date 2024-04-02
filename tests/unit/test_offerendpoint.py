@@ -6,6 +6,9 @@
 #
 
 import unittest
+import mock
+from juju.model import Model
+from juju.controller import Controller
 
 from juju.offerendpoints import (LocalEndpoint, OfferEndpoints, OfferURL,
                                  ParseError, maybe_parse_offer_url_source,
@@ -90,3 +93,59 @@ class TestLocalEndpoint(unittest.TestCase):
                 self.assertEqual(e.message, case)
             except Exception:
                 raise
+
+
+class TestConsume(unittest.IsolatedAsyncioTestCase):
+    @mock.patch.object(Model, 'connection')
+    @mock.patch.object(Controller, 'disconnect')
+    @mock.patch('juju.model._create_consume_args')
+    @mock.patch('juju.client.client.ApplicationFacade.from_connection')
+    async def test_external_controller_consume(self, mock_from_connection,
+                                               mock_controller, mock_connection, mock_create_consume_args):
+        """ Test consuming an offer from an external controller. This would be
+        better suited as an integration test however pylibjuju does not allow
+        for bootstrapping of extra controllers.
+        """
+
+        mock_create_consume_args.return_value = None
+        mock_connection.return_value = None
+
+        mock_consume_details = mock.MagicMock()
+        mock_consume_details.offer.offer_url = "user/offerer.app"
+        mock_controller.get_consume_details = mock.AsyncMock(return_value=mock_consume_details)
+        mock_controller.disconnect = mock.AsyncMock()
+
+        mock_facade = mock.MagicMock()
+        mock_from_connection.return_value = mock_facade
+
+        mock_results = mock.MagicMock()
+        mock_results.results = [mock.MagicMock()]
+        mock_results.results[0].error = None
+        mock_facade.Consume = mock.AsyncMock(return_value=mock_results)
+
+        m = Model()
+        m._get_source_api = mock.AsyncMock(return_value=mock_controller)
+
+        # Test with an external controller.
+        offer_url = "externalcontroller:user/offerer.app"
+        await m.consume(offer_url)
+        m._get_source_api.assert_called_once_with(parse_offer_url(offer_url))
+        mock_controller.get_consume_details.assert_called_with("user/offerer.app")
+
+        # Test with an external controller and controller_name arg.
+        offer_url = "externalcontroller:user/offerer.app"
+        await m.consume(offer_url, controller_name="externalcontroller")
+        m._get_source_api.assert_called_with(parse_offer_url(offer_url))
+        mock_controller.get_consume_details.assert_called_with("user/offerer.app")
+
+        # Test with a local (mocked) controller.
+        offer_url = "user/offerer.app"
+        await m.consume(offer_url, controller=mock_controller)
+        mock_controller.get_consume_details.assert_called_with("user/offerer.app")
+
+        # Test with an external controller with just controller_name. This will
+        # soon be deprecated.
+        offer_url = "user/offerer.app"
+        await m.consume(offer_url, controller_name="externalcontroller")
+        m._get_source_api.assert_called_with(parse_offer_url("externalcontroller:user/offerer.app"))
+        mock_controller.get_consume_details.assert_called_with("user/offerer.app")

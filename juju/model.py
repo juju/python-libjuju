@@ -2539,10 +2539,7 @@ class Model:
         controller name must be included in the endpoint. The controller_name
         argument is being deprecated.
         """
-        if controller_name:
-            log.warning(
-                'controller_name argument will soon be deprecated, controller '
-                'should be specified in endpoint url')
+
         if controller and controller_name:
             raise JujuError("cannot set both controller_name and controller")
         try:
@@ -2555,6 +2552,13 @@ class Model:
         if offer.user == "":
             offer.user = self.info.username
             endpoint = offer.string()
+
+        if controller_name:
+            log.warning(
+                'controller_name argument will soon be deprecated, controller '
+                'should be specified in endpoint url')
+            if offer.source == "":
+                offer.source = controller_name
 
         if offer.source:
             source = await self._get_source_api(offer)
