@@ -1,6 +1,7 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
+
 import json
 import os
 import random
@@ -10,31 +11,18 @@ import uuid
 
 import mock
 import paramiko
+
 import pylxd
 import pytest
-
 from juju import jasyncio, tag, url
-from juju.application import Application
 from juju.client import client
 from juju.client._definitions import FullStatus
-from juju.errors import (
-    JujuConnectionError,
-    JujuError,
-    JujuModelError,
-    JujuUnitError
-)
+from juju.errors import JujuError, JujuModelError, JujuUnitError, JujuConnectionError
 from juju.model import Model, ModelObserver
-from juju.utils import (
-    base_channel_to_series,
-    block_until,
-    run_with_interrupt,
-    wait_for_bundle
-)
+from juju.utils import block_until, run_with_interrupt, wait_for_bundle, base_channel_to_series
 
 from .. import base
-from ..utils import (GB, INTEGRATION_TEST_DIR, MB, OVERLAYS_DIR, SSH_KEY,
-                     TESTS_DIR)
-
+from ..utils import MB, GB, TESTS_DIR, OVERLAYS_DIR, SSH_KEY, INTEGRATION_TEST_DIR
 
 @base.bootstrapped
 async def test_model_name():
