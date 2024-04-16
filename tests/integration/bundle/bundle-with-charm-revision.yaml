@@ -1,0 +1,7 @@
+applications:
+  hello-juju:
+    charm: "hello-juju"
+    channel: latest/stable
+    revision: 8
+    num_units: 1
+    series: focal
