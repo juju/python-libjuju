@@ -17,11 +17,19 @@ from juju import jasyncio, tag, url
 from juju.application import Application
 from juju.client import client
 from juju.client._definitions import FullStatus
-from juju.errors import (JujuConnectionError, JujuError, JujuModelError,
-                         JujuUnitError)
+from juju.errors import (
+    JujuConnectionError,
+    JujuError,
+    JujuModelError,
+    JujuUnitError
+)
 from juju.model import Model, ModelObserver
-from juju.utils import (base_channel_to_series, block_until,
-                        run_with_interrupt, wait_for_bundle)
+from juju.utils import (
+    base_channel_to_series,
+    block_until,
+    run_with_interrupt,
+    wait_for_bundle
+)
 
 from .. import base
 from ..utils import (GB, INTEGRATION_TEST_DIR, MB, OVERLAYS_DIR, SSH_KEY,
