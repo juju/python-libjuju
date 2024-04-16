@@ -10,17 +10,22 @@ import uuid
 
 import mock
 import paramiko
-
 import pylxd
 import pytest
+
 from juju import jasyncio, tag, url
+from juju.application import Application
 from juju.client import client
-from juju.errors import JujuError, JujuModelError, JujuUnitError, JujuConnectionError
+from juju.client._definitions import FullStatus
+from juju.errors import (JujuConnectionError, JujuError, JujuModelError,
+                         JujuUnitError)
 from juju.model import Model, ModelObserver
-from juju.utils import block_until, run_with_interrupt, wait_for_bundle, base_channel_to_series
+from juju.utils import (base_channel_to_series, block_until,
+                        run_with_interrupt, wait_for_bundle)
 
 from .. import base
-from ..utils import MB, GB, TESTS_DIR, OVERLAYS_DIR, SSH_KEY, INTEGRATION_TEST_DIR
+from ..utils import (GB, INTEGRATION_TEST_DIR, MB, OVERLAYS_DIR, SSH_KEY,
+                     TESTS_DIR)
 
 
 @base.bootstrapped
@@ -179,6 +184,25 @@ async def test_deploy_bundle_local_charm_series_manifest():
         assert set(model.units.keys()) == set(['test1/0'])
         assert model.units['test1/0'].agent_status == 'idle'
         assert model.units['test1/0'].workload_status == 'active'
+
+
+@base.bootstrapped
+@pytest.mark.bundle
+async def test_deploy_bundle_with_pinned_charm_revision():
+    bundle_dir = INTEGRATION_TEST_DIR / 'bundle-with-charm-revision.yaml'
+    bundle_yaml_path = bundle_dir / 'bundle-include-file.yaml'
+    # Revision of the hello-juju charm defined in the bundle yaml
+    # We can also read the yaml to get the revision but wr're hard-coding it for now for simplicity
+    pinned_revision = 8
+
+    async with base.CleanModel() as model:
+        await model.deploy(str(bundle_yaml_path))
+
+        application: Application = model.applications.get('hello-juju', None)
+        status: FullStatus = await model.get_status([application.name])
+        # the 'charm' field of application status should be of this format:
+        # ch:amd64/{series}/{name}-{revision}
+        assert f"{application.name}-{pinned_revision}" in status.applications[application.name]["charm"]
 
 
 @base.bootstrapped
