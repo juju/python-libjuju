@@ -195,7 +195,7 @@ async def test_deploy_bundle_with_pinned_charm_revision():
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_yaml_path))
 
-        application: Application = model.applications.get('hello-juju', None)
+        application = model.applications.get('hello-juju', None)
         status: FullStatus = await model.get_status([application.name])
         # the 'charm' field of application status should be of this format:
         # ch:amd64/{series}/{name}-{revision}
