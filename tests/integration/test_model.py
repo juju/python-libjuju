@@ -24,6 +24,7 @@ from juju.utils import block_until, run_with_interrupt, wait_for_bundle, base_ch
 from .. import base
 from ..utils import MB, GB, TESTS_DIR, OVERLAYS_DIR, SSH_KEY, INTEGRATION_TEST_DIR
 
+
 @base.bootstrapped
 async def test_model_name():
     model = Model()
