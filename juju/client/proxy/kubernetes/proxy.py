@@ -1,6 +1,6 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
-
+import os
 import tempfile
 
 from juju.client.proxy.proxy import Proxy, ProxyNotConnectedError
@@ -33,7 +33,7 @@ class KubernetesProxy(Proxy):
             raise ValueError("Invalid port number: {}".format(remote_port))
 
         if ca_cert:
-            self.temp_ca_file = tempfile.NamedTemporaryFile()
+            self.temp_ca_file = tempfile.NamedTemporaryFile(delete=False)
             self.temp_ca_file.write(bytes(ca_cert, 'utf-8'))
             self.temp_ca_file.flush()
             config.ssl_ca_cert = self.temp_ca_file.name
@@ -60,6 +60,7 @@ class KubernetesProxy(Proxy):
 
     def __del__(self):
         self.close()
+        os.unlink(self.temp_ca_file.name)
 
     def close(self):
         try:
