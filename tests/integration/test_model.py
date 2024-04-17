@@ -188,7 +188,7 @@ async def test_deploy_bundle_with_pinned_charm_revision():
     bundle_dir = INTEGRATION_TEST_DIR / 'bundle-with-charm-revision.yaml'
     bundle_yaml_path = bundle_dir / 'bundle-include-file.yaml'
     # Revision of the hello-juju charm defined in the bundle yaml
-    # We can also read the yaml to get the revision but wr're hard-coding it for now for simplicity
+    # We can also read the yaml to get the revision but we are hard-coding it for now for simplicity
     pinned_revision = 8
 
     async with base.CleanModel() as model:
