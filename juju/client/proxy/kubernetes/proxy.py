@@ -2,10 +2,13 @@
 # Licensed under the Apache V2, see LICENCE file for details.
 import os
 import tempfile
+import logging
 
 from juju.client.proxy.proxy import Proxy, ProxyNotConnectedError
 from kubernetes import client
 from kubernetes.stream import portforward
+
+log = logging.getLogger('juju.client.connection')
 
 
 class KubernetesProxy(Proxy):
@@ -60,7 +63,10 @@ class KubernetesProxy(Proxy):
 
     def __del__(self):
         self.close()
-        os.unlink(self.temp_ca_file.name)
+        try:
+            os.unlink(self.temp_ca_file.name)
+        except FileNotFoundError:
+            log.debug(f"file {self.temp_ca_file.name} not found")
 
     def close(self):
         try:
