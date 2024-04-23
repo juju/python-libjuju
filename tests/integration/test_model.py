@@ -15,6 +15,7 @@ import pylxd
 import pytest
 from juju import jasyncio, tag, url
 from juju.client import client
+from juju.client._definitions import FullStatus
 from juju.errors import JujuError, JujuModelError, JujuUnitError, JujuConnectionError
 from juju.model import Model, ModelObserver
 from juju.utils import block_until, run_with_interrupt, wait_for_bundle, base_channel_to_series
@@ -179,6 +180,25 @@ async def test_deploy_bundle_local_charm_series_manifest():
         assert set(model.units.keys()) == set(['test1/0'])
         assert model.units['test1/0'].agent_status == 'idle'
         assert model.units['test1/0'].workload_status == 'active'
+
+
+@base.bootstrapped
+@pytest.mark.bundle
+async def test_deploy_bundle_with_pinned_charm_revision():
+    bundle_dir = INTEGRATION_TEST_DIR / 'bundle'
+    bundle_yaml_path = bundle_dir / 'bundle-with-charm-revision.yaml'
+    # Revision of the hello-juju charm defined in the bundle yaml
+    # We can also read the yaml to get the revision but we are hard-coding it for now for simplicity
+    pinned_revision = 7
+
+    async with base.CleanModel() as model:
+        await model.deploy(str(bundle_yaml_path))
+
+        application = model.applications.get('hello-juju', None)
+        status: FullStatus = await model.get_status([application.name])
+        # the 'charm' field of application status should be of this format:
+        # ch:amd64/{series}/{name}-{revision}
+        assert f"{application.name}-{pinned_revision}" in status.applications[application.name]["charm"]
 
 
 @base.bootstrapped

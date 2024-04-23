@@ -312,12 +312,14 @@ class TestAddCharmChange(unittest.TestCase):
         change = AddCharmChange(1, [], params={"charm": "charm",
                                                "series": "series",
                                                "channel": "channel",
+                                               "revision": "revision",
                                                "architecture": "architecture"})
         self.assertEqual({"change_id": 1,
                           "requires": [],
                           "charm": "charm",
                           "series": "series",
                           "channel": "channel",
+                          "revision": "revision",
                           "architecture": "architecture"}, change.__dict__)
 
     def test_dict_params_missing_data(self):
@@ -328,6 +330,7 @@ class TestAddCharmChange(unittest.TestCase):
                           "charm": "charm",
                           "series": "series",
                           "channel": None,
+                          "revision": None,
                           "architecture": None}, change.__dict__)
 
 

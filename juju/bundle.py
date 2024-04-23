@@ -659,6 +659,7 @@ class AddCharmChange(ChangeInfo):
     _toPy = {'charm': 'charm',
              'series': 'series',
              'channel': 'channel',
+             'revision': 'revision',
              'architecture': 'architecture'}
 
     """AddCharmChange holds a change for adding a charm to the environment.
@@ -675,6 +676,7 @@ class AddCharmChange(ChangeInfo):
         :series: series of the charm to be added if the charm default is
            not sufficient.
         :channel: preferred channel for obtaining the charm.
+        :revision: specified revision of the charm to be added if specified.
     """
     @staticmethod
     def method():
@@ -710,6 +712,7 @@ class AddCharmChange(ChangeInfo):
                                         architecture=arch,
                                         risk=ch.risk,
                                         track=ch.track,
+                                        revision=self.revision,
                                         base=base)
             identifier, origin = await context.model._resolve_charm(url, origin)
 
