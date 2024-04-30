@@ -1,6 +1,6 @@
 description: An overlay for test multi-overlay
 applications:
-  ntp:
+  nrpe:
   memcached:
     charm: "memcached"
     channel: stable
@@ -10,6 +10,6 @@ description: Another overlay for test multi-overlay
 applications:
   memcached:
   mysql:
-    charm: "prometheus"
-    channel: stable
-    num_units: 1
+    charm: "mysql"
+    channel: candidate
+    num_units: 1  

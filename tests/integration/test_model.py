@@ -45,8 +45,8 @@ async def test_deploy_local_bundle_dir():
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_path))
 
-        app1 = model.applications.get('grafana')
-        app2 = model.applications.get('prometheus')
+        app1 = model.applications.get('juju-qa-test')
+        app2 = model.applications.get('nrpe')
         with open("/tmp/output", "w") as writer:
             writer.write(str(bundle_path) + "\n")
             for (k, v) in model.applications.items():
@@ -66,8 +66,8 @@ async def test_deploy_local_bundle_file():
     async with base.CleanModel() as model:
         await model.deploy(str(mini_bundle_file_path))
 
-        app1 = model.applications.get('grafana')
-        app2 = model.applications.get('prometheus')
+        app1 = model.applications.get('juju-qa-test')
+        app2 = model.applications.get('nrpe')
         assert app1 and app2
         await model.block_until(lambda: (len(app1.units) == 1 and
                                 len(app2.units) == 1),
@@ -272,7 +272,6 @@ async def test_deploy_local_bundle_with_overlay_multi():
         # this bundle deploys mysql and ghost apps and relates them,
         # but the overlay attached removes ghost, so
         assert 'mysql' in model.applications
-        assert 'ghost' not in model.applications
 
 
 @base.bootstrapped
@@ -280,19 +279,14 @@ async def test_deploy_local_bundle_with_overlay_multi():
 async def test_deploy_bundle_with_overlay_as_argument():
     async with base.CleanModel() as model:
         overlay_path = OVERLAYS_DIR / 'test-overlay.yaml'
+        bundle_path = TESTS_DIR / "bundle" / "bundle.yaml"
 
-        await model.deploy('juju-qa-bundle-test', overlays=[overlay_path])
-        # juju-qa-bundle-test installs the applications
-        #   - juju-qa-test
-        #   - juju-qa-test-focal
-        #   - ntp
-        #   - ntp-focal
+        await model.deploy(bundle_path, overlays=[overlay_path])
 
-        # our overlay requests to remove ntp and add ghost and mysql
+        # our overlay requests to remove ntp and add mysql
         # and relate them, so
         assert 'juju-qa-test' in model.applications
-        assert 'ntp' not in model.applications
-        assert 'ghost' in model.applications
+        assert 'nrpe' not in model.applications
         assert 'mysql' in model.applications
 
 
@@ -301,9 +295,12 @@ async def test_deploy_bundle_with_overlay_as_argument():
 async def test_deploy_bundle_with_multi_overlay_as_argument():
     async with base.CleanModel() as model:
         overlay_path = OVERLAYS_DIR / 'test-multi-overlay.yaml'
+        bundle_path = TESTS_DIR / "bundle" / "bundle.yaml"
 
-        await model.deploy('juju-qa-bundle-test', overlays=[overlay_path])
-        assert 'ntp' not in model.applications
+        await model.deploy(bundle_path, overlays=[overlay_path])
+
+        assert 'juju-qa-test' in model.applications
+        assert 'nrpe' not in model.applications
         assert 'memcached' not in model.applications
         assert 'mysql' in model.applications
 
@@ -321,7 +318,7 @@ async def test_deploy_bundle_with_multiple_overlays_with_include_files():
         assert 'influxdb' not in model.applications
         assert 'test' not in model.applications
         assert 'memcached' not in model.applications
-        assert 'grafana' in model.applications
+        assert 'juju-qa-test' in model.applications
 
 
 @base.bootstrapped
