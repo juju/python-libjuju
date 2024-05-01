@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+2.9.49.0
+^^^^^^^^
+
+Thursday Apr 25 2024
+
+* Bugfix none type by @Aflynn50 in https://github.com/juju/python-libjuju/pull/1035
+
 2.9.46.1
 ^^^^^^^^
 
