@@ -23,6 +23,7 @@ If you need helpers to manage the asyncio loop, try :doc:`juju.loop`.
     juju.relation
     juju.tag
     juju.unit
+    juju.user
     juju.utils
 
 .. automodule:: juju
