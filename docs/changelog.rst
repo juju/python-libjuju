@@ -1,6 +1,19 @@
 Changelog
 ---------
 
+3.5.0.0
+^^^^^^^
+
+Thursday 30th May 2024
+
+## What's Changed
+
+* Make consume respect the controller name in the url by @Aflynn50 in https://github.com/juju/python-libjuju/pull/1038
+* Fix multiline description in textarea in bug template GH workflow by @cderici in https://github.com/juju/python-libjuju/pull/1041
+* Fix issue with microk8s proxy by @Aflynn50 in https://github.com/juju/python-libjuju/pull/1044
+* add missing "revision" parameter to addModel step. by @Thanhphan1147 in https://github.com/juju/python-libjuju/pull/1043
+* Add user api to pylibjuju documentation by @cderici in https://github.com/juju/python-libjuju/pull/1049
+
 3.4.0.0
 ^^^^^^^
 
