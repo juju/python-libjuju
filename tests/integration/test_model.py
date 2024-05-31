@@ -212,6 +212,18 @@ async def test_deploy_invalid_bundle():
 
 
 @base.bootstrapped
+@pytest.mark.bundle
+async def test_deploy_bundle_with_storage_constraint():
+    bundle_path = INTEGRATION_TEST_DIR / 'bundle' / 'bundle-with-storage-constraint.yaml'
+
+    async with base.CleanModel() as model:
+        await model.deploy(bundle_path)
+        await wait_for_bundle(model, bundle_path)
+        storage = await model.list_storage()
+        assert len(storage) == 1
+
+
+@base.bootstrapped
 async def test_deploy_local_charm():
     charm_path = TESTS_DIR / 'charm'
 
