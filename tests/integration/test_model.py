@@ -210,6 +210,7 @@ async def test_deploy_invalid_bundle():
         with pytest.raises(JujuError):
             await model.deploy(str(bundle_path))
 
+
 @base.bootstrapped
 @pytest.mark.bundle
 async def test_deploy_bundle_with_storage_constraint():
