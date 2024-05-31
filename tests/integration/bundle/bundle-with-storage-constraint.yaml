@@ -1,0 +1,11 @@
+name: bundle-with-storage-constraint
+
+series: jammy
+
+applications:
+  postgresql:
+    charm: postgresql
+    num_units: 1
+    channel: 14/stable
+    storage:
+      pgdata: lxd,8G
