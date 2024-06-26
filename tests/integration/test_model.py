@@ -438,6 +438,15 @@ async def test_deploy_with_base():
 
 
 @base.bootstrapped
+async def test_deploy_noble():
+    charm_path = INTEGRATION_TEST_DIR / 'charm-manifest'
+
+    async with base.CleanModel() as model:
+        await model.deploy(str(charm_path), base="ubuntu@24.04")
+        await model.wait_for_idle(status='active')
+
+
+@base.bootstrapped
 async def test_add_machine():
     from juju.machine import Machine
 
