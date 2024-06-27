@@ -11,7 +11,7 @@ Documentation: https://pythonlibjuju.readthedocs.io/en/latest/
 Requirements
 ------------
 
-* Python 3.9/3.10
+* Python 3.9/3.10/3.11
 
 
 Design Notes
