@@ -2704,15 +2704,15 @@ class Model:
         if result_error.error is not None:
             raise JujuAPIError(result_error.error)
 
-    async def list_secrets(self, filter="", show_secrets=False):
+    async def list_secrets(self, filter=None, show_secrets=False):
         """
         Returns the list of available secrets.
         """
         facade = client.SecretsFacade.from_connection(self.connection())
-        results = await facade.ListSecrets({
-            'filter': filter,
-            'show-secrets': show_secrets,
-        })
+        results = await facade.ListSecrets(
+            filter_=filter,
+            show_secrets=show_secrets,
+        )
         return results.results
 
     async def remove_secret(self, secret_name, revision=-1):
