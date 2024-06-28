@@ -60,7 +60,7 @@ class TestConstraints(unittest.TestCase):
         self.assertEqual(
             _("mem=10G zones=bar,baz tags=tag1 spaces=space1,space2"),
             {"mem": 10 * 1024,
-             "zones": "bar,baz",
+             "zones": ["bar", "baz"],
              "tags": ["tag1"],
              "spaces": ["space1", "space2"]}
         )
