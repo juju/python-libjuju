@@ -6,8 +6,10 @@ import mock
 import asyncio
 
 from juju.model import Model
-from juju.application import (Application, ExposedEndpoint)
+from juju.application import Application, ExposedEndpoint, _refresh_origin
 from juju.errors import JujuError
+from juju.client import client
+from juju.origin import Source
 
 
 class TestExposeApplication(unittest.IsolatedAsyncioTestCase):
@@ -177,3 +179,54 @@ class TestRefreshApplication(unittest.IsolatedAsyncioTestCase):
 
         with self.assertRaises(ValueError):
             await app.refresh(switch="charm1", path="/path/to/charm2")
+
+    def test_refresh_origin(self):
+        current_origin = client.CharmOrigin(
+            source=str(Source.CHARM_HUB),
+            track="latest",
+            risk="stable",
+            revision=100,
+            base=client.Base("24.04", "ubuntu"),
+            architecture="amd64",
+        )
+
+        origin = _refresh_origin(current_origin, None, None)
+        self.assertEqual(origin, current_origin)
+
+        origin = _refresh_origin(current_origin, None, 101)
+        self.assertEqual(origin.revision, 101)
+        # Check source, base & arch do not change
+        self.assertEqual(origin.source, current_origin.source)
+        self.assertEqual(origin.base, current_origin.base)
+        self.assertEqual(origin.architecture, current_origin.architecture)
+
+        origin = _refresh_origin(current_origin, None, 0)
+        self.assertEqual(origin.revision, 0)
+        # Check source, base & arch do not change
+        self.assertEqual(origin.source, current_origin.source)
+        self.assertEqual(origin.base, current_origin.base)
+        self.assertEqual(origin.architecture, current_origin.architecture)
+
+        origin = _refresh_origin(current_origin, "12/edge", None)
+        self.assertEqual(origin.track, "12")
+        self.assertEqual(origin.risk, "edge")
+        # Check source, base & arch do not change
+        self.assertEqual(origin.source, current_origin.source)
+        self.assertEqual(origin.base, current_origin.base)
+        self.assertEqual(origin.architecture, current_origin.architecture)
+
+    def test_refresh_origin_drops_id_hash(self):
+        current_origin = client.CharmOrigin(
+            source=str(Source.CHARM_HUB),
+            track="latest",
+            risk="stable",
+            revision=100,
+            base=client.Base("24.04", "ubuntu"),
+            architecture="amd64",
+            id_="id",
+            hash_="hash",
+        )
+
+        origin = _refresh_origin(current_origin, None, None)
+        self.assertIsNone(origin.id_)
+        self.assertIsNone(origin.hash_)
