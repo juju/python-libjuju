@@ -18,6 +18,7 @@ from .relation import Relation
 from .status import derive_status
 from .url import URL
 from .utils import block_until
+from .version import DEFAULT_ARCHITECTURE
 
 log = logging.getLogger(__name__)
 
@@ -691,12 +692,6 @@ class Application(model.ModelEntity):
         if charm_url_origin_result.error is not None:
             err = charm_url_origin_result.error
             raise JujuError(f'{err.code} : {err.message}')
-        origin = charm_url_origin_result.charm_origin
-
-        if path is not None or (switch is not None and is_local_charm(switch)):
-            await self.local_refresh(origin, force, force_series,
-                                     force_units, path or switch, resources)
-            return
 
         # If switch is not None at this point, that means it's a switch to a store charm
         charm_url = switch or charm_url_origin_result.url
@@ -706,19 +701,24 @@ class Application(model.ModelEntity):
         if parsed_url.schema is None:
             raise JujuError(f'A ch: or cs: schema is required for application refresh, given : {str(parsed_url)}')
 
-        if revision is not None:
-            origin.revision = revision
+        current_origin = charm_url_origin_result.charm_origin
+        if path is not None or (switch is not None and is_local_charm(switch)):
+            await self.local_refresh(current_origin, force, force_series,
+                                     force_units, path or switch, resources)
+            return
 
-        # Make the source-specific changes to the origin/channel/url
-        # (and also get the resources necessary to deploy the (destination) charm -- for later)
-        origin.source = Source.CHARM_HUB.value
-        if channel:
+        ch = None
+        if channel is not None:
             ch = Channel.parse(channel).normalize()
-            origin.risk = ch.risk
-            origin.track = ch.track
 
-        charmhub = self.model.charmhub
-        charm_resources = await charmhub.list_resources(charm_name)
+        origin = client.CharmOrigin(
+            source=str(Source.CHARM_HUB),
+            risk=ch.risk if ch else current_origin.risk,
+            track=ch.track if ch else current_origin.track,
+            revision=revision or current_origin.revision,
+            base=current_origin.base,
+            architecture=current_origin.architecture or DEFAULT_ARCHITECTURE,
+        )
 
         # Resolve the given charm URLs with an optionally specified preferred channel.
         # Channel provided via CharmOrigin.
@@ -761,8 +761,7 @@ class Application(model.ModelEntity):
             else:
                 _arg_res_filenames[res] = filename_or_rev
 
-        # Already prepped the charm_resources
-        # Now get the existing resources from the ResourcesFacade
+        # Get the existing resources from the ResourcesFacade
         request_data = [client.Entity(self.tag)]
         resources_facade = client.ResourcesFacade.from_connection(self.connection)
         response = await resources_facade.ListResources(entities=request_data)
@@ -770,6 +769,9 @@ class Application(model.ModelEntity):
             resource.name: resource
             for resource in response.results[0].resources
         }
+
+        charmhub = self.model.charmhub
+        charm_resources = await charmhub.list_resources(charm_name)
 
         # Compute the difference btw resources needed and the existing resources
         resources_to_update = []
