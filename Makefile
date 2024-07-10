@@ -20,11 +20,11 @@ client:
 	$(PY) -m juju.client.facade -s "juju/client/schemas*" -o juju/client/
 
 .PHONY: run-unit-tests
-run-unit-tests: lint .tox
+run-unit-tests: .tox lint
 	tox -e py3
 
 .PHONY: run-integration-tests
-run-integration-tests: lint .tox
+run-integration-tests: .tox lint
 	tox -e integration
 
 .PHONY: run-all-tests
