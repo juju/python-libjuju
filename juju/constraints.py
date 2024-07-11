@@ -54,7 +54,7 @@ SUPPORTED_KEYS = [
     "zones",
     "allocate_public_ip"]
 
-LIST_KEYS = {'tags', 'spaces'}
+LIST_KEYS = {'tags', 'spaces', 'zones'}
 
 SNAKE1 = re.compile(r'(.)([A-Z][a-z]+)')
 SNAKE2 = re.compile('([a-z0-9])([A-Z])')
