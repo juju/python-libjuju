@@ -288,6 +288,18 @@ async def test_local_refresh():
 
 @base.bootstrapped
 @pytest.mark.asyncio
+async def test_refresh_revision():
+    async with base.CleanModel() as model:
+        app = await model.deploy('juju-qa-test', channel="latest/stable", revision=23)
+        # NOTE: juju-qa-test revision 26 has been released to this channel
+        await app.refresh(revision=25)
+
+        charm_url = URL.parse(app.data['charm-url'])
+        assert charm_url.revision == 25
+
+
+@base.bootstrapped
+@pytest.mark.asyncio
 async def test_trusted():
     async with base.CleanModel() as model:
         await model.deploy('ubuntu', trust=True)
