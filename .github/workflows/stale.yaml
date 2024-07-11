@@ -19,6 +19,6 @@ jobs:
           days-before-pr-close: 5
           stale-issue-label: 'incomplete'
           stale-pr-label: 'incomplete'
-          exempt-issue-labels: 'awaiting-approval,work-in-progress,wishlisted'
-          exempt-pr-labels: 'awaiting-approval,work-in-progress'
+          exempt-issue-labels: 'stalebot/disabled,kind/wishlist'
+          exempt-pr-labels: 'stalebot/disabled,state/awaiting-approval'
           remove-stale-when-updated: true
