@@ -66,6 +66,14 @@ class Connector:
         """
         kwargs.setdefault('max_frame_size', self.max_frame_size)
         kwargs.setdefault('bakery_client', self.bakery_client)
+        account = kwargs.pop('account', {})
+        # Prioritize the username and password that user provided
+        # If not enough, try to patch it with info from accounts.yaml
+        if 'username' not in kwargs and account.get('user'):
+            kwargs.update(username=account.get('user'))
+        if 'password' not in kwargs and account.get('password'):
+            kwargs.update(password=account.get('password'))
+
         if 'macaroons' in kwargs:
             if not kwargs['bakery_client']:
                 kwargs['bakery_client'] = httpbakery.Client()
@@ -74,24 +82,17 @@ class Connector:
             jar = kwargs['bakery_client'].cookies
             for macaroon in kwargs.pop('macaroons'):
                 jar.set_cookie(go_to_py_cookie(macaroon))
+        else:
+            if not ({'username', 'password'}.issubset(kwargs)):
+                required = {'username', 'password'}.difference(kwargs)
+                raise ValueError(f'Some authentication parameters are required : {",".join(required)}')
+
         if 'debug_log_conn' in kwargs:
             assert self._connection
             self._log_connection = await Connection.connect(**kwargs)
         else:
             if self._connection:
                 await self._connection.close()
-
-            account = kwargs.pop('account', {})
-            # Prioritize the username and password that user provided
-            # If not enough, try to patch it with info from accounts.yaml
-            if 'username' not in kwargs and account.get('user'):
-                kwargs.update(username=account.get('user'))
-            if 'password' not in kwargs and account.get('password'):
-                kwargs.update(password=account.get('password'))
-
-            if not ({'username', 'password'}.issubset(kwargs)):
-                required = {'username', 'password'}.difference(kwargs)
-                raise ValueError(f'Some authentication parameters are required : {",".join(required)}')
             self._connection = await Connection.connect(**kwargs)
 
         if not self.controller_name:
