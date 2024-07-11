@@ -1,12 +1,26 @@
 Changelog
 ---------
 
+3.5.2.0
+^^^^^^^
+
+Thursday 11th July 2024
+
+## What's Changed
+
+* fix parsing of storage constraints by @luissimas in https://github.com/juju/python-libjuju/pull/1053
+* Add setuptools to tox.ini by @Aflynn50 in https://github.com/juju/python-libjuju/pull/1058
+* fix(refresh): bug with revisions by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/1067
+* feat: conventional commits static analysis by @SimonRichardson in https://github.com/juju/python-libjuju/pull/1068
+* fix(series): add noble support by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/1063
+* fix zones constraints list parsing by @luissimas in https://github.com/juju/python-libjuju/pull/1054
+* fix(model): fix wrong instanciation of list-secrets facade by @gboutry in https://github.com/juju/python-libjuju/pull/1065
+* fix(makefile): run .tox before lint in makefile target by @cderici in https://github.com/juju/python-libjuju/pull/1069
+
 3.5.0.0
 ^^^^^^^
 
 Thursday 30th May 2024
-
-## What's Changed
 
 * Make consume respect the controller name in the url by @Aflynn50 in https://github.com/juju/python-libjuju/pull/1038
 * Fix multiline description in textarea in bug template GH workflow by @cderici in https://github.com/juju/python-libjuju/pull/1041
@@ -19,8 +33,6 @@ Thursday 30th May 2024
 
 Monday 25th Mar 2024
 
-## What's Changed
-
 * Add build test and update issue template by @cderici in https://github.com/juju/python-libjuju/pull/1030
 * fix: machine scp & ssh by @yanksyoon in https://github.com/juju/python-libjuju/pull/1020
 * Bugfix none type on master by @Aflynn50 in https://github.com/juju/python-libjuju/pull/1036
@@ -29,8 +41,6 @@ Monday 25th Mar 2024
 ^^^^^^^
 
 Thursday 15th Feb 2024
-
-## What's Changed
 
 This is a patch release for fixing some build problems in the 3.3.1.0 release that rendered it unusable in some scenarios.
 
