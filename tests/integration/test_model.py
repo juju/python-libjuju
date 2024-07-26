@@ -1198,6 +1198,21 @@ async def test_model_cache_update():
 
 
 @base.bootstrapped
+async def test_deploy_with_storage():
+    async with base.CleanModel() as model:
+        await model.deploy(
+            'postgresql',
+            storage={"pgdata": {"size": 1024, "count": 1}},
+        )
+        await model.wait_for_idle(status="active")
+        storages = await model.list_storage()
+        await model.list_storage(filesystem=True)
+        await model.list_storage(volume=True)
+
+        assert any([tag.storage("pgdata") in s['storage-tag'] for s in storages])
+
+
+@base.bootstrapped
 async def test_add_storage():
     pytest.skip('skip in favour of test_add_and_list_storage')
     async with base.CleanModel() as model:
