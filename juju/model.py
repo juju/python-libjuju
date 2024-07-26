@@ -2105,6 +2105,13 @@ class Model:
 
         app_facade = client.ApplicationFacade.from_connection(self.connection())
 
+        # Prepare all storage constraints
+        storage = storage or dict()
+        storage = {
+            k: v if isinstance(v, client.Constraints) else parse_storage_constraint(v)
+            for k, v in storage.items()
+        }
+
         if server_side_deploy:
             # Call DeployFromRepository
             app = client.DeployFromRepositoryArg(
@@ -2116,7 +2123,7 @@ class Model:
                 devices=devices,
                 dryrun=False,
                 placement=placement,
-                storage={k: parse_storage_constraint(v) for k, v in (storage or dict()).items()},
+                storage=storage,
                 trust=trust,
                 base=charm_origin.base,
                 channel=channel,
@@ -2151,7 +2158,7 @@ class Model:
                 endpoint_bindings=endpoint_bindings,
                 num_units=num_units,
                 resources=resources,
-                storage={k: parse_storage_constraint(v) for k, v in (storage or dict()).items()},
+                storage=storage,
                 placement=placement,
                 devices=devices,
                 attach_storage=attach_storage,
