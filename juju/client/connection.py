@@ -570,6 +570,9 @@ class Connection:
                     break
                 if result is not None:
                     result = json.loads(result)
+                    with open("/tmp/ws-log.jsonl", "a") as f:
+                        # Top-level key "response": <dict> means incoming message
+                        f.write(json.dumps(result) + "\n")
                     await self.messages.put(result['request-id'], result)
         except jasyncio.CancelledError:
             log.debug('Receiver: Cancelled')
@@ -647,6 +650,9 @@ class Connection:
                                             'websocket closed'))
             try:
                 await self._ws.send(outgoing)
+                with open("/tmp/ws-log.jsonl", "a") as f:
+                    # Top-level key "request": <str> means outgoing message
+                    f.write(json.dumps(msg, cls=encoder) + "\n")
                 break
             except websockets.ConnectionClosed:
                 if attempt == 2:

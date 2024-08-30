@@ -1,6 +1,7 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
+import asyncio
 import os
 import textwrap
 from collections import defaultdict
@@ -100,8 +101,8 @@ class IdQueue:
     Wrapper around asyncio.Queue that maintains a separate queue for each ID.
     """
 
-    def __init__(self, maxsize=0):
-        self._queues = defaultdict(partial(jasyncio.Queue, maxsize))
+    def __init__(self):
+        self._queues = defaultdict(asyncio.Queue)
 
     async def get(self, id):
         value = await self._queues[id].get()
