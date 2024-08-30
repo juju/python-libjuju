@@ -636,10 +636,10 @@ class {name}Facade(Type):
 
 
 class TypeEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, Type):
-            return obj.serialize()
-        return json.JSONEncoder.default(self, obj)
+    def default(self, o):
+        if isinstance(o, Type):
+            return o.serialize()
+        return json.JSONEncoder.default(self, o)
 
 
 class Type:

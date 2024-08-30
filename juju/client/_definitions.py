@@ -22,6 +22,36 @@ class APIHostPortsResult(Type):
 
 
 
+class AccessInfo(Type):
+    _toSchema = {'role': 'role', 'scope_tag': 'scope-tag', 'target_tag': 'target-tag'}
+    _toPy = {'role': 'role', 'scope-tag': 'scope_tag', 'target-tag': 'target_tag'}
+    def __init__(self, role=None, scope_tag=None, target_tag=None, **unknown_fields):
+        '''
+        role : str
+        scope_tag : str
+        target_tag : str
+        '''
+        role_ = role
+        scope_tag_ = scope_tag
+        target_tag_ = target_tag
+
+        # Validate arguments against known Juju API types.
+        if role_ is not None and not isinstance(role_, (bytes, str)):
+            raise Exception("Expected role_ to be a str, received: {}".format(type(role_)))
+
+        if scope_tag_ is not None and not isinstance(scope_tag_, (bytes, str)):
+            raise Exception("Expected scope_tag_ to be a str, received: {}".format(type(scope_tag_)))
+
+        if target_tag_ is not None and not isinstance(target_tag_, (bytes, str)):
+            raise Exception("Expected target_tag_ to be a str, received: {}".format(type(target_tag_)))
+
+        self.role = role_
+        self.scope_tag = scope_tag_
+        self.target_tag = target_tag_
+        self.unknown_fields = unknown_fields
+
+
+
 class Action(Type):
     _toSchema = {'execution_group': 'execution-group', 'name': 'name', 'parallel': 'parallel', 'parameters': 'parameters', 'receiver': 'receiver', 'tag': 'tag'}
     _toPy = {'execution-group': 'execution_group', 'name': 'name', 'parallel': 'parallel', 'parameters': 'parameters', 'receiver': 'receiver', 'tag': 'tag'}
@@ -2044,6 +2074,84 @@ class ApplicationOfferAdminDetails(Type):
 
 
 
+class ApplicationOfferAdminDetailsV5(Type):
+    _toSchema = {'application_description': 'application-description', 'application_name': 'application-name', 'applicationofferdetailsv5': 'ApplicationOfferDetailsV5', 'charm_url': 'charm-url', 'connections': 'connections', 'endpoints': 'endpoints', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'offer_uuid': 'offer-uuid', 'source_model_tag': 'source-model-tag', 'users': 'users'}
+    _toPy = {'ApplicationOfferDetailsV5': 'applicationofferdetailsv5', 'application-description': 'application_description', 'application-name': 'application_name', 'charm-url': 'charm_url', 'connections': 'connections', 'endpoints': 'endpoints', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'offer-uuid': 'offer_uuid', 'source-model-tag': 'source_model_tag', 'users': 'users'}
+    def __init__(self, applicationofferdetailsv5=None, application_description=None, application_name=None, charm_url=None, connections=None, endpoints=None, offer_name=None, offer_url=None, offer_uuid=None, source_model_tag=None, users=None, **unknown_fields):
+        '''
+        applicationofferdetailsv5 : ApplicationOfferDetailsV5
+        application_description : str
+        application_name : str
+        charm_url : str
+        connections : typing.Sequence[~OfferConnection]
+        endpoints : typing.Sequence[~RemoteEndpoint]
+        offer_name : str
+        offer_url : str
+        offer_uuid : str
+        source_model_tag : str
+        users : typing.Sequence[~OfferUserDetails]
+        '''
+        applicationofferdetailsv5_ = ApplicationOfferDetailsV5.from_json(applicationofferdetailsv5) if applicationofferdetailsv5 else None
+        application_description_ = application_description
+        application_name_ = application_name
+        charm_url_ = charm_url
+        connections_ = [OfferConnection.from_json(o) for o in connections or []]
+        endpoints_ = [RemoteEndpoint.from_json(o) for o in endpoints or []]
+        offer_name_ = offer_name
+        offer_url_ = offer_url
+        offer_uuid_ = offer_uuid
+        source_model_tag_ = source_model_tag
+        users_ = [OfferUserDetails.from_json(o) for o in users or []]
+
+        # Validate arguments against known Juju API types.
+        if applicationofferdetailsv5_ is not None and not isinstance(applicationofferdetailsv5_, (dict, ApplicationOfferDetailsV5)):
+            raise Exception("Expected applicationofferdetailsv5_ to be a ApplicationOfferDetailsV5, received: {}".format(type(applicationofferdetailsv5_)))
+
+        if application_description_ is not None and not isinstance(application_description_, (bytes, str)):
+            raise Exception("Expected application_description_ to be a str, received: {}".format(type(application_description_)))
+
+        if application_name_ is not None and not isinstance(application_name_, (bytes, str)):
+            raise Exception("Expected application_name_ to be a str, received: {}".format(type(application_name_)))
+
+        if charm_url_ is not None and not isinstance(charm_url_, (bytes, str)):
+            raise Exception("Expected charm_url_ to be a str, received: {}".format(type(charm_url_)))
+
+        if connections_ is not None and not isinstance(connections_, (bytes, str, list)):
+            raise Exception("Expected connections_ to be a Sequence, received: {}".format(type(connections_)))
+
+        if endpoints_ is not None and not isinstance(endpoints_, (bytes, str, list)):
+            raise Exception("Expected endpoints_ to be a Sequence, received: {}".format(type(endpoints_)))
+
+        if offer_name_ is not None and not isinstance(offer_name_, (bytes, str)):
+            raise Exception("Expected offer_name_ to be a str, received: {}".format(type(offer_name_)))
+
+        if offer_url_ is not None and not isinstance(offer_url_, (bytes, str)):
+            raise Exception("Expected offer_url_ to be a str, received: {}".format(type(offer_url_)))
+
+        if offer_uuid_ is not None and not isinstance(offer_uuid_, (bytes, str)):
+            raise Exception("Expected offer_uuid_ to be a str, received: {}".format(type(offer_uuid_)))
+
+        if source_model_tag_ is not None and not isinstance(source_model_tag_, (bytes, str)):
+            raise Exception("Expected source_model_tag_ to be a str, received: {}".format(type(source_model_tag_)))
+
+        if users_ is not None and not isinstance(users_, (bytes, str, list)):
+            raise Exception("Expected users_ to be a Sequence, received: {}".format(type(users_)))
+
+        self.applicationofferdetailsv5 = applicationofferdetailsv5_
+        self.application_description = application_description_
+        self.application_name = application_name_
+        self.charm_url = charm_url_
+        self.connections = connections_
+        self.endpoints = endpoints_
+        self.offer_name = offer_name_
+        self.offer_url = offer_url_
+        self.offer_uuid = offer_uuid_
+        self.source_model_tag = source_model_tag_
+        self.users = users_
+        self.unknown_fields = unknown_fields
+
+
+
 class ApplicationOfferDetails(Type):
     _toSchema = {'application_description': 'application-description', 'bindings': 'bindings', 'endpoints': 'endpoints', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'offer_uuid': 'offer-uuid', 'source_model_tag': 'source-model-tag', 'spaces': 'spaces', 'users': 'users'}
     _toPy = {'application-description': 'application_description', 'bindings': 'bindings', 'endpoints': 'endpoints', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'offer-uuid': 'offer_uuid', 'source-model-tag': 'source_model_tag', 'spaces': 'spaces', 'users': 'users'}
@@ -2110,23 +2218,77 @@ class ApplicationOfferDetails(Type):
 
 
 
+class ApplicationOfferDetailsV5(Type):
+    _toSchema = {'application_description': 'application-description', 'endpoints': 'endpoints', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'offer_uuid': 'offer-uuid', 'source_model_tag': 'source-model-tag', 'users': 'users'}
+    _toPy = {'application-description': 'application_description', 'endpoints': 'endpoints', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'offer-uuid': 'offer_uuid', 'source-model-tag': 'source_model_tag', 'users': 'users'}
+    def __init__(self, application_description=None, endpoints=None, offer_name=None, offer_url=None, offer_uuid=None, source_model_tag=None, users=None, **unknown_fields):
+        '''
+        application_description : str
+        endpoints : typing.Sequence[~RemoteEndpoint]
+        offer_name : str
+        offer_url : str
+        offer_uuid : str
+        source_model_tag : str
+        users : typing.Sequence[~OfferUserDetails]
+        '''
+        application_description_ = application_description
+        endpoints_ = [RemoteEndpoint.from_json(o) for o in endpoints or []]
+        offer_name_ = offer_name
+        offer_url_ = offer_url
+        offer_uuid_ = offer_uuid
+        source_model_tag_ = source_model_tag
+        users_ = [OfferUserDetails.from_json(o) for o in users or []]
+
+        # Validate arguments against known Juju API types.
+        if application_description_ is not None and not isinstance(application_description_, (bytes, str)):
+            raise Exception("Expected application_description_ to be a str, received: {}".format(type(application_description_)))
+
+        if endpoints_ is not None and not isinstance(endpoints_, (bytes, str, list)):
+            raise Exception("Expected endpoints_ to be a Sequence, received: {}".format(type(endpoints_)))
+
+        if offer_name_ is not None and not isinstance(offer_name_, (bytes, str)):
+            raise Exception("Expected offer_name_ to be a str, received: {}".format(type(offer_name_)))
+
+        if offer_url_ is not None and not isinstance(offer_url_, (bytes, str)):
+            raise Exception("Expected offer_url_ to be a str, received: {}".format(type(offer_url_)))
+
+        if offer_uuid_ is not None and not isinstance(offer_uuid_, (bytes, str)):
+            raise Exception("Expected offer_uuid_ to be a str, received: {}".format(type(offer_uuid_)))
+
+        if source_model_tag_ is not None and not isinstance(source_model_tag_, (bytes, str)):
+            raise Exception("Expected source_model_tag_ to be a str, received: {}".format(type(source_model_tag_)))
+
+        if users_ is not None and not isinstance(users_, (bytes, str, list)):
+            raise Exception("Expected users_ to be a Sequence, received: {}".format(type(users_)))
+
+        self.application_description = application_description_
+        self.endpoints = endpoints_
+        self.offer_name = offer_name_
+        self.offer_url = offer_url_
+        self.offer_uuid = offer_uuid_
+        self.source_model_tag = source_model_tag_
+        self.users = users_
+        self.unknown_fields = unknown_fields
+
+
+
 class ApplicationOfferResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
-        result : ApplicationOfferAdminDetails
+        result : ApplicationOfferAdminDetailsV5
         '''
         error_ = Error.from_json(error) if error else None
-        result_ = ApplicationOfferAdminDetails.from_json(result) if result else None
+        result_ = ApplicationOfferAdminDetailsV5.from_json(result) if result else None
 
         # Validate arguments against known Juju API types.
         if error_ is not None and not isinstance(error_, (dict, Error)):
             raise Exception("Expected error_ to be a Error, received: {}".format(type(error_)))
 
-        if result_ is not None and not isinstance(result_, (dict, ApplicationOfferAdminDetails)):
-            raise Exception("Expected result_ to be a ApplicationOfferAdminDetails, received: {}".format(type(result_)))
+        if result_ is not None and not isinstance(result_, (dict, ApplicationOfferAdminDetailsV5)):
+            raise Exception("Expected result_ to be a ApplicationOfferAdminDetailsV5, received: {}".format(type(result_)))
 
         self.error = error_
         self.result = result_
@@ -4463,25 +4625,37 @@ class CharmBase(Type):
 
 
 class CharmContainer(Type):
-    _toSchema = {'mounts': 'mounts', 'resource': 'resource'}
-    _toPy = {'mounts': 'mounts', 'resource': 'resource'}
-    def __init__(self, mounts=None, resource=None, **unknown_fields):
+    _toSchema = {'gid': 'gid', 'mounts': 'mounts', 'resource': 'resource', 'uid': 'uid'}
+    _toPy = {'gid': 'gid', 'mounts': 'mounts', 'resource': 'resource', 'uid': 'uid'}
+    def __init__(self, gid=None, mounts=None, resource=None, uid=None, **unknown_fields):
         '''
+        gid : int
         mounts : typing.Sequence[~CharmMount]
         resource : str
+        uid : int
         '''
+        gid_ = gid
         mounts_ = [CharmMount.from_json(o) for o in mounts or []]
         resource_ = resource
+        uid_ = uid
 
         # Validate arguments against known Juju API types.
+        if gid_ is not None and not isinstance(gid_, int):
+            raise Exception("Expected gid_ to be a int, received: {}".format(type(gid_)))
+
         if mounts_ is not None and not isinstance(mounts_, (bytes, str, list)):
             raise Exception("Expected mounts_ to be a Sequence, received: {}".format(type(mounts_)))
 
         if resource_ is not None and not isinstance(resource_, (bytes, str)):
             raise Exception("Expected resource_ to be a str, received: {}".format(type(resource_)))
 
+        if uid_ is not None and not isinstance(uid_, int):
+            raise Exception("Expected uid_ to be a int, received: {}".format(type(uid_)))
+
+        self.gid = gid_
         self.mounts = mounts_
         self.resource = resource_
+        self.uid = uid_
         self.unknown_fields = unknown_fields
 
 
@@ -4613,12 +4787,13 @@ class CharmManifest(Type):
 
 
 class CharmMeta(Type):
-    _toSchema = {'assumes_expr': 'assumes-expr', 'categories': 'categories', 'containers': 'containers', 'deployment': 'deployment', 'description': 'description', 'devices': 'devices', 'extra_bindings': 'extra-bindings', 'min_juju_version': 'min-juju-version', 'name': 'name', 'payload_classes': 'payload-classes', 'peers': 'peers', 'provides': 'provides', 'requires': 'requires', 'resources': 'resources', 'series': 'series', 'storage': 'storage', 'subordinate': 'subordinate', 'summary': 'summary', 'tags': 'tags', 'terms': 'terms'}
-    _toPy = {'assumes-expr': 'assumes_expr', 'categories': 'categories', 'containers': 'containers', 'deployment': 'deployment', 'description': 'description', 'devices': 'devices', 'extra-bindings': 'extra_bindings', 'min-juju-version': 'min_juju_version', 'name': 'name', 'payload-classes': 'payload_classes', 'peers': 'peers', 'provides': 'provides', 'requires': 'requires', 'resources': 'resources', 'series': 'series', 'storage': 'storage', 'subordinate': 'subordinate', 'summary': 'summary', 'tags': 'tags', 'terms': 'terms'}
-    def __init__(self, assumes_expr=None, categories=None, containers=None, deployment=None, description=None, devices=None, extra_bindings=None, min_juju_version=None, name=None, payload_classes=None, peers=None, provides=None, requires=None, resources=None, series=None, storage=None, subordinate=None, summary=None, tags=None, terms=None, **unknown_fields):
+    _toSchema = {'assumes_expr': 'assumes-expr', 'categories': 'categories', 'charm_user': 'charm-user', 'containers': 'containers', 'deployment': 'deployment', 'description': 'description', 'devices': 'devices', 'extra_bindings': 'extra-bindings', 'min_juju_version': 'min-juju-version', 'name': 'name', 'payload_classes': 'payload-classes', 'peers': 'peers', 'provides': 'provides', 'requires': 'requires', 'resources': 'resources', 'series': 'series', 'storage': 'storage', 'subordinate': 'subordinate', 'summary': 'summary', 'tags': 'tags', 'terms': 'terms'}
+    _toPy = {'assumes-expr': 'assumes_expr', 'categories': 'categories', 'charm-user': 'charm_user', 'containers': 'containers', 'deployment': 'deployment', 'description': 'description', 'devices': 'devices', 'extra-bindings': 'extra_bindings', 'min-juju-version': 'min_juju_version', 'name': 'name', 'payload-classes': 'payload_classes', 'peers': 'peers', 'provides': 'provides', 'requires': 'requires', 'resources': 'resources', 'series': 'series', 'storage': 'storage', 'subordinate': 'subordinate', 'summary': 'summary', 'tags': 'tags', 'terms': 'terms'}
+    def __init__(self, assumes_expr=None, categories=None, charm_user=None, containers=None, deployment=None, description=None, devices=None, extra_bindings=None, min_juju_version=None, name=None, payload_classes=None, peers=None, provides=None, requires=None, resources=None, series=None, storage=None, subordinate=None, summary=None, tags=None, terms=None, **unknown_fields):
         '''
         assumes_expr : ExpressionTree
         categories : typing.Sequence[str]
+        charm_user : str
         containers : typing.Mapping[str, ~CharmContainer]
         deployment : CharmDeployment
         description : str
@@ -4640,6 +4815,7 @@ class CharmMeta(Type):
         '''
         assumes_expr_ = ExpressionTree.from_json(assumes_expr) if assumes_expr else None
         categories_ = categories
+        charm_user_ = charm_user
         containers_ = {k: CharmContainer.from_json(v) for k, v in (containers or dict()).items()}
         deployment_ = CharmDeployment.from_json(deployment) if deployment else None
         description_ = description
@@ -4665,6 +4841,9 @@ class CharmMeta(Type):
 
         if categories_ is not None and not isinstance(categories_, (bytes, str, list)):
             raise Exception("Expected categories_ to be a Sequence, received: {}".format(type(categories_)))
+
+        if charm_user_ is not None and not isinstance(charm_user_, (bytes, str)):
+            raise Exception("Expected charm_user_ to be a str, received: {}".format(type(charm_user_)))
 
         if containers_ is not None and not isinstance(containers_, dict):
             raise Exception("Expected containers_ to be a Mapping, received: {}".format(type(containers_)))
@@ -4722,6 +4901,7 @@ class CharmMeta(Type):
 
         self.assumes_expr = assumes_expr_
         self.categories = categories_
+        self.charm_user = charm_user_
         self.containers = containers_
         self.deployment = deployment_
         self.description = description_
@@ -6254,9 +6434,9 @@ class CloudsResult(Type):
 
 
 class CommitHookChangesArg(Type):
-    _toSchema = {'add_storage': 'add-storage', 'close_ports': 'close-ports', 'open_ports': 'open-ports', 'pod_spec': 'pod-spec', 'relation_unit_settings': 'relation-unit-settings', 'secret_creates': 'secret-creates', 'secret_deletes': 'secret-deletes', 'secret_grants': 'secret-grants', 'secret_revokes': 'secret-revokes', 'secret_updates': 'secret-updates', 'set_raw_k8s_spec': 'set-raw-k8s-spec', 'tag': 'tag', 'unit_state': 'unit-state', 'update_network_info': 'update-network-info'}
-    _toPy = {'add-storage': 'add_storage', 'close-ports': 'close_ports', 'open-ports': 'open_ports', 'pod-spec': 'pod_spec', 'relation-unit-settings': 'relation_unit_settings', 'secret-creates': 'secret_creates', 'secret-deletes': 'secret_deletes', 'secret-grants': 'secret_grants', 'secret-revokes': 'secret_revokes', 'secret-updates': 'secret_updates', 'set-raw-k8s-spec': 'set_raw_k8s_spec', 'tag': 'tag', 'unit-state': 'unit_state', 'update-network-info': 'update_network_info'}
-    def __init__(self, add_storage=None, close_ports=None, open_ports=None, pod_spec=None, relation_unit_settings=None, secret_creates=None, secret_deletes=None, secret_grants=None, secret_revokes=None, secret_updates=None, set_raw_k8s_spec=None, tag=None, unit_state=None, update_network_info=None, **unknown_fields):
+    _toSchema = {'add_storage': 'add-storage', 'close_ports': 'close-ports', 'open_ports': 'open-ports', 'pod_spec': 'pod-spec', 'relation_unit_settings': 'relation-unit-settings', 'secret_creates': 'secret-creates', 'secret_deletes': 'secret-deletes', 'secret_grants': 'secret-grants', 'secret_revokes': 'secret-revokes', 'secret_track_latest': 'secret-track-latest', 'secret_updates': 'secret-updates', 'set_raw_k8s_spec': 'set-raw-k8s-spec', 'tag': 'tag', 'unit_state': 'unit-state', 'update_network_info': 'update-network-info'}
+    _toPy = {'add-storage': 'add_storage', 'close-ports': 'close_ports', 'open-ports': 'open_ports', 'pod-spec': 'pod_spec', 'relation-unit-settings': 'relation_unit_settings', 'secret-creates': 'secret_creates', 'secret-deletes': 'secret_deletes', 'secret-grants': 'secret_grants', 'secret-revokes': 'secret_revokes', 'secret-track-latest': 'secret_track_latest', 'secret-updates': 'secret_updates', 'set-raw-k8s-spec': 'set_raw_k8s_spec', 'tag': 'tag', 'unit-state': 'unit_state', 'update-network-info': 'update_network_info'}
+    def __init__(self, add_storage=None, close_ports=None, open_ports=None, pod_spec=None, relation_unit_settings=None, secret_creates=None, secret_deletes=None, secret_grants=None, secret_revokes=None, secret_track_latest=None, secret_updates=None, set_raw_k8s_spec=None, tag=None, unit_state=None, update_network_info=None, **unknown_fields):
         '''
         add_storage : typing.Sequence[~StorageAddParams]
         close_ports : typing.Sequence[~EntityPortRange]
@@ -6267,6 +6447,7 @@ class CommitHookChangesArg(Type):
         secret_deletes : typing.Sequence[~DeleteSecretArg]
         secret_grants : typing.Sequence[~GrantRevokeSecretArg]
         secret_revokes : typing.Sequence[~GrantRevokeSecretArg]
+        secret_track_latest : typing.Sequence[str]
         secret_updates : typing.Sequence[~UpdateSecretArg]
         set_raw_k8s_spec : PodSpec
         tag : str
@@ -6282,6 +6463,7 @@ class CommitHookChangesArg(Type):
         secret_deletes_ = [DeleteSecretArg.from_json(o) for o in secret_deletes or []]
         secret_grants_ = [GrantRevokeSecretArg.from_json(o) for o in secret_grants or []]
         secret_revokes_ = [GrantRevokeSecretArg.from_json(o) for o in secret_revokes or []]
+        secret_track_latest_ = secret_track_latest
         secret_updates_ = [UpdateSecretArg.from_json(o) for o in secret_updates or []]
         set_raw_k8s_spec_ = PodSpec.from_json(set_raw_k8s_spec) if set_raw_k8s_spec else None
         tag_ = tag
@@ -6316,6 +6498,9 @@ class CommitHookChangesArg(Type):
         if secret_revokes_ is not None and not isinstance(secret_revokes_, (bytes, str, list)):
             raise Exception("Expected secret_revokes_ to be a Sequence, received: {}".format(type(secret_revokes_)))
 
+        if secret_track_latest_ is not None and not isinstance(secret_track_latest_, (bytes, str, list)):
+            raise Exception("Expected secret_track_latest_ to be a Sequence, received: {}".format(type(secret_track_latest_)))
+
         if secret_updates_ is not None and not isinstance(secret_updates_, (bytes, str, list)):
             raise Exception("Expected secret_updates_ to be a Sequence, received: {}".format(type(secret_updates_)))
 
@@ -6340,6 +6525,7 @@ class CommitHookChangesArg(Type):
         self.secret_deletes = secret_deletes_
         self.secret_grants = secret_grants_
         self.secret_revokes = secret_revokes_
+        self.secret_track_latest = secret_track_latest_
         self.secret_updates = secret_updates_
         self.set_raw_k8s_spec = set_raw_k8s_spec_
         self.tag = tag_
@@ -6670,6 +6856,84 @@ class ConsumeApplicationArg(Type):
 
 
 
+class ConsumeApplicationArgV5(Type):
+    _toSchema = {'application_alias': 'application-alias', 'application_description': 'application-description', 'applicationofferdetailsv5': 'ApplicationOfferDetailsV5', 'endpoints': 'endpoints', 'external_controller': 'external-controller', 'macaroon': 'macaroon', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'offer_uuid': 'offer-uuid', 'source_model_tag': 'source-model-tag', 'users': 'users'}
+    _toPy = {'ApplicationOfferDetailsV5': 'applicationofferdetailsv5', 'application-alias': 'application_alias', 'application-description': 'application_description', 'endpoints': 'endpoints', 'external-controller': 'external_controller', 'macaroon': 'macaroon', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'offer-uuid': 'offer_uuid', 'source-model-tag': 'source_model_tag', 'users': 'users'}
+    def __init__(self, applicationofferdetailsv5=None, application_alias=None, application_description=None, endpoints=None, external_controller=None, macaroon=None, offer_name=None, offer_url=None, offer_uuid=None, source_model_tag=None, users=None, **unknown_fields):
+        '''
+        applicationofferdetailsv5 : ApplicationOfferDetailsV5
+        application_alias : str
+        application_description : str
+        endpoints : typing.Sequence[~RemoteEndpoint]
+        external_controller : ExternalControllerInfo
+        macaroon : Macaroon
+        offer_name : str
+        offer_url : str
+        offer_uuid : str
+        source_model_tag : str
+        users : typing.Sequence[~OfferUserDetails]
+        '''
+        applicationofferdetailsv5_ = ApplicationOfferDetailsV5.from_json(applicationofferdetailsv5) if applicationofferdetailsv5 else None
+        application_alias_ = application_alias
+        application_description_ = application_description
+        endpoints_ = [RemoteEndpoint.from_json(o) for o in endpoints or []]
+        external_controller_ = ExternalControllerInfo.from_json(external_controller) if external_controller else None
+        macaroon_ = Macaroon.from_json(macaroon) if macaroon else None
+        offer_name_ = offer_name
+        offer_url_ = offer_url
+        offer_uuid_ = offer_uuid
+        source_model_tag_ = source_model_tag
+        users_ = [OfferUserDetails.from_json(o) for o in users or []]
+
+        # Validate arguments against known Juju API types.
+        if applicationofferdetailsv5_ is not None and not isinstance(applicationofferdetailsv5_, (dict, ApplicationOfferDetailsV5)):
+            raise Exception("Expected applicationofferdetailsv5_ to be a ApplicationOfferDetailsV5, received: {}".format(type(applicationofferdetailsv5_)))
+
+        if application_alias_ is not None and not isinstance(application_alias_, (bytes, str)):
+            raise Exception("Expected application_alias_ to be a str, received: {}".format(type(application_alias_)))
+
+        if application_description_ is not None and not isinstance(application_description_, (bytes, str)):
+            raise Exception("Expected application_description_ to be a str, received: {}".format(type(application_description_)))
+
+        if endpoints_ is not None and not isinstance(endpoints_, (bytes, str, list)):
+            raise Exception("Expected endpoints_ to be a Sequence, received: {}".format(type(endpoints_)))
+
+        if external_controller_ is not None and not isinstance(external_controller_, (dict, ExternalControllerInfo)):
+            raise Exception("Expected external_controller_ to be a ExternalControllerInfo, received: {}".format(type(external_controller_)))
+
+        if macaroon_ is not None and not isinstance(macaroon_, (dict, Macaroon)):
+            raise Exception("Expected macaroon_ to be a Macaroon, received: {}".format(type(macaroon_)))
+
+        if offer_name_ is not None and not isinstance(offer_name_, (bytes, str)):
+            raise Exception("Expected offer_name_ to be a str, received: {}".format(type(offer_name_)))
+
+        if offer_url_ is not None and not isinstance(offer_url_, (bytes, str)):
+            raise Exception("Expected offer_url_ to be a str, received: {}".format(type(offer_url_)))
+
+        if offer_uuid_ is not None and not isinstance(offer_uuid_, (bytes, str)):
+            raise Exception("Expected offer_uuid_ to be a str, received: {}".format(type(offer_uuid_)))
+
+        if source_model_tag_ is not None and not isinstance(source_model_tag_, (bytes, str)):
+            raise Exception("Expected source_model_tag_ to be a str, received: {}".format(type(source_model_tag_)))
+
+        if users_ is not None and not isinstance(users_, (bytes, str, list)):
+            raise Exception("Expected users_ to be a Sequence, received: {}".format(type(users_)))
+
+        self.applicationofferdetailsv5 = applicationofferdetailsv5_
+        self.application_alias = application_alias_
+        self.application_description = application_description_
+        self.endpoints = endpoints_
+        self.external_controller = external_controller_
+        self.macaroon = macaroon_
+        self.offer_name = offer_name_
+        self.offer_url = offer_url_
+        self.offer_uuid = offer_uuid_
+        self.source_model_tag = source_model_tag_
+        self.users = users_
+        self.unknown_fields = unknown_fields
+
+
+
 class ConsumeApplicationArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
@@ -6688,6 +6952,24 @@ class ConsumeApplicationArgs(Type):
 
 
 
+class ConsumeApplicationArgsV5(Type):
+    _toSchema = {'args': 'args'}
+    _toPy = {'args': 'args'}
+    def __init__(self, args=None, **unknown_fields):
+        '''
+        args : typing.Sequence[~ConsumeApplicationArgV5]
+        '''
+        args_ = [ConsumeApplicationArgV5.from_json(o) for o in args or []]
+
+        # Validate arguments against known Juju API types.
+        if args_ is not None and not isinstance(args_, (bytes, str, list)):
+            raise Exception("Expected args_ to be a Sequence, received: {}".format(type(args_)))
+
+        self.args = args_
+        self.unknown_fields = unknown_fields
+
+
+
 class ConsumeOfferDetails(Type):
     _toSchema = {'external_controller': 'external-controller', 'macaroon': 'macaroon', 'offer': 'offer'}
     _toPy = {'external-controller': 'external_controller', 'macaroon': 'macaroon', 'offer': 'offer'}
@@ -6695,11 +6977,11 @@ class ConsumeOfferDetails(Type):
         '''
         external_controller : ExternalControllerInfo
         macaroon : Macaroon
-        offer : ApplicationOfferDetails
+        offer : ApplicationOfferDetailsV5
         '''
         external_controller_ = ExternalControllerInfo.from_json(external_controller) if external_controller else None
         macaroon_ = Macaroon.from_json(macaroon) if macaroon else None
-        offer_ = ApplicationOfferDetails.from_json(offer) if offer else None
+        offer_ = ApplicationOfferDetailsV5.from_json(offer) if offer else None
 
         # Validate arguments against known Juju API types.
         if external_controller_ is not None and not isinstance(external_controller_, (dict, ExternalControllerInfo)):
@@ -6708,8 +6990,8 @@ class ConsumeOfferDetails(Type):
         if macaroon_ is not None and not isinstance(macaroon_, (dict, Macaroon)):
             raise Exception("Expected macaroon_ to be a Macaroon, received: {}".format(type(macaroon_)))
 
-        if offer_ is not None and not isinstance(offer_, (dict, ApplicationOfferDetails)):
-            raise Exception("Expected offer_ to be a ApplicationOfferDetails, received: {}".format(type(offer_)))
+        if offer_ is not None and not isinstance(offer_, (dict, ApplicationOfferDetailsV5)):
+            raise Exception("Expected offer_ to be a ApplicationOfferDetailsV5, received: {}".format(type(offer_)))
 
         self.external_controller = external_controller_
         self.macaroon = macaroon_
@@ -6751,13 +7033,13 @@ class ConsumeOfferDetailsResult(Type):
         error : Error
         external_controller : ExternalControllerInfo
         macaroon : Macaroon
-        offer : ApplicationOfferDetails
+        offer : ApplicationOfferDetailsV5
         '''
         consumeofferdetails_ = ConsumeOfferDetails.from_json(consumeofferdetails) if consumeofferdetails else None
         error_ = Error.from_json(error) if error else None
         external_controller_ = ExternalControllerInfo.from_json(external_controller) if external_controller else None
         macaroon_ = Macaroon.from_json(macaroon) if macaroon else None
-        offer_ = ApplicationOfferDetails.from_json(offer) if offer else None
+        offer_ = ApplicationOfferDetailsV5.from_json(offer) if offer else None
 
         # Validate arguments against known Juju API types.
         if consumeofferdetails_ is not None and not isinstance(consumeofferdetails_, (dict, ConsumeOfferDetails)):
@@ -6772,8 +7054,8 @@ class ConsumeOfferDetailsResult(Type):
         if macaroon_ is not None and not isinstance(macaroon_, (dict, Macaroon)):
             raise Exception("Expected macaroon_ to be a Macaroon, received: {}".format(type(macaroon_)))
 
-        if offer_ is not None and not isinstance(offer_, (dict, ApplicationOfferDetails)):
-            raise Exception("Expected offer_ to be a ApplicationOfferDetails, received: {}".format(type(offer_)))
+        if offer_ is not None and not isinstance(offer_, (dict, ApplicationOfferDetailsV5)):
+            raise Exception("Expected offer_ to be a ApplicationOfferDetailsV5, received: {}".format(type(offer_)))
 
         self.consumeofferdetails = consumeofferdetails_
         self.error = error_
@@ -10757,9 +11039,9 @@ class GetRemoteSecretAccessArgs(Type):
 
 
 class GetRemoteSecretContentArg(Type):
-    _toSchema = {'application_token': 'application-token', 'bakery_version': 'bakery-version', 'macaroons': 'macaroons', 'peek': 'peek', 'refresh': 'refresh', 'revision': 'revision', 'unit_id': 'unit-id', 'uri': 'uri'}
-    _toPy = {'application-token': 'application_token', 'bakery-version': 'bakery_version', 'macaroons': 'macaroons', 'peek': 'peek', 'refresh': 'refresh', 'revision': 'revision', 'unit-id': 'unit_id', 'uri': 'uri'}
-    def __init__(self, application_token=None, bakery_version=None, macaroons=None, peek=None, refresh=None, revision=None, unit_id=None, uri=None, **unknown_fields):
+    _toSchema = {'application_token': 'application-token', 'bakery_version': 'bakery-version', 'macaroons': 'macaroons', 'peek': 'peek', 'refresh': 'refresh', 'revision': 'revision', 'source_controller_uuid': 'source-controller-uuid', 'unit_id': 'unit-id', 'uri': 'uri'}
+    _toPy = {'application-token': 'application_token', 'bakery-version': 'bakery_version', 'macaroons': 'macaroons', 'peek': 'peek', 'refresh': 'refresh', 'revision': 'revision', 'source-controller-uuid': 'source_controller_uuid', 'unit-id': 'unit_id', 'uri': 'uri'}
+    def __init__(self, application_token=None, bakery_version=None, macaroons=None, peek=None, refresh=None, revision=None, source_controller_uuid=None, unit_id=None, uri=None, **unknown_fields):
         '''
         application_token : str
         bakery_version : int
@@ -10767,6 +11049,7 @@ class GetRemoteSecretContentArg(Type):
         peek : bool
         refresh : bool
         revision : int
+        source_controller_uuid : str
         unit_id : int
         uri : str
         '''
@@ -10776,6 +11059,7 @@ class GetRemoteSecretContentArg(Type):
         peek_ = peek
         refresh_ = refresh
         revision_ = revision
+        source_controller_uuid_ = source_controller_uuid
         unit_id_ = unit_id
         uri_ = uri
 
@@ -10798,6 +11082,9 @@ class GetRemoteSecretContentArg(Type):
         if revision_ is not None and not isinstance(revision_, int):
             raise Exception("Expected revision_ to be a int, received: {}".format(type(revision_)))
 
+        if source_controller_uuid_ is not None and not isinstance(source_controller_uuid_, (bytes, str)):
+            raise Exception("Expected source_controller_uuid_ to be a str, received: {}".format(type(source_controller_uuid_)))
+
         if unit_id_ is not None and not isinstance(unit_id_, int):
             raise Exception("Expected unit_id_ to be a int, received: {}".format(type(unit_id_)))
 
@@ -10810,6 +11097,7 @@ class GetRemoteSecretContentArg(Type):
         self.peek = peek_
         self.refresh = refresh_
         self.revision = revision_
+        self.source_controller_uuid = source_controller_uuid_
         self.unit_id = unit_id_
         self.uri = uri_
         self.unknown_fields = unknown_fields
@@ -13007,10 +13295,11 @@ class ListSecretBackendsResults(Type):
 
 
 class ListSecretResult(Type):
-    _toSchema = {'create_time': 'create-time', 'description': 'description', 'label': 'label', 'latest_expire_time': 'latest-expire-time', 'latest_revision': 'latest-revision', 'next_rotate_time': 'next-rotate-time', 'owner_tag': 'owner-tag', 'revisions': 'revisions', 'rotate_policy': 'rotate-policy', 'update_time': 'update-time', 'uri': 'uri', 'value': 'value', 'version': 'version'}
-    _toPy = {'create-time': 'create_time', 'description': 'description', 'label': 'label', 'latest-expire-time': 'latest_expire_time', 'latest-revision': 'latest_revision', 'next-rotate-time': 'next_rotate_time', 'owner-tag': 'owner_tag', 'revisions': 'revisions', 'rotate-policy': 'rotate_policy', 'update-time': 'update_time', 'uri': 'uri', 'value': 'value', 'version': 'version'}
-    def __init__(self, create_time=None, description=None, label=None, latest_expire_time=None, latest_revision=None, next_rotate_time=None, owner_tag=None, revisions=None, rotate_policy=None, update_time=None, uri=None, value=None, version=None, **unknown_fields):
+    _toSchema = {'access': 'access', 'create_time': 'create-time', 'description': 'description', 'label': 'label', 'latest_expire_time': 'latest-expire-time', 'latest_revision': 'latest-revision', 'next_rotate_time': 'next-rotate-time', 'owner_tag': 'owner-tag', 'revisions': 'revisions', 'rotate_policy': 'rotate-policy', 'update_time': 'update-time', 'uri': 'uri', 'value': 'value', 'version': 'version'}
+    _toPy = {'access': 'access', 'create-time': 'create_time', 'description': 'description', 'label': 'label', 'latest-expire-time': 'latest_expire_time', 'latest-revision': 'latest_revision', 'next-rotate-time': 'next_rotate_time', 'owner-tag': 'owner_tag', 'revisions': 'revisions', 'rotate-policy': 'rotate_policy', 'update-time': 'update_time', 'uri': 'uri', 'value': 'value', 'version': 'version'}
+    def __init__(self, access=None, create_time=None, description=None, label=None, latest_expire_time=None, latest_revision=None, next_rotate_time=None, owner_tag=None, revisions=None, rotate_policy=None, update_time=None, uri=None, value=None, version=None, **unknown_fields):
         '''
+        access : typing.Sequence[~AccessInfo]
         create_time : str
         description : str
         label : str
@@ -13025,6 +13314,7 @@ class ListSecretResult(Type):
         value : SecretValueResult
         version : int
         '''
+        access_ = [AccessInfo.from_json(o) for o in access or []]
         create_time_ = create_time
         description_ = description
         label_ = label
@@ -13040,6 +13330,9 @@ class ListSecretResult(Type):
         version_ = version
 
         # Validate arguments against known Juju API types.
+        if access_ is not None and not isinstance(access_, (bytes, str, list)):
+            raise Exception("Expected access_ to be a Sequence, received: {}".format(type(access_)))
+
         if create_time_ is not None and not isinstance(create_time_, (bytes, str)):
             raise Exception("Expected create_time_ to be a str, received: {}".format(type(create_time_)))
 
@@ -13079,6 +13372,7 @@ class ListSecretResult(Type):
         if version_ is not None and not isinstance(version_, int):
             raise Exception("Expected version_ to be a int, received: {}".format(type(version_)))
 
+        self.access = access_
         self.create_time = create_time_
         self.description = description_
         self.label = label_
@@ -14530,18 +14824,20 @@ class MetricResults(Type):
 
 
 class MigrationModelInfo(Type):
-    _toSchema = {'agent_version': 'agent-version', 'controller_agent_version': 'controller-agent-version', 'name': 'name', 'owner_tag': 'owner-tag', 'uuid': 'uuid'}
-    _toPy = {'agent-version': 'agent_version', 'controller-agent-version': 'controller_agent_version', 'name': 'name', 'owner-tag': 'owner_tag', 'uuid': 'uuid'}
-    def __init__(self, agent_version=None, controller_agent_version=None, name=None, owner_tag=None, uuid=None, **unknown_fields):
+    _toSchema = {'agent_version': 'agent-version', 'controller_agent_version': 'controller-agent-version', 'facade_versions': 'facade-versions', 'name': 'name', 'owner_tag': 'owner-tag', 'uuid': 'uuid'}
+    _toPy = {'agent-version': 'agent_version', 'controller-agent-version': 'controller_agent_version', 'facade-versions': 'facade_versions', 'name': 'name', 'owner-tag': 'owner_tag', 'uuid': 'uuid'}
+    def __init__(self, agent_version=None, controller_agent_version=None, facade_versions=None, name=None, owner_tag=None, uuid=None, **unknown_fields):
         '''
         agent_version : Number
         controller_agent_version : Number
+        facade_versions : typing.Mapping[str, typing.Sequence[int]]
         name : str
         owner_tag : str
         uuid : str
         '''
         agent_version_ = Number.from_json(agent_version) if agent_version else None
         controller_agent_version_ = Number.from_json(controller_agent_version) if controller_agent_version else None
+        facade_versions_ = facade_versions
         name_ = name
         owner_tag_ = owner_tag
         uuid_ = uuid
@@ -14552,6 +14848,9 @@ class MigrationModelInfo(Type):
 
         if controller_agent_version_ is not None and not isinstance(controller_agent_version_, (dict, Number)):
             raise Exception("Expected controller_agent_version_ to be a Number, received: {}".format(type(controller_agent_version_)))
+
+        if facade_versions_ is not None and not isinstance(facade_versions_, dict):
+            raise Exception("Expected facade_versions_ to be a Mapping, received: {}".format(type(facade_versions_)))
 
         if name_ is not None and not isinstance(name_, (bytes, str)):
             raise Exception("Expected name_ to be a str, received: {}".format(type(name_)))
@@ -14564,6 +14863,7 @@ class MigrationModelInfo(Type):
 
         self.agent_version = agent_version_
         self.controller_agent_version = controller_agent_version_
+        self.facade_versions = facade_versions_
         self.name = name_
         self.owner_tag = owner_tag_
         self.uuid = uuid_
@@ -18890,6 +19190,24 @@ class QueryApplicationOffersResults(Type):
 
 
 
+class QueryApplicationOffersResultsV5(Type):
+    _toSchema = {'results': 'results'}
+    _toPy = {'results': 'results'}
+    def __init__(self, results=None, **unknown_fields):
+        '''
+        results : typing.Sequence[~ApplicationOfferAdminDetailsV5]
+        '''
+        results_ = [ApplicationOfferAdminDetailsV5.from_json(o) for o in results or []]
+
+        # Validate arguments against known Juju API types.
+        if results_ is not None and not isinstance(results_, (bytes, str, list)):
+            raise Exception("Expected results_ to be a Sequence, received: {}".format(type(results_)))
+
+        self.results = results_
+        self.unknown_fields = unknown_fields
+
+
+
 class RebootActionResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
@@ -19020,9 +19338,9 @@ class RegionDefaults(Type):
 
 
 class RegisterRemoteRelationArg(Type):
-    _toSchema = {'application_token': 'application-token', 'bakery_version': 'bakery-version', 'consume_version': 'consume-version', 'local_endpoint_name': 'local-endpoint-name', 'macaroons': 'macaroons', 'offer_uuid': 'offer-uuid', 'relation_token': 'relation-token', 'remote_endpoint': 'remote-endpoint', 'remote_space': 'remote-space', 'source_model_tag': 'source-model-tag'}
-    _toPy = {'application-token': 'application_token', 'bakery-version': 'bakery_version', 'consume-version': 'consume_version', 'local-endpoint-name': 'local_endpoint_name', 'macaroons': 'macaroons', 'offer-uuid': 'offer_uuid', 'relation-token': 'relation_token', 'remote-endpoint': 'remote_endpoint', 'remote-space': 'remote_space', 'source-model-tag': 'source_model_tag'}
-    def __init__(self, application_token=None, bakery_version=None, consume_version=None, local_endpoint_name=None, macaroons=None, offer_uuid=None, relation_token=None, remote_endpoint=None, remote_space=None, source_model_tag=None, **unknown_fields):
+    _toSchema = {'application_token': 'application-token', 'bakery_version': 'bakery-version', 'consume_version': 'consume-version', 'local_endpoint_name': 'local-endpoint-name', 'macaroons': 'macaroons', 'offer_uuid': 'offer-uuid', 'relation_token': 'relation-token', 'remote_endpoint': 'remote-endpoint', 'source_model_tag': 'source-model-tag'}
+    _toPy = {'application-token': 'application_token', 'bakery-version': 'bakery_version', 'consume-version': 'consume_version', 'local-endpoint-name': 'local_endpoint_name', 'macaroons': 'macaroons', 'offer-uuid': 'offer_uuid', 'relation-token': 'relation_token', 'remote-endpoint': 'remote_endpoint', 'source-model-tag': 'source_model_tag'}
+    def __init__(self, application_token=None, bakery_version=None, consume_version=None, local_endpoint_name=None, macaroons=None, offer_uuid=None, relation_token=None, remote_endpoint=None, source_model_tag=None, **unknown_fields):
         '''
         application_token : str
         bakery_version : int
@@ -19032,7 +19350,6 @@ class RegisterRemoteRelationArg(Type):
         offer_uuid : str
         relation_token : str
         remote_endpoint : RemoteEndpoint
-        remote_space : RemoteSpace
         source_model_tag : str
         '''
         application_token_ = application_token
@@ -19043,7 +19360,6 @@ class RegisterRemoteRelationArg(Type):
         offer_uuid_ = offer_uuid
         relation_token_ = relation_token
         remote_endpoint_ = RemoteEndpoint.from_json(remote_endpoint) if remote_endpoint else None
-        remote_space_ = RemoteSpace.from_json(remote_space) if remote_space else None
         source_model_tag_ = source_model_tag
 
         # Validate arguments against known Juju API types.
@@ -19071,9 +19387,6 @@ class RegisterRemoteRelationArg(Type):
         if remote_endpoint_ is not None and not isinstance(remote_endpoint_, (dict, RemoteEndpoint)):
             raise Exception("Expected remote_endpoint_ to be a RemoteEndpoint, received: {}".format(type(remote_endpoint_)))
 
-        if remote_space_ is not None and not isinstance(remote_space_, (dict, RemoteSpace)):
-            raise Exception("Expected remote_space_ to be a RemoteSpace, received: {}".format(type(remote_space_)))
-
         if source_model_tag_ is not None and not isinstance(source_model_tag_, (bytes, str)):
             raise Exception("Expected source_model_tag_ to be a str, received: {}".format(type(source_model_tag_)))
 
@@ -19085,7 +19398,6 @@ class RegisterRemoteRelationArg(Type):
         self.offer_uuid = offer_uuid_
         self.relation_token = relation_token_
         self.remote_endpoint = remote_endpoint_
-        self.remote_space = remote_space_
         self.source_model_tag = source_model_tag_
         self.unknown_fields = unknown_fields
 
