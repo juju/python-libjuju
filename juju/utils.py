@@ -103,6 +103,15 @@ class IdQueue:
 
     def __init__(self):
         self._queues = defaultdict(asyncio.Queue)
+        # FIXME cleanup needed.
+        # in some cases an Exception is put into the queue.
+        # if the main coro exits, this exception will be logged as "never awaited"
+        # we gotta do something about that to keep the output clean.
+        #
+        # Additionally, it's conceivable that a response is put in the queue
+        # and then an exception is put via put_all()
+        # the reader only ever fetches one item, and exception is "never awaited"
+        # rewrite put_all to replace the pending response instead.
 
     async def get(self, id):
         value = await self._queues[id].get()
