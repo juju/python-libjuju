@@ -2,6 +2,7 @@
 # Licensed under the Apache V2, see LICENCE file for details.
 
 import base64
+import itertools
 import json
 import logging
 import ssl
@@ -240,6 +241,7 @@ class Connection:
 
     MAX_FRAME_SIZE = 2**22
     "Maximum size for a single frame.  Defaults to 4MB."
+    _count = itertools.count()
 
     @classmethod
     async def connect(
@@ -305,6 +307,7 @@ class Connection:
         self.usertag = tag.user(username)
         self.password = password
 
+        self.name = f"{cls.__name__}-{next(cls._count)}"
         self.__request_id__ = 0
 
         # The following instance variables are initialized by the
@@ -572,7 +575,7 @@ class Connection:
                     result = json.loads(result)
                     with open("/tmp/ws-log.jsonl", "a") as f:
                         # Top-level key "response": <dict> means incoming message
-                        f.write(json.dumps(result) + "\n")
+                        f.write(json.dumps({**result, "_connection": self.name}) + "\n")
                     await self.messages.put(result['request-id'], result)
         except jasyncio.CancelledError:
             log.debug('Receiver: Cancelled')
@@ -652,7 +655,7 @@ class Connection:
                 await self._ws.send(outgoing)
                 with open("/tmp/ws-log.jsonl", "a") as f:
                     # Top-level key "request": <str> means outgoing message
-                    f.write(json.dumps(msg, cls=encoder) + "\n")
+                    f.write(json.dumps({**msg, "_connection": self.name}, cls=encoder) + "\n")
                 break
             except websockets.ConnectionClosed:
                 if attempt == 2:
