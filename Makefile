@@ -16,7 +16,9 @@ clean:
 
 .PHONY: client
 client:
-	tox -r --notest -e lint,py3
+	# FIXME temporarily commented out
+	# tox -r --notest -e lint,py3
+	# why abuse tox venv this way?
 	$(PY) -m juju.client.facade -s "juju/client/schemas*" -o juju/client/
 
 .PHONY: run-unit-tests

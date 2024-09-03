@@ -575,7 +575,7 @@ class Connection:
                     result = json.loads(result)
                     with open("/tmp/ws-log.jsonl", "a") as f:
                         # Top-level key "response": <dict> means incoming message
-                        f.write(json.dumps({**result, "_connection": self.name}) + "\n")
+                        f.write(json.dumps({**result, "_connection": self.name, "_addr": self.addr}) + "\n")
                     await self.messages.put(result['request-id'], result)
         except jasyncio.CancelledError:
             log.debug('Receiver: Cancelled')
@@ -655,7 +655,7 @@ class Connection:
                 await self._ws.send(outgoing)
                 with open("/tmp/ws-log.jsonl", "a") as f:
                     # Top-level key "request": <str> means outgoing message
-                    f.write(json.dumps({**msg, "_connection": self.name}, cls=encoder) + "\n")
+                    f.write(json.dumps({**msg, "_connection": self.name, "_addr": self.addr}, cls=encoder) + "\n")
                 break
             except websockets.ConnectionClosed:
                 if attempt == 2:

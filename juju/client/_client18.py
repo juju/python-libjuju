@@ -965,6 +965,34 @@ class ApplicationFacade(Type):
     
 
     @ReturnMapping(AddRelationResults)
+    def sync_AddRelation(self, endpoints=None, via_cidrs=None):
+        '''
+        AddRelation adds a relation between the specified endpoints and returns the relation info.
+
+        endpoints : typing.Sequence[str]
+        via_cidrs : typing.Sequence[str]
+        Returns -> AddRelationResults
+        '''
+        if endpoints is not None and not isinstance(endpoints, (bytes, str, list)):
+            raise Exception("Expected endpoints to be a Sequence, received: {}".format(type(endpoints)))
+
+        if via_cidrs is not None and not isinstance(via_cidrs, (bytes, str, list)):
+            raise Exception("Expected via_cidrs to be a Sequence, received: {}".format(type(via_cidrs)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='AddRelation',
+                   version=18,
+                   params=_params)
+        _params['endpoints'] = endpoints
+        _params['via-cidrs'] = via_cidrs
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(AddRelationResults)
     async def AddRelation(self, endpoints=None, via_cidrs=None):
         '''
         AddRelation adds a relation between the specified endpoints and returns the relation info.
@@ -988,6 +1016,49 @@ class ApplicationFacade(Type):
         _params['endpoints'] = endpoints
         _params['via-cidrs'] = via_cidrs
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(AddApplicationUnitsResults)
+    def sync_AddUnits(self, application=None, attach_storage=None, num_units=None, placement=None, policy=None):
+        '''
+        AddUnits adds a given number of units to an application.
+
+        application : str
+        attach_storage : typing.Sequence[str]
+        num_units : int
+        placement : typing.Sequence[~Placement]
+        policy : str
+        Returns -> AddApplicationUnitsResults
+        '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception("Expected application to be a str, received: {}".format(type(application)))
+
+        if attach_storage is not None and not isinstance(attach_storage, (bytes, str, list)):
+            raise Exception("Expected attach_storage to be a Sequence, received: {}".format(type(attach_storage)))
+
+        if num_units is not None and not isinstance(num_units, int):
+            raise Exception("Expected num_units to be a int, received: {}".format(type(num_units)))
+
+        if placement is not None and not isinstance(placement, (bytes, str, list)):
+            raise Exception("Expected placement to be a Sequence, received: {}".format(type(placement)))
+
+        if policy is not None and not isinstance(policy, (bytes, str)):
+            raise Exception("Expected policy to be a str, received: {}".format(type(policy)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='AddUnits',
+                   version=18,
+                   params=_params)
+        _params['application'] = application
+        _params['attach-storage'] = attach_storage
+        _params['num-units'] = num_units
+        _params['placement'] = placement
+        _params['policy'] = policy
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1036,6 +1107,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ApplicationInfoResults)
+    def sync_ApplicationsInfo(self, entities=None):
+        '''
+        ApplicationsInfo returns applications information.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ApplicationInfoResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='ApplicationsInfo',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationInfoResults)
     async def ApplicationsInfo(self, entities=None):
         '''
         ApplicationsInfo returns applications information.
@@ -1054,6 +1148,30 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationGetConfigResults)
+    def sync_CharmConfig(self, args=None):
+        '''
+        CharmConfig returns charm config for the input list of applications and
+        model generations.
+
+        args : typing.Sequence[~ApplicationGet]
+        Returns -> ApplicationGetConfigResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='CharmConfig',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1083,6 +1201,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ApplicationCharmRelationsResults)
+    def sync_CharmRelations(self, application=None):
+        '''
+        CharmRelations implements the server side of Application.CharmRelations.
+
+        application : str
+        Returns -> ApplicationCharmRelationsResults
+        '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception("Expected application to be a str, received: {}".format(type(application)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='CharmRelations',
+                   version=18,
+                   params=_params)
+        _params['application'] = application
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationCharmRelationsResults)
     async def CharmRelations(self, application=None):
         '''
         CharmRelations implements the server side of Application.CharmRelations.
@@ -1101,6 +1242,30 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['application'] = application
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_Consume(self, args=None):
+        '''
+        Consume adds remote applications to the model without creating any
+        relations.
+
+        args : typing.Sequence[~ConsumeApplicationArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Consume',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1130,6 +1295,30 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_Deploy(self, applications=None):
+        '''
+        Deploy fetches the charms from the charm store and deploys them
+        using the specified placement directives.
+
+        applications : typing.Sequence[~ApplicationDeploy]
+        Returns -> ErrorResults
+        '''
+        if applications is not None and not isinstance(applications, (bytes, str, list)):
+            raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Deploy',
+                   version=18,
+                   params=_params)
+        _params['applications'] = applications
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def Deploy(self, applications=None):
         '''
         Deploy fetches the charms from the charm store and deploys them
@@ -1149,6 +1338,33 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['applications'] = applications
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(DeployFromRepositoryResults)
+    def sync_DeployFromRepository(self, args=None):
+        '''
+        DeployFromRepository is a one-stop deployment method for repository
+        charms. Only a charm name is required to deploy. If argument validation
+        fails, a list of all errors found in validation will be returned. If a
+        local resource is provided, details required for uploading the validated
+        resource will be returned.
+
+        args : typing.Sequence[~DeployFromRepositoryArg]
+        Returns -> DeployFromRepositoryResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='DeployFromRepository',
+                   version=18,
+                   params=_params)
+        _params['Args'] = args
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1181,6 +1397,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(DestroyApplicationResults)
+    def sync_DestroyApplication(self, applications=None):
+        '''
+        DestroyApplication removes a given set of applications.
+
+        applications : typing.Sequence[~DestroyApplicationParams]
+        Returns -> DestroyApplicationResults
+        '''
+        if applications is not None and not isinstance(applications, (bytes, str, list)):
+            raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='DestroyApplication',
+                   version=18,
+                   params=_params)
+        _params['applications'] = applications
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(DestroyApplicationResults)
     async def DestroyApplication(self, applications=None):
         '''
         DestroyApplication removes a given set of applications.
@@ -1204,6 +1443,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_DestroyConsumedApplications(self, applications=None):
+        '''
+        DestroyConsumedApplications removes a given set of consumed (remote) applications.
+
+        applications : typing.Sequence[~DestroyConsumedApplicationParams]
+        Returns -> ErrorResults
+        '''
+        if applications is not None and not isinstance(applications, (bytes, str, list)):
+            raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='DestroyConsumedApplications',
+                   version=18,
+                   params=_params)
+        _params['applications'] = applications
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def DestroyConsumedApplications(self, applications=None):
         '''
         DestroyConsumedApplications removes a given set of consumed (remote) applications.
@@ -1222,6 +1484,45 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['applications'] = applications
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    def sync_DestroyRelation(self, endpoints=None, force=None, max_wait=None, relation_id=None):
+        '''
+        DestroyRelation removes the relation between the
+        specified endpoints or an id.
+
+        endpoints : typing.Sequence[str]
+        force : bool
+        max_wait : int
+        relation_id : int
+        Returns -> None
+        '''
+        if endpoints is not None and not isinstance(endpoints, (bytes, str, list)):
+            raise Exception("Expected endpoints to be a Sequence, received: {}".format(type(endpoints)))
+
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if max_wait is not None and not isinstance(max_wait, int):
+            raise Exception("Expected max_wait to be a int, received: {}".format(type(max_wait)))
+
+        if relation_id is not None and not isinstance(relation_id, int):
+            raise Exception("Expected relation_id to be a int, received: {}".format(type(relation_id)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='DestroyRelation',
+                   version=18,
+                   params=_params)
+        _params['endpoints'] = endpoints
+        _params['force'] = force
+        _params['max-wait'] = max_wait
+        _params['relation-id'] = relation_id
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1266,6 +1567,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(DestroyUnitResults)
+    def sync_DestroyUnit(self, units=None):
+        '''
+        DestroyUnit removes a given set of application units.
+
+        units : typing.Sequence[~DestroyUnitParams]
+        Returns -> DestroyUnitResults
+        '''
+        if units is not None and not isinstance(units, (bytes, str, list)):
+            raise Exception("Expected units to be a Sequence, received: {}".format(type(units)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='DestroyUnit',
+                   version=18,
+                   params=_params)
+        _params['units'] = units
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(DestroyUnitResults)
     async def DestroyUnit(self, units=None):
         '''
         DestroyUnit removes a given set of application units.
@@ -1284,6 +1608,35 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['units'] = units
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    def sync_Expose(self, application=None, exposed_endpoints=None):
+        '''
+        Expose changes the juju-managed firewall to expose any ports that
+        were also explicitly marked by units as open.
+
+        application : str
+        exposed_endpoints : typing.Mapping[str, ~ExposedEndpoint]
+        Returns -> None
+        '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception("Expected application to be a str, received: {}".format(type(application)))
+
+        if exposed_endpoints is not None and not isinstance(exposed_endpoints, dict):
+            raise Exception("Expected exposed_endpoints to be a Mapping, received: {}".format(type(exposed_endpoints)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Expose',
+                   version=18,
+                   params=_params)
+        _params['application'] = application
+        _params['exposed-endpoints'] = exposed_endpoints
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1318,6 +1671,34 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ApplicationGetResults)
+    def sync_Get(self, application=None, branch=None):
+        '''
+        Get returns the charm configuration for an application.
+
+        application : str
+        branch : str
+        Returns -> ApplicationGetResults
+        '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception("Expected application to be a str, received: {}".format(type(application)))
+
+        if branch is not None and not isinstance(branch, (bytes, str)):
+            raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Get',
+                   version=18,
+                   params=_params)
+        _params['application'] = application
+        _params['branch'] = branch
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationGetResults)
     async def Get(self, application=None, branch=None):
         '''
         Get returns the charm configuration for an application.
@@ -1341,6 +1722,35 @@ class ApplicationFacade(Type):
         _params['application'] = application
         _params['branch'] = branch
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CharmURLOriginResult)
+    def sync_GetCharmURLOrigin(self, application=None, branch=None):
+        '''
+        GetCharmURLOrigin returns the charm URL and charm origin the given
+        application is running at present.
+
+        application : str
+        branch : str
+        Returns -> CharmURLOriginResult
+        '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception("Expected application to be a str, received: {}".format(type(application)))
+
+        if branch is not None and not isinstance(branch, (bytes, str)):
+            raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='GetCharmURLOrigin',
+                   version=18,
+                   params=_params)
+        _params['application'] = application
+        _params['branch'] = branch
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1375,6 +1785,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ApplicationGetConfigResults)
+    def sync_GetConfig(self, entities=None):
+        '''
+        GetConfig returns the charm config for each of the input applications.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ApplicationGetConfigResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='GetConfig',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationGetConfigResults)
     async def GetConfig(self, entities=None):
         '''
         GetConfig returns the charm config for each of the input applications.
@@ -1393,6 +1826,29 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationGetConstraintsResults)
+    def sync_GetConstraints(self, entities=None):
+        '''
+        GetConstraints returns the constraints for a given application.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ApplicationGetConstraintsResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='GetConstraints',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1421,6 +1877,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(StringResult)
+    def sync_Leader(self, tag=None):
+        '''
+        Leader returns the unit name of the leader for the given application.
+
+        tag : str
+        Returns -> StringResult
+        '''
+        if tag is not None and not isinstance(tag, (bytes, str)):
+            raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Leader',
+                   version=18,
+                   params=_params)
+        _params['tag'] = tag
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResult)
     async def Leader(self, tag=None):
         '''
         Leader returns the unit name of the leader for the given application.
@@ -1439,6 +1918,30 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['tag'] = tag
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_MergeBindings(self, args=None):
+        '''
+        MergeBindings merges operator-defined bindings with the current bindings for
+        one or more applications.
+
+        args : typing.Sequence[~ApplicationMergeBindings]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='MergeBindings',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1463,6 +1966,39 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['args'] = args
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_ResolveUnitErrors(self, all_=None, retry=None, tags=None):
+        '''
+        ResolveUnitErrors marks errors on the specified units as resolved.
+
+        all_ : bool
+        retry : bool
+        tags : Entities
+        Returns -> ErrorResults
+        '''
+        if all_ is not None and not isinstance(all_, bool):
+            raise Exception("Expected all_ to be a bool, received: {}".format(type(all_)))
+
+        if retry is not None and not isinstance(retry, bool):
+            raise Exception("Expected retry to be a bool, received: {}".format(type(retry)))
+
+        if tags is not None and not isinstance(tags, (dict, Entities)):
+            raise Exception("Expected tags to be a Entities, received: {}".format(type(tags)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='ResolveUnitErrors',
+                   version=18,
+                   params=_params)
+        _params['all'] = all_
+        _params['retry'] = retry
+        _params['tags'] = tags
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1501,6 +2037,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ScaleApplicationResults)
+    def sync_ScaleApplications(self, applications=None):
+        '''
+        ScaleApplications scales the specified application to the requested number of units.
+
+        applications : typing.Sequence[~ScaleApplicationParams]
+        Returns -> ScaleApplicationResults
+        '''
+        if applications is not None and not isinstance(applications, (bytes, str, list)):
+            raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='ScaleApplications',
+                   version=18,
+                   params=_params)
+        _params['applications'] = applications
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ScaleApplicationResults)
     async def ScaleApplications(self, applications=None):
         '''
         ScaleApplications scales the specified application to the requested number of units.
@@ -1519,6 +2078,89 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['applications'] = applications
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    def sync_SetCharm(self, application=None, channel=None, charm_origin=None, charm_url=None, config_settings=None, config_settings_yaml=None, endpoint_bindings=None, force=None, force_base=None, force_units=None, generation=None, resource_ids=None, storage_constraints=None):
+        '''
+        SetCharm sets the charm for a given for the application.
+
+        application : str
+        channel : str
+        charm_origin : CharmOrigin
+        charm_url : str
+        config_settings : typing.Mapping[str, str]
+        config_settings_yaml : str
+        endpoint_bindings : typing.Mapping[str, str]
+        force : bool
+        force_base : bool
+        force_units : bool
+        generation : str
+        resource_ids : typing.Mapping[str, str]
+        storage_constraints : typing.Mapping[str, ~StorageConstraints]
+        Returns -> None
+        '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception("Expected application to be a str, received: {}".format(type(application)))
+
+        if channel is not None and not isinstance(channel, (bytes, str)):
+            raise Exception("Expected channel to be a str, received: {}".format(type(channel)))
+
+        if charm_origin is not None and not isinstance(charm_origin, (dict, CharmOrigin)):
+            raise Exception("Expected charm_origin to be a CharmOrigin, received: {}".format(type(charm_origin)))
+
+        if charm_url is not None and not isinstance(charm_url, (bytes, str)):
+            raise Exception("Expected charm_url to be a str, received: {}".format(type(charm_url)))
+
+        if config_settings is not None and not isinstance(config_settings, dict):
+            raise Exception("Expected config_settings to be a Mapping, received: {}".format(type(config_settings)))
+
+        if config_settings_yaml is not None and not isinstance(config_settings_yaml, (bytes, str)):
+            raise Exception("Expected config_settings_yaml to be a str, received: {}".format(type(config_settings_yaml)))
+
+        if endpoint_bindings is not None and not isinstance(endpoint_bindings, dict):
+            raise Exception("Expected endpoint_bindings to be a Mapping, received: {}".format(type(endpoint_bindings)))
+
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if force_base is not None and not isinstance(force_base, bool):
+            raise Exception("Expected force_base to be a bool, received: {}".format(type(force_base)))
+
+        if force_units is not None and not isinstance(force_units, bool):
+            raise Exception("Expected force_units to be a bool, received: {}".format(type(force_units)))
+
+        if generation is not None and not isinstance(generation, (bytes, str)):
+            raise Exception("Expected generation to be a str, received: {}".format(type(generation)))
+
+        if resource_ids is not None and not isinstance(resource_ids, dict):
+            raise Exception("Expected resource_ids to be a Mapping, received: {}".format(type(resource_ids)))
+
+        if storage_constraints is not None and not isinstance(storage_constraints, dict):
+            raise Exception("Expected storage_constraints to be a Mapping, received: {}".format(type(storage_constraints)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='SetCharm',
+                   version=18,
+                   params=_params)
+        _params['application'] = application
+        _params['channel'] = channel
+        _params['charm-origin'] = charm_origin
+        _params['charm-url'] = charm_url
+        _params['config-settings'] = config_settings
+        _params['config-settings-yaml'] = config_settings_yaml
+        _params['endpoint-bindings'] = endpoint_bindings
+        _params['force'] = force
+        _params['force-base'] = force_base
+        _params['force-units'] = force_units
+        _params['generation'] = generation
+        _params['resource-ids'] = resource_ids
+        _params['storage-constraints'] = storage_constraints
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1607,6 +2249,31 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_SetConfigs(self, args=None):
+        '''
+        SetConfigs implements the server side of Application.SetConfig.  Both
+        application and charm config are set. It does not unset values in
+        Config map that are set to an empty string. Unset should be used for that.
+
+        args : typing.Sequence[~ConfigSet]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='SetConfigs',
+                   version=18,
+                   params=_params)
+        _params['Args'] = args
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def SetConfigs(self, args=None):
         '''
         SetConfigs implements the server side of Application.SetConfig.  Both
@@ -1627,6 +2294,34 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['Args'] = args
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    def sync_SetConstraints(self, application=None, constraints=None):
+        '''
+        SetConstraints sets the constraints for a given application.
+
+        application : str
+        constraints : Value
+        Returns -> None
+        '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception("Expected application to be a str, received: {}".format(type(application)))
+
+        if constraints is not None and not isinstance(constraints, (dict, Value)):
+            raise Exception("Expected constraints to be a Value, received: {}".format(type(constraints)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='SetConstraints',
+                   version=18,
+                   params=_params)
+        _params['application'] = application
+        _params['constraints'] = constraints
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1660,6 +2355,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_SetMetricCredentials(self, creds=None):
+        '''
+        SetMetricCredentials sets credentials on the application.
+
+        creds : typing.Sequence[~ApplicationMetricCredential]
+        Returns -> ErrorResults
+        '''
+        if creds is not None and not isinstance(creds, (bytes, str, list)):
+            raise Exception("Expected creds to be a Sequence, received: {}".format(type(creds)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='SetMetricCredentials',
+                   version=18,
+                   params=_params)
+        _params['creds'] = creds
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def SetMetricCredentials(self, creds=None):
         '''
         SetMetricCredentials sets credentials on the application.
@@ -1683,6 +2401,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_SetRelationsSuspended(self, args=None):
+        '''
+        SetRelationsSuspended sets the suspended status of the specified relations.
+
+        args : typing.Sequence[~RelationSuspendedArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='SetRelationsSuspended',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def SetRelationsSuspended(self, args=None):
         '''
         SetRelationsSuspended sets the suspended status of the specified relations.
@@ -1701,6 +2442,35 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['args'] = args
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    def sync_Unexpose(self, application=None, exposed_endpoints=None):
+        '''
+        Unexpose changes the juju-managed firewall to unexpose any ports that
+        were also explicitly marked by units as open.
+
+        application : str
+        exposed_endpoints : typing.Sequence[str]
+        Returns -> None
+        '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception("Expected application to be a str, received: {}".format(type(application)))
+
+        if exposed_endpoints is not None and not isinstance(exposed_endpoints, (bytes, str, list)):
+            raise Exception("Expected exposed_endpoints to be a Sequence, received: {}".format(type(exposed_endpoints)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Unexpose',
+                   version=18,
+                   params=_params)
+        _params['application'] = application
+        _params['exposed-endpoints'] = exposed_endpoints
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1735,6 +2505,30 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(UnitInfoResults)
+    def sync_UnitsInfo(self, entities=None):
+        '''
+        UnitsInfo returns unit information for the given entities (units or
+        applications).
+
+        entities : typing.Sequence[~Entity]
+        Returns -> UnitInfoResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='UnitsInfo',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(UnitInfoResults)
     async def UnitsInfo(self, entities=None):
         '''
         UnitsInfo returns unit information for the given entities (units or
@@ -1759,6 +2553,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_UnsetApplicationsConfig(self, args=None):
+        '''
+        UnsetApplicationsConfig implements the server side of Application.UnsetApplicationsConfig.
+
+        args : typing.Sequence[~ApplicationUnset]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='UnsetApplicationsConfig',
+                   version=18,
+                   params=_params)
+        _params['Args'] = args
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def UnsetApplicationsConfig(self, args=None):
         '''
         UnsetApplicationsConfig implements the server side of Application.UnsetApplicationsConfig.
@@ -1777,6 +2594,30 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['Args'] = args
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_UpdateApplicationBase(self, args=None):
+        '''
+        UpdateApplicationBase updates the application base.
+        Base for subordinates is updated too.
+
+        args : typing.Sequence[~UpdateChannelArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='UpdateApplicationBase',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3848,6 +4689,27 @@ class UniterFacade(Type):
     
 
     @ReturnMapping(StringsResult)
+    def sync_APIAddresses(self):
+        '''
+        APIAddresses returns the list of addresses used to connect to the API.
+
+
+        Returns -> StringsResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='APIAddresses',
+                   version=18,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsResult)
     async def APIAddresses(self):
         '''
         APIAddresses returns the list of addresses used to connect to the API.
@@ -3864,6 +4726,27 @@ class UniterFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(APIHostPortsResult)
+    def sync_APIHostPorts(self):
+        '''
+        APIHostPorts returns the API server addresses.
+
+
+        Returns -> APIHostPortsResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='APIHostPorts',
+                   version=18,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3890,6 +4773,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringResults)
+    def sync_ActionStatus(self, entities=None):
+        '''
+        ActionStatus returns the status of Actions by Tags passed in.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='ActionStatus',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
     async def ActionStatus(self, entities=None):
         '''
         ActionStatus returns the status of Actions by Tags passed in.
@@ -3908,6 +4814,30 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ActionResults)
+    def sync_Actions(self, entities=None):
+        '''
+        Actions returns the Actions by Tags passed and ensures that the Unit asking
+        for them is the same Unit that has the Actions.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ActionResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='Actions',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3937,6 +4867,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_AddMetricBatches(self, batches=None):
+        '''
+        AddMetricBatches adds the metrics for the specified unit.
+
+        batches : typing.Sequence[~MetricBatchParam]
+        Returns -> ErrorResults
+        '''
+        if batches is not None and not isinstance(batches, (bytes, str, list)):
+            raise Exception("Expected batches to be a Sequence, received: {}".format(type(batches)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='AddMetricBatches',
+                   version=18,
+                   params=_params)
+        _params['batches'] = batches
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def AddMetricBatches(self, batches=None):
         '''
         AddMetricBatches adds the metrics for the specified unit.
@@ -3955,6 +4908,30 @@ class UniterFacade(Type):
                    params=_params)
         _params['batches'] = batches
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationStatusResults)
+    def sync_ApplicationStatus(self, entities=None):
+        '''
+        ApplicationStatus returns the status of the Applications and its workloads
+        if the given unit is the leader.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ApplicationStatusResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='ApplicationStatus',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3979,6 +4956,31 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
+    def sync_AssignedMachine(self, entities=None):
+        '''
+        AssignedMachine returns the machine tag for each given unit tag, or
+        an error satisfying params.IsCodeNotAssigned when a unit has no
+        assigned machine.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='AssignedMachine',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -4009,6 +5011,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringResults)
+    def sync_AvailabilityZone(self, entities=None):
+        '''
+        AvailabilityZone returns the availability zone for each given unit, if applicable.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='AvailabilityZone',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
     async def AvailabilityZone(self, entities=None):
         '''
         AvailabilityZone returns the availability zone for each given unit, if applicable.
@@ -4027,6 +5052,29 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_BeginActions(self, entities=None):
+        '''
+        BeginActions marks the actions represented by the passed in Tags as running.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='BeginActions',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -4055,6 +5103,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(BoolResults)
+    def sync_CanApplyLXDProfile(self, entities=None):
+        '''
+        CanApplyLXDProfile is a shim to call the LXDProfileAPIv2 version of this method.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> BoolResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='CanApplyLXDProfile',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(BoolResults)
     async def CanApplyLXDProfile(self, entities=None):
         '''
         CanApplyLXDProfile is a shim to call the LXDProfileAPIv2 version of this method.
@@ -4073,6 +5144,30 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
+    def sync_CharmArchiveSha256(self, urls=None):
+        '''
+        CharmArchiveSha256 returns the SHA256 digest of the charm archive
+        (bundle) data for each charm url in the given parameters.
+
+        urls : typing.Sequence[~CharmURL]
+        Returns -> StringResults
+        '''
+        if urls is not None and not isinstance(urls, (bytes, str, list)):
+            raise Exception("Expected urls to be a Sequence, received: {}".format(type(urls)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='CharmArchiveSha256',
+                   version=18,
+                   params=_params)
+        _params['urls'] = urls
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -4102,6 +5197,30 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(IntResults)
+    def sync_CharmModifiedVersion(self, entities=None):
+        '''
+        CharmModifiedVersion returns the most CharmModifiedVersion for all given
+        units or applications.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> IntResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='CharmModifiedVersion',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(IntResults)
     async def CharmModifiedVersion(self, entities=None):
         '''
         CharmModifiedVersion returns the most CharmModifiedVersion for all given
@@ -4121,6 +5240,29 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringBoolResults)
+    def sync_CharmURL(self, entities=None):
+        '''
+        CharmURL returns the charm URL for all given units or applications.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringBoolResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='CharmURL',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -4149,6 +5291,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_ClearResolved(self, entities=None):
+        '''
+        ClearResolved removes any resolved setting from each given unit.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='ClearResolved',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def ClearResolved(self, entities=None):
         '''
         ClearResolved removes any resolved setting from each given unit.
@@ -4167,6 +5332,27 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResult)
+    def sync_CloudAPIVersion(self):
+        '''
+        CloudAPIVersion returns the cloud API version, if available.
+
+
+        Returns -> StringResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='CloudAPIVersion',
+                   version=18,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -4193,6 +5379,30 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(CloudSpecResult)
+    def sync_CloudSpec(self):
+        '''
+        CloudSpec returns the cloud spec used by the model in which the
+        authenticated unit or application resides.
+        A check is made beforehand to ensure that the request is made by an entity
+        that has been granted the appropriate trust.
+
+
+        Returns -> CloudSpecResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='CloudSpec',
+                   version=18,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudSpecResult)
     async def CloudSpec(self):
         '''
         CloudSpec returns the cloud spec used by the model in which the
@@ -4212,6 +5422,31 @@ class UniterFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_CommitHookChanges(self, args=None):
+        '''
+        CommitHookChanges batches together all required API calls for applying
+        a set of changes after a hook successfully completes and executes them in a
+        single transaction.
+
+        args : typing.Sequence[~CommitHookChangesArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='CommitHookChanges',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -4242,6 +5477,30 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ConfigSettingsResults)
+    def sync_ConfigSettings(self, entities=None):
+        '''
+        ConfigSettings returns the complete set of application charm config
+        settings available to each given unit.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ConfigSettingsResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='ConfigSettings',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ConfigSettingsResults)
     async def ConfigSettings(self, entities=None):
         '''
         ConfigSettings returns the complete set of application charm config
@@ -4261,6 +5520,29 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
+    def sync_CreateSecretURIs(self, count=None):
+        '''
+        CreateSecretURIs creates new secret URIs.
+
+        count : int
+        Returns -> StringResults
+        '''
+        if count is not None and not isinstance(count, int):
+            raise Exception("Expected count to be a int, received: {}".format(type(count)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='CreateSecretURIs',
+                   version=18,
+                   params=_params)
+        _params['count'] = count
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -4289,6 +5571,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringResults)
+    def sync_CreateSecrets(self, args=None):
+        '''
+        CreateSecrets creates new secrets.
+
+        args : typing.Sequence[~CreateSecretArg]
+        Returns -> StringResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='CreateSecrets',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
     async def CreateSecrets(self, args=None):
         '''
         CreateSecrets creates new secrets.
@@ -4312,6 +5617,27 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ModelResult)
+    def sync_CurrentModel(self):
+        '''
+        CurrentModel returns the name and UUID for the current juju model.
+
+
+        Returns -> ModelResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='CurrentModel',
+                   version=18,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ModelResult)
     async def CurrentModel(self):
         '''
         CurrentModel returns the name and UUID for the current juju model.
@@ -4328,6 +5654,30 @@ class UniterFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_Destroy(self, entities=None):
+        '''
+        Destroy advances all given Alive units' lifecycles as far as
+        possible. See state/Unit.Destroy().
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='Destroy',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -4357,6 +5707,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_DestroyAllSubordinates(self, entities=None):
+        '''
+        DestroyAllSubordinates destroys all subordinates of each given unit.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='DestroyAllSubordinates',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def DestroyAllSubordinates(self, entities=None):
         '''
         DestroyAllSubordinates destroys all subordinates of each given unit.
@@ -4375,6 +5748,30 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_DestroyUnitStorageAttachments(self, entities=None):
+        '''
+        DestroyUnitStorageAttachments marks each storage attachment of the
+        specified units as Dying.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='DestroyUnitStorageAttachments',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -4399,6 +5796,31 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_EnsureDead(self, entities=None):
+        '''
+        EnsureDead calls EnsureDead on each given entity from state. It
+        will fail if the entity is not present. If it's Alive, nothing will
+        happen (see state/EnsureDead() for units or machines).
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='EnsureDead',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -4429,6 +5851,31 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_EnterScope(self, relation_units=None):
+        '''
+        EnterScope ensures each unit has entered its scope in the relation,
+        for all of the given relation/unit pairs. See also
+        state.RelationUnit.EnterScope().
+
+        relation_units : typing.Sequence[~RelationUnit]
+        Returns -> ErrorResults
+        '''
+        if relation_units is not None and not isinstance(relation_units, (bytes, str, list)):
+            raise Exception("Expected relation_units to be a Sequence, received: {}".format(type(relation_units)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='EnterScope',
+                   version=18,
+                   params=_params)
+        _params['relation-units'] = relation_units
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def EnterScope(self, relation_units=None):
         '''
         EnterScope ensures each unit has entered its scope in the relation,
@@ -4454,6 +5901,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_FinishActions(self, results=None):
+        '''
+        FinishActions saves the result of a completed Action
+
+        results : typing.Sequence[~ActionExecutionResult]
+        Returns -> ErrorResults
+        '''
+        if results is not None and not isinstance(results, (bytes, str, list)):
+            raise Exception("Expected results to be a Sequence, received: {}".format(type(results)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='FinishActions',
+                   version=18,
+                   params=_params)
+        _params['results'] = results
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def FinishActions(self, results=None):
         '''
         FinishActions saves the result of a completed Action
@@ -4472,6 +5942,35 @@ class UniterFacade(Type):
                    params=_params)
         _params['results'] = results
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SecretConsumerInfoResults)
+    def sync_GetConsumerSecretsRevisionInfo(self, consumer_tag=None, uris=None):
+        '''
+        GetConsumerSecretsRevisionInfo returns the latest secret revisions for the specified secrets.
+        This facade method is used for remote watcher to get the latest secret revisions and labels for a secret changed hook.
+
+        consumer_tag : str
+        uris : typing.Sequence[str]
+        Returns -> SecretConsumerInfoResults
+        '''
+        if consumer_tag is not None and not isinstance(consumer_tag, (bytes, str)):
+            raise Exception("Expected consumer_tag to be a str, received: {}".format(type(consumer_tag)))
+
+        if uris is not None and not isinstance(uris, (bytes, str, list)):
+            raise Exception("Expected uris to be a Sequence, received: {}".format(type(uris)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='GetConsumerSecretsRevisionInfo',
+                   version=18,
+                   params=_params)
+        _params['consumer-tag'] = consumer_tag
+        _params['uris'] = uris
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -4506,6 +6005,27 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(MeterStatusResults)
+    def sync_GetMeterStatus(self, entities=None):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> MeterStatusResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='GetMeterStatus',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(MeterStatusResults)
     async def GetMeterStatus(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
@@ -4522,6 +6042,29 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
+    def sync_GetPodSpec(self, entities=None):
+        '''
+        GetPodSpec gets the pod specs for a set of applications.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='GetPodSpec',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -4545,6 +6088,30 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringBoolResults)
+    def sync_GetPrincipal(self, entities=None):
+        '''
+        GetPrincipal returns the result of calling PrincipalName() and
+        converting it to a tag, on each given unit.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringBoolResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='GetPrincipal',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -4574,6 +6141,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringResults)
+    def sync_GetRawK8sSpec(self, entities=None):
+        '''
+        GetRawK8sSpec gets the raw k8s specs for a set of applications.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='GetRawK8sSpec',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
     async def GetRawK8sSpec(self, entities=None):
         '''
         GetRawK8sSpec gets the raw k8s specs for a set of applications.
@@ -4592,6 +6182,34 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SecretBackendConfigResults)
+    def sync_GetSecretBackendConfigs(self, backend_ids=None, for_drain=None):
+        '''
+        GetSecretBackendConfigs gets the config needed to create a client to secret backends.
+
+        backend_ids : typing.Sequence[str]
+        for_drain : bool
+        Returns -> SecretBackendConfigResults
+        '''
+        if backend_ids is not None and not isinstance(backend_ids, (bytes, str, list)):
+            raise Exception("Expected backend_ids to be a Sequence, received: {}".format(type(backend_ids)))
+
+        if for_drain is not None and not isinstance(for_drain, bool):
+            raise Exception("Expected for_drain to be a bool, received: {}".format(type(for_drain)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='GetSecretBackendConfigs',
+                   version=18,
+                   params=_params)
+        _params['backend-ids'] = backend_ids
+        _params['for-drain'] = for_drain
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -4625,6 +6243,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(SecretContentResults)
+    def sync_GetSecretContentInfo(self, args=None):
+        '''
+        GetSecretContentInfo returns the secret values for the specified secrets.
+
+        args : typing.Sequence[~GetSecretContentArg]
+        Returns -> SecretContentResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='GetSecretContentInfo',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SecretContentResults)
     async def GetSecretContentInfo(self, args=None):
         '''
         GetSecretContentInfo returns the secret values for the specified secrets.
@@ -4648,6 +6289,27 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ListSecretResults)
+    def sync_GetSecretMetadata(self):
+        '''
+        GetSecretMetadata returns metadata for the caller's secrets.
+
+
+        Returns -> ListSecretResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='GetSecretMetadata',
+                   version=18,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ListSecretResults)
     async def GetSecretMetadata(self):
         '''
         GetSecretMetadata returns metadata for the caller's secrets.
@@ -4664,6 +6326,39 @@ class UniterFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SecretContentResults)
+    def sync_GetSecretRevisionContentInfo(self, pending_delete=None, revisions=None, uri=None):
+        '''
+        GetSecretRevisionContentInfo returns the secret values for the specified secret revisions.
+
+        pending_delete : bool
+        revisions : typing.Sequence[int]
+        uri : str
+        Returns -> SecretContentResults
+        '''
+        if pending_delete is not None and not isinstance(pending_delete, bool):
+            raise Exception("Expected pending_delete to be a bool, received: {}".format(type(pending_delete)))
+
+        if revisions is not None and not isinstance(revisions, (bytes, str, list)):
+            raise Exception("Expected revisions to be a Sequence, received: {}".format(type(revisions)))
+
+        if uri is not None and not isinstance(uri, (bytes, str)):
+            raise Exception("Expected uri to be a str, received: {}".format(type(uri)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='GetSecretRevisionContentInfo',
+                   version=18,
+                   params=_params)
+        _params['pending-delete'] = pending_delete
+        _params['revisions'] = revisions
+        _params['uri'] = uri
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -4702,6 +6397,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(GoalStateResults)
+    def sync_GoalStates(self, entities=None):
+        '''
+        GoalStates returns information of charm units and relations.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> GoalStateResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='GoalStates',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(GoalStateResults)
     async def GoalStates(self, entities=None):
         '''
         GoalStates returns information of charm units and relations.
@@ -4720,6 +6438,29 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(BoolResults)
+    def sync_HasSubordinates(self, entities=None):
+        '''
+        HasSubordinates returns the whether each given unit has any subordinates.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> BoolResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='HasSubordinates',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -4748,6 +6489,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringResults)
+    def sync_LXDProfileName(self, entities=None):
+        '''
+        LXDProfileName is a shim to call the LXDProfileAPIv2 version of this method.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='LXDProfileName',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
     async def LXDProfileName(self, entities=None):
         '''
         LXDProfileName is a shim to call the LXDProfileAPIv2 version of this method.
@@ -4771,6 +6535,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(BoolResults)
+    def sync_LXDProfileRequired(self, urls=None):
+        '''
+        LXDProfileRequired is a shim to call the LXDProfileAPIv2 version of this method.
+
+        urls : typing.Sequence[~CharmURL]
+        Returns -> BoolResults
+        '''
+        if urls is not None and not isinstance(urls, (bytes, str, list)):
+            raise Exception("Expected urls to be a Sequence, received: {}".format(type(urls)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='LXDProfileRequired',
+                   version=18,
+                   params=_params)
+        _params['urls'] = urls
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(BoolResults)
     async def LXDProfileRequired(self, urls=None):
         '''
         LXDProfileRequired is a shim to call the LXDProfileAPIv2 version of this method.
@@ -4789,6 +6576,31 @@ class UniterFacade(Type):
                    params=_params)
         _params['urls'] = urls
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_LeaveScope(self, relation_units=None):
+        '''
+        LeaveScope signals each unit has left its scope in the relation,
+        for all of the given relation/unit pairs. See also
+        state.RelationUnit.LeaveScope().
+
+        relation_units : typing.Sequence[~RelationUnit]
+        Returns -> ErrorResults
+        '''
+        if relation_units is not None and not isinstance(relation_units, (bytes, str, list)):
+            raise Exception("Expected relation_units to be a Sequence, received: {}".format(type(relation_units)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='LeaveScope',
+                   version=18,
+                   params=_params)
+        _params['relation-units'] = relation_units
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -4819,6 +6631,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(LifeResults)
+    def sync_Life(self, entities=None):
+        '''
+        Life returns the life status of every supplied entity, where available.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> LifeResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='Life',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(LifeResults)
     async def Life(self, entities=None):
         '''
         Life returns the life status of every supplied entity, where available.
@@ -4842,6 +6677,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_LogActionsMessages(self, messages=None):
+        '''
+        LogActionsMessages records the log messages against the specified actions.
+
+        messages : typing.Sequence[~EntityString]
+        Returns -> ErrorResults
+        '''
+        if messages is not None and not isinstance(messages, (bytes, str, list)):
+            raise Exception("Expected messages to be a Sequence, received: {}".format(type(messages)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='LogActionsMessages',
+                   version=18,
+                   params=_params)
+        _params['messages'] = messages
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def LogActionsMessages(self, messages=None):
         '''
         LogActionsMessages records the log messages against the specified actions.
@@ -4860,6 +6718,30 @@ class UniterFacade(Type):
                    params=_params)
         _params['messages'] = messages
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_Merge(self, params=None):
+        '''
+        Merge merges in the provided leadership settings. Only leaders for
+        the given service may perform this operation.
+
+        params : typing.Sequence[~MergeLeadershipSettingsParam]
+        Returns -> ErrorResults
+        '''
+        if params is not None and not isinstance(params, (bytes, str, list)):
+            raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='Merge',
+                   version=18,
+                   params=_params)
+        _params['params'] = params
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -4889,6 +6771,27 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ModelConfigResult)
+    def sync_ModelConfig(self):
+        '''
+        ModelConfig returns the current model's configuration.
+
+
+        Returns -> ModelConfigResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='ModelConfig',
+                   version=18,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ModelConfigResult)
     async def ModelConfig(self):
         '''
         ModelConfig returns the current model's configuration.
@@ -4905,6 +6808,30 @@ class UniterFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResult)
+    def sync_ModelUUID(self):
+        '''
+        ModelUUID returns the model UUID that this unit resides in.
+        It is implemented here directly as a result of removing it from
+        embedded APIAddresser *without* bumping the facade version.
+        It should be blanked when this facade version is next incremented.
+
+
+        Returns -> StringResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='ModelUUID',
+                   version=18,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -4929,6 +6856,39 @@ class UniterFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NetworkInfoResults)
+    def sync_NetworkInfo(self, bindings=None, relation_id=None, unit=None):
+        '''
+        NetworkInfo returns network interfaces/addresses for specified bindings.
+
+        bindings : typing.Sequence[str]
+        relation_id : int
+        unit : str
+        Returns -> NetworkInfoResults
+        '''
+        if bindings is not None and not isinstance(bindings, (bytes, str, list)):
+            raise Exception("Expected bindings to be a Sequence, received: {}".format(type(bindings)))
+
+        if relation_id is not None and not isinstance(relation_id, int):
+            raise Exception("Expected relation_id to be a int, received: {}".format(type(relation_id)))
+
+        if unit is not None and not isinstance(unit, (bytes, str)):
+            raise Exception("Expected unit to be a str, received: {}".format(type(unit)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='NetworkInfo',
+                   version=18,
+                   params=_params)
+        _params['bindings'] = bindings
+        _params['relation-id'] = relation_id
+        _params['unit'] = unit
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -4967,6 +6927,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ApplicationOpenedPortsResults)
+    def sync_OpenedApplicationPortRangesByEndpoint(self, tag=None):
+        '''
+        OpenedApplicationPortRangesByEndpoint returns the port ranges opened by each application.
+
+        tag : str
+        Returns -> ApplicationOpenedPortsResults
+        '''
+        if tag is not None and not isinstance(tag, (bytes, str)):
+            raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='OpenedApplicationPortRangesByEndpoint',
+                   version=18,
+                   params=_params)
+        _params['tag'] = tag
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationOpenedPortsResults)
     async def OpenedApplicationPortRangesByEndpoint(self, tag=None):
         '''
         OpenedApplicationPortRangesByEndpoint returns the port ranges opened by each application.
@@ -4985,6 +6968,30 @@ class UniterFacade(Type):
                    params=_params)
         _params['tag'] = tag
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(OpenPortRangesByEndpointResults)
+    def sync_OpenedMachinePortRangesByEndpoint(self, entities=None):
+        '''
+        OpenedMachinePortRangesByEndpoint returns the port ranges opened by each
+        unit on the provided machines grouped by application endpoint.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> OpenPortRangesByEndpointResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='OpenedMachinePortRangesByEndpoint',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5014,6 +7021,27 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(OpenPortRangesByEndpointResults)
+    def sync_OpenedPortRangesByEndpoint(self):
+        '''
+        OpenedPortRangesByEndpoint returns the port ranges opened by the unit.
+
+
+        Returns -> OpenPortRangesByEndpointResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='OpenedPortRangesByEndpoint',
+                   version=18,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(OpenPortRangesByEndpointResults)
     async def OpenedPortRangesByEndpoint(self):
         '''
         OpenedPortRangesByEndpoint returns the port ranges opened by the unit.
@@ -5030,6 +7058,29 @@ class UniterFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
+    def sync_PrivateAddress(self, entities=None):
+        '''
+        PrivateAddress returns the private address for each given unit, if set.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='PrivateAddress',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5053,6 +7104,32 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResult)
+    def sync_ProviderType(self):
+        '''
+        ProviderType returns the provider type used by the current juju
+        model.
+
+        TODO(dimitern): Refactor the uniter to call this instead of calling
+        ModelConfig() just to get the provider type. Once we have machine
+        addresses, this might be completely unnecessary though.
+
+
+        Returns -> StringResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='ProviderType',
+                   version=18,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5084,6 +7161,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringResults)
+    def sync_PublicAddress(self, entities=None):
+        '''
+        PublicAddress returns the public address for each given unit, if set.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='PublicAddress',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
     async def PublicAddress(self, entities=None):
         '''
         PublicAddress returns the public address for each given unit, if set.
@@ -5102,6 +7202,30 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(GetLeadershipSettingsBulkResults)
+    def sync_Read(self, entities=None):
+        '''
+        Read reads leadership settings for the provided service ID. Any
+        unit of the service may perform this operation.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> GetLeadershipSettingsBulkResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='Read',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5126,6 +7250,35 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SettingsResult)
+    def sync_ReadLocalApplicationSettings(self, relation=None, unit=None):
+        '''
+        ReadLocalApplicationSettings returns the local application settings for a
+        particular relation when invoked by the leader unit.
+
+        relation : str
+        unit : str
+        Returns -> SettingsResult
+        '''
+        if relation is not None and not isinstance(relation, (bytes, str)):
+            raise Exception("Expected relation to be a str, received: {}".format(type(relation)))
+
+        if unit is not None and not isinstance(unit, (bytes, str)):
+            raise Exception("Expected unit to be a str, received: {}".format(type(unit)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='ReadLocalApplicationSettings',
+                   version=18,
+                   params=_params)
+        _params['relation'] = relation
+        _params['unit'] = unit
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5160,6 +7313,30 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(SettingsResults)
+    def sync_ReadRemoteSettings(self, relation_unit_pairs=None):
+        '''
+        ReadRemoteSettings returns the remote settings of each given set of
+        relation/local unit/remote unit.
+
+        relation_unit_pairs : typing.Sequence[~RelationUnitPair]
+        Returns -> SettingsResults
+        '''
+        if relation_unit_pairs is not None and not isinstance(relation_unit_pairs, (bytes, str, list)):
+            raise Exception("Expected relation_unit_pairs to be a Sequence, received: {}".format(type(relation_unit_pairs)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='ReadRemoteSettings',
+                   version=18,
+                   params=_params)
+        _params['relation-unit-pairs'] = relation_unit_pairs
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SettingsResults)
     async def ReadRemoteSettings(self, relation_unit_pairs=None):
         '''
         ReadRemoteSettings returns the remote settings of each given set of
@@ -5179,6 +7356,34 @@ class UniterFacade(Type):
                    params=_params)
         _params['relation-unit-pairs'] = relation_unit_pairs
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SettingsResults)
+    def sync_ReadSettings(self, relation_units=None):
+        '''
+        ReadSettings returns the local settings of each given set of
+        relation/unit.
+
+        NOTE(achilleasa): Using this call to read application data is deprecated
+        and will not work for k8s charms (see LP1876097). Instead, clients should
+        use ReadLocalApplicationSettings.
+
+        relation_units : typing.Sequence[~RelationUnit]
+        Returns -> SettingsResults
+        '''
+        if relation_units is not None and not isinstance(relation_units, (bytes, str, list)):
+            raise Exception("Expected relation_units to be a Sequence, received: {}".format(type(relation_units)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='ReadSettings',
+                   version=18,
+                   params=_params)
+        _params['relation-units'] = relation_units
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5212,6 +7417,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(UnitRefreshResults)
+    def sync_Refresh(self, entities=None):
+        '''
+        Refresh retrieves the latest values for attributes on this unit.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> UnitRefreshResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='Refresh',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(UnitRefreshResults)
     async def Refresh(self, entities=None):
         '''
         Refresh retrieves the latest values for attributes on this unit.
@@ -5230,6 +7458,30 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(RelationResults)
+    def sync_Relation(self, relation_units=None):
+        '''
+        Relation returns information about all given relation/unit pairs,
+        including their id, key and the local endpoint.
+
+        relation_units : typing.Sequence[~RelationUnit]
+        Returns -> RelationResults
+        '''
+        if relation_units is not None and not isinstance(relation_units, (bytes, str, list)):
+            raise Exception("Expected relation_units to be a Sequence, received: {}".format(type(relation_units)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='Relation',
+                   version=18,
+                   params=_params)
+        _params['relation-units'] = relation_units
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5254,6 +7506,31 @@ class UniterFacade(Type):
                    params=_params)
         _params['relation-units'] = relation_units
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(RelationResults)
+    def sync_RelationById(self, relation_ids=None):
+        '''
+        RelationById returns information about all given relations,
+        specified by their ids, including their key and the local
+        endpoint.
+
+        relation_ids : typing.Sequence[int]
+        Returns -> RelationResults
+        '''
+        if relation_ids is not None and not isinstance(relation_ids, (bytes, str, list)):
+            raise Exception("Expected relation_ids to be a Sequence, received: {}".format(type(relation_ids)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='RelationById',
+                   version=18,
+                   params=_params)
+        _params['relation-ids'] = relation_ids
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5284,6 +7561,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(RelationUnitStatusResults)
+    def sync_RelationsStatus(self, entities=None):
+        '''
+        RelationsStatus returns for each unit the corresponding relation and status information.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> RelationUnitStatusResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='RelationsStatus',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(RelationUnitStatusResults)
     async def RelationsStatus(self, entities=None):
         '''
         RelationsStatus returns for each unit the corresponding relation and status information.
@@ -5307,6 +7607,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_RemoveSecrets(self, args=None):
+        '''
+        RemoveSecrets removes the specified secrets.
+
+        args : typing.Sequence[~DeleteSecretArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='RemoveSecrets',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def RemoveSecrets(self, args=None):
         '''
         RemoveSecrets removes the specified secrets.
@@ -5325,6 +7648,30 @@ class UniterFacade(Type):
                    params=_params)
         _params['args'] = args
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_RemoveStorageAttachments(self, ids=None):
+        '''
+        RemoveStorageAttachments removes the specified storage
+        attachments from state.
+
+        ids : typing.Sequence[~StorageAttachmentId]
+        Returns -> ErrorResults
+        '''
+        if ids is not None and not isinstance(ids, (bytes, str, list)):
+            raise Exception("Expected ids to be a Sequence, received: {}".format(type(ids)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='RemoveStorageAttachments',
+                   version=18,
+                   params=_params)
+        _params['ids'] = ids
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5354,6 +7701,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_RequestReboot(self, entities=None):
+        '''
+        RequestReboot sets the reboot flag on the provided machines
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='RequestReboot',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def RequestReboot(self, entities=None):
         '''
         RequestReboot sets the reboot flag on the provided machines
@@ -5372,6 +7742,29 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ResolvedModeResults)
+    def sync_Resolved(self, entities=None):
+        '''
+        Resolved returns the current resolved setting for each given unit.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ResolvedModeResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='Resolved',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5400,6 +7793,27 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringResult)
+    def sync_SLALevel(self):
+        '''
+        SLALevel returns the model's SLA level.
+
+
+        Returns -> StringResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='SLALevel',
+                   version=18,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResult)
     async def SLALevel(self):
         '''
         SLALevel returns the model's SLA level.
@@ -5416,6 +7830,29 @@ class UniterFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_SecretsGrant(self, args=None):
+        '''
+        SecretsGrant grants access to a secret for the specified subjects.
+
+        args : typing.Sequence[~GrantRevokeSecretArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='SecretsGrant',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5444,6 +7881,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_SecretsRevoke(self, args=None):
+        '''
+        SecretsRevoke revokes access to a secret for the specified subjects.
+
+        args : typing.Sequence[~GrantRevokeSecretArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='SecretsRevoke',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def SecretsRevoke(self, args=None):
         '''
         SecretsRevoke revokes access to a secret for the specified subjects.
@@ -5467,6 +7927,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_SecretsRotated(self, args=None):
+        '''
+        SecretsRotated records when secrets were last rotated.
+
+        args : typing.Sequence[~SecretRotatedArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='SecretsRotated',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def SecretsRotated(self, args=None):
         '''
         SecretsRotated records when secrets were last rotated.
@@ -5485,6 +7968,30 @@ class UniterFacade(Type):
                    params=_params)
         _params['args'] = args
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_SetAgentStatus(self, entities=None):
+        '''
+        SetAgentStatus will set status for agents of Units passed in args, if one
+        of the args is not an Unit it will fail.
+
+        entities : typing.Sequence[~EntityStatusArgs]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='SetAgentStatus',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5514,6 +8021,30 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_SetApplicationStatus(self, entities=None):
+        '''
+        SetApplicationStatus sets the status for all the Applications in args if the given Unit is
+        the leader.
+
+        entities : typing.Sequence[~EntityStatusArgs]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='SetApplicationStatus',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def SetApplicationStatus(self, entities=None):
         '''
         SetApplicationStatus sets the status for all the Applications in args if the given Unit is
@@ -5533,6 +8064,30 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_SetCharmURL(self, entities=None):
+        '''
+        SetCharmURL sets the charm URL for each given unit. An error will
+        be returned if a unit is dead, or the charm URL is not known.
+
+        entities : typing.Sequence[~EntityCharmURL]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='SetCharmURL',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5562,6 +8117,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_SetRelationStatus(self, args=None):
+        '''
+        SetRelationStatus updates the status of the specified relations.
+
+        args : typing.Sequence[~RelationStatusArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='SetRelationStatus',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def SetRelationStatus(self, args=None):
         '''
         SetRelationStatus updates the status of the specified relations.
@@ -5580,6 +8158,30 @@ class UniterFacade(Type):
                    params=_params)
         _params['args'] = args
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_SetState(self, args=None):
+        '''
+        SetState sets the state persisted by the charm running in this unit
+        and the state internal to the uniter for this unit.
+
+        args : typing.Sequence[~SetUnitStateArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='SetState',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5604,6 +8206,31 @@ class UniterFacade(Type):
                    params=_params)
         _params['args'] = args
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_SetStatus(self, entities=None):
+        '''
+        SetStatus will set status for a entities passed in args. If the entity is
+        a Unit it will instead set status to its agent, to emulate backwards
+        compatibility.
+
+        entities : typing.Sequence[~EntityStatusArgs]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='SetStatus',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5634,6 +8261,31 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_SetUnitStatus(self, entities=None):
+        '''
+        SetUnitStatus sets status for all elements passed in args, the difference
+        with SetStatus is that if an entity is a Unit it will set its status instead
+        of its agent.
+
+        entities : typing.Sequence[~EntityStatusArgs]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='SetUnitStatus',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def SetUnitStatus(self, entities=None):
         '''
         SetUnitStatus sets status for all elements passed in args, the difference
@@ -5654,6 +8306,30 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_SetUpgradeSeriesUnitStatus(self, params=None):
+        '''
+        SetUpgradeSeriesUnitStatus sets the upgrade series status of the unit.
+        If no upgrade is in progress an error is returned instead.
+
+        params : typing.Sequence[~UpgradeSeriesStatusParam]
+        Returns -> ErrorResults
+        '''
+        if params is not None and not isinstance(params, (bytes, str, list)):
+            raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='SetUpgradeSeriesUnitStatus',
+                   version=18,
+                   params=_params)
+        _params['params'] = params
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5683,6 +8359,30 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_SetWorkloadVersion(self, entities=None):
+        '''
+        SetWorkloadVersion sets the workload version for each given unit. An error will
+        be returned if a unit is dead.
+
+        entities : typing.Sequence[~EntityWorkloadVersion]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='SetWorkloadVersion',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def SetWorkloadVersion(self, entities=None):
         '''
         SetWorkloadVersion sets the workload version for each given unit. An error will
@@ -5702,6 +8402,30 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(UnitStateResults)
+    def sync_State(self, entities=None):
+        '''
+        State returns the state persisted by the charm running in this unit
+        and the state internal to the uniter for this unit.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> UnitStateResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='State',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5731,6 +8455,30 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(LifeResults)
+    def sync_StorageAttachmentLife(self, ids=None):
+        '''
+        StorageAttachmentLife returns the lifecycle state of the storage attachments
+        with the specified tags.
+
+        ids : typing.Sequence[~StorageAttachmentId]
+        Returns -> LifeResults
+        '''
+        if ids is not None and not isinstance(ids, (bytes, str, list)):
+            raise Exception("Expected ids to be a Sequence, received: {}".format(type(ids)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='StorageAttachmentLife',
+                   version=18,
+                   params=_params)
+        _params['ids'] = ids
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(LifeResults)
     async def StorageAttachmentLife(self, ids=None):
         '''
         StorageAttachmentLife returns the lifecycle state of the storage attachments
@@ -5750,6 +8498,29 @@ class UniterFacade(Type):
                    params=_params)
         _params['ids'] = ids
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StorageAttachmentResults)
+    def sync_StorageAttachments(self, ids=None):
+        '''
+        StorageAttachments returns the storage attachments with the specified tags.
+
+        ids : typing.Sequence[~StorageAttachmentId]
+        Returns -> StorageAttachmentResults
+        '''
+        if ids is not None and not isinstance(ids, (bytes, str, list)):
+            raise Exception("Expected ids to be a Sequence, received: {}".format(type(ids)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='StorageAttachments',
+                   version=18,
+                   params=_params)
+        _params['ids'] = ids
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5778,6 +8549,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StatusResults)
+    def sync_UnitStatus(self, entities=None):
+        '''
+        UnitStatus returns the workload status information for the unit.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StatusResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='UnitStatus',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StatusResults)
     async def UnitStatus(self, entities=None):
         '''
         UnitStatus returns the workload status information for the unit.
@@ -5801,6 +8595,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StorageAttachmentIdsResults)
+    def sync_UnitStorageAttachments(self, entities=None):
+        '''
+        UnitStorageAttachments returns the IDs of storage attachments for a collection of units.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StorageAttachmentIdsResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='UnitStorageAttachments',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StorageAttachmentIdsResults)
     async def UnitStorageAttachments(self, entities=None):
         '''
         UnitStorageAttachments returns the IDs of storage attachments for a collection of units.
@@ -5819,6 +8636,30 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_UpdateNetworkInfo(self, entities=None):
+        '''
+        UpdateNetworkInfo refreshes the network settings for a unit's bound
+        endpoints.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='UpdateNetworkInfo',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5848,6 +8689,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_UpdateSecrets(self, args=None):
+        '''
+        UpdateSecrets updates the specified secrets.
+
+        args : typing.Sequence[~UpdateSecretArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='UpdateSecrets',
+                   version=18,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def UpdateSecrets(self, args=None):
         '''
         UpdateSecrets updates the specified secrets.
@@ -5866,6 +8730,31 @@ class UniterFacade(Type):
                    params=_params)
         _params['args'] = args
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(UpgradeSeriesStatusResults)
+    def sync_UpgradeSeriesUnitStatus(self, entities=None):
+        '''
+        UpgradeSeriesUnitStatus returns the current preparation status of an
+        upgrading unit.
+        If no series upgrade is in progress an error is returned instead.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> UpgradeSeriesStatusResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='UpgradeSeriesUnitStatus',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5896,6 +8785,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResults)
+    def sync_Watch(self, entities=None):
+        '''
+        Watch starts an NotifyWatcher for each given entity.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='Watch',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
     async def Watch(self, entities=None):
         '''
         Watch starts an NotifyWatcher for each given entity.
@@ -5914,6 +8826,27 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResult)
+    def sync_WatchAPIHostPorts(self):
+        '''
+        WatchAPIHostPorts watches the API server addresses.
+
+
+        Returns -> NotifyWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchAPIHostPorts',
+                   version=18,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5940,6 +8873,32 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringsWatchResults)
+    def sync_WatchActionNotifications(self, entities=None):
+        '''
+        WatchActionNotifications returns a StringsWatcher for observing
+        incoming action calls to a unit. See also state/watcher.go
+        Unit.WatchActionNotifications(). This method is called from
+        api/uniter/uniter.go WatchActionNotifications().
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchActionNotifications',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
     async def WatchActionNotifications(self, entities=None):
         '''
         WatchActionNotifications returns a StringsWatcher for observing
@@ -5961,6 +8920,33 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
+    def sync_WatchConfigSettingsHash(self, entities=None):
+        '''
+        WatchConfigSettingsHash returns a StringsWatcher that yields a hash
+        of the config values every time the config changes. The uniter can
+        save this hash and use it to decide whether the config-changed hook
+        needs to be run (or whether this was just an agent restart with no
+        substantive config change).
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchConfigSettingsHash',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -5993,6 +8979,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringsWatchResults)
+    def sync_WatchConsumedSecretsChanges(self, entities=None):
+        '''
+        WatchConsumedSecretsChanges sets up a watcher to notify of changes to secret revisions for the specified consumers.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchConsumedSecretsChanges',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
     async def WatchConsumedSecretsChanges(self, entities=None):
         '''
         WatchConsumedSecretsChanges sets up a watcher to notify of changes to secret revisions for the specified consumers.
@@ -6011,6 +9020,31 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResult)
+    def sync_WatchForModelConfigChanges(self):
+        '''
+        WatchForModelConfigChanges returns a NotifyWatcher that observes
+        changes to the model configuration.
+        Note that although the NotifyWatchResult contains an Error field,
+        it's not used because we are only returning a single watcher,
+        so we use the regular error return.
+
+
+        Returns -> NotifyWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchForModelConfigChanges',
+                   version=18,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -6041,6 +9075,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResults)
+    def sync_WatchInstanceData(self, entities=None):
+        '''
+        WatchInstanceData is a shim to call the LXDProfileAPIv2 version of this method.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchInstanceData',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
     async def WatchInstanceData(self, entities=None):
         '''
         WatchInstanceData is a shim to call the LXDProfileAPIv2 version of this method.
@@ -6059,6 +9116,30 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
+    def sync_WatchLeadershipSettings(self, entities=None):
+        '''
+        WatchLeadershipSettings will block the caller until leadership settings
+        for the given service ID change.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchLeadershipSettings',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -6088,6 +9169,27 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResults)
+    def sync_WatchMeterStatus(self, entities=None):
+        '''
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchMeterStatus',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
     async def WatchMeterStatus(self, entities=None):
         '''
         entities : typing.Sequence[~Entity]
@@ -6104,6 +9206,35 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResult)
+    def sync_WatchObsolete(self, entities=None):
+        '''
+        WatchObsolete returns a watcher for notifying when:
+          - a secret owned by the entity is deleted
+          - a secret revision owed by the entity no longer
+            has any consumers
+
+        Obsolete revisions results are "uri/revno" and deleted
+        secret results are "uri".
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResult
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchObsolete',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -6138,6 +9269,31 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(RelationUnitsWatchResults)
+    def sync_WatchRelationUnits(self, relation_units=None):
+        '''
+        WatchRelationUnits returns a RelationUnitsWatcher for observing
+        changes to every unit in the supplied relation that is visible to
+        the supplied unit. See also state/watcher.go:RelationUnit.Watch().
+
+        relation_units : typing.Sequence[~RelationUnit]
+        Returns -> RelationUnitsWatchResults
+        '''
+        if relation_units is not None and not isinstance(relation_units, (bytes, str, list)):
+            raise Exception("Expected relation_units to be a Sequence, received: {}".format(type(relation_units)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchRelationUnits',
+                   version=18,
+                   params=_params)
+        _params['relation-units'] = relation_units
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(RelationUnitsWatchResults)
     async def WatchRelationUnits(self, relation_units=None):
         '''
         WatchRelationUnits returns a RelationUnitsWatcher for observing
@@ -6158,6 +9314,29 @@ class UniterFacade(Type):
                    params=_params)
         _params['relation-units'] = relation_units
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SecretTriggerWatchResult)
+    def sync_WatchSecretRevisionsExpiryChanges(self, entities=None):
+        '''
+        WatchSecretRevisionsExpiryChanges sets up a watcher to notify of changes to secret revision expiry config.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> SecretTriggerWatchResult
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchSecretRevisionsExpiryChanges',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -6186,6 +9365,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(SecretTriggerWatchResult)
+    def sync_WatchSecretsRotationChanges(self, entities=None):
+        '''
+        WatchSecretsRotationChanges sets up a watcher to notify of changes to secret rotation config.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> SecretTriggerWatchResult
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchSecretsRotationChanges',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SecretTriggerWatchResult)
     async def WatchSecretsRotationChanges(self, entities=None):
         '''
         WatchSecretsRotationChanges sets up a watcher to notify of changes to secret rotation config.
@@ -6204,6 +9406,31 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
+    def sync_WatchStorageAttachments(self, ids=None):
+        '''
+        WatchStorageAttachments creates watchers for a collection of storage
+        attachments, each of which can be used to watch changes to storage
+        attachment info.
+
+        ids : typing.Sequence[~StorageAttachmentId]
+        Returns -> NotifyWatchResults
+        '''
+        if ids is not None and not isinstance(ids, (bytes, str, list)):
+            raise Exception("Expected ids to be a Sequence, received: {}".format(type(ids)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchStorageAttachments',
+                   version=18,
+                   params=_params)
+        _params['ids'] = ids
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -6229,6 +9456,32 @@ class UniterFacade(Type):
                    params=_params)
         _params['ids'] = ids
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
+    def sync_WatchTrustConfigSettingsHash(self, entities=None):
+        '''
+        WatchTrustConfigSettingsHash returns a StringsWatcher that yields a
+        hash of the application config values whenever they change. The
+        uniter can use the hash to determine whether the actual values have
+        changed since it last saw the config.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchTrustConfigSettingsHash',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -6260,6 +9513,32 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringsWatchResults)
+    def sync_WatchUnitAddressesHash(self, entities=None):
+        '''
+        WatchUnitAddressesHash returns a StringsWatcher that yields the
+        hashes of the addresses for the unit whenever the addresses
+        change. The uniter can use the hash to determine whether the actual
+        address values have changed since it last saw the config.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchUnitAddressesHash',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
     async def WatchUnitAddressesHash(self, entities=None):
         '''
         WatchUnitAddressesHash returns a StringsWatcher that yields the
@@ -6281,6 +9560,33 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
+    def sync_WatchUnitRelations(self, entities=None):
+        '''
+        WatchUnitRelations returns a StringsWatcher, for each given
+        unit, that notifies of changes to the lifecycles of relations
+        relevant to that unit. For principal units, this will be all of the
+        relations for the application. For subordinate units, only
+        relations with the principal unit's application will be monitored.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchUnitRelations',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -6313,6 +9619,31 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(StringsWatchResults)
+    def sync_WatchUnitStorageAttachments(self, entities=None):
+        '''
+        WatchUnitStorageAttachments creates watchers for a collection of units,
+        each of which can be used to watch for lifecycle changes to the corresponding
+        unit's storage attachments.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchUnitStorageAttachments',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
     async def WatchUnitStorageAttachments(self, entities=None):
         '''
         WatchUnitStorageAttachments creates watchers for a collection of units,
@@ -6338,6 +9669,29 @@ class UniterFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResults)
+    def sync_WatchUpgradeSeriesNotifications(self, entities=None):
+        '''
+        WatchUpgradeSeriesNotifications returns a NotifyWatcher for observing changes to upgrade series locks.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WatchUpgradeSeriesNotifications',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
     async def WatchUpgradeSeriesNotifications(self, entities=None):
         '''
         WatchUpgradeSeriesNotifications returns a NotifyWatcher for observing changes to upgrade series locks.
@@ -6356,6 +9710,29 @@ class UniterFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
+    def sync_WorkloadVersion(self, entities=None):
+        '''
+        WorkloadVersion returns the workload version for all given units or applications.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Uniter',
+                   request='WorkloadVersion',
+                   version=18,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 

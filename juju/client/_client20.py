@@ -930,6 +930,34 @@ class ApplicationFacade(Type):
     
 
     @ReturnMapping(AddRelationResults)
+    def sync_AddRelation(self, endpoints=None, via_cidrs=None):
+        '''
+        AddRelation adds a relation between the specified endpoints and returns the relation info.
+
+        endpoints : typing.Sequence[str]
+        via_cidrs : typing.Sequence[str]
+        Returns -> AddRelationResults
+        '''
+        if endpoints is not None and not isinstance(endpoints, (bytes, str, list)):
+            raise Exception("Expected endpoints to be a Sequence, received: {}".format(type(endpoints)))
+
+        if via_cidrs is not None and not isinstance(via_cidrs, (bytes, str, list)):
+            raise Exception("Expected via_cidrs to be a Sequence, received: {}".format(type(via_cidrs)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='AddRelation',
+                   version=20,
+                   params=_params)
+        _params['endpoints'] = endpoints
+        _params['via-cidrs'] = via_cidrs
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(AddRelationResults)
     async def AddRelation(self, endpoints=None, via_cidrs=None):
         '''
         AddRelation adds a relation between the specified endpoints and returns the relation info.
@@ -953,6 +981,49 @@ class ApplicationFacade(Type):
         _params['endpoints'] = endpoints
         _params['via-cidrs'] = via_cidrs
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(AddApplicationUnitsResults)
+    def sync_AddUnits(self, application=None, attach_storage=None, num_units=None, placement=None, policy=None):
+        '''
+        AddUnits adds a given number of units to an application.
+
+        application : str
+        attach_storage : typing.Sequence[str]
+        num_units : int
+        placement : typing.Sequence[~Placement]
+        policy : str
+        Returns -> AddApplicationUnitsResults
+        '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception("Expected application to be a str, received: {}".format(type(application)))
+
+        if attach_storage is not None and not isinstance(attach_storage, (bytes, str, list)):
+            raise Exception("Expected attach_storage to be a Sequence, received: {}".format(type(attach_storage)))
+
+        if num_units is not None and not isinstance(num_units, int):
+            raise Exception("Expected num_units to be a int, received: {}".format(type(num_units)))
+
+        if placement is not None and not isinstance(placement, (bytes, str, list)):
+            raise Exception("Expected placement to be a Sequence, received: {}".format(type(placement)))
+
+        if policy is not None and not isinstance(policy, (bytes, str)):
+            raise Exception("Expected policy to be a str, received: {}".format(type(policy)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='AddUnits',
+                   version=20,
+                   params=_params)
+        _params['application'] = application
+        _params['attach-storage'] = attach_storage
+        _params['num-units'] = num_units
+        _params['placement'] = placement
+        _params['policy'] = policy
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1001,6 +1072,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ApplicationInfoResults)
+    def sync_ApplicationsInfo(self, entities=None):
+        '''
+        ApplicationsInfo returns applications information.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ApplicationInfoResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='ApplicationsInfo',
+                   version=20,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationInfoResults)
     async def ApplicationsInfo(self, entities=None):
         '''
         ApplicationsInfo returns applications information.
@@ -1019,6 +1113,30 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationGetConfigResults)
+    def sync_CharmConfig(self, args=None):
+        '''
+        CharmConfig returns charm config for the input list of applications and
+        model generations.
+
+        args : typing.Sequence[~ApplicationGet]
+        Returns -> ApplicationGetConfigResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='CharmConfig',
+                   version=20,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1048,6 +1166,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ApplicationCharmRelationsResults)
+    def sync_CharmRelations(self, application=None):
+        '''
+        CharmRelations implements the server side of Application.CharmRelations.
+
+        application : str
+        Returns -> ApplicationCharmRelationsResults
+        '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception("Expected application to be a str, received: {}".format(type(application)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='CharmRelations',
+                   version=20,
+                   params=_params)
+        _params['application'] = application
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationCharmRelationsResults)
     async def CharmRelations(self, application=None):
         '''
         CharmRelations implements the server side of Application.CharmRelations.
@@ -1066,6 +1207,30 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['application'] = application
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_Consume(self, args=None):
+        '''
+        Consume adds remote applications to the model without creating any
+        relations.
+
+        args : typing.Sequence[~ConsumeApplicationArgV5]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Consume',
+                   version=20,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1095,6 +1260,30 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_Deploy(self, applications=None):
+        '''
+        Deploy fetches the charms from the charm store and deploys them
+        using the specified placement directives.
+
+        applications : typing.Sequence[~ApplicationDeploy]
+        Returns -> ErrorResults
+        '''
+        if applications is not None and not isinstance(applications, (bytes, str, list)):
+            raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Deploy',
+                   version=20,
+                   params=_params)
+        _params['applications'] = applications
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def Deploy(self, applications=None):
         '''
         Deploy fetches the charms from the charm store and deploys them
@@ -1114,6 +1303,33 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['applications'] = applications
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(DeployFromRepositoryResults)
+    def sync_DeployFromRepository(self, args=None):
+        '''
+        DeployFromRepository is a one-stop deployment method for repository
+        charms. Only a charm name is required to deploy. If argument validation
+        fails, a list of all errors found in validation will be returned. If a
+        local resource is provided, details required for uploading the validated
+        resource will be returned.
+
+        args : typing.Sequence[~DeployFromRepositoryArg]
+        Returns -> DeployFromRepositoryResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='DeployFromRepository',
+                   version=20,
+                   params=_params)
+        _params['Args'] = args
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1146,6 +1362,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(DestroyApplicationResults)
+    def sync_DestroyApplication(self, applications=None):
+        '''
+        DestroyApplication removes a given set of applications.
+
+        applications : typing.Sequence[~DestroyApplicationParams]
+        Returns -> DestroyApplicationResults
+        '''
+        if applications is not None and not isinstance(applications, (bytes, str, list)):
+            raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='DestroyApplication',
+                   version=20,
+                   params=_params)
+        _params['applications'] = applications
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(DestroyApplicationResults)
     async def DestroyApplication(self, applications=None):
         '''
         DestroyApplication removes a given set of applications.
@@ -1169,6 +1408,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_DestroyConsumedApplications(self, applications=None):
+        '''
+        DestroyConsumedApplications removes a given set of consumed (remote) applications.
+
+        applications : typing.Sequence[~DestroyConsumedApplicationParams]
+        Returns -> ErrorResults
+        '''
+        if applications is not None and not isinstance(applications, (bytes, str, list)):
+            raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='DestroyConsumedApplications',
+                   version=20,
+                   params=_params)
+        _params['applications'] = applications
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def DestroyConsumedApplications(self, applications=None):
         '''
         DestroyConsumedApplications removes a given set of consumed (remote) applications.
@@ -1187,6 +1449,45 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['applications'] = applications
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    def sync_DestroyRelation(self, endpoints=None, force=None, max_wait=None, relation_id=None):
+        '''
+        DestroyRelation removes the relation between the
+        specified endpoints or an id.
+
+        endpoints : typing.Sequence[str]
+        force : bool
+        max_wait : int
+        relation_id : int
+        Returns -> None
+        '''
+        if endpoints is not None and not isinstance(endpoints, (bytes, str, list)):
+            raise Exception("Expected endpoints to be a Sequence, received: {}".format(type(endpoints)))
+
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if max_wait is not None and not isinstance(max_wait, int):
+            raise Exception("Expected max_wait to be a int, received: {}".format(type(max_wait)))
+
+        if relation_id is not None and not isinstance(relation_id, int):
+            raise Exception("Expected relation_id to be a int, received: {}".format(type(relation_id)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='DestroyRelation',
+                   version=20,
+                   params=_params)
+        _params['endpoints'] = endpoints
+        _params['force'] = force
+        _params['max-wait'] = max_wait
+        _params['relation-id'] = relation_id
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1231,6 +1532,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(DestroyUnitResults)
+    def sync_DestroyUnit(self, units=None):
+        '''
+        DestroyUnit removes a given set of application units.
+
+        units : typing.Sequence[~DestroyUnitParams]
+        Returns -> DestroyUnitResults
+        '''
+        if units is not None and not isinstance(units, (bytes, str, list)):
+            raise Exception("Expected units to be a Sequence, received: {}".format(type(units)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='DestroyUnit',
+                   version=20,
+                   params=_params)
+        _params['units'] = units
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(DestroyUnitResults)
     async def DestroyUnit(self, units=None):
         '''
         DestroyUnit removes a given set of application units.
@@ -1249,6 +1573,35 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['units'] = units
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    def sync_Expose(self, application=None, exposed_endpoints=None):
+        '''
+        Expose changes the juju-managed firewall to expose any ports that
+        were also explicitly marked by units as open.
+
+        application : str
+        exposed_endpoints : typing.Mapping[str, ~ExposedEndpoint]
+        Returns -> None
+        '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception("Expected application to be a str, received: {}".format(type(application)))
+
+        if exposed_endpoints is not None and not isinstance(exposed_endpoints, dict):
+            raise Exception("Expected exposed_endpoints to be a Mapping, received: {}".format(type(exposed_endpoints)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Expose',
+                   version=20,
+                   params=_params)
+        _params['application'] = application
+        _params['exposed-endpoints'] = exposed_endpoints
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1283,6 +1636,34 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ApplicationGetResults)
+    def sync_Get(self, application=None, branch=None):
+        '''
+        Get returns the charm configuration for an application.
+
+        application : str
+        branch : str
+        Returns -> ApplicationGetResults
+        '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception("Expected application to be a str, received: {}".format(type(application)))
+
+        if branch is not None and not isinstance(branch, (bytes, str)):
+            raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Get',
+                   version=20,
+                   params=_params)
+        _params['application'] = application
+        _params['branch'] = branch
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationGetResults)
     async def Get(self, application=None, branch=None):
         '''
         Get returns the charm configuration for an application.
@@ -1306,6 +1687,35 @@ class ApplicationFacade(Type):
         _params['application'] = application
         _params['branch'] = branch
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CharmURLOriginResult)
+    def sync_GetCharmURLOrigin(self, application=None, branch=None):
+        '''
+        GetCharmURLOrigin returns the charm URL and charm origin the given
+        application is running at present.
+
+        application : str
+        branch : str
+        Returns -> CharmURLOriginResult
+        '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception("Expected application to be a str, received: {}".format(type(application)))
+
+        if branch is not None and not isinstance(branch, (bytes, str)):
+            raise Exception("Expected branch to be a str, received: {}".format(type(branch)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='GetCharmURLOrigin',
+                   version=20,
+                   params=_params)
+        _params['application'] = application
+        _params['branch'] = branch
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1340,6 +1750,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ApplicationGetConfigResults)
+    def sync_GetConfig(self, entities=None):
+        '''
+        GetConfig returns the charm config for each of the input applications.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ApplicationGetConfigResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='GetConfig',
+                   version=20,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationGetConfigResults)
     async def GetConfig(self, entities=None):
         '''
         GetConfig returns the charm config for each of the input applications.
@@ -1358,6 +1791,29 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationGetConstraintsResults)
+    def sync_GetConstraints(self, entities=None):
+        '''
+        GetConstraints returns the constraints for a given application.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ApplicationGetConstraintsResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='GetConstraints',
+                   version=20,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1386,6 +1842,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(StringResult)
+    def sync_Leader(self, tag=None):
+        '''
+        Leader returns the unit name of the leader for the given application.
+
+        tag : str
+        Returns -> StringResult
+        '''
+        if tag is not None and not isinstance(tag, (bytes, str)):
+            raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Leader',
+                   version=20,
+                   params=_params)
+        _params['tag'] = tag
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResult)
     async def Leader(self, tag=None):
         '''
         Leader returns the unit name of the leader for the given application.
@@ -1404,6 +1883,30 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['tag'] = tag
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_MergeBindings(self, args=None):
+        '''
+        MergeBindings merges operator-defined bindings with the current bindings for
+        one or more applications.
+
+        args : typing.Sequence[~ApplicationMergeBindings]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='MergeBindings',
+                   version=20,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1428,6 +1931,39 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['args'] = args
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_ResolveUnitErrors(self, all_=None, retry=None, tags=None):
+        '''
+        ResolveUnitErrors marks errors on the specified units as resolved.
+
+        all_ : bool
+        retry : bool
+        tags : Entities
+        Returns -> ErrorResults
+        '''
+        if all_ is not None and not isinstance(all_, bool):
+            raise Exception("Expected all_ to be a bool, received: {}".format(type(all_)))
+
+        if retry is not None and not isinstance(retry, bool):
+            raise Exception("Expected retry to be a bool, received: {}".format(type(retry)))
+
+        if tags is not None and not isinstance(tags, (dict, Entities)):
+            raise Exception("Expected tags to be a Entities, received: {}".format(type(tags)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='ResolveUnitErrors',
+                   version=20,
+                   params=_params)
+        _params['all'] = all_
+        _params['retry'] = retry
+        _params['tags'] = tags
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1466,6 +2002,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ScaleApplicationResults)
+    def sync_ScaleApplications(self, applications=None):
+        '''
+        ScaleApplications scales the specified application to the requested number of units.
+
+        applications : typing.Sequence[~ScaleApplicationParams]
+        Returns -> ScaleApplicationResults
+        '''
+        if applications is not None and not isinstance(applications, (bytes, str, list)):
+            raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='ScaleApplications',
+                   version=20,
+                   params=_params)
+        _params['applications'] = applications
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ScaleApplicationResults)
     async def ScaleApplications(self, applications=None):
         '''
         ScaleApplications scales the specified application to the requested number of units.
@@ -1484,6 +2043,89 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['applications'] = applications
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    def sync_SetCharm(self, application=None, channel=None, charm_origin=None, charm_url=None, config_settings=None, config_settings_yaml=None, endpoint_bindings=None, force=None, force_base=None, force_units=None, generation=None, resource_ids=None, storage_constraints=None):
+        '''
+        SetCharm sets the charm for a given for the application.
+
+        application : str
+        channel : str
+        charm_origin : CharmOrigin
+        charm_url : str
+        config_settings : typing.Mapping[str, str]
+        config_settings_yaml : str
+        endpoint_bindings : typing.Mapping[str, str]
+        force : bool
+        force_base : bool
+        force_units : bool
+        generation : str
+        resource_ids : typing.Mapping[str, str]
+        storage_constraints : typing.Mapping[str, ~StorageConstraints]
+        Returns -> None
+        '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception("Expected application to be a str, received: {}".format(type(application)))
+
+        if channel is not None and not isinstance(channel, (bytes, str)):
+            raise Exception("Expected channel to be a str, received: {}".format(type(channel)))
+
+        if charm_origin is not None and not isinstance(charm_origin, (dict, CharmOrigin)):
+            raise Exception("Expected charm_origin to be a CharmOrigin, received: {}".format(type(charm_origin)))
+
+        if charm_url is not None and not isinstance(charm_url, (bytes, str)):
+            raise Exception("Expected charm_url to be a str, received: {}".format(type(charm_url)))
+
+        if config_settings is not None and not isinstance(config_settings, dict):
+            raise Exception("Expected config_settings to be a Mapping, received: {}".format(type(config_settings)))
+
+        if config_settings_yaml is not None and not isinstance(config_settings_yaml, (bytes, str)):
+            raise Exception("Expected config_settings_yaml to be a str, received: {}".format(type(config_settings_yaml)))
+
+        if endpoint_bindings is not None and not isinstance(endpoint_bindings, dict):
+            raise Exception("Expected endpoint_bindings to be a Mapping, received: {}".format(type(endpoint_bindings)))
+
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if force_base is not None and not isinstance(force_base, bool):
+            raise Exception("Expected force_base to be a bool, received: {}".format(type(force_base)))
+
+        if force_units is not None and not isinstance(force_units, bool):
+            raise Exception("Expected force_units to be a bool, received: {}".format(type(force_units)))
+
+        if generation is not None and not isinstance(generation, (bytes, str)):
+            raise Exception("Expected generation to be a str, received: {}".format(type(generation)))
+
+        if resource_ids is not None and not isinstance(resource_ids, dict):
+            raise Exception("Expected resource_ids to be a Mapping, received: {}".format(type(resource_ids)))
+
+        if storage_constraints is not None and not isinstance(storage_constraints, dict):
+            raise Exception("Expected storage_constraints to be a Mapping, received: {}".format(type(storage_constraints)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='SetCharm',
+                   version=20,
+                   params=_params)
+        _params['application'] = application
+        _params['channel'] = channel
+        _params['charm-origin'] = charm_origin
+        _params['charm-url'] = charm_url
+        _params['config-settings'] = config_settings
+        _params['config-settings-yaml'] = config_settings_yaml
+        _params['endpoint-bindings'] = endpoint_bindings
+        _params['force'] = force
+        _params['force-base'] = force_base
+        _params['force-units'] = force_units
+        _params['generation'] = generation
+        _params['resource-ids'] = resource_ids
+        _params['storage-constraints'] = storage_constraints
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1572,6 +2214,31 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_SetConfigs(self, args=None):
+        '''
+        SetConfigs implements the server side of Application.SetConfig.  Both
+        application and charm config are set. It does not unset values in
+        Config map that are set to an empty string. Unset should be used for that.
+
+        args : typing.Sequence[~ConfigSet]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='SetConfigs',
+                   version=20,
+                   params=_params)
+        _params['Args'] = args
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def SetConfigs(self, args=None):
         '''
         SetConfigs implements the server side of Application.SetConfig.  Both
@@ -1592,6 +2259,34 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['Args'] = args
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    def sync_SetConstraints(self, application=None, constraints=None):
+        '''
+        SetConstraints sets the constraints for a given application.
+
+        application : str
+        constraints : Value
+        Returns -> None
+        '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception("Expected application to be a str, received: {}".format(type(application)))
+
+        if constraints is not None and not isinstance(constraints, (dict, Value)):
+            raise Exception("Expected constraints to be a Value, received: {}".format(type(constraints)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='SetConstraints',
+                   version=20,
+                   params=_params)
+        _params['application'] = application
+        _params['constraints'] = constraints
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1625,6 +2320,31 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_SetMetricCredentials(self, creds=None):
+        '''
+        SetMetricCredentials sets credentials on the application.
+        TODO (cderici) only used for metered charms in cmd MeteredDeployAPI,
+        kept for client compatibility, remove in juju 4.0
+
+        creds : typing.Sequence[~ApplicationMetricCredential]
+        Returns -> ErrorResults
+        '''
+        if creds is not None and not isinstance(creds, (bytes, str, list)):
+            raise Exception("Expected creds to be a Sequence, received: {}".format(type(creds)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='SetMetricCredentials',
+                   version=20,
+                   params=_params)
+        _params['creds'] = creds
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def SetMetricCredentials(self, creds=None):
         '''
         SetMetricCredentials sets credentials on the application.
@@ -1650,6 +2370,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_SetRelationsSuspended(self, args=None):
+        '''
+        SetRelationsSuspended sets the suspended status of the specified relations.
+
+        args : typing.Sequence[~RelationSuspendedArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='SetRelationsSuspended',
+                   version=20,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def SetRelationsSuspended(self, args=None):
         '''
         SetRelationsSuspended sets the suspended status of the specified relations.
@@ -1668,6 +2411,35 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['args'] = args
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    def sync_Unexpose(self, application=None, exposed_endpoints=None):
+        '''
+        Unexpose changes the juju-managed firewall to unexpose any ports that
+        were also explicitly marked by units as open.
+
+        application : str
+        exposed_endpoints : typing.Sequence[str]
+        Returns -> None
+        '''
+        if application is not None and not isinstance(application, (bytes, str)):
+            raise Exception("Expected application to be a str, received: {}".format(type(application)))
+
+        if exposed_endpoints is not None and not isinstance(exposed_endpoints, (bytes, str, list)):
+            raise Exception("Expected exposed_endpoints to be a Sequence, received: {}".format(type(exposed_endpoints)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='Unexpose',
+                   version=20,
+                   params=_params)
+        _params['application'] = application
+        _params['exposed-endpoints'] = exposed_endpoints
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1702,6 +2474,30 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(UnitInfoResults)
+    def sync_UnitsInfo(self, entities=None):
+        '''
+        UnitsInfo returns unit information for the given entities (units or
+        applications).
+
+        entities : typing.Sequence[~Entity]
+        Returns -> UnitInfoResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='UnitsInfo',
+                   version=20,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(UnitInfoResults)
     async def UnitsInfo(self, entities=None):
         '''
         UnitsInfo returns unit information for the given entities (units or
@@ -1726,6 +2522,29 @@ class ApplicationFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_UnsetApplicationsConfig(self, args=None):
+        '''
+        UnsetApplicationsConfig implements the server side of Application.UnsetApplicationsConfig.
+
+        args : typing.Sequence[~ApplicationUnset]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='UnsetApplicationsConfig',
+                   version=20,
+                   params=_params)
+        _params['Args'] = args
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def UnsetApplicationsConfig(self, args=None):
         '''
         UnsetApplicationsConfig implements the server side of Application.UnsetApplicationsConfig.
@@ -1744,6 +2563,30 @@ class ApplicationFacade(Type):
                    params=_params)
         _params['Args'] = args
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_UpdateApplicationBase(self, args=None):
+        '''
+        UpdateApplicationBase updates the application base.
+        Base for subordinates is updated too.
+
+        args : typing.Sequence[~UpdateChannelArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Application',
+                   request='UpdateApplicationBase',
+                   version=20,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
         return reply
 
 

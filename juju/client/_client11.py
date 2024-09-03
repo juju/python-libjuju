@@ -569,6 +569,28 @@ class ControllerFacade(Type):
     
 
     @ReturnMapping(UserModelList)
+    def sync_AllModels(self):
+        '''
+        AllModels allows controller administrators to get the list of all the
+        models in the controller.
+
+
+        Returns -> UserModelList
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='AllModels',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(UserModelList)
     async def AllModels(self):
         '''
         AllModels allows controller administrators to get the list of all the
@@ -586,6 +608,29 @@ class ControllerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudSpecResults)
+    def sync_CloudSpec(self, entities=None):
+        '''
+        CloudSpec returns the model's cloud spec.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> CloudSpecResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='CloudSpec',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -609,6 +654,31 @@ class ControllerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    def sync_ConfigSet(self, config=None):
+        '''
+        ConfigSet changes the value of specified controller configuration
+        settings. Only some settings can be changed after bootstrap.
+        Settings that aren't specified in the params are left unchanged.
+
+        config : typing.Mapping[str, typing.Any]
+        Returns -> None
+        '''
+        if config is not None and not isinstance(config, dict):
+            raise Exception("Expected config to be a Mapping, received: {}".format(type(config)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='ConfigSet',
+                   version=11,
+                   params=_params)
+        _params['config'] = config
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -639,6 +709,29 @@ class ControllerFacade(Type):
 
 
     @ReturnMapping(ControllerAPIInfoResults)
+    def sync_ControllerAPIInfoForModels(self, entities=None):
+        '''
+        ControllerAPIInfoForModels returns the controller api connection details for the specified models.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ControllerAPIInfoResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='ControllerAPIInfoForModels',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ControllerAPIInfoResults)
     async def ControllerAPIInfoForModels(self, entities=None):
         '''
         ControllerAPIInfoForModels returns the controller api connection details for the specified models.
@@ -662,6 +755,27 @@ class ControllerFacade(Type):
 
 
     @ReturnMapping(ControllerConfigResult)
+    def sync_ControllerConfig(self):
+        '''
+        ControllerConfig returns the controller's configuration.
+
+
+        Returns -> ControllerConfigResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='ControllerConfig',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ControllerConfigResult)
     async def ControllerConfig(self):
         '''
         ControllerConfig returns the controller's configuration.
@@ -678,6 +792,31 @@ class ControllerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ControllerVersionResults)
+    def sync_ControllerVersion(self):
+        '''
+        ControllerVersion returns the version information associated with this
+        controller binary.
+
+        NOTE: the implementation intentionally does not check for SuperuserAccess
+        as the Version is known even to users with login access.
+
+
+        Returns -> ControllerVersionResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='ControllerVersion',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -708,6 +847,28 @@ class ControllerFacade(Type):
 
 
     @ReturnMapping(DashboardConnectionInfo)
+    def sync_DashboardConnectionInfo(self):
+        '''
+        DashboardConnectionInfo returns the connection information for a client to
+        connect to the Juju Dashboard including any proxying information.
+
+
+        Returns -> DashboardConnectionInfo
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='DashboardConnectionInfo',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(DashboardConnectionInfo)
     async def DashboardConnectionInfo(self):
         '''
         DashboardConnectionInfo returns the connection information for a client to
@@ -725,6 +886,54 @@ class ControllerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    def sync_DestroyController(self, destroy_models=None, destroy_storage=None, force=None, max_wait=None, model_timeout=None):
+        '''
+        DestroyController destroys the controller.
+
+        If the args specify the destruction of the models, this method will
+        attempt to do so. Otherwise, if the controller has any non-empty,
+        non-Dead hosted models, then an error with the code
+        params.CodeHasHostedModels will be transmitted.
+
+        destroy_models : bool
+        destroy_storage : bool
+        force : bool
+        max_wait : int
+        model_timeout : int
+        Returns -> None
+        '''
+        if destroy_models is not None and not isinstance(destroy_models, bool):
+            raise Exception("Expected destroy_models to be a bool, received: {}".format(type(destroy_models)))
+
+        if destroy_storage is not None and not isinstance(destroy_storage, bool):
+            raise Exception("Expected destroy_storage to be a bool, received: {}".format(type(destroy_storage)))
+
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if max_wait is not None and not isinstance(max_wait, int):
+            raise Exception("Expected max_wait to be a int, received: {}".format(type(max_wait)))
+
+        if model_timeout is not None and not isinstance(model_timeout, int):
+            raise Exception("Expected model_timeout to be a int, received: {}".format(type(model_timeout)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='DestroyController',
+                   version=11,
+                   params=_params)
+        _params['destroy-models'] = destroy_models
+        _params['destroy-storage'] = destroy_storage
+        _params['force'] = force
+        _params['max-wait'] = max_wait
+        _params['model-timeout'] = model_timeout
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -778,6 +987,27 @@ class ControllerFacade(Type):
 
 
     @ReturnMapping(CloudSpecResult)
+    def sync_GetCloudSpec(self):
+        '''
+        GetCloudSpec constructs the CloudSpec for a validated and authorized model.
+
+
+        Returns -> CloudSpecResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='GetCloudSpec',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudSpecResult)
     async def GetCloudSpec(self):
         '''
         GetCloudSpec constructs the CloudSpec for a validated and authorized model.
@@ -794,6 +1024,30 @@ class ControllerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(UserAccessResults)
+    def sync_GetControllerAccess(self, entities=None):
+        '''
+        GetControllerAccess returns the level of access the specified users
+        have on the controller.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> UserAccessResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='GetControllerAccess',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -823,6 +1077,29 @@ class ControllerFacade(Type):
 
 
     @ReturnMapping(HostedModelConfigsResults)
+    def sync_HostedModelConfigs(self):
+        '''
+        HostedModelConfigs returns all the information that the client needs in
+        order to connect directly with the host model's provider and destroy it
+        directly.
+
+
+        Returns -> HostedModelConfigsResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='HostedModelConfigs',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(HostedModelConfigsResults)
     async def HostedModelConfigs(self):
         '''
         HostedModelConfigs returns all the information that the client needs in
@@ -841,6 +1118,32 @@ class ControllerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResult)
+    def sync_IdentityProviderURL(self):
+        '''
+        IdentityProviderURL returns the URL of the configured external identity
+        provider for this controller or an empty string if no external identity
+        provider has been configured when the controller was bootstrapped.
+
+        NOTE: the implementation intentionally does not check for SuperuserAccess
+        as the URL is known even to users with login access.
+
+
+        Returns -> StringResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='IdentityProviderURL',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -872,6 +1175,30 @@ class ControllerFacade(Type):
 
 
     @ReturnMapping(InitiateMigrationResults)
+    def sync_InitiateMigration(self, specs=None):
+        '''
+        InitiateMigration attempts to begin the migration of one or
+        more models to other controllers.
+
+        specs : typing.Sequence[~MigrationSpec]
+        Returns -> InitiateMigrationResults
+        '''
+        if specs is not None and not isinstance(specs, (bytes, str, list)):
+            raise Exception("Expected specs to be a Sequence, received: {}".format(type(specs)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='InitiateMigration',
+                   version=11,
+                   params=_params)
+        _params['specs'] = specs
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(InitiateMigrationResults)
     async def InitiateMigration(self, specs=None):
         '''
         InitiateMigration attempts to begin the migration of one or
@@ -891,6 +1218,30 @@ class ControllerFacade(Type):
                    params=_params)
         _params['specs'] = specs
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ModelBlockInfoList)
+    def sync_ListBlockedModels(self):
+        '''
+        ListBlockedModels returns a list of all models on the controller
+        which have a block in place.  The resulting slice is sorted by model
+        name, then owner. Callers must be controller administrators to retrieve the
+        list.
+
+
+        Returns -> ModelBlockInfoList
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='ListBlockedModels',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -920,6 +1271,29 @@ class ControllerFacade(Type):
 
 
     @ReturnMapping(ModelConfigResults)
+    def sync_ModelConfig(self):
+        '''
+        ModelConfig returns the model config for the controller
+        model.  For information on the current model, use
+        client.ModelGet
+
+
+        Returns -> ModelConfigResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='ModelConfig',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ModelConfigResults)
     async def ModelConfig(self):
         '''
         ModelConfig returns the model config for the controller
@@ -938,6 +1312,29 @@ class ControllerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ModelStatusResults)
+    def sync_ModelStatus(self, entities=None):
+        '''
+        ModelStatus returns a summary of the model.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ModelStatusResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='ModelStatus',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -966,6 +1363,29 @@ class ControllerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_ModifyControllerAccess(self, changes=None):
+        '''
+        ModifyControllerAccess changes the model access granted to users.
+
+        changes : typing.Sequence[~ModifyControllerAccess]
+        Returns -> ErrorResults
+        '''
+        if changes is not None and not isinstance(changes, (bytes, str, list)):
+            raise Exception("Expected changes to be a Sequence, received: {}".format(type(changes)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='ModifyControllerAccess',
+                   version=11,
+                   params=_params)
+        _params['changes'] = changes
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def ModifyControllerAccess(self, changes=None):
         '''
         ModifyControllerAccess changes the model access granted to users.
@@ -989,6 +1409,27 @@ class ControllerFacade(Type):
 
 
     @ReturnMapping(StringResult)
+    def sync_MongoVersion(self):
+        '''
+        MongoVersion allows the introspection of the mongo version per controller
+
+
+        Returns -> StringResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='MongoVersion',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResult)
     async def MongoVersion(self):
         '''
         MongoVersion allows the introspection of the mongo version per controller
@@ -1005,6 +1446,29 @@ class ControllerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    def sync_RemoveBlocks(self, all_=None):
+        '''
+        RemoveBlocks removes all the blocks in the controller.
+
+        all_ : bool
+        Returns -> None
+        '''
+        if all_ is not None and not isinstance(all_, bool):
+            raise Exception("Expected all_ to be a bool, received: {}".format(type(all_)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='RemoveBlocks',
+                   version=11,
+                   params=_params)
+        _params['all'] = all_
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1033,6 +1497,29 @@ class ControllerFacade(Type):
 
 
     @ReturnMapping(SummaryWatcherID)
+    def sync_WatchAllModelSummaries(self):
+        '''
+        WatchAllModelSummaries starts watching the summary updates from the cache.
+        This method is superuser access only, and watches all models in the
+        controller.
+
+
+        Returns -> SummaryWatcherID
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='WatchAllModelSummaries',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SummaryWatcherID)
     async def WatchAllModelSummaries(self):
         '''
         WatchAllModelSummaries starts watching the summary updates from the cache.
@@ -1051,6 +1538,29 @@ class ControllerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(AllWatcherId)
+    def sync_WatchAllModels(self):
+        '''
+        WatchAllModels starts watching events for all models in the
+        controller. The returned AllWatcherId should be used with Next on the
+        AllModelWatcher endpoint to receive deltas.
+
+
+        Returns -> AllWatcherId
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='WatchAllModels',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1079,6 +1589,29 @@ class ControllerFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResults)
+    def sync_WatchCloudSpecsChanges(self, entities=None):
+        '''
+        WatchCloudSpecsChanges returns a watcher for cloud spec changes.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='WatchCloudSpecsChanges',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
     async def WatchCloudSpecsChanges(self, entities=None):
         '''
         WatchCloudSpecsChanges returns a watcher for cloud spec changes.
@@ -1097,6 +1630,28 @@ class ControllerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SummaryWatcherID)
+    def sync_WatchModelSummaries(self):
+        '''
+        WatchModelSummaries starts watching the summary updates from the cache.
+        Only models that the user has access to are returned.
+
+
+        Returns -> SummaryWatcherID
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Controller',
+                   request='WatchModelSummaries',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2290,6 +2845,27 @@ class ProvisionerFacade(Type):
     
 
     @ReturnMapping(StringsResult)
+    def sync_APIAddresses(self):
+        '''
+        APIAddresses returns the list of addresses used to connect to the API.
+
+
+        Returns -> StringsResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='APIAddresses',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsResult)
     async def APIAddresses(self):
         '''
         APIAddresses returns the list of addresses used to connect to the API.
@@ -2311,6 +2887,27 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(APIHostPortsResult)
+    def sync_APIHostPorts(self):
+        '''
+        APIHostPorts returns the API server addresses.
+
+
+        Returns -> APIHostPortsResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='APIHostPorts',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(APIHostPortsResult)
     async def APIHostPorts(self):
         '''
         APIHostPorts returns the API server addresses.
@@ -2327,6 +2924,29 @@ class ProvisionerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
+    def sync_AvailabilityZone(self, entities=None):
+        '''
+        AvailabilityZone returns a provider-specific availability zone for each given machine entity
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='AvailabilityZone',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2355,6 +2975,27 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(BytesResult)
+    def sync_CACert(self):
+        '''
+        CACert returns the certificate used to validate the state connection.
+
+
+        Returns -> BytesResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='CACert',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(BytesResult)
     async def CACert(self):
         '''
         CACert returns the certificate used to validate the state connection.
@@ -2371,6 +3012,29 @@ class ProvisionerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ConstraintsResults)
+    def sync_Constraints(self, entities=None):
+        '''
+        Constraints returns the constraints for each given machine entity.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ConstraintsResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='Constraints',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2399,6 +3063,28 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ContainerConfig)
+    def sync_ContainerConfig(self):
+        '''
+        ContainerConfig returns information from the model config that is
+        needed for container cloud-init.
+
+
+        Returns -> ContainerConfig
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='ContainerConfig',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ContainerConfig)
     async def ContainerConfig(self):
         '''
         ContainerConfig returns information from the model config that is
@@ -2416,6 +3102,30 @@ class ProvisionerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ContainerManagerConfig)
+    def sync_ContainerManagerConfig(self, type_=None):
+        '''
+        ContainerManagerConfig returns information from the model config that is
+        needed for configuring the container manager.
+
+        type_ : str
+        Returns -> ContainerManagerConfig
+        '''
+        if type_ is not None and not isinstance(type_, (bytes, str)):
+            raise Exception("Expected type_ to be a str, received: {}".format(type(type_)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='ContainerManagerConfig',
+                   version=11,
+                   params=_params)
+        _params['type'] = type_
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2445,6 +3155,29 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ControllerAPIInfoResults)
+    def sync_ControllerAPIInfoForModels(self, entities=None):
+        '''
+        ControllerAPIInfoForModels returns the controller api connection details for the specified models.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ControllerAPIInfoResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='ControllerAPIInfoForModels',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ControllerAPIInfoResults)
     async def ControllerAPIInfoForModels(self, entities=None):
         '''
         ControllerAPIInfoForModels returns the controller api connection details for the specified models.
@@ -2468,6 +3201,27 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ControllerConfigResult)
+    def sync_ControllerConfig(self):
+        '''
+        ControllerConfig returns the controller's configuration.
+
+
+        Returns -> ControllerConfigResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='ControllerConfig',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ControllerConfigResult)
     async def ControllerConfig(self):
         '''
         ControllerConfig returns the controller's configuration.
@@ -2484,6 +3238,32 @@ class ProvisionerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(DistributionGroupResults)
+    def sync_DistributionGroup(self, entities=None):
+        '''
+        DistributionGroup returns, for each given machine entity,
+        a slice of instance.Ids that belong to the same distribution
+        group as that machine. This information may be used to
+        distribute instances for high availability.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> DistributionGroupResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='DistributionGroup',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2515,6 +3295,32 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(StringsResults)
+    def sync_DistributionGroupByMachineId(self, entities=None):
+        '''
+        DistributionGroupByMachineId returns, for each given machine entity,
+        a slice of machine.Ids that belong to the same distribution
+        group as that machine. This information may be used to
+        distribute instances for high availability.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='DistributionGroupByMachineId',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsResults)
     async def DistributionGroupByMachineId(self, entities=None):
         '''
         DistributionGroupByMachineId returns, for each given machine entity,
@@ -2541,6 +3347,31 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_EnsureDead(self, entities=None):
+        '''
+        EnsureDead calls EnsureDead on each given entity from state. It
+        will fail if the entity is not present. If it's Alive, nothing will
+        happen (see state/EnsureDead() for units or machines).
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='EnsureDead',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def EnsureDead(self, entities=None):
         '''
         EnsureDead calls EnsureDead on each given entity from state. It
@@ -2561,6 +3392,49 @@ class ProvisionerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(FindToolsResult)
+    def sync_FindTools(self, agentstream=None, arch=None, major=None, number=None, os_type=None):
+        '''
+        FindTools returns a List containing all tools matching the given parameters.
+
+        agentstream : str
+        arch : str
+        major : int
+        number : Number
+        os_type : str
+        Returns -> FindToolsResult
+        '''
+        if agentstream is not None and not isinstance(agentstream, (bytes, str)):
+            raise Exception("Expected agentstream to be a str, received: {}".format(type(agentstream)))
+
+        if arch is not None and not isinstance(arch, (bytes, str)):
+            raise Exception("Expected arch to be a str, received: {}".format(type(arch)))
+
+        if major is not None and not isinstance(major, int):
+            raise Exception("Expected major to be a int, received: {}".format(type(major)))
+
+        if number is not None and not isinstance(number, (dict, Number)):
+            raise Exception("Expected number to be a Number, received: {}".format(type(number)))
+
+        if os_type is not None and not isinstance(os_type, (bytes, str)):
+            raise Exception("Expected os_type to be a str, received: {}".format(type(os_type)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='FindTools',
+                   version=11,
+                   params=_params)
+        _params['agentstream'] = agentstream
+        _params['arch'] = arch
+        _params['major'] = major
+        _params['number'] = number
+        _params['os-type'] = os_type
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2609,6 +3483,30 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(MachineNetworkConfigResults)
+    def sync_GetContainerInterfaceInfo(self, entities=None):
+        '''
+        GetContainerInterfaceInfo returns information to configure networking for a
+        container. It accepts container tags as arguments.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> MachineNetworkConfigResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='GetContainerInterfaceInfo',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(MachineNetworkConfigResults)
     async def GetContainerInterfaceInfo(self, entities=None):
         '''
         GetContainerInterfaceInfo returns information to configure networking for a
@@ -2628,6 +3526,32 @@ class ProvisionerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ContainerProfileResults)
+    def sync_GetContainerProfileInfo(self, entities=None):
+        '''
+        GetContainerProfileInfo returns information to configure a lxd profile(s) for a
+        container based on the charms deployed to the container. It accepts container
+        tags as arguments. Unlike machineLXDProfileNames which has the environ
+        write the lxd profiles and returns the names of profiles already written.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ContainerProfileResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='GetContainerProfileInfo',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2659,6 +3583,31 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(HostNetworkChangeResults)
+    def sync_HostChangesForContainers(self, entities=None):
+        '''
+        HostChangesForContainers returns the set of changes that need to be done
+        to the host machine to prepare it for the containers to be created.
+        Pass in a list of the containers that you want the changes for.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> HostNetworkChangeResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='HostChangesForContainers',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(HostNetworkChangeResults)
     async def HostChangesForContainers(self, entities=None):
         '''
         HostChangesForContainers returns the set of changes that need to be done
@@ -2679,6 +3628,30 @@ class ProvisionerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
+    def sync_InstanceId(self, entities=None):
+        '''
+        InstanceId returns the provider specific instance id for each given
+        machine or an CodeNotProvisioned error, if not set.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='InstanceId',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2708,6 +3681,30 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(StatusResults)
+    def sync_InstanceStatus(self, entities=None):
+        '''
+        InstanceStatus returns the instance status for each given entity.
+        Only machine tags are accepted.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StatusResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='InstanceStatus',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StatusResults)
     async def InstanceStatus(self, entities=None):
         '''
         InstanceStatus returns the instance status for each given entity.
@@ -2727,6 +3724,29 @@ class ProvisionerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(BoolResults)
+    def sync_KeepInstance(self, entities=None):
+        '''
+        KeepInstance returns the keep-instance value for each given machine entity.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> BoolResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='KeepInstance',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2755,6 +3775,29 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(LifeResults)
+    def sync_Life(self, entities=None):
+        '''
+        Life returns the life status of every supplied entity, where available.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> LifeResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='Life',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(LifeResults)
     async def Life(self, entities=None):
         '''
         Life returns the life status of every supplied entity, where available.
@@ -2778,6 +3821,28 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(StatusResults)
+    def sync_MachinesWithTransientErrors(self):
+        '''
+        MachinesWithTransientErrors returns status data for machines with provisioning
+        errors which are transient.
+
+
+        Returns -> StatusResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='MachinesWithTransientErrors',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StatusResults)
     async def MachinesWithTransientErrors(self):
         '''
         MachinesWithTransientErrors returns status data for machines with provisioning
@@ -2795,6 +3860,31 @@ class ProvisionerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_MarkMachinesForRemoval(self, entities=None):
+        '''
+        MarkMachinesForRemoval indicates that the specified machines are
+        ready to have any provider-level resources cleaned up and then be
+        removed.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='MarkMachinesForRemoval',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2825,6 +3915,27 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ModelConfigResult)
+    def sync_ModelConfig(self):
+        '''
+        ModelConfig returns the current model's configuration.
+
+
+        Returns -> ModelConfigResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='ModelConfig',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ModelConfigResult)
     async def ModelConfig(self):
         '''
         ModelConfig returns the current model's configuration.
@@ -2846,6 +3957,27 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(StringResult)
+    def sync_ModelUUID(self):
+        '''
+        ModelUUID returns the model UUID that the current connection is for.
+
+
+        Returns -> StringResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='ModelUUID',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResult)
     async def ModelUUID(self):
         '''
         ModelUUID returns the model UUID that the current connection is for.
@@ -2862,6 +3994,30 @@ class ProvisionerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(MachineNetworkConfigResults)
+    def sync_PrepareContainerInterfaceInfo(self, entities=None):
+        '''
+        PrepareContainerInterfaceInfo allocates an address and returns information to
+        configure networking for a container. It accepts container tags as arguments.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> MachineNetworkConfigResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='PrepareContainerInterfaceInfo',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2891,6 +4047,30 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ProvisioningInfoResults)
+    def sync_ProvisioningInfo(self, entities=None):
+        '''
+        ProvisioningInfo returns the provisioning information for each given machine entity.
+        It supports all positive space constraints.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ProvisioningInfoResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='ProvisioningInfo',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ProvisioningInfoResults)
     async def ProvisioningInfo(self, entities=None):
         '''
         ProvisioningInfo returns the provisioning information for each given machine entity.
@@ -2910,6 +4090,31 @@ class ProvisionerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_ReleaseContainerAddresses(self, entities=None):
+        '''
+        ReleaseContainerAddresses finds addresses allocated to a container and marks
+        them as Dead, to be released and removed. It accepts container tags as
+        arguments.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='ReleaseContainerAddresses',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2940,6 +4145,30 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_Remove(self, entities=None):
+        '''
+        Remove removes every given entity from state, calling EnsureDead
+        first, then Remove. It will fail if the entity is not present.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='Remove',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def Remove(self, entities=None):
         '''
         Remove removes every given entity from state, calling EnsureDead
@@ -2964,6 +4193,29 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_SetCharmProfiles(self, args=None):
+        '''
+        SetCharmProfiles records the given slice of charm profile names.
+
+        args : typing.Sequence[~SetProfileArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='SetCharmProfiles',
+                   version=11,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def SetCharmProfiles(self, args=None):
         '''
         SetCharmProfiles records the given slice of charm profile names.
@@ -2982,6 +4234,32 @@ class ProvisionerFacade(Type):
                    params=_params)
         _params['args'] = args
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    def sync_SetHostMachineNetworkConfig(self, config=None, tag=None):
+        '''
+        config : typing.Sequence[~NetworkConfig]
+        tag : str
+        Returns -> None
+        '''
+        if config is not None and not isinstance(config, (bytes, str, list)):
+            raise Exception("Expected config to be a Sequence, received: {}".format(type(config)))
+
+        if tag is not None and not isinstance(tag, (bytes, str)):
+            raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='SetHostMachineNetworkConfig',
+                   version=11,
+                   params=_params)
+        _params['config'] = config
+        _params['tag'] = tag
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3013,6 +4291,31 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_SetInstanceInfo(self, machines=None):
+        '''
+        SetInstanceInfo sets the provider specific machine id, nonce,
+        metadata and network info for each given machine. Once set, the
+        instance id cannot be changed.
+
+        machines : typing.Sequence[~InstanceInfo]
+        Returns -> ErrorResults
+        '''
+        if machines is not None and not isinstance(machines, (bytes, str, list)):
+            raise Exception("Expected machines to be a Sequence, received: {}".format(type(machines)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='SetInstanceInfo',
+                   version=11,
+                   params=_params)
+        _params['machines'] = machines
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def SetInstanceInfo(self, machines=None):
         '''
         SetInstanceInfo sets the provider specific machine id, nonce,
@@ -3033,6 +4336,30 @@ class ProvisionerFacade(Type):
                    params=_params)
         _params['machines'] = machines
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_SetInstanceStatus(self, entities=None):
+        '''
+        SetInstanceStatus updates the instance status for each given
+        entity. Only machine tags are accepted.
+
+        entities : typing.Sequence[~EntityStatusArgs]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='SetInstanceStatus',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3062,6 +4389,35 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_SetModificationStatus(self, entities=None):
+        '''
+        SetModificationStatus updates the instance whilst changes are occurring. This
+        is different from SetStatus and SetInstanceStatus, by the fact this holds
+        information about the ongoing changes that are happening to instances.
+        Consider LXD Profile updates that can modify a instance, but may not cause
+        the instance to be placed into a error state. This modification status
+        serves the purpose of highlighting that to the operator.
+        Only machine tags are accepted.
+
+        entities : typing.Sequence[~EntityStatusArgs]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='SetModificationStatus',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def SetModificationStatus(self, entities=None):
         '''
         SetModificationStatus updates the instance whilst changes are occurring. This
@@ -3086,6 +4442,37 @@ class ProvisionerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    def sync_SetObservedNetworkConfig(self, config=None, tag=None):
+        '''
+        SetObservedNetworkConfig reads the network config for the machine
+        identified by the input args.
+        This config is merged with the new network config supplied in the
+        same args and updated if it has changed.
+
+        config : typing.Sequence[~NetworkConfig]
+        tag : str
+        Returns -> None
+        '''
+        if config is not None and not isinstance(config, (bytes, str, list)):
+            raise Exception("Expected config to be a Sequence, received: {}".format(type(config)))
+
+        if tag is not None and not isinstance(tag, (bytes, str)):
+            raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='SetObservedNetworkConfig',
+                   version=11,
+                   params=_params)
+        _params['config'] = config
+        _params['tag'] = tag
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3122,6 +4509,29 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_SetPasswords(self, changes=None):
+        '''
+        SetPasswords sets the given password for each supplied entity, if possible.
+
+        changes : typing.Sequence[~EntityPassword]
+        Returns -> ErrorResults
+        '''
+        if changes is not None and not isinstance(changes, (bytes, str, list)):
+            raise Exception("Expected changes to be a Sequence, received: {}".format(type(changes)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='SetPasswords',
+                   version=11,
+                   params=_params)
+        _params['changes'] = changes
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def SetPasswords(self, changes=None):
         '''
         SetPasswords sets the given password for each supplied entity, if possible.
@@ -3140,6 +4550,29 @@ class ProvisionerFacade(Type):
                    params=_params)
         _params['changes'] = changes
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_SetStatus(self, entities=None):
+        '''
+        SetStatus sets the status of each given entity.
+
+        entities : typing.Sequence[~EntityStatusArgs]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='SetStatus',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3168,6 +4601,29 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_SetSupportedContainers(self, params=None):
+        '''
+        SetSupportedContainers updates the list of containers supported by the machines passed in args.
+
+        params : typing.Sequence[~MachineContainers]
+        Returns -> ErrorResults
+        '''
+        if params is not None and not isinstance(params, (bytes, str, list)):
+            raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='SetSupportedContainers',
+                   version=11,
+                   params=_params)
+        _params['params'] = params
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def SetSupportedContainers(self, params=None):
         '''
         SetSupportedContainers updates the list of containers supported by the machines passed in args.
@@ -3186,6 +4642,29 @@ class ProvisionerFacade(Type):
                    params=_params)
         _params['params'] = params
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StatusResults)
+    def sync_Status(self, entities=None):
+        '''
+        Status returns the status of each given entity.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StatusResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='Status',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3214,6 +4693,29 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(MachineContainerResults)
+    def sync_SupportedContainers(self, entities=None):
+        '''
+        SupportedContainers returns the list of containers supported by the machines passed in args.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> MachineContainerResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='SupportedContainers',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(MachineContainerResults)
     async def SupportedContainers(self, entities=None):
         '''
         SupportedContainers returns the list of containers supported by the machines passed in args.
@@ -3232,6 +4734,29 @@ class ProvisionerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ToolsResults)
+    def sync_Tools(self, entities=None):
+        '''
+        Tools finds the tools necessary for the given agents.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ToolsResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='Tools',
+                   version=11,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3260,6 +4785,27 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResult)
+    def sync_WatchAPIHostPorts(self):
+        '''
+        WatchAPIHostPorts watches the API server addresses.
+
+
+        Returns -> NotifyWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='WatchAPIHostPorts',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResult)
     async def WatchAPIHostPorts(self):
         '''
         WatchAPIHostPorts watches the API server addresses.
@@ -3276,6 +4822,30 @@ class ProvisionerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
+    def sync_WatchAllContainers(self, params=None):
+        '''
+        WatchAllContainers starts a StringsWatcher to watch all containers deployed to
+        any machine passed in args.
+
+        params : typing.Sequence[~WatchContainer]
+        Returns -> StringsWatchResults
+        '''
+        if params is not None and not isinstance(params, (bytes, str, list)):
+            raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='WatchAllContainers',
+                   version=11,
+                   params=_params)
+        _params['params'] = params
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3305,6 +4875,30 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(StringsWatchResults)
+    def sync_WatchContainers(self, params=None):
+        '''
+        WatchContainers starts a StringsWatcher to watch containers deployed to
+        any machine passed in args.
+
+        params : typing.Sequence[~WatchContainer]
+        Returns -> StringsWatchResults
+        '''
+        if params is not None and not isinstance(params, (bytes, str, list)):
+            raise Exception("Expected params to be a Sequence, received: {}".format(type(params)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='WatchContainers',
+                   version=11,
+                   params=_params)
+        _params['params'] = params
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
     async def WatchContainers(self, params=None):
         '''
         WatchContainers starts a StringsWatcher to watch containers deployed to
@@ -3324,6 +4918,31 @@ class ProvisionerFacade(Type):
                    params=_params)
         _params['params'] = params
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResult)
+    def sync_WatchForModelConfigChanges(self):
+        '''
+        WatchForModelConfigChanges returns a NotifyWatcher that observes
+        changes to the model configuration.
+        Note that although the NotifyWatchResult contains an Error field,
+        it's not used because we are only returning a single watcher,
+        so we use the regular error return.
+
+
+        Returns -> NotifyWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='WatchForModelConfigChanges',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3354,6 +4973,28 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResult)
+    def sync_WatchMachineErrorRetry(self):
+        '''
+        WatchMachineErrorRetry returns a NotifyWatcher that notifies when
+        the provisioner should retry provisioning machines with transient errors.
+
+
+        Returns -> NotifyWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='WatchMachineErrorRetry',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResult)
     async def WatchMachineErrorRetry(self):
         '''
         WatchMachineErrorRetry returns a NotifyWatcher that notifies when
@@ -3376,6 +5017,28 @@ class ProvisionerFacade(Type):
 
 
     @ReturnMapping(StringsWatchResult)
+    def sync_WatchModelMachineStartTimes(self):
+        '''
+        WatchModelMachineStartTimes watches the non-container machines in the model
+        for changes to the Life or AgentStartTime fields and reports them as a batch.
+
+
+        Returns -> StringsWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='WatchModelMachineStartTimes',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResult)
     async def WatchModelMachineStartTimes(self):
         '''
         WatchModelMachineStartTimes watches the non-container machines in the model
@@ -3393,6 +5056,29 @@ class ProvisionerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResult)
+    def sync_WatchModelMachines(self):
+        '''
+        WatchModelMachines returns a StringsWatcher that notifies of
+        changes to the life cycles of the top level machines in the current
+        model.
+
+
+        Returns -> StringsWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Provisioner',
+                   request='WatchModelMachines',
+                   version=11,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
         return reply
 
 

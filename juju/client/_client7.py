@@ -220,6 +220,30 @@ class ActionFacade(Type):
     
 
     @ReturnMapping(ActionResults)
+    def sync_Actions(self, entities=None):
+        '''
+        Actions takes a list of ActionTags, and returns the full Action for
+        each ID.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ActionResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='Actions',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ActionResults)
     async def Actions(self, entities=None):
         '''
         Actions takes a list of ActionTags, and returns the full Action for
@@ -239,6 +263,30 @@ class ActionFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationsCharmActionsResults)
+    def sync_ApplicationsCharmsActions(self, entities=None):
+        '''
+        ApplicationsCharmsActions returns a slice of charm Actions for a slice of
+        services.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ApplicationsCharmActionsResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='ApplicationsCharmsActions',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -268,6 +316,29 @@ class ActionFacade(Type):
 
 
     @ReturnMapping(ActionResults)
+    def sync_Cancel(self, entities=None):
+        '''
+        Cancel attempts to cancel enqueued Actions from running.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ActionResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='Cancel',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ActionResults)
     async def Cancel(self, entities=None):
         '''
         Cancel attempts to cancel enqueued Actions from running.
@@ -286,6 +357,31 @@ class ActionFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(EnqueuedActions)
+    def sync_EnqueueOperation(self, actions=None):
+        '''
+        EnqueueOperation takes a list of Actions and queues them up to be executed as
+        an operation, each action running as a task on the designated ActionReceiver.
+        We return the ID of the overall operation and each individual task.
+
+        actions : typing.Sequence[~Action]
+        Returns -> EnqueuedActions
+        '''
+        if actions is not None and not isinstance(actions, (bytes, str, list)):
+            raise Exception("Expected actions to be a Sequence, received: {}".format(type(actions)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='EnqueueOperation',
+                   version=7,
+                   params=_params)
+        _params['actions'] = actions
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -311,6 +407,59 @@ class ActionFacade(Type):
                    params=_params)
         _params['actions'] = actions
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(OperationResults)
+    def sync_ListOperations(self, actions=None, applications=None, limit=None, machines=None, offset=None, status=None, units=None):
+        '''
+        ListOperations fetches the called actions for specified apps/units.
+
+        actions : typing.Sequence[str]
+        applications : typing.Sequence[str]
+        limit : int
+        machines : typing.Sequence[str]
+        offset : int
+        status : typing.Sequence[str]
+        units : typing.Sequence[str]
+        Returns -> OperationResults
+        '''
+        if actions is not None and not isinstance(actions, (bytes, str, list)):
+            raise Exception("Expected actions to be a Sequence, received: {}".format(type(actions)))
+
+        if applications is not None and not isinstance(applications, (bytes, str, list)):
+            raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
+
+        if limit is not None and not isinstance(limit, int):
+            raise Exception("Expected limit to be a int, received: {}".format(type(limit)))
+
+        if machines is not None and not isinstance(machines, (bytes, str, list)):
+            raise Exception("Expected machines to be a Sequence, received: {}".format(type(machines)))
+
+        if offset is not None and not isinstance(offset, int):
+            raise Exception("Expected offset to be a int, received: {}".format(type(offset)))
+
+        if status is not None and not isinstance(status, (bytes, str, list)):
+            raise Exception("Expected status to be a Sequence, received: {}".format(type(status)))
+
+        if units is not None and not isinstance(units, (bytes, str, list)):
+            raise Exception("Expected units to be a Sequence, received: {}".format(type(units)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='ListOperations',
+                   version=7,
+                   params=_params)
+        _params['actions'] = actions
+        _params['applications'] = applications
+        _params['limit'] = limit
+        _params['machines'] = machines
+        _params['offset'] = offset
+        _params['status'] = status
+        _params['units'] = units
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -369,6 +518,29 @@ class ActionFacade(Type):
 
 
     @ReturnMapping(OperationResults)
+    def sync_Operations(self, entities=None):
+        '''
+        Operations fetches the specified operation ids.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> OperationResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='Operations',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(OperationResults)
     async def Operations(self, entities=None):
         '''
         Operations fetches the specified operation ids.
@@ -387,6 +559,65 @@ class ActionFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(EnqueuedActions)
+    def sync_Run(self, applications=None, commands=None, execution_group=None, machines=None, parallel=None, timeout=None, units=None, workload_context=None):
+        '''
+        Run the commands specified on the machines identified through the
+        list of machines, units and services.
+
+        applications : typing.Sequence[str]
+        commands : str
+        execution_group : str
+        machines : typing.Sequence[str]
+        parallel : bool
+        timeout : int
+        units : typing.Sequence[str]
+        workload_context : bool
+        Returns -> EnqueuedActions
+        '''
+        if applications is not None and not isinstance(applications, (bytes, str, list)):
+            raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
+
+        if commands is not None and not isinstance(commands, (bytes, str)):
+            raise Exception("Expected commands to be a str, received: {}".format(type(commands)))
+
+        if execution_group is not None and not isinstance(execution_group, (bytes, str)):
+            raise Exception("Expected execution_group to be a str, received: {}".format(type(execution_group)))
+
+        if machines is not None and not isinstance(machines, (bytes, str, list)):
+            raise Exception("Expected machines to be a Sequence, received: {}".format(type(machines)))
+
+        if parallel is not None and not isinstance(parallel, bool):
+            raise Exception("Expected parallel to be a bool, received: {}".format(type(parallel)))
+
+        if timeout is not None and not isinstance(timeout, int):
+            raise Exception("Expected timeout to be a int, received: {}".format(type(timeout)))
+
+        if units is not None and not isinstance(units, (bytes, str, list)):
+            raise Exception("Expected units to be a Sequence, received: {}".format(type(units)))
+
+        if workload_context is not None and not isinstance(workload_context, bool):
+            raise Exception("Expected workload_context to be a bool, received: {}".format(type(workload_context)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='Run',
+                   version=7,
+                   params=_params)
+        _params['applications'] = applications
+        _params['commands'] = commands
+        _params['execution-group'] = execution_group
+        _params['machines'] = machines
+        _params['parallel'] = parallel
+        _params['timeout'] = timeout
+        _params['units'] = units
+        _params['workload-context'] = workload_context
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -451,6 +682,64 @@ class ActionFacade(Type):
 
 
     @ReturnMapping(EnqueuedActions)
+    def sync_RunOnAllMachines(self, applications=None, commands=None, execution_group=None, machines=None, parallel=None, timeout=None, units=None, workload_context=None):
+        '''
+        RunOnAllMachines attempts to run the specified command on all the machines.
+
+        applications : typing.Sequence[str]
+        commands : str
+        execution_group : str
+        machines : typing.Sequence[str]
+        parallel : bool
+        timeout : int
+        units : typing.Sequence[str]
+        workload_context : bool
+        Returns -> EnqueuedActions
+        '''
+        if applications is not None and not isinstance(applications, (bytes, str, list)):
+            raise Exception("Expected applications to be a Sequence, received: {}".format(type(applications)))
+
+        if commands is not None and not isinstance(commands, (bytes, str)):
+            raise Exception("Expected commands to be a str, received: {}".format(type(commands)))
+
+        if execution_group is not None and not isinstance(execution_group, (bytes, str)):
+            raise Exception("Expected execution_group to be a str, received: {}".format(type(execution_group)))
+
+        if machines is not None and not isinstance(machines, (bytes, str, list)):
+            raise Exception("Expected machines to be a Sequence, received: {}".format(type(machines)))
+
+        if parallel is not None and not isinstance(parallel, bool):
+            raise Exception("Expected parallel to be a bool, received: {}".format(type(parallel)))
+
+        if timeout is not None and not isinstance(timeout, int):
+            raise Exception("Expected timeout to be a int, received: {}".format(type(timeout)))
+
+        if units is not None and not isinstance(units, (bytes, str, list)):
+            raise Exception("Expected units to be a Sequence, received: {}".format(type(units)))
+
+        if workload_context is not None and not isinstance(workload_context, bool):
+            raise Exception("Expected workload_context to be a bool, received: {}".format(type(workload_context)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='RunOnAllMachines',
+                   version=7,
+                   params=_params)
+        _params['applications'] = applications
+        _params['commands'] = commands
+        _params['execution-group'] = execution_group
+        _params['machines'] = machines
+        _params['parallel'] = parallel
+        _params['timeout'] = timeout
+        _params['units'] = units
+        _params['workload-context'] = workload_context
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(EnqueuedActions)
     async def RunOnAllMachines(self, applications=None, commands=None, execution_group=None, machines=None, parallel=None, timeout=None, units=None, workload_context=None):
         '''
         RunOnAllMachines attempts to run the specified command on all the machines.
@@ -504,6 +793,29 @@ class ActionFacade(Type):
         _params['units'] = units
         _params['workload-context'] = workload_context
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
+    def sync_WatchActionsProgress(self, entities=None):
+        '''
+        WatchActionsProgress creates a watcher that reports on action log messages.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Action',
+                   request='WatchActionsProgress',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -973,6 +1285,41 @@ class CharmsFacade(Type):
     
 
     @ReturnMapping(CharmOriginResult)
+    def sync_AddCharm(self, charm_origin=None, force=None, url=None):
+        '''
+        AddCharm adds the given charm URL (which must include revision) to the
+        environment, if it does not exist yet. Local charms are not supported,
+        only charm store and charm hub URLs. See also AddLocalCharm().
+
+        charm_origin : CharmOrigin
+        force : bool
+        url : str
+        Returns -> CharmOriginResult
+        '''
+        if charm_origin is not None and not isinstance(charm_origin, (dict, CharmOrigin)):
+            raise Exception("Expected charm_origin to be a CharmOrigin, received: {}".format(type(charm_origin)))
+
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if url is not None and not isinstance(url, (bytes, str)):
+            raise Exception("Expected url to be a str, received: {}".format(type(url)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='AddCharm',
+                   version=7,
+                   params=_params)
+        _params['charm-origin'] = charm_origin
+        _params['force'] = force
+        _params['url'] = url
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CharmOriginResult)
     async def AddCharm(self, charm_origin=None, force=None, url=None):
         '''
         AddCharm adds the given charm URL (which must include revision) to the
@@ -1008,6 +1355,29 @@ class CharmsFacade(Type):
 
 
     @ReturnMapping(Charm)
+    def sync_CharmInfo(self, url=None):
+        '''
+        CharmInfo returns information about the requested charm.
+
+        url : str
+        Returns -> Charm
+        '''
+        if url is not None and not isinstance(url, (bytes, str)):
+            raise Exception("Expected url to be a str, received: {}".format(type(url)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='CharmInfo',
+                   version=7,
+                   params=_params)
+        _params['url'] = url
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(Charm)
     async def CharmInfo(self, url=None):
         '''
         CharmInfo returns information about the requested charm.
@@ -1026,6 +1396,30 @@ class CharmsFacade(Type):
                    params=_params)
         _params['url'] = url
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_CheckCharmPlacement(self, placements=None):
+        '''
+        CheckCharmPlacement checks if a charm is allowed to be placed with in a
+        given application.
+
+        placements : typing.Sequence[~ApplicationCharmPlacement]
+        Returns -> ErrorResults
+        '''
+        if placements is not None and not isinstance(placements, (bytes, str, list)):
+            raise Exception("Expected placements to be a Sequence, received: {}".format(type(placements)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='CheckCharmPlacement',
+                   version=7,
+                   params=_params)
+        _params['placements'] = placements
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1055,6 +1449,30 @@ class CharmsFacade(Type):
 
 
     @ReturnMapping(DownloadInfoResults)
+    def sync_GetDownloadInfos(self, entities=None):
+        '''
+        GetDownloadInfos attempts to get the bundle corresponding to the charm url
+        and origin.
+
+        entities : typing.Sequence[~CharmURLAndOrigin]
+        Returns -> DownloadInfoResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='GetDownloadInfos',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(DownloadInfoResults)
     async def GetDownloadInfos(self, entities=None):
         '''
         GetDownloadInfos attempts to get the bundle corresponding to the charm url
@@ -1074,6 +1492,31 @@ class CharmsFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(IsMeteredResult)
+    def sync_IsMetered(self, url=None):
+        '''
+        IsMetered returns whether or not the charm is metered.
+        TODO (cderici) only used for metered charms in cmd MeteredDeployAPI,
+        kept for client compatibility, remove in juju 4.0
+
+        url : str
+        Returns -> IsMeteredResult
+        '''
+        if url is not None and not isinstance(url, (bytes, str)):
+            raise Exception("Expected url to be a str, received: {}".format(type(url)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='IsMetered',
+                   version=7,
+                   params=_params)
+        _params['url'] = url
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1104,6 +1547,31 @@ class CharmsFacade(Type):
 
 
     @ReturnMapping(CharmsListResult)
+    def sync_List(self, names=None):
+        '''
+        List returns a list of charm URLs currently in the state.
+        If supplied parameter contains any names, the result will
+        be filtered to return only the charms with supplied names.
+
+        names : typing.Sequence[str]
+        Returns -> CharmsListResult
+        '''
+        if names is not None and not isinstance(names, (bytes, str, list)):
+            raise Exception("Expected names to be a Sequence, received: {}".format(type(names)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='List',
+                   version=7,
+                   params=_params)
+        _params['names'] = names
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CharmsListResult)
     async def List(self, names=None):
         '''
         List returns a list of charm URLs currently in the state.
@@ -1129,6 +1597,29 @@ class CharmsFacade(Type):
 
 
     @ReturnMapping(CharmResourcesResults)
+    def sync_ListCharmResources(self, entities=None):
+        '''
+        ListCharmResources returns a series of resources for a given charm.
+
+        entities : typing.Sequence[~CharmURLAndOrigin]
+        Returns -> CharmResourcesResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='ListCharmResources',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CharmResourcesResults)
     async def ListCharmResources(self, entities=None):
         '''
         ListCharmResources returns a series of resources for a given charm.
@@ -1147,6 +1638,35 @@ class CharmsFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ResolveCharmWithChannelResults)
+    def sync_ResolveCharms(self, macaroon=None, resolve=None):
+        '''
+        ResolveCharms resolves the given charm URLs with an optionally specified
+        preferred channel.  Channel provided via CharmOrigin.
+
+        macaroon : Macaroon
+        resolve : typing.Sequence[~ResolveCharmWithChannel]
+        Returns -> ResolveCharmWithChannelResults
+        '''
+        if macaroon is not None and not isinstance(macaroon, (dict, Macaroon)):
+            raise Exception("Expected macaroon to be a Macaroon, received: {}".format(type(macaroon)))
+
+        if resolve is not None and not isinstance(resolve, (bytes, str, list)):
+            raise Exception("Expected resolve to be a Sequence, received: {}".format(type(resolve)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Charms',
+                   request='ResolveCharms',
+                   version=7,
+                   params=_params)
+        _params['macaroon'] = macaroon
+        _params['resolve'] = resolve
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1735,6 +2255,50 @@ class ClientFacade(Type):
     
 
     @ReturnMapping(FindToolsResult)
+    def sync_FindTools(self, agentstream=None, arch=None, major=None, number=None, os_type=None):
+        '''
+        FindTools returns a List containing all tools matching the given parameters.
+        TODO(juju 3.1) - remove, used by 2.9 client only
+
+        agentstream : str
+        arch : str
+        major : int
+        number : Number
+        os_type : str
+        Returns -> FindToolsResult
+        '''
+        if agentstream is not None and not isinstance(agentstream, (bytes, str)):
+            raise Exception("Expected agentstream to be a str, received: {}".format(type(agentstream)))
+
+        if arch is not None and not isinstance(arch, (bytes, str)):
+            raise Exception("Expected arch to be a str, received: {}".format(type(arch)))
+
+        if major is not None and not isinstance(major, int):
+            raise Exception("Expected major to be a int, received: {}".format(type(major)))
+
+        if number is not None and not isinstance(number, (dict, Number)):
+            raise Exception("Expected number to be a Number, received: {}".format(type(number)))
+
+        if os_type is not None and not isinstance(os_type, (bytes, str)):
+            raise Exception("Expected os_type to be a str, received: {}".format(type(os_type)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='FindTools',
+                   version=7,
+                   params=_params)
+        _params['agentstream'] = agentstream
+        _params['arch'] = arch
+        _params['major'] = major
+        _params['number'] = number
+        _params['os-type'] = os_type
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(FindToolsResult)
     async def FindTools(self, agentstream=None, arch=None, major=None, number=None, os_type=None):
         '''
         FindTools returns a List containing all tools matching the given parameters.
@@ -1779,6 +2343,34 @@ class ClientFacade(Type):
 
 
     @ReturnMapping(FullStatus)
+    def sync_FullStatus(self, include_storage=None, patterns=None):
+        '''
+        FullStatus gives the information needed for juju status over the api
+
+        include_storage : bool
+        patterns : typing.Sequence[str]
+        Returns -> FullStatus
+        '''
+        if include_storage is not None and not isinstance(include_storage, bool):
+            raise Exception("Expected include_storage to be a bool, received: {}".format(type(include_storage)))
+
+        if patterns is not None and not isinstance(patterns, (bytes, str, list)):
+            raise Exception("Expected patterns to be a Sequence, received: {}".format(type(patterns)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='FullStatus',
+                   version=7,
+                   params=_params)
+        _params['include-storage'] = include_storage
+        _params['patterns'] = patterns
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(FullStatus)
     async def FullStatus(self, include_storage=None, patterns=None):
         '''
         FullStatus gives the information needed for juju status over the api
@@ -1807,6 +2399,29 @@ class ClientFacade(Type):
 
 
     @ReturnMapping(StatusHistoryResults)
+    def sync_StatusHistory(self, requests=None):
+        '''
+        StatusHistory returns a slice of past statuses for several entities.
+
+        requests : typing.Sequence[~StatusHistoryRequest]
+        Returns -> StatusHistoryResults
+        '''
+        if requests is not None and not isinstance(requests, (bytes, str, list)):
+            raise Exception("Expected requests to be a Sequence, received: {}".format(type(requests)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='StatusHistory',
+                   version=7,
+                   params=_params)
+        _params['requests'] = requests
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StatusHistoryResults)
     async def StatusHistory(self, requests=None):
         '''
         StatusHistory returns a slice of past statuses for several entities.
@@ -1825,6 +2440,27 @@ class ClientFacade(Type):
                    params=_params)
         _params['requests'] = requests
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(AllWatcherId)
+    def sync_WatchAll(self):
+        '''
+        WatchAll initiates a watcher for entities in the connected model.
+
+
+        Returns -> AllWatcherId
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Client',
+                   request='WatchAll',
+                   version=7,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2377,6 +3013,39 @@ class CloudFacade(Type):
     
 
     @ReturnMapping(None)
+    def sync_AddCloud(self, cloud=None, force=None, name=None):
+        '''
+        AddCloud adds a new cloud, different from the one managed by the controller.
+
+        cloud : Cloud
+        force : bool
+        name : str
+        Returns -> None
+        '''
+        if cloud is not None and not isinstance(cloud, (dict, Cloud)):
+            raise Exception("Expected cloud to be a Cloud, received: {}".format(type(cloud)))
+
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if name is not None and not isinstance(name, (bytes, str)):
+            raise Exception("Expected name to be a str, received: {}".format(type(name)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='AddCloud',
+                   version=7,
+                   params=_params)
+        _params['cloud'] = cloud
+        _params['force'] = force
+        _params['name'] = name
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
     async def AddCloud(self, cloud=None, force=None, name=None):
         '''
         AddCloud adds a new cloud, different from the one managed by the controller.
@@ -2410,6 +3079,32 @@ class CloudFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_AddCredentials(self, credentials=None):
+        '''
+        AddCredentials adds new credentials.
+        In contrast to UpdateCredentials() below, the new credentials can be
+        for a cloud that the controller does not manage (this is required
+        for CAAS models)
+
+        credentials : typing.Sequence[~TaggedCredential]
+        Returns -> ErrorResults
+        '''
+        if credentials is not None and not isinstance(credentials, (bytes, str, list)):
+            raise Exception("Expected credentials to be a Sequence, received: {}".format(type(credentials)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='AddCredentials',
+                   version=7,
+                   params=_params)
+        _params['credentials'] = credentials
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def AddCredentials(self, credentials=None):
         '''
         AddCredentials adds new credentials.
@@ -2431,6 +3126,34 @@ class CloudFacade(Type):
                    params=_params)
         _params['credentials'] = credentials
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(UpdateCredentialResults)
+    def sync_CheckCredentialsModels(self, credentials=None):
+        '''
+        CheckCredentialsModels validates supplied cloud credentials' content against
+        models that currently use these credentials.
+        If there are any models that are using a credential and these models or their
+        cloud instances are not going to be accessible with corresponding credential,
+        there will be detailed validation errors per model.
+        There's no Juju API client which uses this, but JAAS does,
+
+        credentials : typing.Sequence[~TaggedCredential]
+        Returns -> UpdateCredentialResults
+        '''
+        if credentials is not None and not isinstance(credentials, (bytes, str, list)):
+            raise Exception("Expected credentials to be a Sequence, received: {}".format(type(credentials)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='CheckCredentialsModels',
+                   version=7,
+                   params=_params)
+        _params['credentials'] = credentials
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2464,6 +3187,29 @@ class CloudFacade(Type):
 
 
     @ReturnMapping(CloudResults)
+    def sync_Cloud(self, entities=None):
+        '''
+        Cloud returns the cloud definitions for the specified clouds.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> CloudResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='Cloud',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudResults)
     async def Cloud(self, entities=None):
         '''
         Cloud returns the cloud definitions for the specified clouds.
@@ -2482,6 +3228,29 @@ class CloudFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudInfoResults)
+    def sync_CloudInfo(self, entities=None):
+        '''
+        CloudInfo returns information about the specified clouds.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> CloudInfoResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='CloudInfo',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2510,6 +3279,28 @@ class CloudFacade(Type):
 
 
     @ReturnMapping(CloudsResult)
+    def sync_Clouds(self):
+        '''
+        Clouds returns the definitions of all clouds supported by the controller
+        that the logged in user can see.
+
+
+        Returns -> CloudsResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='Clouds',
+                   version=7,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudsResult)
     async def Clouds(self):
         '''
         Clouds returns the definitions of all clouds supported by the controller
@@ -2527,6 +3318,29 @@ class CloudFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudCredentialResults)
+    def sync_Credential(self, entities=None):
+        '''
+        Credential returns the specified cloud credential for each tag, minus secrets.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> CloudCredentialResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='Credential',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2550,6 +3364,39 @@ class CloudFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CredentialContentResults)
+    def sync_CredentialContents(self, credentials=None, include_secrets=None):
+        '''
+        CredentialContents returns the specified cloud credentials,
+        including the secrets if requested.
+        If no specific credential name/cloud was passed in, all credentials for this user
+        are returned.
+        Only credential owner can see its contents as well as what models use it.
+        Controller admin has no special superpowers here and is treated the same as all other users.
+
+        credentials : typing.Sequence[~CloudCredentialArg]
+        include_secrets : bool
+        Returns -> CredentialContentResults
+        '''
+        if credentials is not None and not isinstance(credentials, (bytes, str, list)):
+            raise Exception("Expected credentials to be a Sequence, received: {}".format(type(credentials)))
+
+        if include_secrets is not None and not isinstance(include_secrets, bool):
+            raise Exception("Expected include_secrets to be a bool, received: {}".format(type(include_secrets)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='CredentialContents',
+                   version=7,
+                   params=_params)
+        _params['credentials'] = credentials
+        _params['include-secrets'] = include_secrets
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2588,6 +3435,30 @@ class CloudFacade(Type):
 
 
     @ReturnMapping(InstanceTypesResults)
+    def sync_InstanceTypes(self, constraints=None):
+        '''
+        InstanceTypes returns instance type information for the cloud and region
+        in which the current model is deployed.
+
+        constraints : typing.Sequence[~CloudInstanceTypesConstraint]
+        Returns -> InstanceTypesResults
+        '''
+        if constraints is not None and not isinstance(constraints, (bytes, str, list)):
+            raise Exception("Expected constraints to be a Sequence, received: {}".format(type(constraints)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='InstanceTypes',
+                   version=7,
+                   params=_params)
+        _params['constraints'] = constraints
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(InstanceTypesResults)
     async def InstanceTypes(self, constraints=None):
         '''
         InstanceTypes returns instance type information for the cloud and region
@@ -2607,6 +3478,36 @@ class CloudFacade(Type):
                    params=_params)
         _params['constraints'] = constraints
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ListCloudInfoResults)
+    def sync_ListCloudInfo(self, all_=None, user_tag=None):
+        '''
+        ListCloudInfo returns clouds that the specified user has access to.
+        Controller admins (superuser) can list clouds for any user.
+        Other users can only ask about their own clouds.
+
+        all_ : bool
+        user_tag : str
+        Returns -> ListCloudInfoResults
+        '''
+        if all_ is not None and not isinstance(all_, bool):
+            raise Exception("Expected all_ to be a bool, received: {}".format(type(all_)))
+
+        if user_tag is not None and not isinstance(user_tag, (bytes, str)):
+            raise Exception("Expected user_tag to be a str, received: {}".format(type(user_tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='ListCloudInfo',
+                   version=7,
+                   params=_params)
+        _params['all'] = all_
+        _params['user-tag'] = user_tag
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2642,6 +3543,29 @@ class CloudFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_ModifyCloudAccess(self, changes=None):
+        '''
+        ModifyCloudAccess changes the model access granted to users.
+
+        changes : typing.Sequence[~ModifyCloudAccess]
+        Returns -> ErrorResults
+        '''
+        if changes is not None and not isinstance(changes, (bytes, str, list)):
+            raise Exception("Expected changes to be a Sequence, received: {}".format(type(changes)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='ModifyCloudAccess',
+                   version=7,
+                   params=_params)
+        _params['changes'] = changes
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def ModifyCloudAccess(self, changes=None):
         '''
         ModifyCloudAccess changes the model access granted to users.
@@ -2660,6 +3584,30 @@ class CloudFacade(Type):
                    params=_params)
         _params['changes'] = changes
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_RemoveClouds(self, entities=None):
+        '''
+        RemoveClouds removes the specified clouds from the controller.
+        If a cloud is in use (has models deployed to it), the removal will fail.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='RemoveClouds',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2684,6 +3632,31 @@ class CloudFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_RevokeCredentialsCheckModels(self, credentials=None):
+        '''
+        RevokeCredentialsCheckModels revokes a set of cloud credentials.
+        If the credentials are used by any of the models, the credential deletion will be aborted.
+        If credential-in-use needs to be revoked nonetheless, this method allows the use of force.
+
+        credentials : typing.Sequence[~RevokeCredentialArg]
+        Returns -> ErrorResults
+        '''
+        if credentials is not None and not isinstance(credentials, (bytes, str, list)):
+            raise Exception("Expected credentials to be a Sequence, received: {}".format(type(credentials)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='RevokeCredentialsCheckModels',
+                   version=7,
+                   params=_params)
+        _params['credentials'] = credentials
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2714,6 +3687,29 @@ class CloudFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_UpdateCloud(self, clouds=None):
+        '''
+        UpdateCloud updates an existing cloud that the controller knows about.
+
+        clouds : typing.Sequence[~AddCloudArgs]
+        Returns -> ErrorResults
+        '''
+        if clouds is not None and not isinstance(clouds, (bytes, str, list)):
+            raise Exception("Expected clouds to be a Sequence, received: {}".format(type(clouds)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='UpdateCloud',
+                   version=7,
+                   params=_params)
+        _params['clouds'] = clouds
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def UpdateCloud(self, clouds=None):
         '''
         UpdateCloud updates an existing cloud that the controller knows about.
@@ -2732,6 +3728,40 @@ class CloudFacade(Type):
                    params=_params)
         _params['clouds'] = clouds
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(UpdateCredentialResults)
+    def sync_UpdateCredentialsCheckModels(self, credentials=None, force=None):
+        '''
+        UpdateCredentialsCheckModels updates a set of cloud credentials' content.
+        If there are any models that are using a credential and these models
+        are not going to be visible with updated credential content,
+        there will be detailed validation errors per model.  Such model errors are returned
+        separately and do not contribute to the overall method error status.
+        Controller admins can 'force' an update of the credential
+        regardless of whether it is deemed valid or not.
+
+        credentials : typing.Sequence[~TaggedCredential]
+        force : bool
+        Returns -> UpdateCredentialResults
+        '''
+        if credentials is not None and not isinstance(credentials, (bytes, str, list)):
+            raise Exception("Expected credentials to be a Sequence, received: {}".format(type(credentials)))
+
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='UpdateCredentialsCheckModels',
+                   version=7,
+                   params=_params)
+        _params['credentials'] = credentials
+        _params['force'] = force
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -2766,6 +3796,29 @@ class CloudFacade(Type):
         _params['credentials'] = credentials
         _params['force'] = force
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsResults)
+    def sync_UserCredentials(self, user_clouds=None):
+        '''
+        UserCredentials returns the cloud credentials for a set of users.
+
+        user_clouds : typing.Sequence[~UserCloud]
+        Returns -> StringsResults
+        '''
+        if user_clouds is not None and not isinstance(user_clouds, (bytes, str, list)):
+            raise Exception("Expected user_clouds to be a Sequence, received: {}".format(type(user_clouds)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Cloud',
+                   request='UserCredentials',
+                   version=7,
+                   params=_params)
+        _params['user-clouds'] = user_clouds
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3364,6 +4417,30 @@ class FirewallerFacade(Type):
     
 
     @ReturnMapping(BoolResults)
+    def sync_AreManuallyProvisioned(self, entities=None):
+        '''
+        AreManuallyProvisioned returns whether each given entity is
+        manually provisioned or not. Only machine tags are accepted.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> BoolResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='AreManuallyProvisioned',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(BoolResults)
     async def AreManuallyProvisioned(self, entities=None):
         '''
         AreManuallyProvisioned returns whether each given entity is
@@ -3383,6 +4460,29 @@ class FirewallerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudSpecResults)
+    def sync_CloudSpec(self, entities=None):
+        '''
+        CloudSpec returns the model's cloud spec.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> CloudSpecResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='CloudSpec',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3411,6 +4511,29 @@ class FirewallerFacade(Type):
 
 
     @ReturnMapping(ControllerAPIInfoResults)
+    def sync_ControllerAPIInfoForModels(self, entities=None):
+        '''
+        ControllerAPIInfoForModels returns the controller api connection details for the specified models.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ControllerAPIInfoResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='ControllerAPIInfoForModels',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ControllerAPIInfoResults)
     async def ControllerAPIInfoForModels(self, entities=None):
         '''
         ControllerAPIInfoForModels returns the controller api connection details for the specified models.
@@ -3434,6 +4557,27 @@ class FirewallerFacade(Type):
 
 
     @ReturnMapping(ControllerConfigResult)
+    def sync_ControllerConfig(self):
+        '''
+        ControllerConfig returns the controller's configuration.
+
+
+        Returns -> ControllerConfigResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='ControllerConfig',
+                   version=7,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ControllerConfigResult)
     async def ControllerConfig(self):
         '''
         ControllerConfig returns the controller's configuration.
@@ -3450,6 +4594,30 @@ class FirewallerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
+    def sync_GetAssignedMachine(self, entities=None):
+        '''
+        GetAssignedMachine returns the assigned machine tag (if any) for
+        each given unit.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='GetAssignedMachine',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3479,6 +4647,27 @@ class FirewallerFacade(Type):
 
 
     @ReturnMapping(CloudSpecResult)
+    def sync_GetCloudSpec(self):
+        '''
+        GetCloudSpec constructs the CloudSpec for a validated and authorized model.
+
+
+        Returns -> CloudSpecResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='GetCloudSpec',
+                   version=7,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(CloudSpecResult)
     async def GetCloudSpec(self):
         '''
         GetCloudSpec constructs the CloudSpec for a validated and authorized model.
@@ -3495,6 +4684,30 @@ class FirewallerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ExposeInfoResults)
+    def sync_GetExposeInfo(self, entities=None):
+        '''
+        GetExposeInfo returns the expose flag and per-endpoint expose settings
+        for the specified applications.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ExposeInfoResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='GetExposeInfo',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3524,6 +4737,30 @@ class FirewallerFacade(Type):
 
 
     @ReturnMapping(StringResults)
+    def sync_InstanceId(self, entities=None):
+        '''
+        InstanceId returns the provider specific instance id for each given
+        machine or an CodeNotProvisioned error, if not set.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='InstanceId',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringResults)
     async def InstanceId(self, entities=None):
         '''
         InstanceId returns the provider specific instance id for each given
@@ -3543,6 +4780,29 @@ class FirewallerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(LifeResults)
+    def sync_Life(self, entities=None):
+        '''
+        Life returns the life status of every supplied entity, where available.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> LifeResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='Life',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3571,6 +4831,29 @@ class FirewallerFacade(Type):
 
 
     @ReturnMapping(MacaroonResults)
+    def sync_MacaroonForRelations(self, entities=None):
+        '''
+        MacaroonForRelations returns the macaroon for the specified relations.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> MacaroonResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='MacaroonForRelations',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(MacaroonResults)
     async def MacaroonForRelations(self, entities=None):
         '''
         MacaroonForRelations returns the macaroon for the specified relations.
@@ -3589,6 +4872,27 @@ class FirewallerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ModelConfigResult)
+    def sync_ModelConfig(self):
+        '''
+        ModelConfig returns the current model's configuration.
+
+
+        Returns -> ModelConfigResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='ModelConfig',
+                   version=7,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3615,6 +4919,28 @@ class FirewallerFacade(Type):
 
 
     @ReturnMapping(IngressRulesResult)
+    def sync_ModelFirewallRules(self):
+        '''
+        ModelFirewallRules returns the firewall rules that this model is
+        configured to open
+
+
+        Returns -> IngressRulesResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='ModelFirewallRules',
+                   version=7,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(IngressRulesResult)
     async def ModelFirewallRules(self):
         '''
         ModelFirewallRules returns the firewall rules that this model is
@@ -3632,6 +4958,32 @@ class FirewallerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(OpenMachinePortRangesResults)
+    def sync_OpenedMachinePortRanges(self, entities=None):
+        '''
+        OpenedMachinePortRanges returns a list of the opened port ranges for the
+        specified machines where each result is broken down by unit. The list of
+        opened ports for each unit is further grouped by endpoint name and includes
+        the subnet CIDRs that belong to the space that each endpoint is bound to.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> OpenMachinePortRangesResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='OpenedMachinePortRanges',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3663,6 +5015,29 @@ class FirewallerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_SetRelationsStatus(self, entities=None):
+        '''
+        SetRelationsStatus sets the status for the specified relations.
+
+        entities : typing.Sequence[~EntityStatusArgs]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='SetRelationsStatus',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def SetRelationsStatus(self, entities=None):
         '''
         SetRelationsStatus sets the status for the specified relations.
@@ -3681,6 +5056,30 @@ class FirewallerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SpaceInfos)
+    def sync_SpaceInfos(self, space_ids=None):
+        '''
+        SpaceInfos returns a comprehensive representation of either all spaces or
+        a filtered subset of the known spaces and their associated subnet details.
+
+        space_ids : typing.Sequence[str]
+        Returns -> SpaceInfos
+        '''
+        if space_ids is not None and not isinstance(space_ids, (bytes, str, list)):
+            raise Exception("Expected space_ids to be a Sequence, received: {}".format(type(space_ids)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='SpaceInfos',
+                   version=7,
+                   params=_params)
+        _params['space-ids'] = space_ids
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3710,6 +5109,29 @@ class FirewallerFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResults)
+    def sync_Watch(self, entities=None):
+        '''
+        Watch starts an NotifyWatcher for each given entity.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='Watch',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
     async def Watch(self, entities=None):
         '''
         Watch starts an NotifyWatcher for each given entity.
@@ -3733,6 +5155,29 @@ class FirewallerFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResults)
+    def sync_WatchCloudSpecsChanges(self, entities=None):
+        '''
+        WatchCloudSpecsChanges returns a watcher for cloud spec changes.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchCloudSpecsChanges',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
     async def WatchCloudSpecsChanges(self, entities=None):
         '''
         WatchCloudSpecsChanges returns a watcher for cloud spec changes.
@@ -3751,6 +5196,31 @@ class FirewallerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
+    def sync_WatchEgressAddressesForRelations(self, entities=None):
+        '''
+        WatchEgressAddressesForRelations creates a watcher that notifies when addresses, from which
+        connections will originate for the relation, change.
+        Each event contains the entire set of addresses which are required for ingress for the relation.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchEgressAddressesForRelations',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3781,6 +5251,31 @@ class FirewallerFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResult)
+    def sync_WatchForModelConfigChanges(self):
+        '''
+        WatchForModelConfigChanges returns a NotifyWatcher that observes
+        changes to the model configuration.
+        Note that although the NotifyWatchResult contains an Error field,
+        it's not used because we are only returning a single watcher,
+        so we use the regular error return.
+
+
+        Returns -> NotifyWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchForModelConfigChanges',
+                   version=7,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResult)
     async def WatchForModelConfigChanges(self):
         '''
         WatchForModelConfigChanges returns a NotifyWatcher that observes
@@ -3801,6 +5296,30 @@ class FirewallerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
+    def sync_WatchIngressAddressesForRelations(self, entities=None):
+        '''
+        WatchIngressAddressesForRelations creates a watcher that returns the ingress networks
+        that have been recorded against the specified relations.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchIngressAddressesForRelations',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3830,6 +5349,28 @@ class FirewallerFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResult)
+    def sync_WatchModelFirewallRules(self):
+        '''
+        WatchModelFirewallRules returns a NotifyWatcher that notifies of
+        potential changes to a model's configured firewall rules
+
+
+        Returns -> NotifyWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchModelFirewallRules',
+                   version=7,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResult)
     async def WatchModelFirewallRules(self):
         '''
         WatchModelFirewallRules returns a NotifyWatcher that notifies of
@@ -3847,6 +5388,28 @@ class FirewallerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResult)
+    def sync_WatchModelMachineStartTimes(self):
+        '''
+        WatchModelMachineStartTimes watches the non-container machines in the model
+        for changes to the Life or AgentStartTime fields and reports them as a batch.
+
+
+        Returns -> StringsWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchModelMachineStartTimes',
+                   version=7,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3874,6 +5437,29 @@ class FirewallerFacade(Type):
 
 
     @ReturnMapping(StringsWatchResult)
+    def sync_WatchModelMachines(self):
+        '''
+        WatchModelMachines returns a StringsWatcher that notifies of
+        changes to the life cycles of the top level machines in the current
+        model.
+
+
+        Returns -> StringsWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchModelMachines',
+                   version=7,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResult)
     async def WatchModelMachines(self):
         '''
         WatchModelMachines returns a StringsWatcher that notifies of
@@ -3892,6 +5478,30 @@ class FirewallerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
+    def sync_WatchOpenedPorts(self, entities=None):
+        '''
+        WatchOpenedPorts returns a new StringsWatcher for each given
+        model tag.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchOpenedPorts',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -3921,6 +5531,30 @@ class FirewallerFacade(Type):
 
 
     @ReturnMapping(StringsWatchResult)
+    def sync_WatchSubnets(self, entities=None):
+        '''
+        WatchSubnets returns a new StringsWatcher that watches the specified
+        subnet tags or all tags if no entities are specified.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResult
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchSubnets',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResult)
     async def WatchSubnets(self, entities=None):
         '''
         WatchSubnets returns a new StringsWatcher that watches the specified
@@ -3940,6 +5574,30 @@ class FirewallerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsWatchResults)
+    def sync_WatchUnits(self, entities=None):
+        '''
+        WatchUnits starts a StringsWatcher to watch all units belonging to
+        to any entity (machine or service) passed in args.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> StringsWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Firewaller',
+                   request='WatchUnits',
+                   version=7,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 

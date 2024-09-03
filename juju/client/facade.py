@@ -1,5 +1,11 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "typing_inspect>=0.6.0",
+# ]
+# ///
 
 import argparse
 import builtins
@@ -15,11 +21,10 @@ from glob import glob
 from pathlib import Path
 from typing import Any, Mapping, Sequence, TypeVar
 
-import typing_inspect
+import typing_inspect  # type: ignore  # FIXME no stubs?
 
 from . import codegen
 
-_marker = object()
 
 JUJU_VERSION = re.compile(r'[0-9]+\.[0-9-]+[\.\-][0-9a-z]+(\.[0-9]+)?')
 # Workaround for https://bugs.launchpad.net/juju/+bug/1683906
@@ -146,10 +151,12 @@ class TypeRegistry(dict):
     def __init__(self, schema):
         self.schema = schema
 
-    def get(self, name):
+    def get(self, name, default=None):
+        assert not default
         # Two way mapping
         refname = self.schema.referenceName(name)
         if refname not in self:
+            # FIXME that's not what TypeVar's are for
             result = TypeVar(refname)
             self[refname] = result
             self[result] = refname
@@ -451,7 +458,7 @@ class {}(Type):
             source.append("{}self.unknown_fields = unknown_fields".format(INDENT * 2))
 
         source = "\n".join(source)
-        capture.clear(name)
+        capture.pop(name, None)
         capture[name].write(source)
         capture[name].write("\n\n")
         if name is None:
@@ -509,7 +516,7 @@ def ReturnMapping(cls):
     return decorator
 
 
-def makeFunc(cls, name, description, params, result, _async=True):
+def makeFunc(cls, name, description, params, result):
     INDENT = "    "
     args = Args(cls.schema, params)
     assignments = []
@@ -523,7 +530,7 @@ def makeFunc(cls, name, description, params, result, _async=True):
     source = """
 
 @ReturnMapping({rettype})
-{_async}def {name}(self{argsep}{args}):
+{_async}def {sync}{name}(self{argsep}{args}):
     '''
 {docstring}
     Returns -> {res}
@@ -536,7 +543,7 @@ def makeFunc(cls, name, description, params, result, _async=True):
                version={cls.version},
                params=_params)
 {assignments}
-    reply = {_await}self.rpc(msg)
+    reply = {_await}self.{sync}rpc(msg)
     return reply
 
 """
@@ -544,18 +551,40 @@ def makeFunc(cls, name, description, params, result, _async=True):
     if description != "":
         description = "{}\n\n".format(description)
     doc_string = "{}{}".format(description, args.get_doc())
-    fsource = source.format(_async="async " if _async else "",
-                            name=name,
-                            argsep=", " if args else "",
-                            args=args.as_kwargs(),
-                            res=res,
-                            validation=args.as_validation(),
-                            rettype=result.__name__ if result else None,
-                            docstring=textwrap.indent(doc_string, INDENT),
-                            cls=cls,
-                            assignments=assignments,
-                            _await="await " if _async else "")
+
+    src1 = source.format(
+        _async="",
+        sync="sync_",
+        name=name,
+        argsep=", " if args else "",
+        args=args.as_kwargs(),
+        res=res,
+        validation=args.as_validation(),
+        rettype=result.__name__ if result else None,
+        docstring=textwrap.indent(doc_string, INDENT),
+        cls=cls,
+        assignments=assignments,
+        _await="",
+    )
+
+    src2 = source.format(
+        _async="async ",
+        sync="",
+        name=name,
+        argsep=", " if args else "",
+        args=args.as_kwargs(),
+        res=res,
+        validation=args.as_validation(),
+        rettype=result.__name__ if result else None,
+        docstring=textwrap.indent(doc_string, INDENT),
+        cls=cls,
+        assignments=assignments,
+        _await="await ",
+    )
+
+    fsource = "".join([src1, src2])
     ns = _getns(cls.schema)
+    # Validate that this is valid Python code
     exec(fsource, ns)
     func = ns[name]
     return func, fsource
@@ -576,6 +605,17 @@ async def rpc(self, msg):
     reply = await self.connection.rpc(msg, encoder=TypeEncoder)
     return reply
 
+async def sync_rpc(self, msg):
+    '''
+    Patch rpc method to add Id.
+    '''
+    if not hasattr(self, 'Id'):
+        raise RuntimeError('Missing "Id" field')
+    msg['Id'] = id
+
+    from .facade import TypeEncoder
+    return self.sync_connection.rpc(msg, encoder=TypeEncoder)
+
 """
     ns = _getns(cls.schema)
     exec(source, ns)
@@ -591,7 +631,7 @@ def buildMethods(cls, capture):
         capture["{}Facade".format(cls.__name__)].write(source, depth=1)
 
 
-def _buildMethod(cls, name):
+def _buildMethod(cls, name: str):
     params = None
     result = None
     method = cls.schema['properties'][name]
@@ -643,6 +683,9 @@ class TypeEncoder(json.JSONEncoder):
 
 
 class Type:
+    _toPy: dict[str, str]
+    _toSchema: dict[str, str]
+
     def connect(self, connection):
         self.connection = connection
 
@@ -929,7 +972,7 @@ def generate_facades(schemas):
             cls, source = buildFacade(schema)
             cls_name = "{}Facade".format(schema.name)
 
-            captures[schema.version].clear(cls_name)
+            captures[schema.version].pop(cls_name, None)
             # Make the factory class for _client.py
             make_factory(cls_name)
             # Make the actual class

@@ -336,6 +336,34 @@ class ApplicationOffersFacade(Type):
     
 
     @ReturnMapping(ApplicationOffersResults)
+    def sync_ApplicationOffers(self, bakery_version=None, offer_urls=None):
+        '''
+        ApplicationOffers gets details about remote applications that match given URLs.
+
+        bakery_version : int
+        offer_urls : typing.Sequence[str]
+        Returns -> ApplicationOffersResults
+        '''
+        if bakery_version is not None and not isinstance(bakery_version, int):
+            raise Exception("Expected bakery_version to be a int, received: {}".format(type(bakery_version)))
+
+        if offer_urls is not None and not isinstance(offer_urls, (bytes, str, list)):
+            raise Exception("Expected offer_urls to be a Sequence, received: {}".format(type(offer_urls)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='ApplicationOffers',
+                   version=5,
+                   params=_params)
+        _params['bakery-version'] = bakery_version
+        _params['offer-urls'] = offer_urls
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ApplicationOffersResults)
     async def ApplicationOffers(self, bakery_version=None, offer_urls=None):
         '''
         ApplicationOffers gets details about remote applications that match given URLs.
@@ -359,6 +387,34 @@ class ApplicationOffersFacade(Type):
         _params['bakery-version'] = bakery_version
         _params['offer-urls'] = offer_urls
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_DestroyOffers(self, force=None, offer_urls=None):
+        '''
+        DestroyOffers removes the offers specified by the given URLs, forcing if necessary.
+
+        force : bool
+        offer_urls : typing.Sequence[str]
+        Returns -> ErrorResults
+        '''
+        if force is not None and not isinstance(force, bool):
+            raise Exception("Expected force to be a bool, received: {}".format(type(force)))
+
+        if offer_urls is not None and not isinstance(offer_urls, (bytes, str, list)):
+            raise Exception("Expected offer_urls to be a Sequence, received: {}".format(type(offer_urls)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='DestroyOffers',
+                   version=5,
+                   params=_params)
+        _params['force'] = force
+        _params['offer-urls'] = offer_urls
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -392,6 +448,29 @@ class ApplicationOffersFacade(Type):
 
 
     @ReturnMapping(QueryApplicationOffersResultsV5)
+    def sync_FindApplicationOffers(self, filters=None):
+        '''
+        FindApplicationOffers gets details about remote applications that match given filter.
+
+        filters : typing.Sequence[~OfferFilter]
+        Returns -> QueryApplicationOffersResultsV5
+        '''
+        if filters is not None and not isinstance(filters, (bytes, str, list)):
+            raise Exception("Expected filters to be a Sequence, received: {}".format(type(filters)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='FindApplicationOffers',
+                   version=5,
+                   params=_params)
+        _params['Filters'] = filters
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(QueryApplicationOffersResultsV5)
     async def FindApplicationOffers(self, filters=None):
         '''
         FindApplicationOffers gets details about remote applications that match given filter.
@@ -410,6 +489,35 @@ class ApplicationOffersFacade(Type):
                    params=_params)
         _params['Filters'] = filters
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ConsumeOfferDetailsResults)
+    def sync_GetConsumeDetails(self, offer_urls=None, user_tag=None):
+        '''
+        GetConsumeDetails returns the details necessary to pass to another model
+        to allow the specified args user to consume the offers represented by the args URLs.
+
+        offer_urls : OfferURLs
+        user_tag : str
+        Returns -> ConsumeOfferDetailsResults
+        '''
+        if offer_urls is not None and not isinstance(offer_urls, (dict, OfferURLs)):
+            raise Exception("Expected offer_urls to be a OfferURLs, received: {}".format(type(offer_urls)))
+
+        if user_tag is not None and not isinstance(user_tag, (bytes, str)):
+            raise Exception("Expected user_tag to be a str, received: {}".format(type(user_tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='GetConsumeDetails',
+                   version=5,
+                   params=_params)
+        _params['offer-urls'] = offer_urls
+        _params['user-tag'] = user_tag
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -444,6 +552,30 @@ class ApplicationOffersFacade(Type):
 
 
     @ReturnMapping(QueryApplicationOffersResultsV5)
+    def sync_ListApplicationOffers(self, filters=None):
+        '''
+        ListApplicationOffers gets deployed details about application offers that match given filter.
+        The results contain details about the deployed applications such as connection count.
+
+        filters : typing.Sequence[~OfferFilter]
+        Returns -> QueryApplicationOffersResultsV5
+        '''
+        if filters is not None and not isinstance(filters, (bytes, str, list)):
+            raise Exception("Expected filters to be a Sequence, received: {}".format(type(filters)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='ListApplicationOffers',
+                   version=5,
+                   params=_params)
+        _params['Filters'] = filters
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(QueryApplicationOffersResultsV5)
     async def ListApplicationOffers(self, filters=None):
         '''
         ListApplicationOffers gets deployed details about application offers that match given filter.
@@ -463,6 +595,29 @@ class ApplicationOffersFacade(Type):
                    params=_params)
         _params['Filters'] = filters
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_ModifyOfferAccess(self, changes=None):
+        '''
+        ModifyOfferAccess changes the application offer access granted to users.
+
+        changes : typing.Sequence[~ModifyOfferAccess]
+        Returns -> ErrorResults
+        '''
+        if changes is not None and not isinstance(changes, (bytes, str, list)):
+            raise Exception("Expected changes to be a Sequence, received: {}".format(type(changes)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='ModifyOfferAccess',
+                   version=5,
+                   params=_params)
+        _params['changes'] = changes
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -491,6 +646,29 @@ class ApplicationOffersFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_Offer(self, offers=None):
+        '''
+        Offer makes application endpoints available for consumption at a specified URL.
+
+        offers : typing.Sequence[~AddApplicationOffer]
+        Returns -> ErrorResults
+        '''
+        if offers is not None and not isinstance(offers, (bytes, str, list)):
+            raise Exception("Expected offers to be a Sequence, received: {}".format(type(offers)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='Offer',
+                   version=5,
+                   params=_params)
+        _params['Offers'] = offers
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def Offer(self, offers=None):
         '''
         Offer makes application endpoints available for consumption at a specified URL.
@@ -509,6 +687,35 @@ class ApplicationOffersFacade(Type):
                    params=_params)
         _params['Offers'] = offers
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(RemoteApplicationInfoResults)
+    def sync_RemoteApplicationInfo(self, bakery_version=None, offer_urls=None):
+        '''
+        RemoteApplicationInfo returns information about the requested remote application.
+        This call currently has no client side API, only there for the Dashboard at this stage.
+
+        bakery_version : int
+        offer_urls : typing.Sequence[str]
+        Returns -> RemoteApplicationInfoResults
+        '''
+        if bakery_version is not None and not isinstance(bakery_version, int):
+            raise Exception("Expected bakery_version to be a int, received: {}".format(type(bakery_version)))
+
+        if offer_urls is not None and not isinstance(offer_urls, (bytes, str, list)):
+            raise Exception("Expected offer_urls to be a Sequence, received: {}".format(type(offer_urls)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='ApplicationOffers',
+                   request='RemoteApplicationInfo',
+                   version=5,
+                   params=_params)
+        _params['bakery-version'] = bakery_version
+        _params['offer-urls'] = offer_urls
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -828,6 +1035,27 @@ class MachinerFacade(Type):
     
 
     @ReturnMapping(StringsResult)
+    def sync_APIAddresses(self):
+        '''
+        APIAddresses returns the list of addresses used to connect to the API.
+
+
+        Returns -> StringsResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='APIAddresses',
+                   version=5,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(StringsResult)
     async def APIAddresses(self):
         '''
         APIAddresses returns the list of addresses used to connect to the API.
@@ -849,6 +1077,27 @@ class MachinerFacade(Type):
 
 
     @ReturnMapping(APIHostPortsResult)
+    def sync_APIHostPorts(self):
+        '''
+        APIHostPorts returns the API server addresses.
+
+
+        Returns -> APIHostPortsResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='APIHostPorts',
+                   version=5,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(APIHostPortsResult)
     async def APIHostPorts(self):
         '''
         APIHostPorts returns the API server addresses.
@@ -865,6 +1114,31 @@ class MachinerFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_EnsureDead(self, entities=None):
+        '''
+        EnsureDead calls EnsureDead on each given entity from state. It
+        will fail if the entity is not present. If it's Alive, nothing will
+        happen (see state/EnsureDead() for units or machines).
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='EnsureDead',
+                   version=5,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -895,6 +1169,29 @@ class MachinerFacade(Type):
 
 
     @ReturnMapping(JobsResults)
+    def sync_Jobs(self, entities=None):
+        '''
+        Jobs returns the jobs assigned to the given entities.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> JobsResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='Jobs',
+                   version=5,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(JobsResults)
     async def Jobs(self, entities=None):
         '''
         Jobs returns the jobs assigned to the given entities.
@@ -918,6 +1215,29 @@ class MachinerFacade(Type):
 
 
     @ReturnMapping(LifeResults)
+    def sync_Life(self, entities=None):
+        '''
+        Life returns the life status of every supplied entity, where available.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> LifeResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='Life',
+                   version=5,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(LifeResults)
     async def Life(self, entities=None):
         '''
         Life returns the life status of every supplied entity, where available.
@@ -936,6 +1256,30 @@ class MachinerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
+    def sync_RecordAgentStartInformation(self, args=None):
+        '''
+        RecordAgentStartInformation syncs the machine model with information
+        reported by a machine agent when it starts.
+
+        args : typing.Sequence[~RecordAgentStartInformationArg]
+        Returns -> ErrorResults
+        '''
+        if args is not None and not isinstance(args, (bytes, str, list)):
+            raise Exception("Expected args to be a Sequence, received: {}".format(type(args)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='RecordAgentStartInformation',
+                   version=5,
+                   params=_params)
+        _params['args'] = args
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -965,6 +1309,29 @@ class MachinerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_RecordAgentStartTime(self, entities=None):
+        '''
+        RecordAgentStartTime updates the agent start time field in the machine doc.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='RecordAgentStartTime',
+                   version=5,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def RecordAgentStartTime(self, entities=None):
         '''
         RecordAgentStartTime updates the agent start time field in the machine doc.
@@ -988,6 +1355,27 @@ class MachinerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_SetMachineAddresses(self, machine_addresses=None):
+        '''
+        machine_addresses : typing.Sequence[~MachineAddresses]
+        Returns -> ErrorResults
+        '''
+        if machine_addresses is not None and not isinstance(machine_addresses, (bytes, str, list)):
+            raise Exception("Expected machine_addresses to be a Sequence, received: {}".format(type(machine_addresses)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='SetMachineAddresses',
+                   version=5,
+                   params=_params)
+        _params['machine-addresses'] = machine_addresses
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def SetMachineAddresses(self, machine_addresses=None):
         '''
         machine_addresses : typing.Sequence[~MachineAddresses]
@@ -1004,6 +1392,37 @@ class MachinerFacade(Type):
                    params=_params)
         _params['machine-addresses'] = machine_addresses
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(None)
+    def sync_SetObservedNetworkConfig(self, config=None, tag=None):
+        '''
+        SetObservedNetworkConfig reads the network config for the machine
+        identified by the input args.
+        This config is merged with the new network config supplied in the
+        same args and updated if it has changed.
+
+        config : typing.Sequence[~NetworkConfig]
+        tag : str
+        Returns -> None
+        '''
+        if config is not None and not isinstance(config, (bytes, str, list)):
+            raise Exception("Expected config to be a Sequence, received: {}".format(type(config)))
+
+        if tag is not None and not isinstance(tag, (bytes, str)):
+            raise Exception("Expected tag to be a str, received: {}".format(type(tag)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='SetObservedNetworkConfig',
+                   version=5,
+                   params=_params)
+        _params['config'] = config
+        _params['tag'] = tag
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1040,6 +1459,29 @@ class MachinerFacade(Type):
 
 
     @ReturnMapping(ErrorResults)
+    def sync_SetStatus(self, entities=None):
+        '''
+        SetStatus sets the status of each given entity.
+
+        entities : typing.Sequence[~EntityStatusArgs]
+        Returns -> ErrorResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='SetStatus',
+                   version=5,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ErrorResults)
     async def SetStatus(self, entities=None):
         '''
         SetStatus sets the status of each given entity.
@@ -1063,6 +1505,29 @@ class MachinerFacade(Type):
 
 
     @ReturnMapping(NotifyWatchResults)
+    def sync_Watch(self, entities=None):
+        '''
+        Watch starts an NotifyWatcher for each given entity.
+
+        entities : typing.Sequence[~Entity]
+        Returns -> NotifyWatchResults
+        '''
+        if entities is not None and not isinstance(entities, (bytes, str, list)):
+            raise Exception("Expected entities to be a Sequence, received: {}".format(type(entities)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='Watch',
+                   version=5,
+                   params=_params)
+        _params['entities'] = entities
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResults)
     async def Watch(self, entities=None):
         '''
         Watch starts an NotifyWatcher for each given entity.
@@ -1081,6 +1546,27 @@ class MachinerFacade(Type):
                    params=_params)
         _params['entities'] = entities
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(NotifyWatchResult)
+    def sync_WatchAPIHostPorts(self):
+        '''
+        WatchAPIHostPorts watches the API server addresses.
+
+
+        Returns -> NotifyWatchResult
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Machiner',
+                   request='WatchAPIHostPorts',
+                   version=5,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1214,6 +1700,29 @@ class SubnetsFacade(Type):
     
 
     @ReturnMapping(ZoneResults)
+    def sync_AllZones(self):
+        '''
+        AllZones returns all availability zones known to Juju. If a
+        zone is unusable, unavailable, or deprecated the Available
+        field will be false.
+
+
+        Returns -> ZoneResults
+        '''
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Subnets',
+                   request='AllZones',
+                   version=5,
+                   params=_params)
+
+        reply = self.sync_rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ZoneResults)
     async def AllZones(self):
         '''
         AllZones returns all availability zones known to Juju. If a
@@ -1232,6 +1741,35 @@ class SubnetsFacade(Type):
                    params=_params)
 
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(ListSubnetsResults)
+    def sync_ListSubnets(self, space_tag=None, zone=None):
+        '''
+        ListSubnets returns the matching subnets after applying
+        optional filters.
+
+        space_tag : str
+        zone : str
+        Returns -> ListSubnetsResults
+        '''
+        if space_tag is not None and not isinstance(space_tag, (bytes, str)):
+            raise Exception("Expected space_tag to be a str, received: {}".format(type(space_tag)))
+
+        if zone is not None and not isinstance(zone, (bytes, str)):
+            raise Exception("Expected zone to be a str, received: {}".format(type(zone)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Subnets',
+                   request='ListSubnets',
+                   version=5,
+                   params=_params)
+        _params['space-tag'] = space_tag
+        _params['zone'] = zone
+        reply = self.sync_rpc(msg)
         return reply
 
 
@@ -1261,6 +1799,29 @@ class SubnetsFacade(Type):
         _params['space-tag'] = space_tag
         _params['zone'] = zone
         reply = await self.rpc(msg)
+        return reply
+
+
+
+    @ReturnMapping(SubnetsResults)
+    def sync_SubnetsByCIDR(self, cidrs=None):
+        '''
+        SubnetsByCIDR returns the collection of subnets matching each CIDR in the input.
+
+        cidrs : typing.Sequence[str]
+        Returns -> SubnetsResults
+        '''
+        if cidrs is not None and not isinstance(cidrs, (bytes, str, list)):
+            raise Exception("Expected cidrs to be a Sequence, received: {}".format(type(cidrs)))
+
+        # map input types to rpc msg
+        _params = dict()
+        msg = dict(type='Subnets',
+                   request='SubnetsByCIDR',
+                   version=5,
+                   params=_params)
+        _params['cidrs'] = cidrs
+        reply = self.sync_rpc(msg)
         return reply
 
 
