@@ -44,6 +44,24 @@ def lookup_facade(name, version):
 
 class TypeFactory:
     @classmethod
+    def from_sync_connection(cls, connection):
+        facade_name = cls.__name__
+        if not facade_name.endswith('Facade'):
+           raise TypeError('Unexpected class name: {}'.format(facade_name))
+        facade_name = facade_name[:-len('Facade')]
+        version = connection.facades.get(facade_name)
+        if version is None:
+            raise Exception('No facade {} in facades {}'.format(facade_name,
+                                                                connection.facades))
+
+        c = lookup_facade(cls.__name__, version)
+        c = c()
+        c.sync_connect(connection)
+
+        return c
+
+
+    @classmethod
     def from_connection(cls, connection):
         """
         Given a connected Connection object, return an initialized and

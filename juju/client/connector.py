@@ -51,6 +51,10 @@ class Connector:
         """Report whether there is a currently connected controller or not"""
         return self._connection is not None
 
+    def sync_connection(self):
+        # FIXME cache it maybe?
+        return Connection.sync_connect()
+
     def connection(self):
         """Return the current connection; raises an exception if there
         is no current connection."""
@@ -97,6 +101,7 @@ class Connector:
             if not ({'username', 'password'}.issubset(kwargs)):
                 required = {'username', 'password'}.difference(kwargs)
                 raise ValueError(f'Some authentication parameters are required : {",".join(required)}')
+            # FIXME split this up...
             self._connection = await Connection.connect(**kwargs)
 
         # Check if we support the target controller

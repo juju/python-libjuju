@@ -597,6 +597,9 @@ class Model:
         if the Model is disconnected"""
         return self._connector.connection()
 
+    def sync_connection(self):
+        return self._connector.sync_connection()
+
     async def get_controller(self):
         """Return a Controller instance for the currently connected model.
         :return Controller:

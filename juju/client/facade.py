@@ -10,6 +10,7 @@
 import argparse
 import builtins
 import functools
+import inspect
 import json
 import keyword
 import pprint
@@ -72,6 +73,24 @@ def lookup_facade(name, version):
 
 TYPE_FACTORY = '''
 class TypeFactory:
+    @classmethod
+    def from_sync_connection(cls, connection):
+        facade_name = cls.__name__
+        if not facade_name.endswith('Facade'):
+           raise TypeError('Unexpected class name: {}'.format(facade_name))
+        facade_name = facade_name[:-len('Facade')]
+        version = connection.facades.get(facade_name)
+        if version is None:
+            raise Exception('No facade {} in facades {}'.format(facade_name,
+                                                                connection.facades))
+
+        c = lookup_facade(cls.__name__, version)
+        c = c()
+        c.sync_connect(connection)
+
+        return c
+
+
     @classmethod
     def from_connection(cls, connection):
         """
@@ -489,8 +508,18 @@ def ReturnMapping(cls):
     def decorator(f):
         @functools.wraps(f)
         async def wrapper(*args, **kwargs):
-            nonlocal cls
             reply = await f(*args, **kwargs)
+            return tail(reply)
+
+        @functools.wraps(f)
+        def sync_wrapper(*args, **kwargs):
+            reply = f(*args, **kwargs)
+            return tail(reply)
+
+        def tail(reply):
+            # FIXME rework this
+            nonlocal cls
+
             if cls is None:
                 return reply
             if 'error' in reply:
@@ -512,7 +541,7 @@ def ReturnMapping(cls):
                 result = cls.from_json(reply['response'])
 
             return result
-        return wrapper
+        return wrapper if inspect.iscoroutinefunction(f) else sync_wrapper
     return decorator
 
 
@@ -686,7 +715,13 @@ class Type:
     _toPy: dict[str, str]
     _toSchema: dict[str, str]
 
+    # FIXME a bit ugly, let's think about this later
+    def sync_connect(self, connection):
+        self.sync_connection = connection
+        self.connection = None
+
     def connect(self, connection):
+        self.sync_connection = None
         self.connection = connection
 
     def __repr__(self):
@@ -698,9 +733,11 @@ class Type:
 
         return self.__dict__ == other.__dict__
 
+    def sync_rpc(self, msg):
+        return self.sync_connection.rpc(msg, encoder=TypeEncoder)
+
     async def rpc(self, msg):
-        result = await self.connection.rpc(msg, encoder=TypeEncoder)
-        return result
+        return await self.connection.rpc(msg, encoder=TypeEncoder)
 
     @classmethod
     def from_json(cls, data):
