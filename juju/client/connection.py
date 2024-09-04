@@ -5,6 +5,7 @@ import base64
 import itertools
 import json
 import logging
+import typing
 import ssl
 import urllib.request
 import weakref
@@ -242,6 +243,140 @@ class Connection:
     MAX_FRAME_SIZE = 2**22
     "Maximum size for a single frame.  Defaults to 4MB."
     _count = itertools.count()
+    uuid: str|None
+    bakery_client: typing.Any
+    usertag: str|None
+    password: str|None
+    name: str
+    __request_id__: int
+    endpoints: list[tuple[str, str]]|None  # FIXME seems to always be None
+    is_debug_log_connection: bool
+    monitor: Monitor
+    proxy: typing.Any  # is a library thing?
+
+    @classmethod
+    def sync_connect(
+            cls,
+            endpoint: list[str]|str|None = None,
+            uuid=None,
+            username=None,
+            password=None,
+            cacert=None,
+            bakery_client=None,
+            max_frame_size=None,
+            retries=3,
+            retry_backoff=10,
+            specified_facades=None,
+            proxy=None,
+            debug_log_conn=None,
+            debug_log_params={}
+    ):
+        """Connect to the websocket, synchronously.
+
+        If uuid is None, the connection will be to the controller. Otherwise it
+        will be to the model.
+
+        :param str endpoint: The hostname:port of the controller to connect to (or list of strings).
+        :param str uuid: The model UUID to connect to (None for a
+            controller-only connection).
+        :param str username: The username for controller-local users (or None
+            to use macaroon-based login.)
+        :param str password: The password for controller-local users.
+        :param str cacert: The CA certificate of the controller
+            (PEM formatted).
+        :param httpbakery.Client bakery_client: The macaroon bakery client to
+            to use when performing macaroon-based login. Macaroon tokens
+            acquired when logging will be saved to bakery_client.cookies.
+            If this is None, a default bakery_client will be used.
+        :param int max_frame_size: The maximum websocket frame size to allow.
+        :param int retries: When connecting or reconnecting, and all endpoints
+            fail, how many times to retry the connection before giving up.
+        :param int retry_backoff: Number of seconds to increase the wait
+            between connection retry attempts (a backoff of 10 with 3 retries
+            would wait 10s, 20s, and 30s).
+        :param specified_facades: Define a series of facade versions you wish to override
+            to prevent using the conservative client pinning with in the client.
+        :param TextIOWrapper debug_log_conn: target if this is a debug log connection
+        :param dict debug_log_params: filtering parameters for the debug-log output
+        """
+        # FIXME refactor logic shared with async connect()
+        self = cls()
+        if endpoint is None:
+            raise ValueError('no endpoint provided')
+        if not isinstance(endpoint, str) and not isinstance(endpoint, list):
+            raise TypeError("Endpoint should be either str or list")
+        self.uuid = uuid
+        if bakery_client is None:
+            bakery_client = httpbakery.Client()
+        self.bakery_client = bakery_client
+        if username and '@' in username and not username.endswith('@local'):
+            # We're trying to log in as an external user - we need to use
+            # macaroon authentication with no username or password.
+            if password is not None:
+                raise errors.JujuAuthError('cannot log in as external '
+                                           'user with a password')
+            username = None
+        self.usertag = tag.user(username)
+        self.password = password
+
+        self.name = f"{cls.__name__}-{next(cls._count)}"
+        self.__request_id__ = 0
+
+        # The following instance variables are initialized by the
+        # _connect_with_redirect method, but create them here
+        # as a reminder that they will exist.
+        self.addr = None
+        self._ws = None
+        self.endpoint = None
+        self.endpoints = None
+        self.cacert = None
+        self.info = None
+
+        assert debug_log_conn is None, "FIXME not implemented"
+        self.debug_log_target = debug_log_conn
+        self.is_debug_log_connection = debug_log_conn is not None
+        self.debug_log_params = debug_log_params
+        self.debug_log_shown_lines = 0  # number of lines
+
+        # Create that _Task objects but don't start the tasks yet.
+        self._pinger_task = None
+        self._receiver_task = None
+        self._debug_log_task = None
+
+        self._retries = retries
+        self._retry_backoff = retry_backoff
+
+        self.facades = {}
+        self.specified_facades = specified_facades or {}
+
+        self.messages = IdQueue()
+        self.monitor = Monitor(connection=self)
+        if max_frame_size is None:
+            max_frame_size = self.MAX_FRAME_SIZE
+        self.max_frame_size = max_frame_size
+
+        self.proxy = proxy
+        if self.proxy is not None:
+            self.proxy.connect()
+
+        assert endpoint is not None
+        _endpoints: list[tuple[str, str|None]] = [(endpoint, cacert)] if isinstance(endpoint, str) else [(e, cacert) for e in endpoint]
+        lastError: Exception|None = None
+        for _ep in _endpoints:
+            try:
+                self._sync_connect(*_ep, with_redirect=not self.is_debug_log_connection)
+                return self
+            except ssl.SSLError as e:
+                lastError = e
+                continue
+            except OSError as e:
+                logging.debug(
+                    "Cannot access endpoint {}: {}".format(_ep, e.strerror))
+                lastError = e
+                continue
+        if lastError is not None:
+            raise lastError
+        raise Exception("Unable to connect to websocket")
 
     @classmethod
     async def connect(
@@ -375,7 +510,7 @@ class Connection:
         return self._ws
 
     @property
-    def username(self):
+    def username(self) -> str|None:
         if not self.usertag:
             return None
         return self.usertag[len('user-'):]
@@ -628,6 +763,51 @@ class Connection:
             log.debug('ping failed because of closed connection')
             pass
 
+    def sync_rpc(self, msg: dict, encoder=None) -> dict:  # FIXME encoder is always the same thing
+        # FIXME need separate rpc flavours:
+        # - to establish the connection, aka login
+        # - for regular API calls
+        self.__request_id__ += 1
+        msg = {**msg, "request-id": self.__request_id__}
+        if 'params' not in msg:
+            msg['params'] = {}
+        if "version" not in msg:
+            msg['version'] = self.facades[msg['type']]
+        outgoing = json.dumps(msg, indent=2, cls=encoder)
+        self._sync_ws.send(outgoing)
+        with open("/tmp/ws-log.jsonl", "a") as f:
+            # Top-level key "request": <str> means outgoing message
+            f.write(json.dumps({**msg, "sync": True, "_connection": self.name, "_addr": self.addr}, cls=encoder) + "\n")
+
+        blob = self._sync_ws.recv()
+        result = json.loads(blob)
+        assert isinstance(result, dict)
+
+        if 'error' in result:
+            # API Error Response
+            raise errors.JujuAPIError(result)
+
+        assert "response" in result
+
+        if 'results' in result['response']:
+            # Check for errors in a result list.
+            # TODO This loses the results that might have succeeded.
+            # Perhaps JujuError should return all the results including
+            # errors, or perhaps a keyword parameter to the rpc method
+            # could be added to trigger this behaviour.
+            err_results = []
+            for res in result['response']['results'] or []:
+                if res.get('error', {}).get('message'):
+                    err_results.append(res['error']['message'])
+            if err_results:
+                raise errors.JujuError(err_results)
+
+        elif result['response'].get('error', {}).get('message'):
+            raise errors.JujuError(result['response']['error']['message'])
+
+        return result
+
+
     async def rpc(self, msg, encoder=None):
         '''Make an RPC to the API. The message is encoded as JSON
         using the given encoder if any.
@@ -804,6 +984,39 @@ class Connection:
                 if not self._pinger_task:
                     log.debug('reconnect: scheduling a pinger task')
                     self._pinger_task = jasyncio.create_task(self._pinger(), name="Task_Pinger")
+
+    def _sync_connect(self, endpoint: str, cacert: str|None, *, with_redirect: bool):
+        # make raw connection
+        if self.uuid:
+            url = "wss://{}/model/{}/api".format(endpoint, self.uuid)
+        else:
+            url = "wss://{}/api".format(endpoint)
+        # login flow
+        params = {
+            'client-version': CLIENT_VERSION,
+            'auth-tag': self.usertag,
+        }
+        if self.password:
+            params['credentials'] = self.password
+        else:
+            raise NotImplementedError("FIXME support macaroons")
+
+        try:
+            result = self.sync_rpc({
+                "type": "Admin",
+                "request": "Login",
+                "version": 3,
+                "params": params,
+            })
+        except errors.JujuAPIError as e:
+            if e.error_code != 'redirection required':
+                raise NotImplementedError("FIXME macaroons")
+            raise
+
+        assert not result.get["dischange-required"], "Macaroons are not implemented in the sync path yet"
+        self.info = result
+        # FIXME add the Login/redirect machinery
+        self._build_facades(result.get('facades', {}))
 
     async def _connect(self, endpoints):
         if len(endpoints) == 0:
