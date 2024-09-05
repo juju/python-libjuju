@@ -1,9 +1,9 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
+import asyncio
 import logging
 from pathlib import Path
-import asyncio
 
 import pytest
 
@@ -25,7 +25,7 @@ from ..utils import INTEGRATION_TEST_DIR
 async def test_action():
     async with base.CleanModel() as model:
         app = await model.deploy('juju-qa-test')
-        await jasyncio.sleep(10)
+        await asyncio.sleep(10)
         actions = await app.get_actions(schema=True)
         assert 'fortune' in actions.keys(), 'mis"fortune" in charm actions'
 

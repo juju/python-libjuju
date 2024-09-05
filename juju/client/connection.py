@@ -1,6 +1,7 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
+import asyncio
 import base64
 import itertools
 import json
@@ -756,7 +757,7 @@ class Connection:
                     log=log)
                 if self.monitor.close_called.is_set():
                     break
-                await jasyncio.sleep(10)
+                await asyncio.sleep(10)
         except jasyncio.CancelledError:
             log.debug('Pinger: Cancelled')
             pass
@@ -1022,12 +1023,12 @@ class Connection:
         self._build_facades(result.get('facades', {}))
 
     async def _connect(self, endpoints):
-        if len(endpoints) == 0:
+        if not endpoints:
             raise errors.JujuConnectionError('no endpoints to connect to')
 
         async def _try_endpoint(endpoint, cacert, delay):
             if delay:
-                await jasyncio.sleep(delay)
+                await asyncio.sleep(delay)
             return await self._open(endpoint, cacert)
 
         # Try all endpoints in parallel, with slight increasing delay (+100ms
@@ -1051,7 +1052,7 @@ class Connection:
                               'attempt {} of {}'.format(_endpoints_str,
                                                         attempt + 1,
                                                         self._retries + 1))
-                    await jasyncio.sleep((attempt + 1) * self._retry_backoff)
+                    await asyncio.sleep((attempt + 1) * self._retry_backoff)
                     continue
                 else:
                     raise errors.JujuConnectionError(

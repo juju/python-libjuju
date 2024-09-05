@@ -18,7 +18,7 @@ import logging
 ROOT_LOGGER = logging.getLogger()
 
 from asyncio import Event, TimeoutError, ensure_future, \
-    gather, sleep, wait_for, create_subprocess_exec, subprocess, \
+    gather, wait_for, create_subprocess_exec, subprocess, \
     wait, FIRST_COMPLETED, Lock, as_completed, new_event_loop, \
     get_event_loop_policy, CancelledError, get_running_loop, \
     create_task, ALL_COMPLETED, all_tasks, current_task, shield     # noqa

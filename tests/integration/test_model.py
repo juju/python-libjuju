@@ -1,6 +1,7 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
+import asyncio
 import json
 import os
 import random
@@ -1229,7 +1230,7 @@ async def test_model_attach_storage_at_deploy():
         storage_id = ret[0]
 
         await unit.detach_storage(storage_id, force=True)
-        await jasyncio.sleep(10)
+        await asyncio.sleep(10)
 
         storages1 = await model.list_storage()
         assert any([storage_id in s['storage-tag'] for s in storages1])
@@ -1237,7 +1238,7 @@ async def test_model_attach_storage_at_deploy():
         # juju remove-application
         # actually removes the storage even though the destroy_storage=false
         await app.destroy(destroy_storage=False)
-        await jasyncio.sleep(10)
+        await asyncio.sleep(10)
 
         storages2 = await model.list_storage()
         assert any([storage_id in s['storage-tag'] for s in storages2])
@@ -1258,14 +1259,14 @@ async def test_detach_storage():
         unit = app.units[0]
         storage_ids = await unit.add_storage("pgdata")
         storage_id = storage_ids[0]
-        await jasyncio.sleep(5)
+        await asyncio.sleep(5)
 
         _storage_details_1 = await model.show_storage_details(storage_id)
         storage_details_1 = _storage_details_1[0]
         assert 'unit-postgresql-0' in storage_details_1['attachments']
 
         await unit.detach_storage(storage_id, force=True)
-        await jasyncio.sleep(20)
+        await asyncio.sleep(20)
 
         _storage_details_2 = await model.show_storage_details(storage_id)
         storage_details_2 = _storage_details_2[0]
@@ -1274,7 +1275,7 @@ async def test_detach_storage():
 
         # remove_storage
         await model.remove_storage(storage_id, force=True)
-        await jasyncio.sleep(10)
+        await asyncio.sleep(10)
         storages = await model.list_storage()
         assert all([storage_id not in s['storage-tag'] for s in storages])
 
@@ -1289,7 +1290,7 @@ async def test_add_and_list_storage():
         # All we need is to make sure a unit is up, doesn't even need to
         # be in 'active' or 'idle', i.e.
         # await model.wait_for_idle(status="waiting", wait_for_exact_units=1)
-        await jasyncio.sleep(5)
+        await asyncio.sleep(5)
         unit = app.units[0]
         await unit.add_storage("pgdata", size=512)
         storages = await model.list_storage()
@@ -1311,6 +1312,6 @@ async def test_storage_pools_on_lxd():
         assert "test-pool" in [p['name'] for p in pools]
 
         await model.remove_storage_pool("test-pool")
-        await jasyncio.sleep(5)
+        await asyncio.sleep(5)
         pools = await model.list_storage_pools()
         assert "test-pool" not in [p['name'] for p in pools]

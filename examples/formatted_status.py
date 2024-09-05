@@ -6,6 +6,7 @@ This example demonstrates how to obtain a formatted full status
 description. For a similar solution using the FullStatus object
 check examples/fullstatus.py
 """
+import asyncio
 from juju import jasyncio
 import logging
 import sys
@@ -30,7 +31,7 @@ async def main():
         channel='stable',
     )
 
-    await jasyncio.sleep(10)
+    await asyncio.sleep(10)
     tmp = tempfile.NamedTemporaryFile(delete=False)
     LOG.info('status dumped to %s', tmp.name)
     with open(tmp.name, 'w') as f:
@@ -40,7 +41,7 @@ async def main():
             # await formatted_status(model, target=sys.stdout)
             await formatted_status(model, target=f)
             f.write('-----------\n')
-            await jasyncio.sleep(1)
+            await asyncio.sleep(1)
     await application.remove()
     await model.disconnect()
 

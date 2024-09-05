@@ -1,6 +1,7 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
+import asyncio
 import http
 import logging
 import socket
@@ -48,7 +49,7 @@ async def test_monitor_catches_error():
                 await conn._ws.close()  # this could be racy with reconnect
                 # if auto-reconnect is not disabled by lock, force this
                 # test to fail by deferring to the reconnect task via sleep
-                await jasyncio.sleep(0.1)
+                await asyncio.sleep(0.1)
                 assert conn.monitor.status == 'error'
         finally:
             await conn.close()
@@ -76,7 +77,7 @@ async def test_reconnect():
         kwargs = model.connection().connect_params()
         conn = await Connection.connect(**kwargs)
         try:
-            await jasyncio.sleep(0.1)
+            await asyncio.sleep(0.1)
             assert conn.is_open
             await conn._ws.close()
             assert not conn.is_open
@@ -202,7 +203,7 @@ class RedirectServer:
                         logger.debug('server: started')
                         while not self._stop.is_set():
                             await run_with_interrupt(
-                                jasyncio.sleep(1),
+                                asyncio.sleep(1),
                                 self._stop)
                             logger.debug('server: tick')
                         logger.debug('server: stopping')

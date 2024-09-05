@@ -1,6 +1,7 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
+import asyncio
 import ipaddress
 import logging
 import typing
@@ -148,7 +149,7 @@ class Machine(model.ModelEntity):
             await process.wait()
             if process.returncode == 0:
                 break
-            await jasyncio.sleep(retry_backoff)
+            await asyncio.sleep(retry_backoff)
         if process.returncode != 0:
             raise JujuError(f"command failed after {retries} attempts: {cmd}")
 
@@ -193,7 +194,7 @@ class Machine(model.ModelEntity):
             stdout, stderr = await process.communicate()
             if process.returncode == 0:
                 break
-            await jasyncio.sleep(retry_backoff)
+            await asyncio.sleep(retry_backoff)
         if process.returncode != 0:
             raise JujuError(f"command failed: {cmd} after {retries} attempts, with {stderr.decode()}")
         # stdout is a bytes-like object, returning a string might be more useful

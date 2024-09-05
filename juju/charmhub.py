@@ -1,6 +1,7 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
+import asyncio
 from .client import client
 from .errors import JujuError
 from juju import jasyncio
@@ -22,7 +23,7 @@ class CharmHub:
             _response = requests.get(url)
             if _response.status_code == 200:
                 return _response
-            await jasyncio.sleep(5)
+            await asyncio.sleep(5)
         raise JujuError("Got {} from {}".format(_response.status_code, url))
 
     async def get_charm_id(self, charm_name):

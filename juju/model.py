@@ -1,6 +1,7 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
+import asyncio
 import base64
 import collections
 import hashlib
@@ -2424,7 +2425,7 @@ class Model:
                 if action_output.results[0].status in ('completed', 'failed'):
                     return
                 else:
-                    await jasyncio.sleep(1)
+                    await asyncio.sleep(1)
         await jasyncio.wait_for(
             _wait_for_action_status(),
             timeout=wait)
@@ -2974,7 +2975,7 @@ class Model:
             if last_log_time is None or datetime.now() - last_log_time > log_interval:
                 log.info("Waiting for model:\n  " + busy)
                 last_log_time = datetime.now()
-            await jasyncio.sleep(check_freq)
+            await asyncio.sleep(check_freq)
 
 
 def _create_consume_args(offer, macaroon, controller_info):
