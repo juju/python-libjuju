@@ -253,6 +253,9 @@ class Connection:
     is_debug_log_connection: bool
     monitor: Monitor
     proxy: typing.Any  # is a library thing?
+    max_frame_size: int
+    _retries: int
+    _retry_backoff: float
 
     @classmethod
     def sync_connect(
@@ -1057,8 +1060,12 @@ class Connection:
             # only executed if inner loop's else did not continue
             # (i.e., inner loop did break due to successful connection)
             break
+        else:
+            assert False  # impossible, work around https://github.com/microsoft/pyright/issues/8791
+
         for task in tasks:
             task.cancel()
+
         self._ws = result[0]
         self.addr = result[1]
         self.endpoint = result[2]
