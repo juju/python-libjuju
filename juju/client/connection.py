@@ -16,6 +16,7 @@ from dateutil.parser import parse
 import macaroonbakery.bakery as bakery
 import macaroonbakery.httpbakery as httpbakery
 import websockets
+import websockets.sync.client
 from juju import errors, tag, utils, jasyncio
 from juju.client import client
 from juju.utils import IdQueue
@@ -995,6 +996,20 @@ class Connection:
             url = "wss://{}/model/{}/api".format(endpoint, self.uuid)
         else:
             url = "wss://{}/api".format(endpoint)
+
+        server_hostname = None
+        sock = None
+        if self.proxy is not None:
+            sock = self.proxy.socket()
+            server_hostname = "juju-app"
+
+        self._sync_ws = websockets.sync.client.connect(
+                url,
+                ssl=self._get_ssl(cacert),
+                max_size=self.max_frame_size,
+                server_hostname=server_hostname,
+                sock=sock,
+                )
         # login flow
         params = {
             'client-version': CLIENT_VERSION,

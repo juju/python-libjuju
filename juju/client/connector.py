@@ -51,9 +51,32 @@ class Connector:
         """Report whether there is a currently connected controller or not"""
         return self._connection is not None
 
-    def sync_connection(self):
+    def sync_connection(self, *, model_uuid: str|None = None, **kwargs):
+        # kwargs.setdefault("max_frame_size", self.max_frame_size)
+        # kwargs.setdefault("bakery_client", self.bakery_client)
+        # if "macaroons" in kwargs:
+            # raise NotImplementedError("FIXME macaroons flow")
+        # if "debug_log_conn" in kwargs:
+            # raise NotImplementedError("FIXME debug log connection flow")
+        # if not model_uuid:
+            # raise NotImplementedError("FIXME implement model-less sync connection")
+
+        # account = kwargs.pop('account', {})
+
+        # # Prioritize the username and password that user provided
+        # # If not enough, try to patch it with info from accounts.yaml
+        # if 'username' not in kwargs and account.get('user'):
+            # kwargs.update(username=account.get('user'))
+        # if 'password' not in kwargs and account.get('password'):
+            # kwargs.update(password=account.get('password'))
+
+        # if not ({'username', 'password'}.issubset(kwargs)):
+            # required = {'username', 'password'}.difference(kwargs)
+            # raise ValueError(f'Some authentication parameters are required : {",".join(required)}')
         # FIXME cache it maybe?
-        return Connection.sync_connect()
+        # FIXME borrowing computed connection bits from the async method
+        return Connection.sync_connect(**self._fixme_connect_kwargs)
+        # FIXME juju major version check, maybe
 
     def connection(self):
         """Return the current connection; raises an exception if there
@@ -102,6 +125,7 @@ class Connector:
                 required = {'username', 'password'}.difference(kwargs)
                 raise ValueError(f'Some authentication parameters are required : {",".join(required)}')
             # FIXME split this up...
+            self._fixme_connect_kwargs = {**kwargs}
             self._connection = await Connection.connect(**kwargs)
 
         # Check if we support the target controller
