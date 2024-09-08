@@ -599,7 +599,10 @@ class Model:
         return self._connector.connection()
 
     def sync_connection(self):
-        return self._connector.sync_connection()
+        tmp = self._connector.sync_connection()
+        # FIXME
+        tmp.facades = self._connector.connection().facades
+        return tmp
 
     async def get_controller(self):
         """Return a Controller instance for the currently connected model.
