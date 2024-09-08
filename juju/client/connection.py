@@ -1035,7 +1035,7 @@ class Connection:
                 raise NotImplementedError("FIXME macaroons")
             raise
 
-        assert not result.get["dischange-required"], "Macaroons are not implemented in the sync path yet"
+        assert not result.get("dischange-required"), "Macaroons are not implemented in the sync path yet"
         self.info = result
         # FIXME add the Login/redirect machinery
         self._build_facades(result.get('facades', {}))
