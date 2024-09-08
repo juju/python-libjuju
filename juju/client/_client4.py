@@ -127,7 +127,7 @@ class AllModelWatcherFacade(Type):
         reply = await self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
-    async def sync_rpc(self, msg):
+    def sync_rpc(self, msg):
         '''
         Patch rpc method to add Id.
         '''
