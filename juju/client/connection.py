@@ -999,8 +999,10 @@ class Connection:
 
         server_hostname = None
         sock = None
+        unix = False
         if self.proxy is not None:
             sock = self.proxy.socket()
+            unix = True
             server_hostname = "juju-app"
 
         self._sync_ws = websockets.sync.client.connect(
@@ -1009,6 +1011,7 @@ class Connection:
                 max_size=self.max_frame_size,
                 server_hostname=server_hostname,
                 sock=sock,
+                unix=unix,
                 )
         # login flow
         params = {
