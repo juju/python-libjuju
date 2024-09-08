@@ -714,6 +714,9 @@ class TypeEncoder(json.JSONEncoder):
 class Type:
     _toPy: dict[str, str]
     _toSchema: dict[str, str]
+    connection: "juju.client.Connection"
+    sync_connection: "juju.client.Connection"
+
 
     # FIXME a bit ugly, let's think about this later
     def sync_connect(self, connection):
@@ -733,10 +736,10 @@ class Type:
 
         return self.__dict__ == other.__dict__
 
-    def sync_rpc(self, msg):
-        return self.sync_connection.rpc(msg, encoder=TypeEncoder)
+    def sync_rpc(self, msg: dict) -> dict:
+        return self.sync_connection.sync_rpc(msg, encoder=TypeEncoder)
 
-    async def rpc(self, msg):
+    async def rpc(self, msg: dict) -> dict:
         return await self.connection.rpc(msg, encoder=TypeEncoder)
 
     @classmethod
