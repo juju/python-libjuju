@@ -11323,7 +11323,7 @@ class MigrationStatusWatcherFacade(Type):
 
 
 
-    async def rpc(self, msg):
+    async def rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -11335,7 +11335,7 @@ class MigrationStatusWatcherFacade(Type):
         reply = await self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
-    def sync_rpc(self, msg):
+    def sync_rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -11344,7 +11344,7 @@ class MigrationStatusWatcherFacade(Type):
         msg['Id'] = id
 
         from .facade import TypeEncoder
-        return self.sync_connection.rpc(msg, encoder=TypeEncoder)
+        return self.sync_connection.sync_rpc(msg, encoder=TypeEncoder)
 
 
 
@@ -12184,7 +12184,7 @@ class ModelSummaryWatcherFacade(Type):
 
 
 
-    async def rpc(self, msg):
+    async def rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -12196,7 +12196,7 @@ class ModelSummaryWatcherFacade(Type):
         reply = await self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
-    def sync_rpc(self, msg):
+    def sync_rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -12205,7 +12205,7 @@ class ModelSummaryWatcherFacade(Type):
         msg['Id'] = id
 
         from .facade import TypeEncoder
-        return self.sync_connection.rpc(msg, encoder=TypeEncoder)
+        return self.sync_connection.sync_rpc(msg, encoder=TypeEncoder)
 
 
 
@@ -12502,7 +12502,7 @@ class NotifyWatcherFacade(Type):
 
 
 
-    async def rpc(self, msg):
+    async def rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -12514,7 +12514,7 @@ class NotifyWatcherFacade(Type):
         reply = await self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
-    def sync_rpc(self, msg):
+    def sync_rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -12523,7 +12523,7 @@ class NotifyWatcherFacade(Type):
         msg['Id'] = id
 
         from .facade import TypeEncoder
-        return self.sync_connection.rpc(msg, encoder=TypeEncoder)
+        return self.sync_connection.sync_rpc(msg, encoder=TypeEncoder)
 
 
 
@@ -12662,7 +12662,7 @@ class OfferStatusWatcherFacade(Type):
 
 
 
-    async def rpc(self, msg):
+    async def rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -12674,7 +12674,7 @@ class OfferStatusWatcherFacade(Type):
         reply = await self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
-    def sync_rpc(self, msg):
+    def sync_rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -12683,7 +12683,7 @@ class OfferStatusWatcherFacade(Type):
         msg['Id'] = id
 
         from .facade import TypeEncoder
-        return self.sync_connection.rpc(msg, encoder=TypeEncoder)
+        return self.sync_connection.sync_rpc(msg, encoder=TypeEncoder)
 
 
 
@@ -13338,7 +13338,7 @@ class RelationStatusWatcherFacade(Type):
 
 
 
-    async def rpc(self, msg):
+    async def rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -13350,7 +13350,7 @@ class RelationStatusWatcherFacade(Type):
         reply = await self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
-    def sync_rpc(self, msg):
+    def sync_rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -13359,7 +13359,7 @@ class RelationStatusWatcherFacade(Type):
         msg['Id'] = id
 
         from .facade import TypeEncoder
-        return self.sync_connection.rpc(msg, encoder=TypeEncoder)
+        return self.sync_connection.sync_rpc(msg, encoder=TypeEncoder)
 
 
 
@@ -13495,7 +13495,7 @@ class RelationUnitsWatcherFacade(Type):
 
 
 
-    async def rpc(self, msg):
+    async def rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -13507,7 +13507,7 @@ class RelationUnitsWatcherFacade(Type):
         reply = await self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
-    def sync_rpc(self, msg):
+    def sync_rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -13516,7 +13516,7 @@ class RelationUnitsWatcherFacade(Type):
         msg['Id'] = id
 
         from .facade import TypeEncoder
-        return self.sync_connection.rpc(msg, encoder=TypeEncoder)
+        return self.sync_connection.sync_rpc(msg, encoder=TypeEncoder)
 
 
 
@@ -13656,7 +13656,7 @@ class RemoteRelationWatcherFacade(Type):
 
 
 
-    async def rpc(self, msg):
+    async def rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -13668,7 +13668,7 @@ class RemoteRelationWatcherFacade(Type):
         reply = await self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
-    def sync_rpc(self, msg):
+    def sync_rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -13677,7 +13677,7 @@ class RemoteRelationWatcherFacade(Type):
         msg['Id'] = id
 
         from .facade import TypeEncoder
-        return self.sync_connection.rpc(msg, encoder=TypeEncoder)
+        return self.sync_connection.sync_rpc(msg, encoder=TypeEncoder)
 
 
 
@@ -14600,7 +14600,7 @@ class SecretBackendsRotateWatcherFacade(Type):
 
 
 
-    async def rpc(self, msg):
+    async def rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -14612,7 +14612,7 @@ class SecretBackendsRotateWatcherFacade(Type):
         reply = await self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
-    def sync_rpc(self, msg):
+    def sync_rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -14621,7 +14621,7 @@ class SecretBackendsRotateWatcherFacade(Type):
         msg['Id'] = id
 
         from .facade import TypeEncoder
-        return self.sync_connection.rpc(msg, encoder=TypeEncoder)
+        return self.sync_connection.sync_rpc(msg, encoder=TypeEncoder)
 
 
 
@@ -16405,7 +16405,7 @@ class SecretsRevisionWatcherFacade(Type):
 
 
 
-    async def rpc(self, msg):
+    async def rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -16417,7 +16417,7 @@ class SecretsRevisionWatcherFacade(Type):
         reply = await self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
-    def sync_rpc(self, msg):
+    def sync_rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -16426,7 +16426,7 @@ class SecretsRevisionWatcherFacade(Type):
         msg['Id'] = id
 
         from .facade import TypeEncoder
-        return self.sync_connection.rpc(msg, encoder=TypeEncoder)
+        return self.sync_connection.sync_rpc(msg, encoder=TypeEncoder)
 
 
 
@@ -16558,7 +16558,7 @@ class SecretsTriggerWatcherFacade(Type):
 
 
 
-    async def rpc(self, msg):
+    async def rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -16570,7 +16570,7 @@ class SecretsTriggerWatcherFacade(Type):
         reply = await self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
-    def sync_rpc(self, msg):
+    def sync_rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -16579,7 +16579,7 @@ class SecretsTriggerWatcherFacade(Type):
         msg['Id'] = id
 
         from .facade import TypeEncoder
-        return self.sync_connection.rpc(msg, encoder=TypeEncoder)
+        return self.sync_connection.sync_rpc(msg, encoder=TypeEncoder)
 
 
 
@@ -16702,7 +16702,7 @@ class StringsWatcherFacade(Type):
 
 
 
-    async def rpc(self, msg):
+    async def rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -16714,7 +16714,7 @@ class StringsWatcherFacade(Type):
         reply = await self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
-    def sync_rpc(self, msg):
+    def sync_rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -16723,7 +16723,7 @@ class StringsWatcherFacade(Type):
         msg['Id'] = id
 
         from .facade import TypeEncoder
-        return self.sync_connection.rpc(msg, encoder=TypeEncoder)
+        return self.sync_connection.sync_rpc(msg, encoder=TypeEncoder)
 
 
 
@@ -18709,7 +18709,7 @@ class VolumeAttachmentPlansWatcherFacade(Type):
 
 
 
-    async def rpc(self, msg):
+    async def rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -18721,7 +18721,7 @@ class VolumeAttachmentPlansWatcherFacade(Type):
         reply = await self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
-    def sync_rpc(self, msg):
+    def sync_rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -18730,6 +18730,6 @@ class VolumeAttachmentPlansWatcherFacade(Type):
         msg['Id'] = id
 
         from .facade import TypeEncoder
-        return self.sync_connection.rpc(msg, encoder=TypeEncoder)
+        return self.sync_connection.sync_rpc(msg, encoder=TypeEncoder)
 
 

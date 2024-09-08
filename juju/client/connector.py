@@ -51,7 +51,7 @@ class Connector:
         """Report whether there is a currently connected controller or not"""
         return self._connection is not None
 
-    def sync_connection(self, *, model_uuid: str|None = None, **kwargs):
+    def sync_connection(self, *, model_uuid: str|None = None, **kwargs) -> Connection:
         # kwargs.setdefault("max_frame_size", self.max_frame_size)
         # kwargs.setdefault("bakery_client", self.bakery_client)
         # if "macaroons" in kwargs:
@@ -78,11 +78,12 @@ class Connector:
         return Connection.sync_connect(**self._fixme_connect_kwargs)
         # FIXME juju major version check, maybe
 
-    def connection(self):
+    def connection(self) -> Connection:
         """Return the current connection; raises an exception if there
         is no current connection."""
         if not self.is_connected():
             raise NoConnectionException("not connected")
+        assert self._connection  # for type checker
         return self._connection
 
     async def connect(self, **kwargs):

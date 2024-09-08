@@ -28,6 +28,7 @@ from .annotationhelper import _get_annotations, _set_annotations
 from .bundle import BundleHandler, get_charm_series, is_local_charm
 from .charmhub import CharmHub
 from .client import client, connector
+from .client.connection import Connection
 from .client.overrides import Caveat, Macaroon
 from .constraints import parse as parse_constraints
 from .constraints import parse_storage_constraint
@@ -593,12 +594,12 @@ class Model:
         """Reports whether the Model is currently connected."""
         return self._connector.is_connected()
 
-    def connection(self):
+    def connection(self) -> Connection:
         """Return the current Connection object. It raises an exception
         if the Model is disconnected"""
         return self._connector.connection()
 
-    def sync_connection(self):
+    def sync_connection(self) -> Connection:
         tmp = self._connector.sync_connection()
         # FIXME
         tmp.facades = self._connector.connection().facades

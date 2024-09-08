@@ -1198,7 +1198,7 @@ class AllWatcherFacade(Type):
 
 
 
-    async def rpc(self, msg):
+    async def rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -1210,7 +1210,7 @@ class AllWatcherFacade(Type):
         reply = await self.connection.rpc(msg, encoder=TypeEncoder)
         return reply
 
-    def sync_rpc(self, msg):
+    def sync_rpc(self, msg: dict) -> dict:
         '''
         Patch rpc method to add Id.
         '''
@@ -1219,7 +1219,7 @@ class AllWatcherFacade(Type):
         msg['Id'] = id
 
         from .facade import TypeEncoder
-        return self.sync_connection.rpc(msg, encoder=TypeEncoder)
+        return self.sync_connection.sync_rpc(msg, encoder=TypeEncoder)
 
 
 

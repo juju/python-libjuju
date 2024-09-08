@@ -258,6 +258,7 @@ class Connection:
     max_frame_size: int
     _retries: int
     _retry_backoff: float
+    facades: dict[str, int]  # best available version for each type? request?
 
     @classmethod
     def sync_connect(
@@ -275,7 +276,7 @@ class Connection:
             proxy=None,
             debug_log_conn=None,
             debug_log_params={}
-    ):
+    ) -> typing.Self:
         """Connect to the websocket, synchronously.
 
         If uuid is None, the connection will be to the controller. Otherwise it
@@ -399,7 +400,7 @@ class Connection:
             proxy=None,
             debug_log_conn=None,
             debug_log_params={}
-    ):
+    ) -> typing.Self:
         """Connect to the websocket.
 
         If uuid is None, the connection will be to the controller. Otherwise it
