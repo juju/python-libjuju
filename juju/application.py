@@ -7,6 +7,7 @@ import logging
 import typing
 from pathlib import Path
 
+import juju.client.facade
 from . import jasyncio, model, tag, utils
 from .annotationhelper import _get_annotations, _set_annotations
 from .bundle import get_charm_series, is_local_charm
@@ -24,6 +25,22 @@ log = logging.getLogger(__name__)
 
 
 class Application(model.ModelEntity):
+    # What safe data usually contains
+    _expected_attributes = [
+        "model_uuid",
+        "name",
+        "exposed",
+        "charm_url",
+        "owner_tag",
+        "life",
+        "min_units",
+        "constraints",
+        "subordinate",
+        "status",
+        "workload_version",
+    ]
+    _pk: str|int
+
     @property
     def _unit_match_pattern(self):
         return r'^{}.*$'.format(self.entity_id)
@@ -33,6 +50,9 @@ class Application(model.ModelEntity):
 
     def _facade_version(self):
         return client.ApplicationFacade.best_facade_version(self.connection)
+
+    def _sync_facade(self) -> juju.client.facade.Type:
+        return client.ApplicationFacade.from_sync_connection(self.model.sync_connection())
 
     def on_unit_add(self, callable_):
         """Add a "unit added" observer to this entity, which will be called

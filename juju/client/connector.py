@@ -30,6 +30,8 @@ class Connector:
     """This class abstracts out a reconnectable client that can connect
     to controllers and models found in the Juju data files.
     """
+    _connection: Connection|None
+    _sync_connection: Connection|None
 
     def __init__(
         self,
@@ -42,6 +44,7 @@ class Connector:
         self.max_frame_size = max_frame_size
         self.bakery_client = bakery_client
         self._connection = None
+        self._sync_connection = None
         self._log_connection = None
         self.controller_uuid = None
         self.model_name = None
@@ -75,7 +78,10 @@ class Connector:
             # raise ValueError(f'Some authentication parameters are required : {",".join(required)}')
         # FIXME cache it maybe?
         # FIXME borrowing computed connection bits from the async method
-        return Connection.sync_connect(**self._fixme_connect_kwargs)
+        if not self._sync_connection:
+            print("#"*66)
+            self._sync_connection = Connection.sync_connect(**self._fixme_connect_kwargs)
+        return self._sync_connection
         # FIXME juju major version check, maybe
 
     def connection(self) -> Connection:

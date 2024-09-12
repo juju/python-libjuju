@@ -16,6 +16,7 @@ import warnings
 import weakref
 import zipfile
 from concurrent.futures import CancelledError
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from functools import partial
 from pathlib import Path
@@ -48,6 +49,30 @@ from .url import URL, Schema
 from .version import DEFAULT_ARCHITECTURE
 
 log = logging.getLogger(__name__)
+
+
+@dataclass
+class _SyncCache:
+    value: dict
+    exception: Exception|None = None
+    stale: bool = True
+
+    @classmethod
+    def new(cls):
+        return cls({})
+
+    def update(self, value: dict|None = None, exception: Exception|None = None) -> None:
+        if value is None and exception is None:
+            raise ValueError("At least one must be set")
+        self.value = value or {}
+        self.exception = exception
+        self.stale = False
+        asyncio.create_task(asyncio.sleep(0)).add_done_callback(self.invalidate)
+
+    def invalidate(self, task: asyncio.Task) -> None:
+        print("!! invalidated")
+        self.stale = True
+        task.result()
 
 
 class _Observer:
@@ -256,6 +281,7 @@ class ModelState:
 
 class ModelEntity:
     """An object in the Model tree"""
+    _sync_cache: _SyncCache
 
     def __init__(self, entity_id, model, history_index=-1, connected=True):
         """Initialize a new entity
@@ -269,12 +295,14 @@ class ModelEntity:
             from the model.
 
         """
+        print("~~~~ init", self.__class__.__name__)
         self.entity_id = entity_id
         self.model = model
         self._history_index = history_index
         self.connected = connected
         self.connection = model.connection()
         self._status = 'unknown'
+        self._sync_cache = _SyncCache.new()
 
     def __repr__(self):
         return '<{} entity_id="{}">'.format(type(self).__name__,
@@ -285,6 +313,31 @@ class ModelEntity:
         model.
 
         """
+        print(self.__class__.__name__, name)
+        # Dima's hacks
+        if "_sync_facade" in self.__class__.__dict__:
+            facade = self._sync_facade()
+            if name not in self._expected_attributes:
+                raise AttributeError(f"{self.__class__.__name__!r} object has no attribute {name!r}")
+            # print(self.safe_data.keys())
+
+            if self._sync_cache.stale:
+                try:
+                    self._sync_cache.update(value=facade.sync_Get(self.entity_id))
+                    print("++ cache update value")
+                    #print("", self._sync_cache.value.__dict__.keys())
+                    #print("", self._expected_attributes)
+                except Exception as e:
+                    self._sync_cache.update(exception=e)
+                    print("++ cache update exc")
+                    raise
+
+            print(">> cache lookup", name)
+            if self._sync_cache.exception:
+                raise self._sync_cache.exception
+            return getattr(self._sync_cache.value, name)
+
+        # End of hack
         try:
             return self.safe_data[name]
         except KeyError:
@@ -330,6 +383,7 @@ class ModelEntity:
                 return s[0].lower() + s[1:]
         return first_lower(self.__class__.__name__)
 
+    # FIXME not used externally, phew!
     @property
     def current(self):
         """Return True if this object represents the current state of the
