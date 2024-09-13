@@ -1,3 +1,5 @@
+import logging
+
 from juju import jasyncio
 from juju.client import client
 from juju.model import Model
@@ -10,12 +12,11 @@ async def main():
     sync_facade = client.ApplicationFacade.from_sync_connection(m.sync_connection())
     for app_name in m.applications:
         print()
-        print()
-        m.applications[app_name].constraints.arch
-        m.applications[app_name].constraints.arch
-        m.applications[app_name].constraints.arch
-        m.applications[app_name].constraints.arch
-        print()
+        print(m.applications[app_name].constraints.arch)
+        print(m.applications[app_name].constraints.arch)
+        print(m.applications[app_name].constraints.arch)
+        print(m.applications[app_name].constraints.arch)
+
         print()
         app = await app_facade.Get(app_name)
         print(app.application, app.charm, app.constraints.arch)
@@ -24,4 +25,5 @@ async def main():
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level="INFO", format="ℹ️ %(message)s")
     jasyncio.run(main())

@@ -2,6 +2,7 @@
 # Licensed under the Apache V2, see LICENCE file for details.
 
 import asyncio
+import logging
 import os
 import textwrap
 from collections import defaultdict
@@ -21,13 +22,15 @@ from .errors import JujuError
 
 @dataclass
 class _SyncCache:
-    value: Any
+    value: Any = None
     exception: Exception|None = None
     stale: bool = True
+    debug_name: str = ""
 
     @classmethod
-    def new(cls):
-        return cls({})
+    def new(cls, debug_name=""):
+        logging.info("created %s", debug_name)
+        return cls(debug_name=debug_name)
 
     # FIXME check if None is ever a valid cached thing, maybe replace with _SENTINEL
     def update(self, value: Any = None, exception: Exception|None = None) -> None:
@@ -37,11 +40,12 @@ class _SyncCache:
         self.exception = exception
         self.stale = False
         asyncio.create_task(asyncio.sleep(0)).add_done_callback(self.invalidate)
+        logging.info("updated %s", self.debug_name)
 
     def invalidate(self, task: asyncio.Task) -> None:
-        print("!! invalidated")
         self.stale = True
         task.result()
+        logging.info("invalidated %s", self.debug_name)
 
 
 async def execute_process(*cmd, log=None):

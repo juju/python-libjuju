@@ -1,8 +1,9 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
+from __future__ import annotations
 
 from .client import client
-from .model import ModelEntity
+from . import model
 
 
 def get_entity_delta(d):
@@ -20,7 +21,7 @@ class EntityDelta(client.Delta):
         return self.data['id']
 
     @classmethod
-    def get_entity_class(cls) -> type[ModelEntity]:
+    def get_entity_class(cls) -> type[model.ModelEntity]:
         raise NotImplementedError()
 
 

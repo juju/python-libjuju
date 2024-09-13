@@ -1,5 +1,6 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
+from __future__ import annotations
 
 import asyncio
 import base64
@@ -126,17 +127,20 @@ class ModelState:
     def __init__(self, model):
         self.model = model
         self.state = dict()
+        self._live_entity_cache = _SyncCache.new(debug_name="live entity map")
 
-    def _live_entity_map(self, entity_type):
+    def _live_entity_map(self, entity_type: str) -> dict[str, ModelEntity]:
         """Return an id:Entity map of all the living entities of
         type ``entity_type``.
 
         """
-        return {
-            entity_id: self.get_entity(entity_type, entity_id)
-            for entity_id, history in self.state.get(entity_type, {}).items()
-            if history[-1] is not None
-        }
+        if self._live_entity_cache.stale:
+            self._live_entity_cache.update(value = {
+                entity_id: self.get_entity(entity_type, entity_id)
+                for entity_id, history in self.state.get(entity_type, {}).items()
+                if history[-1] is not None
+            })
+        return self._live_entity_cache.value
 
     @property
     def applications(self):
@@ -255,9 +259,6 @@ class ModelState:
             connected=connected)
 
 
-import itertools
-ctr = itertools.count()
-
 class ModelEntity:
     """An object in the Model tree"""
     _sync_cache: _SyncCache
@@ -274,18 +275,13 @@ class ModelEntity:
             from the model.
 
         """
-        print("~~~~ init", self.__class__.__name__)
-        if self.__class__.__name__ == "Application":
-            if (n := next(ctr)) == 10:
-                import pdb
-                pdb.set_trace()
         self.entity_id = entity_id
         self.model = model
         self._history_index = history_index
         self.connected = connected
         self.connection = model.connection()
         self._status = 'unknown'
-        self._sync_cache = _SyncCache.new()
+        self._sync_cache = _SyncCache.new(debug_name=self.__class__.__name__)
 
     def __repr__(self):
         return '<{} entity_id="{}">'.format(type(self).__name__,
@@ -307,15 +303,12 @@ class ModelEntity:
             if self._sync_cache.stale:
                 try:
                     self._sync_cache.update(value=facade.sync_Get(self.entity_id))
-                    print("++ cache update value")
                     #print("", self._sync_cache.value.__dict__.keys())
                     #print("", self._expected_attributes)
                 except Exception as e:
                     self._sync_cache.update(exception=e)
-                    print("++ cache update exc")
                     raise
 
-            print(">> cache lookup", name)
             if self._sync_cache.exception:
                 raise self._sync_cache.exception
             return getattr(self._sync_cache.value, name)
