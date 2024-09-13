@@ -1,17 +1,18 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
+import copy
 import hashlib
 import json
 import logging
-import typing
+from typing import Any, List
 from pathlib import Path
 
 import juju.client.facade
 from . import jasyncio, model, tag, utils
 from .annotationhelper import _get_annotations, _set_annotations
 from .bundle import get_charm_series, is_local_charm
-from .client import client
+from .client import client, _definitions
 from .errors import JujuApplicationConfigError, JujuError
 from .origin import Channel
 from .placement import parse as parse_placement
@@ -23,11 +24,44 @@ from .version import DEFAULT_ARCHITECTURE
 
 log = logging.getLogger(__name__)
 
+"""
+# juju:rpc/params/multiwatcher.go
+
+// StatusInfo holds the unit and machine status information. It is
+// used by ApplicationInfo and UnitInfo.
+type StatusInfo struct {
+	Err     error                  `json:"err,omitempty"`
+	Current status.Status          `json:"current"`
+	Message string                 `json:"message"`
+	Since   *time.Time             `json:"since,omitempty"`
+	Version string                 `json:"version"`
+	Data    map[string]interface{} `json:"data,omitempty"`
+}
+
+// ApplicationInfo holds the information about an application that is tracked
+// by multiwatcherStore.
+type ApplicationInfo struct {
+	ModelUUID       string                 `json:"model-uuid"`
+	Name            string                 `json:"name"`
+	Exposed         bool                   `json:"exposed"`
+	CharmURL        string                 `json:"charm-url"`
+	OwnerTag        string                 `json:"owner-tag"`
+	Life            life.Value             `json:"life"`
+	MinUnits        int                    `json:"min-units"`
+	Constraints     constraints.Value      `json:"constraints"`
+	Config          map[string]interface{} `json:"config,omitempty"`
+	Subordinate     bool                   `json:"subordinate"`
+	Status          StatusInfo             `json:"status"`
+	WorkloadVersion string                 `json:"workload-version"`
+}
+"""
+
+_FIXME = object()
 
 class Application(model.ModelEntity):
     # What safe data usually contains
     _expected_attributes = [
-        "model_uuid",
+        "model_uuid",  # FIXME is it even useful? There's always a link to the model.
         "name",
         "exposed",
         "charm_url",
@@ -39,7 +73,41 @@ class Application(model.ModelEntity):
         "status",
         "workload_version",
     ]
+
+    model_uuid: str
+    name: str
+    exposed: bool  # present on ApplicationResult, ApplicationStatus
+    charm_url: str
+    owner_tag: str  # This is weird, present on Model, Secret, Storage, ApplicationOffer, MigrationModel; not app
+    life: Any  # Life, present on ApplicationStatus
+    min_units: int
+    constraints: _definitions.Value
+    config: dict[str, Any]  # json-able  # FIXME may be omitted
+    subordinate: bool
+    # status: Any  # Status  # @property
+    workload_version: str  # e.g. ApplicationStatus, maybe EntityXxx
+
     _pk: str|int
+
+    def _facade_to_data(self, obj: juju.client.facade.Type) -> dict:
+        value = obj.serialize()
+        rv = {
+            "name": value.pop("application"),
+            "exposed": _FIXME,
+            "charm_url": value.pop("charm"),
+            "owner_tag": _FIXME,
+            "life": _FIXME,
+            "min_units": _FIXME,
+            "constraints": _definitions.Value.from_json(value.pop("constraints")),
+            "subordinate": _FIXME,
+            "status": _FIXME,  # needs a separate API call
+            "workload_version": _FIXME,
+        }
+        __import__("pdb").set_trace()
+        if value:
+            logging.info("Unused Application.Get fields %s", list(value))
+            logging.debug("Unused Application.Get data %s", value)
+        return rv
 
     @property
     def _unit_match_pattern(self):
@@ -83,7 +151,7 @@ class Application(model.ModelEntity):
         return [u for u in self.units if u.is_subordinate]
 
     @property
-    def relations(self) -> typing.List[Relation]:
+    def relations(self) -> List[Relation]:
         return [rel for rel in self.model.relations if rel.matches(self.name)]
 
     def related_applications(self, endpoint_name=None):
@@ -107,6 +175,9 @@ class Application(model.ModelEntity):
         If the application is unknown it will attempt to derive the unit
         workload status and highlight the most relevant (severity).
         """
+        # FIXME how to undo this mess?
+        # users rely on status subscript
+        # users may rely on status inference from units
         status = self.safe_data['status']['current']
         if status == "unset":
             known_statuses = []
@@ -598,7 +669,7 @@ class Application(model.ModelEntity):
         return URL.parse(self.charm_url).name
 
     @property
-    def charm_url(self):
+    def __fixme_remove_charm_url(self):
         """Get the charm url for this application
 
         :return str: The charm url

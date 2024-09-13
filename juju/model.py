@@ -20,6 +20,7 @@ from concurrent.futures import CancelledError
 from datetime import datetime, timedelta
 from functools import partial
 from pathlib import Path
+from typing import Any
 
 import yaml
 import websockets
@@ -28,7 +29,7 @@ from . import provisioner, tag, utils, jasyncio
 from .annotationhelper import _get_annotations, _set_annotations
 from .bundle import BundleHandler, get_charm_series, is_local_charm
 from .charmhub import CharmHub
-from .client import client, connector
+from .client import client, connector, facade
 from .client.connection import Connection
 from .client.overrides import Caveat, Macaroon
 from .constraints import parse as parse_constraints
@@ -261,6 +262,7 @@ class ModelState:
 
 class ModelEntity:
     """An object in the Model tree"""
+    entity_id: str
     _sync_cache: _SyncCache
 
     def __init__(self, entity_id, model, history_index=-1, connected=True):
@@ -287,7 +289,10 @@ class ModelEntity:
         return '<{} entity_id="{}">'.format(type(self).__name__,
                                             self.entity_id)
 
-    def __getattr__(self, name):
+    def _facade_to_data(self, obj: facade.Type) -> dict:
+        raise NotImplementedError()
+
+    def __getattr__(self, name: str) -> Any:
         """Fetch object attributes from the underlying data dict held in the
         model.
 
@@ -302,7 +307,7 @@ class ModelEntity:
 
             if self._sync_cache.stale:
                 try:
-                    self._sync_cache.update(value=facade.sync_Get(self.entity_id))
+                    self._sync_cache.update(value=self._facade_to_data(facade.sync_Get(self.entity_id)))
                     #print("", self._sync_cache.value.__dict__.keys())
                     #print("", self._expected_attributes)
                 except Exception as e:
@@ -311,7 +316,13 @@ class ModelEntity:
 
             if self._sync_cache.exception:
                 raise self._sync_cache.exception
-            return getattr(self._sync_cache.value, name)
+            old = self.safe_data.get(name, self.safe_data.get(name.replace("_", "-"), "unknown"))
+            new = self._sync_cache.value[name]
+            if old != new:
+                logging.warning("%s.%s: value mismatch old %r new %r", self.__class__.__name__, name, old, new)
+                return old
+            else:
+                return new
 
         # End of hack
         try:

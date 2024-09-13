@@ -788,7 +788,7 @@ class Type:
             return cls(**d)
         return None
 
-    def serialize(self):
+    def serialize(self) -> dict:
         d = {}
         for attr, tgt in self._toSchema.items():
             d[tgt] = getattr(self, attr)
