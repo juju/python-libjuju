@@ -5,8 +5,9 @@ import asyncio
 import os
 import textwrap
 from collections import defaultdict
-from functools import partial
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 import base64
 from pyasn1.type import univ, char
 from pyasn1.codec.der.encoder import encode
@@ -16,6 +17,31 @@ import zipfile
 from . import jasyncio, origin, errors
 from .client import client
 from .errors import JujuError
+
+
+@dataclass
+class _SyncCache:
+    value: Any
+    exception: Exception|None = None
+    stale: bool = True
+
+    @classmethod
+    def new(cls):
+        return cls({})
+
+    # FIXME check if None is ever a valid cached thing, maybe replace with _SENTINEL
+    def update(self, value: Any = None, exception: Exception|None = None) -> None:
+        if value is None and exception is None:
+            raise ValueError("At least one must be set")
+        self.value = value
+        self.exception = exception
+        self.stale = False
+        asyncio.create_task(asyncio.sleep(0)).add_done_callback(self.invalidate)
+
+    def invalidate(self, task: asyncio.Task) -> None:
+        print("!! invalidated")
+        self.stale = True
+        task.result()
 
 
 async def execute_process(*cmd, log=None):

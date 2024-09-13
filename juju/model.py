@@ -16,7 +16,6 @@ import warnings
 import weakref
 import zipfile
 from concurrent.futures import CancelledError
-from dataclasses import dataclass
 from datetime import datetime, timedelta
 from functools import partial
 from pathlib import Path
@@ -46,33 +45,10 @@ from .placement import parse as parse_placement
 from .secrets import create_secret_data, read_secret_data
 from .tag import application as application_tag
 from .url import URL, Schema
+from .utils import _SyncCache
 from .version import DEFAULT_ARCHITECTURE
 
 log = logging.getLogger(__name__)
-
-
-@dataclass
-class _SyncCache:
-    value: dict
-    exception: Exception|None = None
-    stale: bool = True
-
-    @classmethod
-    def new(cls):
-        return cls({})
-
-    def update(self, value: dict|None = None, exception: Exception|None = None) -> None:
-        if value is None and exception is None:
-            raise ValueError("At least one must be set")
-        self.value = value or {}
-        self.exception = exception
-        self.stale = False
-        asyncio.create_task(asyncio.sleep(0)).add_done_callback(self.invalidate)
-
-    def invalidate(self, task: asyncio.Task) -> None:
-        print("!! invalidated")
-        self.stale = True
-        task.result()
 
 
 class _Observer:
@@ -279,6 +255,9 @@ class ModelState:
             connected=connected)
 
 
+import itertools
+ctr = itertools.count()
+
 class ModelEntity:
     """An object in the Model tree"""
     _sync_cache: _SyncCache
@@ -296,6 +275,10 @@ class ModelEntity:
 
         """
         print("~~~~ init", self.__class__.__name__)
+        if self.__class__.__name__ == "Application":
+            if (n := next(ctr)) == 10:
+                import pdb
+                pdb.set_trace()
         self.entity_id = entity_id
         self.model = model
         self._history_index = history_index
