@@ -7,6 +7,7 @@ from juju.client.facade import Type, ReturnMapping
 class APIHostPortsResult(Type):
     _toSchema = {'servers': 'servers'}
     _toPy = {'servers': 'servers'}
+
     def __init__(self, servers=None, **unknown_fields):
         '''
         servers : typing.Sequence[~HostPort]
@@ -25,6 +26,7 @@ class APIHostPortsResult(Type):
 class AccessInfo(Type):
     _toSchema = {'role': 'role', 'scope_tag': 'scope-tag', 'target_tag': 'target-tag'}
     _toPy = {'role': 'role', 'scope-tag': 'scope_tag', 'target-tag': 'target_tag'}
+
     def __init__(self, role=None, scope_tag=None, target_tag=None, **unknown_fields):
         '''
         role : str
@@ -55,6 +57,7 @@ class AccessInfo(Type):
 class Action(Type):
     _toSchema = {'execution_group': 'execution-group', 'name': 'name', 'parallel': 'parallel', 'parameters': 'parameters', 'receiver': 'receiver', 'tag': 'tag'}
     _toPy = {'execution-group': 'execution_group', 'name': 'name', 'parallel': 'parallel', 'parameters': 'parameters', 'receiver': 'receiver', 'tag': 'tag'}
+
     def __init__(self, execution_group=None, name=None, parallel=None, parameters=None, receiver=None, tag=None, **unknown_fields):
         '''
         execution_group : str
@@ -103,6 +106,7 @@ class Action(Type):
 class ActionExecutionResult(Type):
     _toSchema = {'action_tag': 'action-tag', 'message': 'message', 'results': 'results', 'status': 'status'}
     _toPy = {'action-tag': 'action_tag', 'message': 'message', 'results': 'results', 'status': 'status'}
+
     def __init__(self, action_tag=None, message=None, results=None, status=None, **unknown_fields):
         '''
         action_tag : str
@@ -139,6 +143,7 @@ class ActionExecutionResult(Type):
 class ActionExecutionResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ActionExecutionResult]
@@ -157,6 +162,7 @@ class ActionExecutionResults(Type):
 class ActionMessage(Type):
     _toSchema = {'message': 'message', 'timestamp': 'timestamp'}
     _toPy = {'message': 'message', 'timestamp': 'timestamp'}
+
     def __init__(self, message=None, timestamp=None, **unknown_fields):
         '''
         message : str
@@ -181,6 +187,7 @@ class ActionMessage(Type):
 class ActionMessageParams(Type):
     _toSchema = {'messages': 'messages'}
     _toPy = {'messages': 'messages'}
+
     def __init__(self, messages=None, **unknown_fields):
         '''
         messages : typing.Sequence[~EntityString]
@@ -199,6 +206,7 @@ class ActionMessageParams(Type):
 class ActionPruneArgs(Type):
     _toSchema = {'max_history_mb': 'max-history-mb', 'max_history_time': 'max-history-time'}
     _toPy = {'max-history-mb': 'max_history_mb', 'max-history-time': 'max_history_time'}
+
     def __init__(self, max_history_mb=None, max_history_time=None, **unknown_fields):
         '''
         max_history_mb : int
@@ -223,6 +231,7 @@ class ActionPruneArgs(Type):
 class ActionResult(Type):
     _toSchema = {'action': 'action', 'completed': 'completed', 'enqueued': 'enqueued', 'error': 'error', 'log': 'log', 'message': 'message', 'output': 'output', 'started': 'started', 'status': 'status'}
     _toPy = {'action': 'action', 'completed': 'completed', 'enqueued': 'enqueued', 'error': 'error', 'log': 'log', 'message': 'message', 'output': 'output', 'started': 'started', 'status': 'status'}
+
     def __init__(self, action=None, completed=None, enqueued=None, error=None, log=None, message=None, output=None, started=None, status=None, **unknown_fields):
         '''
         action : Action
@@ -289,6 +298,7 @@ class ActionResult(Type):
 class ActionResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ActionResult]
@@ -307,6 +317,7 @@ class ActionResults(Type):
 class ActionSpec(Type):
     _toSchema = {'description': 'description', 'params': 'params'}
     _toPy = {'description': 'description', 'params': 'params'}
+
     def __init__(self, description=None, params=None, **unknown_fields):
         '''
         description : str
@@ -331,6 +342,7 @@ class ActionSpec(Type):
 class Actions(Type):
     _toSchema = {'actions': 'actions'}
     _toPy = {'actions': 'actions'}
+
     def __init__(self, actions=None, **unknown_fields):
         '''
         actions : typing.Sequence[~Action]
@@ -349,6 +361,7 @@ class Actions(Type):
 class ActionsByReceiver(Type):
     _toSchema = {'actions': 'actions', 'error': 'error', 'receiver': 'receiver'}
     _toPy = {'actions': 'actions', 'error': 'error', 'receiver': 'receiver'}
+
     def __init__(self, actions=None, error=None, receiver=None, **unknown_fields):
         '''
         actions : typing.Sequence[~ActionResult]
@@ -379,6 +392,7 @@ class ActionsByReceiver(Type):
 class ActionsByReceivers(Type):
     _toSchema = {'actions': 'actions'}
     _toPy = {'actions': 'actions'}
+
     def __init__(self, actions=None, **unknown_fields):
         '''
         actions : typing.Sequence[~ActionsByReceiver]
@@ -397,6 +411,7 @@ class ActionsByReceivers(Type):
 class ActivateModelArgs(Type):
     _toSchema = {'controller_alias': 'controller-alias', 'controller_tag': 'controller-tag', 'cross_model_uuids': 'cross-model-uuids', 'model_tag': 'model-tag', 'source_api_addrs': 'source-api-addrs', 'source_ca_cert': 'source-ca-cert'}
     _toPy = {'controller-alias': 'controller_alias', 'controller-tag': 'controller_tag', 'cross-model-uuids': 'cross_model_uuids', 'model-tag': 'model_tag', 'source-api-addrs': 'source_api_addrs', 'source-ca-cert': 'source_ca_cert'}
+
     def __init__(self, controller_alias=None, controller_tag=None, cross_model_uuids=None, model_tag=None, source_api_addrs=None, source_ca_cert=None, **unknown_fields):
         '''
         controller_alias : str
@@ -445,6 +460,7 @@ class ActivateModelArgs(Type):
 class AddApplicationOffer(Type):
     _toSchema = {'application_description': 'application-description', 'application_name': 'application-name', 'endpoints': 'endpoints', 'model_tag': 'model-tag', 'offer_name': 'offer-name', 'owner_tag': 'owner-tag'}
     _toPy = {'application-description': 'application_description', 'application-name': 'application_name', 'endpoints': 'endpoints', 'model-tag': 'model_tag', 'offer-name': 'offer_name', 'owner-tag': 'owner_tag'}
+
     def __init__(self, application_description=None, application_name=None, endpoints=None, model_tag=None, offer_name=None, owner_tag=None, **unknown_fields):
         '''
         application_description : str
@@ -493,6 +509,7 @@ class AddApplicationOffer(Type):
 class AddApplicationOffers(Type):
     _toSchema = {'offers': 'Offers'}
     _toPy = {'Offers': 'offers'}
+
     def __init__(self, offers=None, **unknown_fields):
         '''
         offers : typing.Sequence[~AddApplicationOffer]
@@ -511,6 +528,7 @@ class AddApplicationOffers(Type):
 class AddApplicationUnits(Type):
     _toSchema = {'application': 'application', 'attach_storage': 'attach-storage', 'num_units': 'num-units', 'placement': 'placement', 'policy': 'policy'}
     _toPy = {'application': 'application', 'attach-storage': 'attach_storage', 'num-units': 'num_units', 'placement': 'placement', 'policy': 'policy'}
+
     def __init__(self, application=None, attach_storage=None, num_units=None, placement=None, policy=None, **unknown_fields):
         '''
         application : str
@@ -553,6 +571,7 @@ class AddApplicationUnits(Type):
 class AddApplicationUnitsResults(Type):
     _toSchema = {'units': 'units'}
     _toPy = {'units': 'units'}
+
     def __init__(self, units=None, **unknown_fields):
         '''
         units : typing.Sequence[str]
@@ -571,6 +590,7 @@ class AddApplicationUnitsResults(Type):
 class AddCharmWithOrigin(Type):
     _toSchema = {'charm_origin': 'charm-origin', 'force': 'force', 'url': 'url'}
     _toPy = {'charm-origin': 'charm_origin', 'force': 'force', 'url': 'url'}
+
     def __init__(self, charm_origin=None, force=None, url=None, **unknown_fields):
         '''
         charm_origin : CharmOrigin
@@ -601,6 +621,7 @@ class AddCharmWithOrigin(Type):
 class AddCloudArgs(Type):
     _toSchema = {'cloud': 'cloud', 'force': 'force', 'name': 'name'}
     _toPy = {'cloud': 'cloud', 'force': 'force', 'name': 'name'}
+
     def __init__(self, cloud=None, force=None, name=None, **unknown_fields):
         '''
         cloud : Cloud
@@ -631,6 +652,7 @@ class AddCloudArgs(Type):
 class AddMachineParams(Type):
     _toSchema = {'addresses': 'addresses', 'base': 'base', 'constraints': 'constraints', 'container_type': 'container-type', 'disks': 'disks', 'hardware_characteristics': 'hardware-characteristics', 'instance_id': 'instance-id', 'jobs': 'jobs', 'nonce': 'nonce', 'parent_id': 'parent-id', 'placement': 'placement'}
     _toPy = {'addresses': 'addresses', 'base': 'base', 'constraints': 'constraints', 'container-type': 'container_type', 'disks': 'disks', 'hardware-characteristics': 'hardware_characteristics', 'instance-id': 'instance_id', 'jobs': 'jobs', 'nonce': 'nonce', 'parent-id': 'parent_id', 'placement': 'placement'}
+
     def __init__(self, addresses=None, base=None, constraints=None, container_type=None, disks=None, hardware_characteristics=None, instance_id=None, jobs=None, nonce=None, parent_id=None, placement=None, **unknown_fields):
         '''
         addresses : typing.Sequence[~Address]
@@ -709,6 +731,7 @@ class AddMachineParams(Type):
 class AddMachines(Type):
     _toSchema = {'params': 'params'}
     _toPy = {'params': 'params'}
+
     def __init__(self, params=None, **unknown_fields):
         '''
         params : typing.Sequence[~AddMachineParams]
@@ -727,6 +750,7 @@ class AddMachines(Type):
 class AddMachinesResult(Type):
     _toSchema = {'error': 'error', 'machine': 'machine'}
     _toPy = {'error': 'error', 'machine': 'machine'}
+
     def __init__(self, error=None, machine=None, **unknown_fields):
         '''
         error : Error
@@ -751,6 +775,7 @@ class AddMachinesResult(Type):
 class AddMachinesResults(Type):
     _toSchema = {'machines': 'machines'}
     _toPy = {'machines': 'machines'}
+
     def __init__(self, machines=None, **unknown_fields):
         '''
         machines : typing.Sequence[~AddMachinesResult]
@@ -769,6 +794,7 @@ class AddMachinesResults(Type):
 class AddPendingResourcesArgsV2(Type):
     _toSchema = {'charm_origin': 'charm-origin', 'entity': 'Entity', 'macaroon': 'macaroon', 'resources': 'resources', 'tag': 'tag', 'url': 'url'}
     _toPy = {'Entity': 'entity', 'charm-origin': 'charm_origin', 'macaroon': 'macaroon', 'resources': 'resources', 'tag': 'tag', 'url': 'url'}
+
     def __init__(self, entity=None, charm_origin=None, macaroon=None, resources=None, tag=None, url=None, **unknown_fields):
         '''
         entity : Entity
@@ -817,6 +843,7 @@ class AddPendingResourcesArgsV2(Type):
 class AddPendingResourcesResult(Type):
     _toSchema = {'error': 'error', 'errorresult': 'ErrorResult', 'pending_ids': 'pending-ids'}
     _toPy = {'ErrorResult': 'errorresult', 'error': 'error', 'pending-ids': 'pending_ids'}
+
     def __init__(self, errorresult=None, error=None, pending_ids=None, **unknown_fields):
         '''
         errorresult : ErrorResult
@@ -847,6 +874,7 @@ class AddPendingResourcesResult(Type):
 class AddRelation(Type):
     _toSchema = {'endpoints': 'endpoints', 'via_cidrs': 'via-cidrs'}
     _toPy = {'endpoints': 'endpoints', 'via-cidrs': 'via_cidrs'}
+
     def __init__(self, endpoints=None, via_cidrs=None, **unknown_fields):
         '''
         endpoints : typing.Sequence[str]
@@ -871,6 +899,7 @@ class AddRelation(Type):
 class AddRelationResults(Type):
     _toSchema = {'endpoints': 'endpoints'}
     _toPy = {'endpoints': 'endpoints'}
+
     def __init__(self, endpoints=None, **unknown_fields):
         '''
         endpoints : typing.Mapping[str, ~CharmRelation]
@@ -889,6 +918,7 @@ class AddRelationResults(Type):
 class AddSecretBackendArg(Type):
     _toSchema = {'backend_type': 'backend-type', 'config': 'config', 'id_': 'id', 'name': 'name', 'secretbackend': 'SecretBackend', 'token_rotate_interval': 'token-rotate-interval'}
     _toPy = {'SecretBackend': 'secretbackend', 'backend-type': 'backend_type', 'config': 'config', 'id': 'id_', 'name': 'name', 'token-rotate-interval': 'token_rotate_interval'}
+
     def __init__(self, secretbackend=None, backend_type=None, config=None, id_=None, name=None, token_rotate_interval=None, **unknown_fields):
         '''
         secretbackend : SecretBackend
@@ -937,6 +967,7 @@ class AddSecretBackendArg(Type):
 class AddSecretBackendArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~AddSecretBackendArg]
@@ -955,6 +986,7 @@ class AddSecretBackendArgs(Type):
 class AddStorageDetails(Type):
     _toSchema = {'storage_tags': 'storage-tags'}
     _toPy = {'storage-tags': 'storage_tags'}
+
     def __init__(self, storage_tags=None, **unknown_fields):
         '''
         storage_tags : typing.Sequence[str]
@@ -973,6 +1005,7 @@ class AddStorageDetails(Type):
 class AddStorageResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -997,6 +1030,7 @@ class AddStorageResult(Type):
 class AddStorageResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~AddStorageResult]
@@ -1015,6 +1049,7 @@ class AddStorageResults(Type):
 class AddUser(Type):
     _toSchema = {'display_name': 'display-name', 'password': 'password', 'username': 'username'}
     _toPy = {'display-name': 'display_name', 'password': 'password', 'username': 'username'}
+
     def __init__(self, display_name=None, password=None, username=None, **unknown_fields):
         '''
         display_name : str
@@ -1045,6 +1080,7 @@ class AddUser(Type):
 class AddUserResult(Type):
     _toSchema = {'error': 'error', 'secret_key': 'secret-key', 'tag': 'tag'}
     _toPy = {'error': 'error', 'secret-key': 'secret_key', 'tag': 'tag'}
+
     def __init__(self, error=None, secret_key=None, tag=None, **unknown_fields):
         '''
         error : Error
@@ -1075,6 +1111,7 @@ class AddUserResult(Type):
 class AddUserResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~AddUserResult]
@@ -1093,6 +1130,7 @@ class AddUserResults(Type):
 class AddUsers(Type):
     _toSchema = {'users': 'users'}
     _toPy = {'users': 'users'}
+
     def __init__(self, users=None, **unknown_fields):
         '''
         users : typing.Sequence[~AddUser]
@@ -1111,6 +1149,7 @@ class AddUsers(Type):
 class Address(Type):
     _toSchema = {'cidr': 'cidr', 'config_type': 'config-type', 'is_secondary': 'is-secondary', 'scope': 'scope', 'space_id': 'space-id', 'space_name': 'space-name', 'type_': 'type', 'value': 'value'}
     _toPy = {'cidr': 'cidr', 'config-type': 'config_type', 'is-secondary': 'is_secondary', 'scope': 'scope', 'space-id': 'space_id', 'space-name': 'space_name', 'type': 'type_', 'value': 'value'}
+
     def __init__(self, cidr=None, config_type=None, is_secondary=None, scope=None, space_id=None, space_name=None, type_=None, value=None, **unknown_fields):
         '''
         cidr : str
@@ -1171,6 +1210,7 @@ class Address(Type):
 class AdoptResourcesArgs(Type):
     _toSchema = {'model_tag': 'model-tag', 'source_controller_version': 'source-controller-version'}
     _toPy = {'model-tag': 'model_tag', 'source-controller-version': 'source_controller_version'}
+
     def __init__(self, model_tag=None, source_controller_version=None, **unknown_fields):
         '''
         model_tag : str
@@ -1195,6 +1235,7 @@ class AdoptResourcesArgs(Type):
 class AgentGetEntitiesResult(Type):
     _toSchema = {'container_type': 'container-type', 'error': 'error', 'jobs': 'jobs', 'life': 'life'}
     _toPy = {'container-type': 'container_type', 'error': 'error', 'jobs': 'jobs', 'life': 'life'}
+
     def __init__(self, container_type=None, error=None, jobs=None, life=None, **unknown_fields):
         '''
         container_type : str
@@ -1231,6 +1272,7 @@ class AgentGetEntitiesResult(Type):
 class AgentGetEntitiesResults(Type):
     _toSchema = {'entities': 'entities'}
     _toPy = {'entities': 'entities'}
+
     def __init__(self, entities=None, **unknown_fields):
         '''
         entities : typing.Sequence[~AgentGetEntitiesResult]
@@ -1249,6 +1291,7 @@ class AgentGetEntitiesResults(Type):
 class AllWatcherId(Type):
     _toSchema = {'watcher_id': 'watcher-id'}
     _toPy = {'watcher-id': 'watcher_id'}
+
     def __init__(self, watcher_id=None, **unknown_fields):
         '''
         watcher_id : str
@@ -1267,6 +1310,7 @@ class AllWatcherId(Type):
 class AllWatcherNextResults(Type):
     _toSchema = {'deltas': 'deltas'}
     _toPy = {'deltas': 'deltas'}
+
     def __init__(self, deltas=None, **unknown_fields):
         '''
         deltas : typing.Sequence[~Delta]
@@ -1285,6 +1329,7 @@ class AllWatcherNextResults(Type):
 class AnnotationsGetResult(Type):
     _toSchema = {'annotations': 'annotations', 'entity': 'entity', 'error': 'error'}
     _toPy = {'annotations': 'annotations', 'entity': 'entity', 'error': 'error'}
+
     def __init__(self, annotations=None, entity=None, error=None, **unknown_fields):
         '''
         annotations : typing.Mapping[str, str]
@@ -1315,6 +1360,7 @@ class AnnotationsGetResult(Type):
 class AnnotationsGetResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~AnnotationsGetResult]
@@ -1333,6 +1379,7 @@ class AnnotationsGetResults(Type):
 class AnnotationsSet(Type):
     _toSchema = {'annotations': 'annotations'}
     _toPy = {'annotations': 'annotations'}
+
     def __init__(self, annotations=None, **unknown_fields):
         '''
         annotations : typing.Sequence[~EntityAnnotations]
@@ -1351,6 +1398,7 @@ class AnnotationsSet(Type):
 class ApplicationCharm(Type):
     _toSchema = {'charm_modified_version': 'charm-modified-version', 'deployment_mode': 'deployment-mode', 'force_upgrade': 'force-upgrade', 'sha256': 'sha256', 'url': 'url'}
     _toPy = {'charm-modified-version': 'charm_modified_version', 'deployment-mode': 'deployment_mode', 'force-upgrade': 'force_upgrade', 'sha256': 'sha256', 'url': 'url'}
+
     def __init__(self, charm_modified_version=None, deployment_mode=None, force_upgrade=None, sha256=None, url=None, **unknown_fields):
         '''
         charm_modified_version : int
@@ -1393,6 +1441,7 @@ class ApplicationCharm(Type):
 class ApplicationCharmActionsResult(Type):
     _toSchema = {'actions': 'actions', 'application_tag': 'application-tag', 'error': 'error'}
     _toPy = {'actions': 'actions', 'application-tag': 'application_tag', 'error': 'error'}
+
     def __init__(self, actions=None, application_tag=None, error=None, **unknown_fields):
         '''
         actions : typing.Mapping[str, ~ActionSpec]
@@ -1423,6 +1472,7 @@ class ApplicationCharmActionsResult(Type):
 class ApplicationCharmPlacement(Type):
     _toSchema = {'application': 'application', 'charm_url': 'charm-url'}
     _toPy = {'application': 'application', 'charm-url': 'charm_url'}
+
     def __init__(self, application=None, charm_url=None, **unknown_fields):
         '''
         application : str
@@ -1447,6 +1497,7 @@ class ApplicationCharmPlacement(Type):
 class ApplicationCharmPlacements(Type):
     _toSchema = {'placements': 'placements'}
     _toPy = {'placements': 'placements'}
+
     def __init__(self, placements=None, **unknown_fields):
         '''
         placements : typing.Sequence[~ApplicationCharmPlacement]
@@ -1465,6 +1516,7 @@ class ApplicationCharmPlacements(Type):
 class ApplicationCharmRelations(Type):
     _toSchema = {'application': 'application'}
     _toPy = {'application': 'application'}
+
     def __init__(self, application=None, **unknown_fields):
         '''
         application : str
@@ -1483,6 +1535,7 @@ class ApplicationCharmRelations(Type):
 class ApplicationCharmRelationsResults(Type):
     _toSchema = {'charm_relations': 'charm-relations'}
     _toPy = {'charm-relations': 'charm_relations'}
+
     def __init__(self, charm_relations=None, **unknown_fields):
         '''
         charm_relations : typing.Sequence[str]
@@ -1501,6 +1554,7 @@ class ApplicationCharmRelationsResults(Type):
 class ApplicationCharmResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -1525,6 +1579,7 @@ class ApplicationCharmResult(Type):
 class ApplicationCharmResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ApplicationCharmResult]
@@ -1543,6 +1598,7 @@ class ApplicationCharmResults(Type):
 class ApplicationConfigUnsetArgs(Type):
     _toSchema = {'args': 'Args'}
     _toPy = {'Args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~ApplicationUnset]
@@ -1561,6 +1617,7 @@ class ApplicationConfigUnsetArgs(Type):
 class ApplicationConstraint(Type):
     _toSchema = {'constraints': 'constraints', 'error': 'error'}
     _toPy = {'constraints': 'constraints', 'error': 'error'}
+
     def __init__(self, constraints=None, error=None, **unknown_fields):
         '''
         constraints : Value
@@ -1585,6 +1642,7 @@ class ApplicationConstraint(Type):
 class ApplicationDeploy(Type):
     _toSchema = {'application': 'application', 'attach_storage': 'attach-storage', 'channel': 'channel', 'charm_origin': 'charm-origin', 'charm_url': 'charm-url', 'config': 'config', 'config_yaml': 'config-yaml', 'constraints': 'constraints', 'devices': 'devices', 'endpoint_bindings': 'endpoint-bindings', 'force': 'Force', 'num_units': 'num-units', 'placement': 'placement', 'policy': 'policy', 'resources': 'resources', 'storage': 'storage'}
     _toPy = {'Force': 'force', 'application': 'application', 'attach-storage': 'attach_storage', 'channel': 'channel', 'charm-origin': 'charm_origin', 'charm-url': 'charm_url', 'config': 'config', 'config-yaml': 'config_yaml', 'constraints': 'constraints', 'devices': 'devices', 'endpoint-bindings': 'endpoint_bindings', 'num-units': 'num_units', 'placement': 'placement', 'policy': 'policy', 'resources': 'resources', 'storage': 'storage'}
+
     def __init__(self, force=None, application=None, attach_storage=None, channel=None, charm_origin=None, charm_url=None, config=None, config_yaml=None, constraints=None, devices=None, endpoint_bindings=None, num_units=None, placement=None, policy=None, resources=None, storage=None, **unknown_fields):
         '''
         force : bool
@@ -1693,6 +1751,7 @@ class ApplicationDeploy(Type):
 class ApplicationExpose(Type):
     _toSchema = {'application': 'application', 'exposed_endpoints': 'exposed-endpoints'}
     _toPy = {'application': 'application', 'exposed-endpoints': 'exposed_endpoints'}
+
     def __init__(self, application=None, exposed_endpoints=None, **unknown_fields):
         '''
         application : str
@@ -1717,6 +1776,7 @@ class ApplicationExpose(Type):
 class ApplicationGet(Type):
     _toSchema = {'application': 'application', 'branch': 'branch'}
     _toPy = {'application': 'application', 'branch': 'branch'}
+
     def __init__(self, application=None, branch=None, **unknown_fields):
         '''
         application : str
@@ -1741,6 +1801,7 @@ class ApplicationGet(Type):
 class ApplicationGetArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~ApplicationGet]
@@ -1759,6 +1820,7 @@ class ApplicationGetArgs(Type):
 class ApplicationGetConfigResults(Type):
     _toSchema = {'results': 'Results'}
     _toPy = {'Results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ConfigResult]
@@ -1777,6 +1839,7 @@ class ApplicationGetConfigResults(Type):
 class ApplicationGetConstraintsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ApplicationConstraint]
@@ -1795,6 +1858,7 @@ class ApplicationGetConstraintsResults(Type):
 class ApplicationGetResults(Type):
     _toSchema = {'application': 'application', 'application_config': 'application-config', 'base': 'base', 'channel': 'channel', 'charm': 'charm', 'config': 'config', 'constraints': 'constraints', 'endpoint_bindings': 'endpoint-bindings'}
     _toPy = {'application': 'application', 'application-config': 'application_config', 'base': 'base', 'channel': 'channel', 'charm': 'charm', 'config': 'config', 'constraints': 'constraints', 'endpoint-bindings': 'endpoint_bindings'}
+
     def __init__(self, application=None, application_config=None, base=None, channel=None, charm=None, config=None, constraints=None, endpoint_bindings=None, **unknown_fields):
         '''
         application : str
@@ -1855,6 +1919,7 @@ class ApplicationGetResults(Type):
 class ApplicationInfoResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -1879,6 +1944,7 @@ class ApplicationInfoResult(Type):
 class ApplicationInfoResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ApplicationInfoResult]
@@ -1897,6 +1963,7 @@ class ApplicationInfoResults(Type):
 class ApplicationMergeBindings(Type):
     _toSchema = {'application_tag': 'application-tag', 'bindings': 'bindings', 'force': 'force'}
     _toPy = {'application-tag': 'application_tag', 'bindings': 'bindings', 'force': 'force'}
+
     def __init__(self, application_tag=None, bindings=None, force=None, **unknown_fields):
         '''
         application_tag : str
@@ -1927,6 +1994,7 @@ class ApplicationMergeBindings(Type):
 class ApplicationMergeBindingsArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~ApplicationMergeBindings]
@@ -1945,6 +2013,7 @@ class ApplicationMergeBindingsArgs(Type):
 class ApplicationMetricCredential(Type):
     _toSchema = {'application': 'application', 'metrics_credentials': 'metrics-credentials'}
     _toPy = {'application': 'application', 'metrics-credentials': 'metrics_credentials'}
+
     def __init__(self, application=None, metrics_credentials=None, **unknown_fields):
         '''
         application : str
@@ -1969,6 +2038,7 @@ class ApplicationMetricCredential(Type):
 class ApplicationMetricCredentials(Type):
     _toSchema = {'creds': 'creds'}
     _toPy = {'creds': 'creds'}
+
     def __init__(self, creds=None, **unknown_fields):
         '''
         creds : typing.Sequence[~ApplicationMetricCredential]
@@ -1987,6 +2057,7 @@ class ApplicationMetricCredentials(Type):
 class ApplicationOfferAdminDetails(Type):
     _toSchema = {'application_description': 'application-description', 'application_name': 'application-name', 'applicationofferdetails': 'ApplicationOfferDetails', 'bindings': 'bindings', 'charm_url': 'charm-url', 'connections': 'connections', 'endpoints': 'endpoints', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'offer_uuid': 'offer-uuid', 'source_model_tag': 'source-model-tag', 'spaces': 'spaces', 'users': 'users'}
     _toPy = {'ApplicationOfferDetails': 'applicationofferdetails', 'application-description': 'application_description', 'application-name': 'application_name', 'bindings': 'bindings', 'charm-url': 'charm_url', 'connections': 'connections', 'endpoints': 'endpoints', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'offer-uuid': 'offer_uuid', 'source-model-tag': 'source_model_tag', 'spaces': 'spaces', 'users': 'users'}
+
     def __init__(self, applicationofferdetails=None, application_description=None, application_name=None, bindings=None, charm_url=None, connections=None, endpoints=None, offer_name=None, offer_url=None, offer_uuid=None, source_model_tag=None, spaces=None, users=None, **unknown_fields):
         '''
         applicationofferdetails : ApplicationOfferDetails
@@ -2077,6 +2148,7 @@ class ApplicationOfferAdminDetails(Type):
 class ApplicationOfferAdminDetailsV5(Type):
     _toSchema = {'application_description': 'application-description', 'application_name': 'application-name', 'applicationofferdetailsv5': 'ApplicationOfferDetailsV5', 'charm_url': 'charm-url', 'connections': 'connections', 'endpoints': 'endpoints', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'offer_uuid': 'offer-uuid', 'source_model_tag': 'source-model-tag', 'users': 'users'}
     _toPy = {'ApplicationOfferDetailsV5': 'applicationofferdetailsv5', 'application-description': 'application_description', 'application-name': 'application_name', 'charm-url': 'charm_url', 'connections': 'connections', 'endpoints': 'endpoints', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'offer-uuid': 'offer_uuid', 'source-model-tag': 'source_model_tag', 'users': 'users'}
+
     def __init__(self, applicationofferdetailsv5=None, application_description=None, application_name=None, charm_url=None, connections=None, endpoints=None, offer_name=None, offer_url=None, offer_uuid=None, source_model_tag=None, users=None, **unknown_fields):
         '''
         applicationofferdetailsv5 : ApplicationOfferDetailsV5
@@ -2155,6 +2227,7 @@ class ApplicationOfferAdminDetailsV5(Type):
 class ApplicationOfferDetails(Type):
     _toSchema = {'application_description': 'application-description', 'bindings': 'bindings', 'endpoints': 'endpoints', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'offer_uuid': 'offer-uuid', 'source_model_tag': 'source-model-tag', 'spaces': 'spaces', 'users': 'users'}
     _toPy = {'application-description': 'application_description', 'bindings': 'bindings', 'endpoints': 'endpoints', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'offer-uuid': 'offer_uuid', 'source-model-tag': 'source_model_tag', 'spaces': 'spaces', 'users': 'users'}
+
     def __init__(self, application_description=None, bindings=None, endpoints=None, offer_name=None, offer_url=None, offer_uuid=None, source_model_tag=None, spaces=None, users=None, **unknown_fields):
         '''
         application_description : str
@@ -2221,6 +2294,7 @@ class ApplicationOfferDetails(Type):
 class ApplicationOfferDetailsV5(Type):
     _toSchema = {'application_description': 'application-description', 'endpoints': 'endpoints', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'offer_uuid': 'offer-uuid', 'source_model_tag': 'source-model-tag', 'users': 'users'}
     _toPy = {'application-description': 'application_description', 'endpoints': 'endpoints', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'offer-uuid': 'offer_uuid', 'source-model-tag': 'source_model_tag', 'users': 'users'}
+
     def __init__(self, application_description=None, endpoints=None, offer_name=None, offer_url=None, offer_uuid=None, source_model_tag=None, users=None, **unknown_fields):
         '''
         application_description : str
@@ -2275,6 +2349,7 @@ class ApplicationOfferDetailsV5(Type):
 class ApplicationOfferResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -2299,6 +2374,7 @@ class ApplicationOfferResult(Type):
 class ApplicationOfferStatus(Type):
     _toSchema = {'active_connected_count': 'active-connected-count', 'application_name': 'application-name', 'charm': 'charm', 'endpoints': 'endpoints', 'err': 'err', 'offer_name': 'offer-name', 'total_connected_count': 'total-connected-count'}
     _toPy = {'active-connected-count': 'active_connected_count', 'application-name': 'application_name', 'charm': 'charm', 'endpoints': 'endpoints', 'err': 'err', 'offer-name': 'offer_name', 'total-connected-count': 'total_connected_count'}
+
     def __init__(self, active_connected_count=None, application_name=None, charm=None, endpoints=None, err=None, offer_name=None, total_connected_count=None, **unknown_fields):
         '''
         active_connected_count : int
@@ -2353,6 +2429,7 @@ class ApplicationOfferStatus(Type):
 class ApplicationOffersResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ApplicationOfferResult]
@@ -2371,6 +2448,7 @@ class ApplicationOffersResults(Type):
 class ApplicationOpenedPorts(Type):
     _toSchema = {'endpoint': 'endpoint', 'port_ranges': 'port-ranges'}
     _toPy = {'endpoint': 'endpoint', 'port-ranges': 'port_ranges'}
+
     def __init__(self, endpoint=None, port_ranges=None, **unknown_fields):
         '''
         endpoint : str
@@ -2395,6 +2473,7 @@ class ApplicationOpenedPorts(Type):
 class ApplicationOpenedPortsResult(Type):
     _toSchema = {'application_port_ranges': 'application-port-ranges', 'error': 'error'}
     _toPy = {'application-port-ranges': 'application_port_ranges', 'error': 'error'}
+
     def __init__(self, application_port_ranges=None, error=None, **unknown_fields):
         '''
         application_port_ranges : typing.Sequence[~ApplicationOpenedPorts]
@@ -2419,6 +2498,7 @@ class ApplicationOpenedPortsResult(Type):
 class ApplicationOpenedPortsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ApplicationOpenedPortsResult]
@@ -2437,6 +2517,7 @@ class ApplicationOpenedPortsResults(Type):
 class ApplicationResult(Type):
     _toSchema = {'base': 'base', 'channel': 'channel', 'charm': 'charm', 'constraints': 'constraints', 'endpoint_bindings': 'endpoint-bindings', 'exposed': 'exposed', 'exposed_endpoints': 'exposed-endpoints', 'life': 'life', 'principal': 'principal', 'remote': 'remote', 'tag': 'tag'}
     _toPy = {'base': 'base', 'channel': 'channel', 'charm': 'charm', 'constraints': 'constraints', 'endpoint-bindings': 'endpoint_bindings', 'exposed': 'exposed', 'exposed-endpoints': 'exposed_endpoints', 'life': 'life', 'principal': 'principal', 'remote': 'remote', 'tag': 'tag'}
+
     def __init__(self, base=None, channel=None, charm=None, constraints=None, endpoint_bindings=None, exposed=None, exposed_endpoints=None, life=None, principal=None, remote=None, tag=None, **unknown_fields):
         '''
         base : Base
@@ -2515,6 +2596,7 @@ class ApplicationResult(Type):
 class ApplicationSetCharm(Type):
     _toSchema = {'application': 'application', 'channel': 'channel', 'charm_origin': 'charm-origin', 'charm_url': 'charm-url', 'config_settings': 'config-settings', 'config_settings_yaml': 'config-settings-yaml', 'endpoint_bindings': 'endpoint-bindings', 'force': 'force', 'force_base': 'force-base', 'force_units': 'force-units', 'generation': 'generation', 'resource_ids': 'resource-ids', 'storage_constraints': 'storage-constraints'}
     _toPy = {'application': 'application', 'channel': 'channel', 'charm-origin': 'charm_origin', 'charm-url': 'charm_url', 'config-settings': 'config_settings', 'config-settings-yaml': 'config_settings_yaml', 'endpoint-bindings': 'endpoint_bindings', 'force': 'force', 'force-base': 'force_base', 'force-units': 'force_units', 'generation': 'generation', 'resource-ids': 'resource_ids', 'storage-constraints': 'storage_constraints'}
+
     def __init__(self, application=None, channel=None, charm_origin=None, charm_url=None, config_settings=None, config_settings_yaml=None, endpoint_bindings=None, force=None, force_base=None, force_units=None, generation=None, resource_ids=None, storage_constraints=None, **unknown_fields):
         '''
         application : str
@@ -2605,6 +2687,7 @@ class ApplicationSetCharm(Type):
 class ApplicationStatus(Type):
     _toSchema = {'base': 'base', 'can_upgrade_to': 'can-upgrade-to', 'charm': 'charm', 'charm_channel': 'charm-channel', 'charm_profile': 'charm-profile', 'charm_version': 'charm-version', 'endpoint_bindings': 'endpoint-bindings', 'err': 'err', 'exposed': 'exposed', 'exposed_endpoints': 'exposed-endpoints', 'int_': 'int', 'life': 'life', 'meter_statuses': 'meter-statuses', 'provider_id': 'provider-id', 'public_address': 'public-address', 'relations': 'relations', 'status': 'status', 'subordinate_to': 'subordinate-to', 'units': 'units', 'workload_version': 'workload-version'}
     _toPy = {'base': 'base', 'can-upgrade-to': 'can_upgrade_to', 'charm': 'charm', 'charm-channel': 'charm_channel', 'charm-profile': 'charm_profile', 'charm-version': 'charm_version', 'endpoint-bindings': 'endpoint_bindings', 'err': 'err', 'exposed': 'exposed', 'exposed-endpoints': 'exposed_endpoints', 'int': 'int_', 'life': 'life', 'meter-statuses': 'meter_statuses', 'provider-id': 'provider_id', 'public-address': 'public_address', 'relations': 'relations', 'status': 'status', 'subordinate-to': 'subordinate_to', 'units': 'units', 'workload-version': 'workload_version'}
+
     def __init__(self, base=None, can_upgrade_to=None, charm=None, charm_channel=None, charm_profile=None, charm_version=None, endpoint_bindings=None, err=None, exposed=None, exposed_endpoints=None, int_=None, life=None, meter_statuses=None, provider_id=None, public_address=None, relations=None, status=None, subordinate_to=None, units=None, workload_version=None, **unknown_fields):
         '''
         base : Base
@@ -2737,6 +2820,7 @@ class ApplicationStatus(Type):
 class ApplicationStatusResult(Type):
     _toSchema = {'application': 'application', 'error': 'error', 'units': 'units'}
     _toPy = {'application': 'application', 'error': 'error', 'units': 'units'}
+
     def __init__(self, application=None, error=None, units=None, **unknown_fields):
         '''
         application : StatusResult
@@ -2767,6 +2851,7 @@ class ApplicationStatusResult(Type):
 class ApplicationStatusResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ApplicationStatusResult]
@@ -2785,6 +2870,7 @@ class ApplicationStatusResults(Type):
 class ApplicationTag(Type):
     _toSchema = {'name': 'Name'}
     _toPy = {'Name': 'name'}
+
     def __init__(self, name=None, **unknown_fields):
         '''
         name : str
@@ -2803,6 +2889,7 @@ class ApplicationTag(Type):
 class ApplicationUnexpose(Type):
     _toSchema = {'application': 'application', 'exposed_endpoints': 'exposed-endpoints'}
     _toPy = {'application': 'application', 'exposed-endpoints': 'exposed_endpoints'}
+
     def __init__(self, application=None, exposed_endpoints=None, **unknown_fields):
         '''
         application : str
@@ -2827,6 +2914,7 @@ class ApplicationUnexpose(Type):
 class ApplicationUnitInfo(Type):
     _toSchema = {'provider_id': 'provider-id', 'unit_tag': 'unit-tag'}
     _toPy = {'provider-id': 'provider_id', 'unit-tag': 'unit_tag'}
+
     def __init__(self, provider_id=None, unit_tag=None, **unknown_fields):
         '''
         provider_id : str
@@ -2851,6 +2939,7 @@ class ApplicationUnitInfo(Type):
 class ApplicationUnitParams(Type):
     _toSchema = {'address': 'address', 'data': 'data', 'filesystem_info': 'filesystem-info', 'info': 'info', 'ports': 'ports', 'provider_id': 'provider-id', 'stateful': 'stateful', 'status': 'status', 'unit_tag': 'unit-tag'}
     _toPy = {'address': 'address', 'data': 'data', 'filesystem-info': 'filesystem_info', 'info': 'info', 'ports': 'ports', 'provider-id': 'provider_id', 'stateful': 'stateful', 'status': 'status', 'unit-tag': 'unit_tag'}
+
     def __init__(self, address=None, data=None, filesystem_info=None, info=None, ports=None, provider_id=None, stateful=None, status=None, unit_tag=None, **unknown_fields):
         '''
         address : str
@@ -2917,6 +3006,7 @@ class ApplicationUnitParams(Type):
 class ApplicationUnset(Type):
     _toSchema = {'application': 'application', 'branch': 'branch', 'options': 'options'}
     _toPy = {'application': 'application', 'branch': 'branch', 'options': 'options'}
+
     def __init__(self, application=None, branch=None, options=None, **unknown_fields):
         '''
         application : str
@@ -2947,6 +3037,7 @@ class ApplicationUnset(Type):
 class ApplicationsCharmActionsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ApplicationCharmActionsResult]
@@ -2965,6 +3056,7 @@ class ApplicationsCharmActionsResults(Type):
 class ApplicationsDeploy(Type):
     _toSchema = {'applications': 'applications'}
     _toPy = {'applications': 'applications'}
+
     def __init__(self, applications=None, **unknown_fields):
         '''
         applications : typing.Sequence[~ApplicationDeploy]
@@ -2983,6 +3075,7 @@ class ApplicationsDeploy(Type):
 class AuthUserInfo(Type):
     _toSchema = {'controller_access': 'controller-access', 'credentials': 'credentials', 'display_name': 'display-name', 'identity': 'identity', 'last_connection': 'last-connection', 'model_access': 'model-access'}
     _toPy = {'controller-access': 'controller_access', 'credentials': 'credentials', 'display-name': 'display_name', 'identity': 'identity', 'last-connection': 'last_connection', 'model-access': 'model_access'}
+
     def __init__(self, controller_access=None, credentials=None, display_name=None, identity=None, last_connection=None, model_access=None, **unknown_fields):
         '''
         controller_access : str
@@ -3031,6 +3124,7 @@ class AuthUserInfo(Type):
 class BackupsCreateArgs(Type):
     _toSchema = {'no_download': 'no-download', 'notes': 'notes'}
     _toPy = {'no-download': 'no_download', 'notes': 'notes'}
+
     def __init__(self, no_download=None, notes=None, **unknown_fields):
         '''
         no_download : bool
@@ -3055,6 +3149,7 @@ class BackupsCreateArgs(Type):
 class BackupsMetadataResult(Type):
     _toSchema = {'base': 'base', 'checksum': 'checksum', 'checksum_format': 'checksum-format', 'controller_machine_id': 'controller-machine-id', 'controller_machine_inst_id': 'controller-machine-inst-id', 'controller_uuid': 'controller-uuid', 'filename': 'filename', 'finished': 'finished', 'format_version': 'format-version', 'ha_nodes': 'ha-nodes', 'hostname': 'hostname', 'id_': 'id', 'machine': 'machine', 'model': 'model', 'notes': 'notes', 'size': 'size', 'started': 'started', 'stored': 'stored', 'version': 'version'}
     _toPy = {'base': 'base', 'checksum': 'checksum', 'checksum-format': 'checksum_format', 'controller-machine-id': 'controller_machine_id', 'controller-machine-inst-id': 'controller_machine_inst_id', 'controller-uuid': 'controller_uuid', 'filename': 'filename', 'finished': 'finished', 'format-version': 'format_version', 'ha-nodes': 'ha_nodes', 'hostname': 'hostname', 'id': 'id_', 'machine': 'machine', 'model': 'model', 'notes': 'notes', 'size': 'size', 'started': 'started', 'stored': 'stored', 'version': 'version'}
+
     def __init__(self, base=None, checksum=None, checksum_format=None, controller_machine_id=None, controller_machine_inst_id=None, controller_uuid=None, filename=None, finished=None, format_version=None, ha_nodes=None, hostname=None, id_=None, machine=None, model=None, notes=None, size=None, started=None, stored=None, version=None, **unknown_fields):
         '''
         base : str
@@ -3181,6 +3276,7 @@ class BackupsMetadataResult(Type):
 class Base(Type):
     _toSchema = {'channel': 'channel', 'name': 'name'}
     _toPy = {'channel': 'channel', 'name': 'name'}
+
     def __init__(self, channel=None, name=None, **unknown_fields):
         '''
         channel : str
@@ -3205,6 +3301,7 @@ class Base(Type):
 class Binary(Type):
     _toSchema = {'arch': 'Arch', 'build': 'Build', 'major': 'Major', 'minor': 'Minor', 'number': 'Number', 'patch': 'Patch', 'release': 'Release', 'tag': 'Tag'}
     _toPy = {'Arch': 'arch', 'Build': 'build', 'Major': 'major', 'Minor': 'minor', 'Number': 'number', 'Patch': 'patch', 'Release': 'release', 'Tag': 'tag'}
+
     def __init__(self, arch=None, build=None, major=None, minor=None, number=None, patch=None, release=None, tag=None, **unknown_fields):
         '''
         arch : str
@@ -3265,6 +3362,7 @@ class Binary(Type):
 class Block(Type):
     _toSchema = {'id_': 'id', 'message': 'message', 'tag': 'tag', 'type_': 'type'}
     _toPy = {'id': 'id_', 'message': 'message', 'tag': 'tag', 'type': 'type_'}
+
     def __init__(self, id_=None, message=None, tag=None, type_=None, **unknown_fields):
         '''
         id_ : str
@@ -3301,6 +3399,7 @@ class Block(Type):
 class BlockDevice(Type):
     _toSchema = {'busaddress': 'BusAddress', 'devicelinks': 'DeviceLinks', 'devicename': 'DeviceName', 'filesystemtype': 'FilesystemType', 'hardwareid': 'HardwareId', 'inuse': 'InUse', 'label': 'Label', 'mountpoint': 'MountPoint', 'serialid': 'SerialId', 'size': 'Size', 'uuid': 'UUID', 'wwn': 'WWN'}
     _toPy = {'BusAddress': 'busaddress', 'DeviceLinks': 'devicelinks', 'DeviceName': 'devicename', 'FilesystemType': 'filesystemtype', 'HardwareId': 'hardwareid', 'InUse': 'inuse', 'Label': 'label', 'MountPoint': 'mountpoint', 'SerialId': 'serialid', 'Size': 'size', 'UUID': 'uuid', 'WWN': 'wwn'}
+
     def __init__(self, busaddress=None, devicelinks=None, devicename=None, filesystemtype=None, hardwareid=None, inuse=None, label=None, mountpoint=None, serialid=None, size=None, uuid=None, wwn=None, **unknown_fields):
         '''
         busaddress : str
@@ -3385,6 +3484,7 @@ class BlockDevice(Type):
 class BlockDeviceResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -3409,6 +3509,7 @@ class BlockDeviceResult(Type):
 class BlockDeviceResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~BlockDeviceResult]
@@ -3427,6 +3528,7 @@ class BlockDeviceResults(Type):
 class BlockResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -3451,6 +3553,7 @@ class BlockResult(Type):
 class BlockResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~BlockResult]
@@ -3469,6 +3572,7 @@ class BlockResults(Type):
 class BlockSwitchParams(Type):
     _toSchema = {'message': 'message', 'type_': 'type'}
     _toPy = {'message': 'message', 'type': 'type_'}
+
     def __init__(self, message=None, type_=None, **unknown_fields):
         '''
         message : str
@@ -3493,6 +3597,7 @@ class BlockSwitchParams(Type):
 class BoolResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -3517,6 +3622,7 @@ class BoolResult(Type):
 class BoolResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~BoolResult]
@@ -3535,6 +3641,7 @@ class BoolResults(Type):
 class BranchArg(Type):
     _toSchema = {'branch': 'branch'}
     _toPy = {'branch': 'branch'}
+
     def __init__(self, branch=None, **unknown_fields):
         '''
         branch : str
@@ -3553,6 +3660,7 @@ class BranchArg(Type):
 class BranchInfoArgs(Type):
     _toSchema = {'branches': 'branches', 'detailed': 'detailed'}
     _toPy = {'branches': 'branches', 'detailed': 'detailed'}
+
     def __init__(self, branches=None, detailed=None, **unknown_fields):
         '''
         branches : typing.Sequence[str]
@@ -3577,6 +3685,7 @@ class BranchInfoArgs(Type):
 class BranchResults(Type):
     _toSchema = {'error': 'error', 'generations': 'generations'}
     _toPy = {'error': 'error', 'generations': 'generations'}
+
     def __init__(self, error=None, generations=None, **unknown_fields):
         '''
         error : Error
@@ -3601,6 +3710,7 @@ class BranchResults(Type):
 class BranchStatus(Type):
     _toSchema = {'assigned_units': 'assigned-units', 'created': 'created', 'created_by': 'created-by'}
     _toPy = {'assigned-units': 'assigned_units', 'created': 'created', 'created-by': 'created_by'}
+
     def __init__(self, assigned_units=None, created=None, created_by=None, **unknown_fields):
         '''
         assigned_units : typing.Mapping[str, typing.Sequence[str]]
@@ -3631,6 +3741,7 @@ class BranchStatus(Type):
 class BranchTrackArg(Type):
     _toSchema = {'branch': 'branch', 'entities': 'entities', 'num_units': 'num-units'}
     _toPy = {'branch': 'branch', 'entities': 'entities', 'num-units': 'num_units'}
+
     def __init__(self, branch=None, entities=None, num_units=None, **unknown_fields):
         '''
         branch : str
@@ -3661,6 +3772,7 @@ class BranchTrackArg(Type):
 class BulkImportStorageParams(Type):
     _toSchema = {'storage': 'storage'}
     _toPy = {'storage': 'storage'}
+
     def __init__(self, storage=None, **unknown_fields):
         '''
         storage : typing.Sequence[~ImportStorageParams]
@@ -3679,6 +3791,7 @@ class BulkImportStorageParams(Type):
 class BundleChange(Type):
     _toSchema = {'args': 'args', 'id_': 'id', 'method': 'method', 'requires': 'requires'}
     _toPy = {'args': 'args', 'id': 'id_', 'method': 'method', 'requires': 'requires'}
+
     def __init__(self, args=None, id_=None, method=None, requires=None, **unknown_fields):
         '''
         args : typing.Sequence[typing.Any]
@@ -3715,6 +3828,7 @@ class BundleChange(Type):
 class BundleChangesMapArgs(Type):
     _toSchema = {'args': 'args', 'id_': 'id', 'method': 'method', 'requires': 'requires'}
     _toPy = {'args': 'args', 'id': 'id_', 'method': 'method', 'requires': 'requires'}
+
     def __init__(self, args=None, id_=None, method=None, requires=None, **unknown_fields):
         '''
         args : typing.Mapping[str, typing.Any]
@@ -3751,6 +3865,7 @@ class BundleChangesMapArgs(Type):
 class BundleChangesMapArgsResults(Type):
     _toSchema = {'changes': 'changes', 'errors': 'errors'}
     _toPy = {'changes': 'changes', 'errors': 'errors'}
+
     def __init__(self, changes=None, errors=None, **unknown_fields):
         '''
         changes : typing.Sequence[~BundleChangesMapArgs]
@@ -3775,6 +3890,7 @@ class BundleChangesMapArgsResults(Type):
 class BundleChangesParams(Type):
     _toSchema = {'bundleurl': 'bundleURL', 'yaml': 'yaml'}
     _toPy = {'bundleURL': 'bundleurl', 'yaml': 'yaml'}
+
     def __init__(self, bundleurl=None, yaml=None, **unknown_fields):
         '''
         bundleurl : str
@@ -3799,6 +3915,7 @@ class BundleChangesParams(Type):
 class BundleChangesResults(Type):
     _toSchema = {'changes': 'changes', 'errors': 'errors'}
     _toPy = {'changes': 'changes', 'errors': 'errors'}
+
     def __init__(self, changes=None, errors=None, **unknown_fields):
         '''
         changes : typing.Sequence[~BundleChange]
@@ -3823,6 +3940,7 @@ class BundleChangesResults(Type):
 class BytesResult(Type):
     _toSchema = {'result': 'result'}
     _toPy = {'result': 'result'}
+
     def __init__(self, result=None, **unknown_fields):
         '''
         result : typing.Sequence[int]
@@ -3841,6 +3959,7 @@ class BytesResult(Type):
 class CAASApplicationGarbageCollectArg(Type):
     _toSchema = {'active_pod_names': 'active-pod-names', 'application': 'application', 'desired_replicas': 'desired-replicas', 'force': 'force', 'observed_units': 'observed-units'}
     _toPy = {'active-pod-names': 'active_pod_names', 'application': 'application', 'desired-replicas': 'desired_replicas', 'force': 'force', 'observed-units': 'observed_units'}
+
     def __init__(self, active_pod_names=None, application=None, desired_replicas=None, force=None, observed_units=None, **unknown_fields):
         '''
         active_pod_names : typing.Sequence[str]
@@ -3883,6 +4002,7 @@ class CAASApplicationGarbageCollectArg(Type):
 class CAASApplicationGarbageCollectArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~CAASApplicationGarbageCollectArg]
@@ -3901,6 +4021,7 @@ class CAASApplicationGarbageCollectArgs(Type):
 class CAASApplicationOCIResourceResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -3925,6 +4046,7 @@ class CAASApplicationOCIResourceResult(Type):
 class CAASApplicationOCIResourceResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~CAASApplicationOCIResourceResult]
@@ -3943,6 +4065,7 @@ class CAASApplicationOCIResourceResults(Type):
 class CAASApplicationOCIResources(Type):
     _toSchema = {'images': 'images'}
     _toPy = {'images': 'images'}
+
     def __init__(self, images=None, **unknown_fields):
         '''
         images : typing.Mapping[str, ~DockerImageInfo]
@@ -3961,6 +4084,7 @@ class CAASApplicationOCIResources(Type):
 class CAASApplicationProvisionerConfig(Type):
     _toSchema = {'unmanaged_applications': 'unmanaged-applications'}
     _toPy = {'unmanaged-applications': 'unmanaged_applications'}
+
     def __init__(self, unmanaged_applications=None, **unknown_fields):
         '''
         unmanaged_applications : Entities
@@ -3979,6 +4103,7 @@ class CAASApplicationProvisionerConfig(Type):
 class CAASApplicationProvisionerConfigResult(Type):
     _toSchema = {'error': 'error', 'provisioner_config': 'provisioner-config'}
     _toPy = {'error': 'error', 'provisioner-config': 'provisioner_config'}
+
     def __init__(self, error=None, provisioner_config=None, **unknown_fields):
         '''
         error : Error
@@ -4003,6 +4128,7 @@ class CAASApplicationProvisionerConfigResult(Type):
 class CAASApplicationProvisioningInfo(Type):
     _toSchema = {'api_addresses': 'api-addresses', 'base': 'base', 'ca_cert': 'ca-cert', 'charm_modified_version': 'charm-modified-version', 'charm_url': 'charm-url', 'constraints': 'constraints', 'devices': 'devices', 'error': 'error', 'filesystems': 'filesystems', 'image_repo': 'image-repo', 'scale': 'scale', 'tags': 'tags', 'trust': 'trust', 'version': 'version', 'volumes': 'volumes'}
     _toPy = {'api-addresses': 'api_addresses', 'base': 'base', 'ca-cert': 'ca_cert', 'charm-modified-version': 'charm_modified_version', 'charm-url': 'charm_url', 'constraints': 'constraints', 'devices': 'devices', 'error': 'error', 'filesystems': 'filesystems', 'image-repo': 'image_repo', 'scale': 'scale', 'tags': 'tags', 'trust': 'trust', 'version': 'version', 'volumes': 'volumes'}
+
     def __init__(self, api_addresses=None, base=None, ca_cert=None, charm_modified_version=None, charm_url=None, constraints=None, devices=None, error=None, filesystems=None, image_repo=None, scale=None, tags=None, trust=None, version=None, volumes=None, **unknown_fields):
         '''
         api_addresses : typing.Sequence[str]
@@ -4105,6 +4231,7 @@ class CAASApplicationProvisioningInfo(Type):
 class CAASApplicationProvisioningInfoResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~CAASApplicationProvisioningInfo]
@@ -4123,6 +4250,7 @@ class CAASApplicationProvisioningInfoResults(Type):
 class CAASApplicationProvisioningState(Type):
     _toSchema = {'scale_target': 'scale-target', 'scaling': 'scaling'}
     _toPy = {'scale-target': 'scale_target', 'scaling': 'scaling'}
+
     def __init__(self, scale_target=None, scaling=None, **unknown_fields):
         '''
         scale_target : int
@@ -4147,6 +4275,7 @@ class CAASApplicationProvisioningState(Type):
 class CAASApplicationProvisioningStateArg(Type):
     _toSchema = {'application': 'application', 'provisioning_state': 'provisioning-state'}
     _toPy = {'application': 'application', 'provisioning-state': 'provisioning_state'}
+
     def __init__(self, application=None, provisioning_state=None, **unknown_fields):
         '''
         application : Entity
@@ -4171,6 +4300,7 @@ class CAASApplicationProvisioningStateArg(Type):
 class CAASApplicationProvisioningStateResult(Type):
     _toSchema = {'error': 'error', 'provisioning_state': 'provisioning-state'}
     _toPy = {'error': 'error', 'provisioning-state': 'provisioning_state'}
+
     def __init__(self, error=None, provisioning_state=None, **unknown_fields):
         '''
         error : Error
@@ -4195,6 +4325,7 @@ class CAASApplicationProvisioningStateResult(Type):
 class CAASUnitInfo(Type):
     _toSchema = {'tag': 'tag', 'unit_status': 'unit-status'}
     _toPy = {'tag': 'tag', 'unit-status': 'unit_status'}
+
     def __init__(self, tag=None, unit_status=None, **unknown_fields):
         '''
         tag : str
@@ -4219,6 +4350,7 @@ class CAASUnitInfo(Type):
 class CAASUnitIntroduction(Type):
     _toSchema = {'agent_conf': 'agent-conf', 'unit_name': 'unit-name'}
     _toPy = {'agent-conf': 'agent_conf', 'unit-name': 'unit_name'}
+
     def __init__(self, agent_conf=None, unit_name=None, **unknown_fields):
         '''
         agent_conf : typing.Sequence[int]
@@ -4243,6 +4375,7 @@ class CAASUnitIntroduction(Type):
 class CAASUnitIntroductionArgs(Type):
     _toSchema = {'pod_name': 'pod-name', 'pod_uuid': 'pod-uuid'}
     _toPy = {'pod-name': 'pod_name', 'pod-uuid': 'pod_uuid'}
+
     def __init__(self, pod_name=None, pod_uuid=None, **unknown_fields):
         '''
         pod_name : str
@@ -4267,6 +4400,7 @@ class CAASUnitIntroductionArgs(Type):
 class CAASUnitIntroductionResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -4291,6 +4425,7 @@ class CAASUnitIntroductionResult(Type):
 class CAASUnitTerminationResult(Type):
     _toSchema = {'error': 'Error', 'willrestart': 'WillRestart'}
     _toPy = {'Error': 'error', 'WillRestart': 'willrestart'}
+
     def __init__(self, error=None, willrestart=None, **unknown_fields):
         '''
         error : Error
@@ -4315,6 +4450,7 @@ class CAASUnitTerminationResult(Type):
 class CAASUnitsResult(Type):
     _toSchema = {'error': 'error', 'units': 'units'}
     _toPy = {'error': 'error', 'units': 'units'}
+
     def __init__(self, error=None, units=None, **unknown_fields):
         '''
         error : Error
@@ -4339,6 +4475,7 @@ class CAASUnitsResult(Type):
 class CAASUnitsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~CAASUnitsResult]
@@ -4357,6 +4494,7 @@ class CAASUnitsResults(Type):
 class CIDRParams(Type):
     _toSchema = {'cidrs': 'cidrs'}
     _toPy = {'cidrs': 'cidrs'}
+
     def __init__(self, cidrs=None, **unknown_fields):
         '''
         cidrs : typing.Sequence[str]
@@ -4375,6 +4513,7 @@ class CIDRParams(Type):
 class ChangeModelCredentialParams(Type):
     _toSchema = {'credential_tag': 'credential-tag', 'model_tag': 'model-tag'}
     _toPy = {'credential-tag': 'credential_tag', 'model-tag': 'model_tag'}
+
     def __init__(self, credential_tag=None, model_tag=None, **unknown_fields):
         '''
         credential_tag : str
@@ -4399,6 +4538,7 @@ class ChangeModelCredentialParams(Type):
 class ChangeModelCredentialsParams(Type):
     _toSchema = {'model_credentials': 'model-credentials'}
     _toPy = {'model-credentials': 'model_credentials'}
+
     def __init__(self, model_credentials=None, **unknown_fields):
         '''
         model_credentials : typing.Sequence[~ChangeModelCredentialParams]
@@ -4417,6 +4557,7 @@ class ChangeModelCredentialsParams(Type):
 class ChangeSecretBackendArg(Type):
     _toSchema = {'content': 'content', 'revision': 'revision', 'uri': 'uri'}
     _toPy = {'content': 'content', 'revision': 'revision', 'uri': 'uri'}
+
     def __init__(self, content=None, revision=None, uri=None, **unknown_fields):
         '''
         content : SecretContentParams
@@ -4447,6 +4588,7 @@ class ChangeSecretBackendArg(Type):
 class ChangeSecretBackendArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~ChangeSecretBackendArg]
@@ -4465,6 +4607,7 @@ class ChangeSecretBackendArgs(Type):
 class Channel(Type):
     _toSchema = {'branch': 'branch', 'risk': 'risk', 'track': 'track'}
     _toPy = {'branch': 'branch', 'risk': 'risk', 'track': 'track'}
+
     def __init__(self, branch=None, risk=None, track=None, **unknown_fields):
         '''
         branch : str
@@ -4495,6 +4638,7 @@ class Channel(Type):
 class Charm(Type):
     _toSchema = {'actions': 'actions', 'config': 'config', 'lxd_profile': 'lxd-profile', 'manifest': 'manifest', 'meta': 'meta', 'metrics': 'metrics', 'revision': 'revision', 'url': 'url'}
     _toPy = {'actions': 'actions', 'config': 'config', 'lxd-profile': 'lxd_profile', 'manifest': 'manifest', 'meta': 'meta', 'metrics': 'metrics', 'revision': 'revision', 'url': 'url'}
+
     def __init__(self, actions=None, config=None, lxd_profile=None, manifest=None, meta=None, metrics=None, revision=None, url=None, **unknown_fields):
         '''
         actions : CharmActions
@@ -4555,6 +4699,7 @@ class Charm(Type):
 class CharmActionSpec(Type):
     _toSchema = {'description': 'description', 'params': 'params'}
     _toPy = {'description': 'description', 'params': 'params'}
+
     def __init__(self, description=None, params=None, **unknown_fields):
         '''
         description : str
@@ -4579,6 +4724,7 @@ class CharmActionSpec(Type):
 class CharmActions(Type):
     _toSchema = {'specs': 'specs'}
     _toPy = {'specs': 'specs'}
+
     def __init__(self, specs=None, **unknown_fields):
         '''
         specs : typing.Mapping[str, ~CharmActionSpec]
@@ -4597,6 +4743,7 @@ class CharmActions(Type):
 class CharmBase(Type):
     _toSchema = {'architectures': 'architectures', 'channel': 'channel', 'name': 'name'}
     _toPy = {'architectures': 'architectures', 'channel': 'channel', 'name': 'name'}
+
     def __init__(self, architectures=None, channel=None, name=None, **unknown_fields):
         '''
         architectures : typing.Sequence[str]
@@ -4627,6 +4774,7 @@ class CharmBase(Type):
 class CharmContainer(Type):
     _toSchema = {'gid': 'gid', 'mounts': 'mounts', 'resource': 'resource', 'uid': 'uid'}
     _toPy = {'gid': 'gid', 'mounts': 'mounts', 'resource': 'resource', 'uid': 'uid'}
+
     def __init__(self, gid=None, mounts=None, resource=None, uid=None, **unknown_fields):
         '''
         gid : int
@@ -4663,6 +4811,7 @@ class CharmContainer(Type):
 class CharmDeployment(Type):
     _toSchema = {'min_version': 'min-version', 'mode': 'mode', 'service': 'service', 'type_': 'type'}
     _toPy = {'min-version': 'min_version', 'mode': 'mode', 'service': 'service', 'type': 'type_'}
+
     def __init__(self, min_version=None, mode=None, service=None, type_=None, **unknown_fields):
         '''
         min_version : str
@@ -4699,6 +4848,7 @@ class CharmDeployment(Type):
 class CharmDevice(Type):
     _toSchema = {'countmax': 'CountMax', 'countmin': 'CountMin', 'description': 'Description', 'name': 'Name', 'type_': 'Type'}
     _toPy = {'CountMax': 'countmax', 'CountMin': 'countmin', 'Description': 'description', 'Name': 'name', 'Type': 'type_'}
+
     def __init__(self, countmax=None, countmin=None, description=None, name=None, type_=None, **unknown_fields):
         '''
         countmax : int
@@ -4741,6 +4891,7 @@ class CharmDevice(Type):
 class CharmLXDProfile(Type):
     _toSchema = {'config': 'config', 'description': 'description', 'devices': 'devices'}
     _toPy = {'config': 'config', 'description': 'description', 'devices': 'devices'}
+
     def __init__(self, config=None, description=None, devices=None, **unknown_fields):
         '''
         config : typing.Mapping[str, str]
@@ -4771,6 +4922,7 @@ class CharmLXDProfile(Type):
 class CharmManifest(Type):
     _toSchema = {'bases': 'bases'}
     _toPy = {'bases': 'bases'}
+
     def __init__(self, bases=None, **unknown_fields):
         '''
         bases : typing.Sequence[~CharmBase]
@@ -4789,6 +4941,7 @@ class CharmManifest(Type):
 class CharmMeta(Type):
     _toSchema = {'assumes_expr': 'assumes-expr', 'categories': 'categories', 'charm_user': 'charm-user', 'containers': 'containers', 'deployment': 'deployment', 'description': 'description', 'devices': 'devices', 'extra_bindings': 'extra-bindings', 'min_juju_version': 'min-juju-version', 'name': 'name', 'payload_classes': 'payload-classes', 'peers': 'peers', 'provides': 'provides', 'requires': 'requires', 'resources': 'resources', 'series': 'series', 'storage': 'storage', 'subordinate': 'subordinate', 'summary': 'summary', 'tags': 'tags', 'terms': 'terms'}
     _toPy = {'assumes-expr': 'assumes_expr', 'categories': 'categories', 'charm-user': 'charm_user', 'containers': 'containers', 'deployment': 'deployment', 'description': 'description', 'devices': 'devices', 'extra-bindings': 'extra_bindings', 'min-juju-version': 'min_juju_version', 'name': 'name', 'payload-classes': 'payload_classes', 'peers': 'peers', 'provides': 'provides', 'requires': 'requires', 'resources': 'resources', 'series': 'series', 'storage': 'storage', 'subordinate': 'subordinate', 'summary': 'summary', 'tags': 'tags', 'terms': 'terms'}
+
     def __init__(self, assumes_expr=None, categories=None, charm_user=None, containers=None, deployment=None, description=None, devices=None, extra_bindings=None, min_juju_version=None, name=None, payload_classes=None, peers=None, provides=None, requires=None, resources=None, series=None, storage=None, subordinate=None, summary=None, tags=None, terms=None, **unknown_fields):
         '''
         assumes_expr : ExpressionTree
@@ -4927,6 +5080,7 @@ class CharmMeta(Type):
 class CharmMetric(Type):
     _toSchema = {'description': 'description', 'type_': 'type'}
     _toPy = {'description': 'description', 'type': 'type_'}
+
     def __init__(self, description=None, type_=None, **unknown_fields):
         '''
         description : str
@@ -4951,6 +5105,7 @@ class CharmMetric(Type):
 class CharmMetrics(Type):
     _toSchema = {'metrics': 'metrics', 'plan': 'plan'}
     _toPy = {'metrics': 'metrics', 'plan': 'plan'}
+
     def __init__(self, metrics=None, plan=None, **unknown_fields):
         '''
         metrics : typing.Mapping[str, ~CharmMetric]
@@ -4975,6 +5130,7 @@ class CharmMetrics(Type):
 class CharmMount(Type):
     _toSchema = {'location': 'location', 'storage': 'storage'}
     _toPy = {'location': 'location', 'storage': 'storage'}
+
     def __init__(self, location=None, storage=None, **unknown_fields):
         '''
         location : str
@@ -4999,6 +5155,7 @@ class CharmMount(Type):
 class CharmOption(Type):
     _toSchema = {'default': 'default', 'description': 'description', 'type_': 'type'}
     _toPy = {'default': 'default', 'description': 'description', 'type': 'type_'}
+
     def __init__(self, default=None, description=None, type_=None, **unknown_fields):
         '''
         default : Any
@@ -5026,6 +5183,7 @@ class CharmOption(Type):
 class CharmOrigin(Type):
     _toSchema = {'architecture': 'architecture', 'base': 'base', 'branch': 'branch', 'hash_': 'hash', 'id_': 'id', 'instance_key': 'instance-key', 'revision': 'revision', 'risk': 'risk', 'source': 'source', 'track': 'track', 'type_': 'type'}
     _toPy = {'architecture': 'architecture', 'base': 'base', 'branch': 'branch', 'hash': 'hash_', 'id': 'id_', 'instance-key': 'instance_key', 'revision': 'revision', 'risk': 'risk', 'source': 'source', 'track': 'track', 'type': 'type_'}
+
     def __init__(self, architecture=None, base=None, branch=None, hash_=None, id_=None, instance_key=None, revision=None, risk=None, source=None, track=None, type_=None, **unknown_fields):
         '''
         architecture : str
@@ -5104,6 +5262,7 @@ class CharmOrigin(Type):
 class CharmOriginResult(Type):
     _toSchema = {'charm_origin': 'charm-origin', 'error': 'error'}
     _toPy = {'charm-origin': 'charm_origin', 'error': 'error'}
+
     def __init__(self, charm_origin=None, error=None, **unknown_fields):
         '''
         charm_origin : CharmOrigin
@@ -5128,6 +5287,7 @@ class CharmOriginResult(Type):
 class CharmPayloadClass(Type):
     _toSchema = {'name': 'name', 'type_': 'type'}
     _toPy = {'name': 'name', 'type': 'type_'}
+
     def __init__(self, name=None, type_=None, **unknown_fields):
         '''
         name : str
@@ -5152,6 +5312,7 @@ class CharmPayloadClass(Type):
 class CharmPlan(Type):
     _toSchema = {'required': 'required'}
     _toPy = {'required': 'required'}
+
     def __init__(self, required=None, **unknown_fields):
         '''
         required : bool
@@ -5170,6 +5331,7 @@ class CharmPlan(Type):
 class CharmProfilingInfoResult(Type):
     _toSchema = {'current_profiles': 'current-profiles', 'error': 'error', 'instance_id': 'instance-id', 'model_name': 'model-name', 'profile_changes': 'profile-changes'}
     _toPy = {'current-profiles': 'current_profiles', 'error': 'error', 'instance-id': 'instance_id', 'model-name': 'model_name', 'profile-changes': 'profile_changes'}
+
     def __init__(self, current_profiles=None, error=None, instance_id=None, model_name=None, profile_changes=None, **unknown_fields):
         '''
         current_profiles : typing.Sequence[str]
@@ -5212,6 +5374,7 @@ class CharmProfilingInfoResult(Type):
 class CharmRelation(Type):
     _toSchema = {'interface': 'interface', 'limit': 'limit', 'name': 'name', 'optional': 'optional', 'role': 'role', 'scope': 'scope'}
     _toPy = {'interface': 'interface', 'limit': 'limit', 'name': 'name', 'optional': 'optional', 'role': 'role', 'scope': 'scope'}
+
     def __init__(self, interface=None, limit=None, name=None, optional=None, role=None, scope=None, **unknown_fields):
         '''
         interface : str
@@ -5260,6 +5423,7 @@ class CharmRelation(Type):
 class CharmResource(Type):
     _toSchema = {'description': 'description', 'fingerprint': 'fingerprint', 'name': 'name', 'origin': 'origin', 'path': 'path', 'revision': 'revision', 'size': 'size', 'type_': 'type'}
     _toPy = {'description': 'description', 'fingerprint': 'fingerprint', 'name': 'name', 'origin': 'origin', 'path': 'path', 'revision': 'revision', 'size': 'size', 'type': 'type_'}
+
     def __init__(self, description=None, fingerprint=None, name=None, origin=None, path=None, revision=None, size=None, type_=None, **unknown_fields):
         '''
         description : str
@@ -5320,6 +5484,7 @@ class CharmResource(Type):
 class CharmResourceMeta(Type):
     _toSchema = {'description': 'description', 'name': 'name', 'path': 'path', 'type_': 'type'}
     _toPy = {'description': 'description', 'name': 'name', 'path': 'path', 'type': 'type_'}
+
     def __init__(self, description=None, name=None, path=None, type_=None, **unknown_fields):
         '''
         description : str
@@ -5356,6 +5521,7 @@ class CharmResourceMeta(Type):
 class CharmResourceResult(Type):
     _toSchema = {'charmresource': 'CharmResource', 'description': 'description', 'error': 'error', 'errorresult': 'ErrorResult', 'fingerprint': 'fingerprint', 'name': 'name', 'origin': 'origin', 'path': 'path', 'revision': 'revision', 'size': 'size', 'type_': 'type'}
     _toPy = {'CharmResource': 'charmresource', 'ErrorResult': 'errorresult', 'description': 'description', 'error': 'error', 'fingerprint': 'fingerprint', 'name': 'name', 'origin': 'origin', 'path': 'path', 'revision': 'revision', 'size': 'size', 'type': 'type_'}
+
     def __init__(self, charmresource=None, errorresult=None, description=None, error=None, fingerprint=None, name=None, origin=None, path=None, revision=None, size=None, type_=None, **unknown_fields):
         '''
         charmresource : CharmResource
@@ -5434,6 +5600,7 @@ class CharmResourceResult(Type):
 class CharmResourcesResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~CharmResourceResult]
@@ -5452,6 +5619,7 @@ class CharmResourcesResults(Type):
 class CharmStorage(Type):
     _toSchema = {'count_max': 'count-max', 'count_min': 'count-min', 'description': 'description', 'location': 'location', 'minimum_size': 'minimum-size', 'name': 'name', 'properties': 'properties', 'read_only': 'read-only', 'shared': 'shared', 'type_': 'type'}
     _toPy = {'count-max': 'count_max', 'count-min': 'count_min', 'description': 'description', 'location': 'location', 'minimum-size': 'minimum_size', 'name': 'name', 'properties': 'properties', 'read-only': 'read_only', 'shared': 'shared', 'type': 'type_'}
+
     def __init__(self, count_max=None, count_min=None, description=None, location=None, minimum_size=None, name=None, properties=None, read_only=None, shared=None, type_=None, **unknown_fields):
         '''
         count_max : int
@@ -5524,6 +5692,7 @@ class CharmStorage(Type):
 class CharmURL(Type):
     _toSchema = {'url': 'url'}
     _toPy = {'url': 'url'}
+
     def __init__(self, url=None, **unknown_fields):
         '''
         url : str
@@ -5542,6 +5711,7 @@ class CharmURL(Type):
 class CharmURLAndOrigin(Type):
     _toSchema = {'charm_origin': 'charm-origin', 'charm_url': 'charm-url', 'macaroon': 'macaroon'}
     _toPy = {'charm-origin': 'charm_origin', 'charm-url': 'charm_url', 'macaroon': 'macaroon'}
+
     def __init__(self, charm_origin=None, charm_url=None, macaroon=None, **unknown_fields):
         '''
         charm_origin : CharmOrigin
@@ -5572,6 +5742,7 @@ class CharmURLAndOrigin(Type):
 class CharmURLAndOrigins(Type):
     _toSchema = {'entities': 'entities'}
     _toPy = {'entities': 'entities'}
+
     def __init__(self, entities=None, **unknown_fields):
         '''
         entities : typing.Sequence[~CharmURLAndOrigin]
@@ -5590,6 +5761,7 @@ class CharmURLAndOrigins(Type):
 class CharmURLOriginResult(Type):
     _toSchema = {'charm_origin': 'charm-origin', 'error': 'error', 'url': 'url'}
     _toPy = {'charm-origin': 'charm_origin', 'error': 'error', 'url': 'url'}
+
     def __init__(self, charm_origin=None, error=None, url=None, **unknown_fields):
         '''
         charm_origin : CharmOrigin
@@ -5620,6 +5792,7 @@ class CharmURLOriginResult(Type):
 class CharmURLs(Type):
     _toSchema = {'urls': 'urls'}
     _toPy = {'urls': 'urls'}
+
     def __init__(self, urls=None, **unknown_fields):
         '''
         urls : typing.Sequence[~CharmURL]
@@ -5638,6 +5811,7 @@ class CharmURLs(Type):
 class CharmsList(Type):
     _toSchema = {'names': 'names'}
     _toPy = {'names': 'names'}
+
     def __init__(self, names=None, **unknown_fields):
         '''
         names : typing.Sequence[str]
@@ -5656,6 +5830,7 @@ class CharmsList(Type):
 class CharmsListResult(Type):
     _toSchema = {'charm_urls': 'charm-urls'}
     _toPy = {'charm-urls': 'charm_urls'}
+
     def __init__(self, charm_urls=None, **unknown_fields):
         '''
         charm_urls : typing.Sequence[str]
@@ -5674,6 +5849,7 @@ class CharmsListResult(Type):
 class ClaimLeadershipBulkParams(Type):
     _toSchema = {'params': 'params'}
     _toPy = {'params': 'params'}
+
     def __init__(self, params=None, **unknown_fields):
         '''
         params : typing.Sequence[~ClaimLeadershipParams]
@@ -5692,6 +5868,7 @@ class ClaimLeadershipBulkParams(Type):
 class ClaimLeadershipBulkResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ErrorResult]
@@ -5710,6 +5887,7 @@ class ClaimLeadershipBulkResults(Type):
 class ClaimLeadershipParams(Type):
     _toSchema = {'application_tag': 'application-tag', 'duration': 'duration', 'unit_tag': 'unit-tag'}
     _toPy = {'application-tag': 'application_tag', 'duration': 'duration', 'unit-tag': 'unit_tag'}
+
     def __init__(self, application_tag=None, duration=None, unit_tag=None, **unknown_fields):
         '''
         application_tag : str
@@ -5740,6 +5918,7 @@ class ClaimLeadershipParams(Type):
 class Cloud(Type):
     _toSchema = {'auth_types': 'auth-types', 'ca_certificates': 'ca-certificates', 'config': 'config', 'endpoint': 'endpoint', 'host_cloud_region': 'host-cloud-region', 'identity_endpoint': 'identity-endpoint', 'is_controller_cloud': 'is-controller-cloud', 'region_config': 'region-config', 'regions': 'regions', 'skip_tls_verify': 'skip-tls-verify', 'storage_endpoint': 'storage-endpoint', 'type_': 'type'}
     _toPy = {'auth-types': 'auth_types', 'ca-certificates': 'ca_certificates', 'config': 'config', 'endpoint': 'endpoint', 'host-cloud-region': 'host_cloud_region', 'identity-endpoint': 'identity_endpoint', 'is-controller-cloud': 'is_controller_cloud', 'region-config': 'region_config', 'regions': 'regions', 'skip-tls-verify': 'skip_tls_verify', 'storage-endpoint': 'storage_endpoint', 'type': 'type_'}
+
     def __init__(self, auth_types=None, ca_certificates=None, config=None, endpoint=None, host_cloud_region=None, identity_endpoint=None, is_controller_cloud=None, region_config=None, regions=None, skip_tls_verify=None, storage_endpoint=None, type_=None, **unknown_fields):
         '''
         auth_types : typing.Sequence[str]
@@ -5824,6 +6003,7 @@ class Cloud(Type):
 class CloudCredential(Type):
     _toSchema = {'attrs': 'attrs', 'auth_type': 'auth-type', 'redacted': 'redacted'}
     _toPy = {'attrs': 'attrs', 'auth-type': 'auth_type', 'redacted': 'redacted'}
+
     def __init__(self, attrs=None, auth_type=None, redacted=None, **unknown_fields):
         '''
         attrs : typing.Mapping[str, str]
@@ -5854,6 +6034,7 @@ class CloudCredential(Type):
 class CloudCredentialArg(Type):
     _toSchema = {'cloud_name': 'cloud-name', 'credential_name': 'credential-name'}
     _toPy = {'cloud-name': 'cloud_name', 'credential-name': 'credential_name'}
+
     def __init__(self, cloud_name=None, credential_name=None, **unknown_fields):
         '''
         cloud_name : str
@@ -5878,6 +6059,7 @@ class CloudCredentialArg(Type):
 class CloudCredentialArgs(Type):
     _toSchema = {'credentials': 'credentials', 'include_secrets': 'include-secrets'}
     _toPy = {'credentials': 'credentials', 'include-secrets': 'include_secrets'}
+
     def __init__(self, credentials=None, include_secrets=None, **unknown_fields):
         '''
         credentials : typing.Sequence[~CloudCredentialArg]
@@ -5902,6 +6084,7 @@ class CloudCredentialArgs(Type):
 class CloudCredentialResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -5926,6 +6109,7 @@ class CloudCredentialResult(Type):
 class CloudCredentialResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~CloudCredentialResult]
@@ -5944,6 +6128,7 @@ class CloudCredentialResults(Type):
 class CloudDetails(Type):
     _toSchema = {'auth_types': 'auth-types', 'endpoint': 'endpoint', 'identity_endpoint': 'identity-endpoint', 'regions': 'regions', 'storage_endpoint': 'storage-endpoint', 'type_': 'type'}
     _toPy = {'auth-types': 'auth_types', 'endpoint': 'endpoint', 'identity-endpoint': 'identity_endpoint', 'regions': 'regions', 'storage-endpoint': 'storage_endpoint', 'type': 'type_'}
+
     def __init__(self, auth_types=None, endpoint=None, identity_endpoint=None, regions=None, storage_endpoint=None, type_=None, **unknown_fields):
         '''
         auth_types : typing.Sequence[str]
@@ -5992,6 +6177,7 @@ class CloudDetails(Type):
 class CloudImageMetadata(Type):
     _toSchema = {'arch': 'arch', 'image_id': 'image-id', 'priority': 'priority', 'region': 'region', 'root_storage_size': 'root-storage-size', 'root_storage_type': 'root-storage-type', 'source': 'source', 'stream': 'stream', 'version': 'version', 'virt_type': 'virt-type'}
     _toPy = {'arch': 'arch', 'image-id': 'image_id', 'priority': 'priority', 'region': 'region', 'root-storage-size': 'root_storage_size', 'root-storage-type': 'root_storage_type', 'source': 'source', 'stream': 'stream', 'version': 'version', 'virt-type': 'virt_type'}
+
     def __init__(self, arch=None, image_id=None, priority=None, region=None, root_storage_size=None, root_storage_type=None, source=None, stream=None, version=None, virt_type=None, **unknown_fields):
         '''
         arch : str
@@ -6064,6 +6250,7 @@ class CloudImageMetadata(Type):
 class CloudImageMetadataList(Type):
     _toSchema = {'metadata': 'metadata'}
     _toPy = {'metadata': 'metadata'}
+
     def __init__(self, metadata=None, **unknown_fields):
         '''
         metadata : typing.Sequence[~CloudImageMetadata]
@@ -6082,6 +6269,7 @@ class CloudImageMetadataList(Type):
 class CloudInfo(Type):
     _toSchema = {'clouddetails': 'CloudDetails', 'users': 'users'}
     _toPy = {'CloudDetails': 'clouddetails', 'users': 'users'}
+
     def __init__(self, clouddetails=None, users=None, **unknown_fields):
         '''
         clouddetails : CloudDetails
@@ -6106,6 +6294,7 @@ class CloudInfo(Type):
 class CloudInfoResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -6130,6 +6319,7 @@ class CloudInfoResult(Type):
 class CloudInfoResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~CloudInfoResult]
@@ -6148,6 +6338,7 @@ class CloudInfoResults(Type):
 class CloudInstanceTypesConstraint(Type):
     _toSchema = {'cloud_tag': 'cloud-tag', 'constraints': 'constraints', 'region': 'region'}
     _toPy = {'cloud-tag': 'cloud_tag', 'constraints': 'constraints', 'region': 'region'}
+
     def __init__(self, cloud_tag=None, constraints=None, region=None, **unknown_fields):
         '''
         cloud_tag : str
@@ -6178,6 +6369,7 @@ class CloudInstanceTypesConstraint(Type):
 class CloudInstanceTypesConstraints(Type):
     _toSchema = {'constraints': 'constraints'}
     _toPy = {'constraints': 'constraints'}
+
     def __init__(self, constraints=None, **unknown_fields):
         '''
         constraints : typing.Sequence[~CloudInstanceTypesConstraint]
@@ -6196,6 +6388,7 @@ class CloudInstanceTypesConstraints(Type):
 class CloudRegion(Type):
     _toSchema = {'endpoint': 'endpoint', 'identity_endpoint': 'identity-endpoint', 'name': 'name', 'storage_endpoint': 'storage-endpoint'}
     _toPy = {'endpoint': 'endpoint', 'identity-endpoint': 'identity_endpoint', 'name': 'name', 'storage-endpoint': 'storage_endpoint'}
+
     def __init__(self, endpoint=None, identity_endpoint=None, name=None, storage_endpoint=None, **unknown_fields):
         '''
         endpoint : str
@@ -6232,6 +6425,7 @@ class CloudRegion(Type):
 class CloudResult(Type):
     _toSchema = {'cloud': 'cloud', 'error': 'error'}
     _toPy = {'cloud': 'cloud', 'error': 'error'}
+
     def __init__(self, cloud=None, error=None, **unknown_fields):
         '''
         cloud : Cloud
@@ -6256,6 +6450,7 @@ class CloudResult(Type):
 class CloudResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~CloudResult]
@@ -6274,6 +6469,7 @@ class CloudResults(Type):
 class CloudSpec(Type):
     _toSchema = {'cacertificates': 'cacertificates', 'credential': 'credential', 'endpoint': 'endpoint', 'identity_endpoint': 'identity-endpoint', 'is_controller_cloud': 'is-controller-cloud', 'name': 'name', 'region': 'region', 'skip_tls_verify': 'skip-tls-verify', 'storage_endpoint': 'storage-endpoint', 'type_': 'type'}
     _toPy = {'cacertificates': 'cacertificates', 'credential': 'credential', 'endpoint': 'endpoint', 'identity-endpoint': 'identity_endpoint', 'is-controller-cloud': 'is_controller_cloud', 'name': 'name', 'region': 'region', 'skip-tls-verify': 'skip_tls_verify', 'storage-endpoint': 'storage_endpoint', 'type': 'type_'}
+
     def __init__(self, cacertificates=None, credential=None, endpoint=None, identity_endpoint=None, is_controller_cloud=None, name=None, region=None, skip_tls_verify=None, storage_endpoint=None, type_=None, **unknown_fields):
         '''
         cacertificates : typing.Sequence[str]
@@ -6346,6 +6542,7 @@ class CloudSpec(Type):
 class CloudSpecResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -6370,6 +6567,7 @@ class CloudSpecResult(Type):
 class CloudSpecResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~CloudSpecResult]
@@ -6388,6 +6586,7 @@ class CloudSpecResults(Type):
 class CloudUserInfo(Type):
     _toSchema = {'access': 'access', 'display_name': 'display-name', 'user': 'user'}
     _toPy = {'access': 'access', 'display-name': 'display_name', 'user': 'user'}
+
     def __init__(self, access=None, display_name=None, user=None, **unknown_fields):
         '''
         access : str
@@ -6418,6 +6617,7 @@ class CloudUserInfo(Type):
 class CloudsResult(Type):
     _toSchema = {'clouds': 'clouds'}
     _toPy = {'clouds': 'clouds'}
+
     def __init__(self, clouds=None, **unknown_fields):
         '''
         clouds : typing.Mapping[str, ~Cloud]
@@ -6436,6 +6636,7 @@ class CloudsResult(Type):
 class CommitHookChangesArg(Type):
     _toSchema = {'add_storage': 'add-storage', 'close_ports': 'close-ports', 'open_ports': 'open-ports', 'pod_spec': 'pod-spec', 'relation_unit_settings': 'relation-unit-settings', 'secret_creates': 'secret-creates', 'secret_deletes': 'secret-deletes', 'secret_grants': 'secret-grants', 'secret_revokes': 'secret-revokes', 'secret_track_latest': 'secret-track-latest', 'secret_updates': 'secret-updates', 'set_raw_k8s_spec': 'set-raw-k8s-spec', 'tag': 'tag', 'unit_state': 'unit-state', 'update_network_info': 'update-network-info'}
     _toPy = {'add-storage': 'add_storage', 'close-ports': 'close_ports', 'open-ports': 'open_ports', 'pod-spec': 'pod_spec', 'relation-unit-settings': 'relation_unit_settings', 'secret-creates': 'secret_creates', 'secret-deletes': 'secret_deletes', 'secret-grants': 'secret_grants', 'secret-revokes': 'secret_revokes', 'secret-track-latest': 'secret_track_latest', 'secret-updates': 'secret_updates', 'set-raw-k8s-spec': 'set_raw_k8s_spec', 'tag': 'tag', 'unit-state': 'unit_state', 'update-network-info': 'update_network_info'}
+
     def __init__(self, add_storage=None, close_ports=None, open_ports=None, pod_spec=None, relation_unit_settings=None, secret_creates=None, secret_deletes=None, secret_grants=None, secret_revokes=None, secret_track_latest=None, secret_updates=None, set_raw_k8s_spec=None, tag=None, unit_state=None, update_network_info=None, **unknown_fields):
         '''
         add_storage : typing.Sequence[~StorageAddParams]
@@ -6538,6 +6739,7 @@ class CommitHookChangesArg(Type):
 class CommitHookChangesArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~CommitHookChangesArg]
@@ -6556,6 +6758,7 @@ class CommitHookChangesArgs(Type):
 class ConfigResult(Type):
     _toSchema = {'config': 'config', 'error': 'error'}
     _toPy = {'config': 'config', 'error': 'error'}
+
     def __init__(self, config=None, error=None, **unknown_fields):
         '''
         config : typing.Mapping[str, typing.Any]
@@ -6580,6 +6783,7 @@ class ConfigResult(Type):
 class ConfigSet(Type):
     _toSchema = {'application': 'application', 'config': 'config', 'config_yaml': 'config-yaml', 'generation': 'generation'}
     _toPy = {'application': 'application', 'config': 'config', 'config-yaml': 'config_yaml', 'generation': 'generation'}
+
     def __init__(self, application=None, config=None, config_yaml=None, generation=None, **unknown_fields):
         '''
         application : str
@@ -6616,6 +6820,7 @@ class ConfigSet(Type):
 class ConfigSetArgs(Type):
     _toSchema = {'args': 'Args'}
     _toPy = {'Args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~ConfigSet]
@@ -6634,6 +6839,7 @@ class ConfigSetArgs(Type):
 class ConfigSettingsResult(Type):
     _toSchema = {'error': 'error', 'settings': 'settings'}
     _toPy = {'error': 'error', 'settings': 'settings'}
+
     def __init__(self, error=None, settings=None, **unknown_fields):
         '''
         error : Error
@@ -6658,6 +6864,7 @@ class ConfigSettingsResult(Type):
 class ConfigSettingsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ConfigSettingsResult]
@@ -6676,6 +6883,7 @@ class ConfigSettingsResults(Type):
 class ConfigValue(Type):
     _toSchema = {'source': 'source', 'value': 'value'}
     _toPy = {'source': 'source', 'value': 'value'}
+
     def __init__(self, source=None, value=None, **unknown_fields):
         '''
         source : str
@@ -6697,6 +6905,7 @@ class ConfigValue(Type):
 class Constraints(Type):
     _toSchema = {'count': 'Count', 'pool': 'Pool', 'size': 'Size'}
     _toPy = {'Count': 'count', 'Pool': 'pool', 'Size': 'size'}
+
     def __init__(self, count=None, pool=None, size=None, **unknown_fields):
         '''
         count : int
@@ -6727,6 +6936,7 @@ class Constraints(Type):
 class ConstraintsResult(Type):
     _toSchema = {'constraints': 'constraints', 'error': 'error'}
     _toPy = {'constraints': 'constraints', 'error': 'error'}
+
     def __init__(self, constraints=None, error=None, **unknown_fields):
         '''
         constraints : Value
@@ -6751,6 +6961,7 @@ class ConstraintsResult(Type):
 class ConstraintsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ConstraintsResult]
@@ -6769,6 +6980,7 @@ class ConstraintsResults(Type):
 class ConsumeApplicationArg(Type):
     _toSchema = {'application_alias': 'application-alias', 'application_description': 'application-description', 'applicationofferdetails': 'ApplicationOfferDetails', 'bindings': 'bindings', 'endpoints': 'endpoints', 'external_controller': 'external-controller', 'macaroon': 'macaroon', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'offer_uuid': 'offer-uuid', 'source_model_tag': 'source-model-tag', 'spaces': 'spaces', 'users': 'users'}
     _toPy = {'ApplicationOfferDetails': 'applicationofferdetails', 'application-alias': 'application_alias', 'application-description': 'application_description', 'bindings': 'bindings', 'endpoints': 'endpoints', 'external-controller': 'external_controller', 'macaroon': 'macaroon', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'offer-uuid': 'offer_uuid', 'source-model-tag': 'source_model_tag', 'spaces': 'spaces', 'users': 'users'}
+
     def __init__(self, applicationofferdetails=None, application_alias=None, application_description=None, bindings=None, endpoints=None, external_controller=None, macaroon=None, offer_name=None, offer_url=None, offer_uuid=None, source_model_tag=None, spaces=None, users=None, **unknown_fields):
         '''
         applicationofferdetails : ApplicationOfferDetails
@@ -6859,6 +7071,7 @@ class ConsumeApplicationArg(Type):
 class ConsumeApplicationArgV5(Type):
     _toSchema = {'application_alias': 'application-alias', 'application_description': 'application-description', 'applicationofferdetailsv5': 'ApplicationOfferDetailsV5', 'endpoints': 'endpoints', 'external_controller': 'external-controller', 'macaroon': 'macaroon', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'offer_uuid': 'offer-uuid', 'source_model_tag': 'source-model-tag', 'users': 'users'}
     _toPy = {'ApplicationOfferDetailsV5': 'applicationofferdetailsv5', 'application-alias': 'application_alias', 'application-description': 'application_description', 'endpoints': 'endpoints', 'external-controller': 'external_controller', 'macaroon': 'macaroon', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'offer-uuid': 'offer_uuid', 'source-model-tag': 'source_model_tag', 'users': 'users'}
+
     def __init__(self, applicationofferdetailsv5=None, application_alias=None, application_description=None, endpoints=None, external_controller=None, macaroon=None, offer_name=None, offer_url=None, offer_uuid=None, source_model_tag=None, users=None, **unknown_fields):
         '''
         applicationofferdetailsv5 : ApplicationOfferDetailsV5
@@ -6937,6 +7150,7 @@ class ConsumeApplicationArgV5(Type):
 class ConsumeApplicationArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~ConsumeApplicationArg]
@@ -6955,6 +7169,7 @@ class ConsumeApplicationArgs(Type):
 class ConsumeApplicationArgsV5(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~ConsumeApplicationArgV5]
@@ -6973,6 +7188,7 @@ class ConsumeApplicationArgsV5(Type):
 class ConsumeOfferDetails(Type):
     _toSchema = {'external_controller': 'external-controller', 'macaroon': 'macaroon', 'offer': 'offer'}
     _toPy = {'external-controller': 'external_controller', 'macaroon': 'macaroon', 'offer': 'offer'}
+
     def __init__(self, external_controller=None, macaroon=None, offer=None, **unknown_fields):
         '''
         external_controller : ExternalControllerInfo
@@ -7003,6 +7219,7 @@ class ConsumeOfferDetails(Type):
 class ConsumeOfferDetailsArg(Type):
     _toSchema = {'offer_urls': 'offer-urls', 'user_tag': 'user-tag'}
     _toPy = {'offer-urls': 'offer_urls', 'user-tag': 'user_tag'}
+
     def __init__(self, offer_urls=None, user_tag=None, **unknown_fields):
         '''
         offer_urls : OfferURLs
@@ -7027,6 +7244,7 @@ class ConsumeOfferDetailsArg(Type):
 class ConsumeOfferDetailsResult(Type):
     _toSchema = {'consumeofferdetails': 'ConsumeOfferDetails', 'error': 'error', 'external_controller': 'external-controller', 'macaroon': 'macaroon', 'offer': 'offer'}
     _toPy = {'ConsumeOfferDetails': 'consumeofferdetails', 'error': 'error', 'external-controller': 'external_controller', 'macaroon': 'macaroon', 'offer': 'offer'}
+
     def __init__(self, consumeofferdetails=None, error=None, external_controller=None, macaroon=None, offer=None, **unknown_fields):
         '''
         consumeofferdetails : ConsumeOfferDetails
@@ -7069,6 +7287,7 @@ class ConsumeOfferDetailsResult(Type):
 class ConsumeOfferDetailsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ConsumeOfferDetailsResult]
@@ -7087,6 +7306,7 @@ class ConsumeOfferDetailsResults(Type):
 class ContainerConfig(Type):
     _toSchema = {'apt_mirror': 'apt-mirror', 'apt_proxy': 'apt-proxy', 'authorized_keys': 'authorized-keys', 'cloudinit_userdata': 'cloudinit-userdata', 'container_inherit_properties': 'container-inherit-properties', 'juju_proxy': 'juju-proxy', 'legacy_proxy': 'legacy-proxy', 'provider_type': 'provider-type', 'snap_proxy': 'snap-proxy', 'snap_store_assertions': 'snap-store-assertions', 'snap_store_proxy_id': 'snap-store-proxy-id', 'snap_store_proxy_url': 'snap-store-proxy-url', 'ssl_hostname_verification': 'ssl-hostname-verification', 'updatebehavior': 'UpdateBehavior'}
     _toPy = {'UpdateBehavior': 'updatebehavior', 'apt-mirror': 'apt_mirror', 'apt-proxy': 'apt_proxy', 'authorized-keys': 'authorized_keys', 'cloudinit-userdata': 'cloudinit_userdata', 'container-inherit-properties': 'container_inherit_properties', 'juju-proxy': 'juju_proxy', 'legacy-proxy': 'legacy_proxy', 'provider-type': 'provider_type', 'snap-proxy': 'snap_proxy', 'snap-store-assertions': 'snap_store_assertions', 'snap-store-proxy-id': 'snap_store_proxy_id', 'snap-store-proxy-url': 'snap_store_proxy_url', 'ssl-hostname-verification': 'ssl_hostname_verification'}
+
     def __init__(self, updatebehavior=None, apt_mirror=None, apt_proxy=None, authorized_keys=None, cloudinit_userdata=None, container_inherit_properties=None, juju_proxy=None, legacy_proxy=None, provider_type=None, snap_proxy=None, snap_store_assertions=None, snap_store_proxy_id=None, snap_store_proxy_url=None, ssl_hostname_verification=None, **unknown_fields):
         '''
         updatebehavior : UpdateBehavior
@@ -7183,6 +7403,7 @@ class ContainerConfig(Type):
 class ContainerLXDProfile(Type):
     _toSchema = {'name': 'name', 'profile': 'profile'}
     _toPy = {'name': 'name', 'profile': 'profile'}
+
     def __init__(self, name=None, profile=None, **unknown_fields):
         '''
         name : str
@@ -7207,6 +7428,7 @@ class ContainerLXDProfile(Type):
 class ContainerManagerConfig(Type):
     _toSchema = {'config': 'config'}
     _toPy = {'config': 'config'}
+
     def __init__(self, config=None, **unknown_fields):
         '''
         config : typing.Mapping[str, str]
@@ -7225,6 +7447,7 @@ class ContainerManagerConfig(Type):
 class ContainerManagerConfigParams(Type):
     _toSchema = {'type_': 'type'}
     _toPy = {'type': 'type_'}
+
     def __init__(self, type_=None, **unknown_fields):
         '''
         type_ : str
@@ -7243,6 +7466,7 @@ class ContainerManagerConfigParams(Type):
 class ContainerProfileResult(Type):
     _toSchema = {'error': 'error', 'lxd_profiles': 'lxd-profiles'}
     _toPy = {'error': 'error', 'lxd-profiles': 'lxd_profiles'}
+
     def __init__(self, error=None, lxd_profiles=None, **unknown_fields):
         '''
         error : Error
@@ -7267,6 +7491,7 @@ class ContainerProfileResult(Type):
 class ContainerProfileResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ContainerProfileResult]
@@ -7285,6 +7510,7 @@ class ContainerProfileResults(Type):
 class ContainerTypeResult(Type):
     _toSchema = {'container_type': 'container-type', 'error': 'error'}
     _toPy = {'container-type': 'container_type', 'error': 'error'}
+
     def __init__(self, container_type=None, error=None, **unknown_fields):
         '''
         container_type : str
@@ -7309,6 +7535,7 @@ class ContainerTypeResult(Type):
 class ControllerAPIInfoResult(Type):
     _toSchema = {'addresses': 'addresses', 'cacert': 'cacert', 'error': 'error'}
     _toPy = {'addresses': 'addresses', 'cacert': 'cacert', 'error': 'error'}
+
     def __init__(self, addresses=None, cacert=None, error=None, **unknown_fields):
         '''
         addresses : typing.Sequence[str]
@@ -7339,6 +7566,7 @@ class ControllerAPIInfoResult(Type):
 class ControllerAPIInfoResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ControllerAPIInfoResult]
@@ -7357,6 +7585,7 @@ class ControllerAPIInfoResults(Type):
 class ControllerConfigResult(Type):
     _toSchema = {'config': 'config'}
     _toPy = {'config': 'config'}
+
     def __init__(self, config=None, **unknown_fields):
         '''
         config : typing.Mapping[str, typing.Any]
@@ -7375,6 +7604,7 @@ class ControllerConfigResult(Type):
 class ControllerConfigSet(Type):
     _toSchema = {'config': 'config'}
     _toPy = {'config': 'config'}
+
     def __init__(self, config=None, **unknown_fields):
         '''
         config : typing.Mapping[str, typing.Any]
@@ -7393,6 +7623,7 @@ class ControllerConfigSet(Type):
 class ControllerCredentialInfo(Type):
     _toSchema = {'content': 'content', 'models': 'models'}
     _toPy = {'content': 'content', 'models': 'models'}
+
     def __init__(self, content=None, models=None, **unknown_fields):
         '''
         content : CredentialContent
@@ -7417,6 +7648,7 @@ class ControllerCredentialInfo(Type):
 class ControllerVersionResults(Type):
     _toSchema = {'git_commit': 'git-commit', 'version': 'version'}
     _toPy = {'git-commit': 'git_commit', 'version': 'version'}
+
     def __init__(self, git_commit=None, version=None, **unknown_fields):
         '''
         git_commit : str
@@ -7441,6 +7673,7 @@ class ControllerVersionResults(Type):
 class ControllersChangeResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -7465,6 +7698,7 @@ class ControllersChangeResult(Type):
 class ControllersChangeResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ControllersChangeResult]
@@ -7483,6 +7717,7 @@ class ControllersChangeResults(Type):
 class ControllersChanges(Type):
     _toSchema = {'added': 'added', 'converted': 'converted', 'maintained': 'maintained', 'removed': 'removed'}
     _toPy = {'added': 'added', 'converted': 'converted', 'maintained': 'maintained', 'removed': 'removed'}
+
     def __init__(self, added=None, converted=None, maintained=None, removed=None, **unknown_fields):
         '''
         added : typing.Sequence[str]
@@ -7519,6 +7754,7 @@ class ControllersChanges(Type):
 class ControllersSpec(Type):
     _toSchema = {'constraints': 'constraints', 'num_controllers': 'num-controllers', 'placement': 'placement'}
     _toPy = {'constraints': 'constraints', 'num-controllers': 'num_controllers', 'placement': 'placement'}
+
     def __init__(self, constraints=None, num_controllers=None, placement=None, **unknown_fields):
         '''
         constraints : Value
@@ -7549,6 +7785,7 @@ class ControllersSpec(Type):
 class ControllersSpecs(Type):
     _toSchema = {'specs': 'specs'}
     _toPy = {'specs': 'specs'}
+
     def __init__(self, specs=None, **unknown_fields):
         '''
         specs : typing.Sequence[~ControllersSpec]
@@ -7567,6 +7804,7 @@ class ControllersSpecs(Type):
 class CreateSecretArg(Type):
     _toSchema = {'content': 'content', 'description': 'description', 'expire_time': 'expire-time', 'label': 'label', 'owner_tag': 'owner-tag', 'params': 'params', 'rotate_policy': 'rotate-policy', 'upsertsecretarg': 'UpsertSecretArg', 'uri': 'uri'}
     _toPy = {'UpsertSecretArg': 'upsertsecretarg', 'content': 'content', 'description': 'description', 'expire-time': 'expire_time', 'label': 'label', 'owner-tag': 'owner_tag', 'params': 'params', 'rotate-policy': 'rotate_policy', 'uri': 'uri'}
+
     def __init__(self, upsertsecretarg=None, content=None, description=None, expire_time=None, label=None, owner_tag=None, params=None, rotate_policy=None, uri=None, **unknown_fields):
         '''
         upsertsecretarg : UpsertSecretArg
@@ -7633,6 +7871,7 @@ class CreateSecretArg(Type):
 class CreateSecretArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~CreateSecretArg]
@@ -7651,6 +7890,7 @@ class CreateSecretArgs(Type):
 class CreateSecretURIsArg(Type):
     _toSchema = {'count': 'count'}
     _toPy = {'count': 'count'}
+
     def __init__(self, count=None, **unknown_fields):
         '''
         count : int
@@ -7669,6 +7909,7 @@ class CreateSecretURIsArg(Type):
 class CreateSpaceParams(Type):
     _toSchema = {'cidrs': 'cidrs', 'provider_id': 'provider-id', 'public': 'public', 'space_tag': 'space-tag'}
     _toPy = {'cidrs': 'cidrs', 'provider-id': 'provider_id', 'public': 'public', 'space-tag': 'space_tag'}
+
     def __init__(self, cidrs=None, provider_id=None, public=None, space_tag=None, **unknown_fields):
         '''
         cidrs : typing.Sequence[str]
@@ -7705,6 +7946,7 @@ class CreateSpaceParams(Type):
 class CreateSpacesParams(Type):
     _toSchema = {'spaces': 'spaces'}
     _toPy = {'spaces': 'spaces'}
+
     def __init__(self, spaces=None, **unknown_fields):
         '''
         spaces : typing.Sequence[~CreateSpaceParams]
@@ -7723,6 +7965,7 @@ class CreateSpacesParams(Type):
 class CredentialContent(Type):
     _toSchema = {'attrs': 'attrs', 'auth_type': 'auth-type', 'cloud': 'cloud', 'name': 'name', 'valid': 'valid'}
     _toPy = {'attrs': 'attrs', 'auth-type': 'auth_type', 'cloud': 'cloud', 'name': 'name', 'valid': 'valid'}
+
     def __init__(self, attrs=None, auth_type=None, cloud=None, name=None, valid=None, **unknown_fields):
         '''
         attrs : typing.Mapping[str, str]
@@ -7765,6 +8008,7 @@ class CredentialContent(Type):
 class CredentialContentResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -7789,6 +8033,7 @@ class CredentialContentResult(Type):
 class CredentialContentResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~CredentialContentResult]
@@ -7807,6 +8052,7 @@ class CredentialContentResults(Type):
 class DashboardConnectionInfo(Type):
     _toSchema = {'error': 'error', 'proxy_connection': 'proxy-connection', 'ssh_connection': 'ssh-connection'}
     _toPy = {'error': 'error', 'proxy-connection': 'proxy_connection', 'ssh-connection': 'ssh_connection'}
+
     def __init__(self, error=None, proxy_connection=None, ssh_connection=None, **unknown_fields):
         '''
         error : Error
@@ -7837,6 +8083,7 @@ class DashboardConnectionInfo(Type):
 class DashboardConnectionSSHTunnel(Type):
     _toSchema = {'entity': 'entity', 'host': 'host', 'model': 'model', 'port': 'port'}
     _toPy = {'entity': 'entity', 'host': 'host', 'model': 'model', 'port': 'port'}
+
     def __init__(self, entity=None, host=None, model=None, port=None, **unknown_fields):
         '''
         entity : str
@@ -7873,6 +8120,7 @@ class DashboardConnectionSSHTunnel(Type):
 class DeleteSecretArg(Type):
     _toSchema = {'label': 'label', 'revisions': 'revisions', 'uri': 'uri'}
     _toPy = {'label': 'label', 'revisions': 'revisions', 'uri': 'uri'}
+
     def __init__(self, label=None, revisions=None, uri=None, **unknown_fields):
         '''
         label : str
@@ -7903,6 +8151,7 @@ class DeleteSecretArg(Type):
 class DeleteSecretArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~DeleteSecretArg]
@@ -7921,6 +8170,7 @@ class DeleteSecretArgs(Type):
 class Delta(Type):
     _toSchema = {'entity': 'entity', 'removed': 'removed'}
     _toPy = {'entity': 'entity', 'removed': 'removed'}
+
     def __init__(self, entity=None, removed=None, **unknown_fields):
         '''
         entity : Any
@@ -7942,6 +8192,7 @@ class Delta(Type):
 class DeployFromRepositoryArg(Type):
     _toSchema = {'applicationname': 'ApplicationName', 'attachstorage': 'AttachStorage', 'base': 'base', 'channel': 'channel', 'charmname': 'CharmName', 'configyaml': 'ConfigYAML', 'cons': 'Cons', 'devices': 'Devices', 'dryrun': 'DryRun', 'endpoint_bindings': 'endpoint-bindings', 'force': 'force', 'num_units': 'num-units', 'placement': 'Placement', 'resources': 'resources', 'revision': 'revision', 'storage': 'Storage', 'trust': 'Trust'}
     _toPy = {'ApplicationName': 'applicationname', 'AttachStorage': 'attachstorage', 'CharmName': 'charmname', 'ConfigYAML': 'configyaml', 'Cons': 'cons', 'Devices': 'devices', 'DryRun': 'dryrun', 'Placement': 'placement', 'Storage': 'storage', 'Trust': 'trust', 'base': 'base', 'channel': 'channel', 'endpoint-bindings': 'endpoint_bindings', 'force': 'force', 'num-units': 'num_units', 'resources': 'resources', 'revision': 'revision'}
+
     def __init__(self, applicationname=None, attachstorage=None, charmname=None, configyaml=None, cons=None, devices=None, dryrun=None, placement=None, storage=None, trust=None, base=None, channel=None, endpoint_bindings=None, force=None, num_units=None, resources=None, revision=None, **unknown_fields):
         '''
         applicationname : str
@@ -8056,6 +8307,7 @@ class DeployFromRepositoryArg(Type):
 class DeployFromRepositoryArgs(Type):
     _toSchema = {'args': 'Args'}
     _toPy = {'Args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~DeployFromRepositoryArg]
@@ -8074,6 +8326,7 @@ class DeployFromRepositoryArgs(Type):
 class DeployFromRepositoryInfo(Type):
     _toSchema = {'architecture': 'architecture', 'base': 'base', 'channel': 'channel', 'effective_channel': 'effective-channel', 'name': 'name', 'revision': 'revision'}
     _toPy = {'architecture': 'architecture', 'base': 'base', 'channel': 'channel', 'effective-channel': 'effective_channel', 'name': 'name', 'revision': 'revision'}
+
     def __init__(self, architecture=None, base=None, channel=None, effective_channel=None, name=None, revision=None, **unknown_fields):
         '''
         architecture : str
@@ -8122,6 +8375,7 @@ class DeployFromRepositoryInfo(Type):
 class DeployFromRepositoryResult(Type):
     _toSchema = {'errors': 'Errors', 'info': 'Info', 'pendingresourceuploads': 'PendingResourceUploads'}
     _toPy = {'Errors': 'errors', 'Info': 'info', 'PendingResourceUploads': 'pendingresourceuploads'}
+
     def __init__(self, errors=None, info=None, pendingresourceuploads=None, **unknown_fields):
         '''
         errors : typing.Sequence[~Error]
@@ -8152,6 +8406,7 @@ class DeployFromRepositoryResult(Type):
 class DeployFromRepositoryResults(Type):
     _toSchema = {'results': 'Results'}
     _toPy = {'Results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~DeployFromRepositoryResult]
@@ -8170,6 +8425,7 @@ class DeployFromRepositoryResults(Type):
 class DeployerConnectionValues(Type):
     _toSchema = {'api_addresses': 'api-addresses'}
     _toPy = {'api-addresses': 'api_addresses'}
+
     def __init__(self, api_addresses=None, **unknown_fields):
         '''
         api_addresses : typing.Sequence[str]
@@ -8188,6 +8444,7 @@ class DeployerConnectionValues(Type):
 class DestroyApplicationInfo(Type):
     _toSchema = {'destroyed_storage': 'destroyed-storage', 'destroyed_units': 'destroyed-units', 'detached_storage': 'detached-storage'}
     _toPy = {'destroyed-storage': 'destroyed_storage', 'destroyed-units': 'destroyed_units', 'detached-storage': 'detached_storage'}
+
     def __init__(self, destroyed_storage=None, destroyed_units=None, detached_storage=None, **unknown_fields):
         '''
         destroyed_storage : typing.Sequence[~Entity]
@@ -8218,6 +8475,7 @@ class DestroyApplicationInfo(Type):
 class DestroyApplicationOffers(Type):
     _toSchema = {'force': 'force', 'offer_urls': 'offer-urls'}
     _toPy = {'force': 'force', 'offer-urls': 'offer_urls'}
+
     def __init__(self, force=None, offer_urls=None, **unknown_fields):
         '''
         force : bool
@@ -8242,6 +8500,7 @@ class DestroyApplicationOffers(Type):
 class DestroyApplicationParams(Type):
     _toSchema = {'application_tag': 'application-tag', 'destroy_storage': 'destroy-storage', 'dry_run': 'dry-run', 'force': 'force', 'max_wait': 'max-wait'}
     _toPy = {'application-tag': 'application_tag', 'destroy-storage': 'destroy_storage', 'dry-run': 'dry_run', 'force': 'force', 'max-wait': 'max_wait'}
+
     def __init__(self, application_tag=None, destroy_storage=None, dry_run=None, force=None, max_wait=None, **unknown_fields):
         '''
         application_tag : str
@@ -8284,6 +8543,7 @@ class DestroyApplicationParams(Type):
 class DestroyApplicationResult(Type):
     _toSchema = {'error': 'error', 'info': 'info'}
     _toPy = {'error': 'error', 'info': 'info'}
+
     def __init__(self, error=None, info=None, **unknown_fields):
         '''
         error : Error
@@ -8308,6 +8568,7 @@ class DestroyApplicationResult(Type):
 class DestroyApplicationResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~DestroyApplicationResult]
@@ -8326,6 +8587,7 @@ class DestroyApplicationResults(Type):
 class DestroyApplicationsParams(Type):
     _toSchema = {'applications': 'applications'}
     _toPy = {'applications': 'applications'}
+
     def __init__(self, applications=None, **unknown_fields):
         '''
         applications : typing.Sequence[~DestroyApplicationParams]
@@ -8344,6 +8606,7 @@ class DestroyApplicationsParams(Type):
 class DestroyConsumedApplicationParams(Type):
     _toSchema = {'application_tag': 'application-tag', 'force': 'force', 'max_wait': 'max-wait'}
     _toPy = {'application-tag': 'application_tag', 'force': 'force', 'max-wait': 'max_wait'}
+
     def __init__(self, application_tag=None, force=None, max_wait=None, **unknown_fields):
         '''
         application_tag : str
@@ -8374,6 +8637,7 @@ class DestroyConsumedApplicationParams(Type):
 class DestroyConsumedApplicationsParams(Type):
     _toSchema = {'applications': 'applications'}
     _toPy = {'applications': 'applications'}
+
     def __init__(self, applications=None, **unknown_fields):
         '''
         applications : typing.Sequence[~DestroyConsumedApplicationParams]
@@ -8392,6 +8656,7 @@ class DestroyConsumedApplicationsParams(Type):
 class DestroyControllerArgs(Type):
     _toSchema = {'destroy_models': 'destroy-models', 'destroy_storage': 'destroy-storage', 'force': 'force', 'max_wait': 'max-wait', 'model_timeout': 'model-timeout'}
     _toPy = {'destroy-models': 'destroy_models', 'destroy-storage': 'destroy_storage', 'force': 'force', 'max-wait': 'max_wait', 'model-timeout': 'model_timeout'}
+
     def __init__(self, destroy_models=None, destroy_storage=None, force=None, max_wait=None, model_timeout=None, **unknown_fields):
         '''
         destroy_models : bool
@@ -8434,6 +8699,7 @@ class DestroyControllerArgs(Type):
 class DestroyMachineInfo(Type):
     _toSchema = {'destroyed_containers': 'destroyed-containers', 'destroyed_storage': 'destroyed-storage', 'destroyed_units': 'destroyed-units', 'detached_storage': 'detached-storage', 'machine_id': 'machine-id'}
     _toPy = {'destroyed-containers': 'destroyed_containers', 'destroyed-storage': 'destroyed_storage', 'destroyed-units': 'destroyed_units', 'detached-storage': 'detached_storage', 'machine-id': 'machine_id'}
+
     def __init__(self, destroyed_containers=None, destroyed_storage=None, destroyed_units=None, detached_storage=None, machine_id=None, **unknown_fields):
         '''
         destroyed_containers : typing.Sequence[~DestroyMachineResult]
@@ -8476,6 +8742,7 @@ class DestroyMachineInfo(Type):
 class DestroyMachineResult(Type):
     _toSchema = {'error': 'error', 'info': 'info'}
     _toPy = {'error': 'error', 'info': 'info'}
+
     def __init__(self, error=None, info=None, **unknown_fields):
         '''
         error : Error
@@ -8500,6 +8767,7 @@ class DestroyMachineResult(Type):
 class DestroyMachineResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~DestroyMachineResult]
@@ -8518,6 +8786,7 @@ class DestroyMachineResults(Type):
 class DestroyMachinesParams(Type):
     _toSchema = {'dry_run': 'dry-run', 'force': 'force', 'keep': 'keep', 'machine_tags': 'machine-tags', 'max_wait': 'max-wait'}
     _toPy = {'dry-run': 'dry_run', 'force': 'force', 'keep': 'keep', 'machine-tags': 'machine_tags', 'max-wait': 'max_wait'}
+
     def __init__(self, dry_run=None, force=None, keep=None, machine_tags=None, max_wait=None, **unknown_fields):
         '''
         dry_run : bool
@@ -8560,6 +8829,7 @@ class DestroyMachinesParams(Type):
 class DestroyModelParams(Type):
     _toSchema = {'destroy_storage': 'destroy-storage', 'force': 'force', 'max_wait': 'max-wait', 'model_tag': 'model-tag', 'timeout': 'timeout'}
     _toPy = {'destroy-storage': 'destroy_storage', 'force': 'force', 'max-wait': 'max_wait', 'model-tag': 'model_tag', 'timeout': 'timeout'}
+
     def __init__(self, destroy_storage=None, force=None, max_wait=None, model_tag=None, timeout=None, **unknown_fields):
         '''
         destroy_storage : bool
@@ -8602,6 +8872,7 @@ class DestroyModelParams(Type):
 class DestroyModelsParams(Type):
     _toSchema = {'models': 'models'}
     _toPy = {'models': 'models'}
+
     def __init__(self, models=None, **unknown_fields):
         '''
         models : typing.Sequence[~DestroyModelParams]
@@ -8620,6 +8891,7 @@ class DestroyModelsParams(Type):
 class DestroyRelation(Type):
     _toSchema = {'endpoints': 'endpoints', 'force': 'force', 'max_wait': 'max-wait', 'relation_id': 'relation-id'}
     _toPy = {'endpoints': 'endpoints', 'force': 'force', 'max-wait': 'max_wait', 'relation-id': 'relation_id'}
+
     def __init__(self, endpoints=None, force=None, max_wait=None, relation_id=None, **unknown_fields):
         '''
         endpoints : typing.Sequence[str]
@@ -8656,6 +8928,7 @@ class DestroyRelation(Type):
 class DestroyUnitInfo(Type):
     _toSchema = {'destroyed_storage': 'destroyed-storage', 'detached_storage': 'detached-storage'}
     _toPy = {'destroyed-storage': 'destroyed_storage', 'detached-storage': 'detached_storage'}
+
     def __init__(self, destroyed_storage=None, detached_storage=None, **unknown_fields):
         '''
         destroyed_storage : typing.Sequence[~Entity]
@@ -8680,6 +8953,7 @@ class DestroyUnitInfo(Type):
 class DestroyUnitParams(Type):
     _toSchema = {'destroy_storage': 'destroy-storage', 'dry_run': 'dry-run', 'force': 'force', 'max_wait': 'max-wait', 'unit_tag': 'unit-tag'}
     _toPy = {'destroy-storage': 'destroy_storage', 'dry-run': 'dry_run', 'force': 'force', 'max-wait': 'max_wait', 'unit-tag': 'unit_tag'}
+
     def __init__(self, destroy_storage=None, dry_run=None, force=None, max_wait=None, unit_tag=None, **unknown_fields):
         '''
         destroy_storage : bool
@@ -8722,6 +8996,7 @@ class DestroyUnitParams(Type):
 class DestroyUnitResult(Type):
     _toSchema = {'error': 'error', 'info': 'info'}
     _toPy = {'error': 'error', 'info': 'info'}
+
     def __init__(self, error=None, info=None, **unknown_fields):
         '''
         error : Error
@@ -8746,6 +9021,7 @@ class DestroyUnitResult(Type):
 class DestroyUnitResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~DestroyUnitResult]
@@ -8764,6 +9040,7 @@ class DestroyUnitResults(Type):
 class DestroyUnitsParams(Type):
     _toSchema = {'units': 'units'}
     _toPy = {'units': 'units'}
+
     def __init__(self, units=None, **unknown_fields):
         '''
         units : typing.Sequence[~DestroyUnitParams]
@@ -8782,6 +9059,7 @@ class DestroyUnitsParams(Type):
 class DetailedStatus(Type):
     _toSchema = {'data': 'data', 'err': 'err', 'info': 'info', 'kind': 'kind', 'life': 'life', 'since': 'since', 'status': 'status', 'version': 'version'}
     _toPy = {'data': 'data', 'err': 'err', 'info': 'info', 'kind': 'kind', 'life': 'life', 'since': 'since', 'status': 'status', 'version': 'version'}
+
     def __init__(self, data=None, err=None, info=None, kind=None, life=None, since=None, status=None, version=None, **unknown_fields):
         '''
         data : typing.Mapping[str, typing.Any]
@@ -8842,6 +9120,7 @@ class DetailedStatus(Type):
 class DeviceBridgeInfo(Type):
     _toSchema = {'bridge_name': 'bridge-name', 'host_device_name': 'host-device-name', 'mac_address': 'mac-address'}
     _toPy = {'bridge-name': 'bridge_name', 'host-device-name': 'host_device_name', 'mac-address': 'mac_address'}
+
     def __init__(self, bridge_name=None, host_device_name=None, mac_address=None, **unknown_fields):
         '''
         bridge_name : str
@@ -8872,6 +9151,7 @@ class DeviceBridgeInfo(Type):
 class DistributionGroupResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -8896,6 +9176,7 @@ class DistributionGroupResult(Type):
 class DistributionGroupResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~DistributionGroupResult]
@@ -8914,6 +9195,7 @@ class DistributionGroupResults(Type):
 class DockerImageInfo(Type):
     _toSchema = {'auth': 'auth', 'email': 'email', 'identitytoken': 'identitytoken', 'image_name': 'image-name', 'password': 'password', 'registrytoken': 'registrytoken', 'repository': 'repository', 'serveraddress': 'serveraddress', 'username': 'username'}
     _toPy = {'auth': 'auth', 'email': 'email', 'identitytoken': 'identitytoken', 'image-name': 'image_name', 'password': 'password', 'registrytoken': 'registrytoken', 'repository': 'repository', 'serveraddress': 'serveraddress', 'username': 'username'}
+
     def __init__(self, auth=None, email=None, identitytoken=None, image_name=None, password=None, registrytoken=None, repository=None, serveraddress=None, username=None, **unknown_fields):
         '''
         auth : str
@@ -8980,6 +9262,7 @@ class DockerImageInfo(Type):
 class DownloadInfoResult(Type):
     _toSchema = {'charm_origin': 'charm-origin', 'url': 'url'}
     _toPy = {'charm-origin': 'charm_origin', 'url': 'url'}
+
     def __init__(self, charm_origin=None, url=None, **unknown_fields):
         '''
         charm_origin : CharmOrigin
@@ -9004,6 +9287,7 @@ class DownloadInfoResult(Type):
 class DownloadInfoResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~DownloadInfoResult]
@@ -9022,6 +9306,7 @@ class DownloadInfoResults(Type):
 class DumpModelRequest(Type):
     _toSchema = {'entities': 'entities', 'simplified': 'simplified'}
     _toPy = {'entities': 'entities', 'simplified': 'simplified'}
+
     def __init__(self, entities=None, simplified=None, **unknown_fields):
         '''
         entities : typing.Sequence[~Entity]
@@ -9046,6 +9331,7 @@ class DumpModelRequest(Type):
 class Endpoint(Type):
     _toSchema = {'application_name': 'application-name', 'relation': 'relation'}
     _toPy = {'application-name': 'application_name', 'relation': 'relation'}
+
     def __init__(self, application_name=None, relation=None, **unknown_fields):
         '''
         application_name : str
@@ -9070,6 +9356,7 @@ class Endpoint(Type):
 class EndpointFilterAttributes(Type):
     _toSchema = {'interface': 'interface', 'name': 'name', 'role': 'role'}
     _toPy = {'interface': 'interface', 'name': 'name', 'role': 'role'}
+
     def __init__(self, interface=None, name=None, role=None, **unknown_fields):
         '''
         interface : str
@@ -9100,6 +9387,7 @@ class EndpointFilterAttributes(Type):
 class EndpointRelationData(Type):
     _toSchema = {'applicationdata': 'ApplicationData', 'cross_model': 'cross-model', 'endpoint': 'endpoint', 'related_endpoint': 'related-endpoint', 'relation_id': 'relation-id', 'unit_relation_data': 'unit-relation-data'}
     _toPy = {'ApplicationData': 'applicationdata', 'cross-model': 'cross_model', 'endpoint': 'endpoint', 'related-endpoint': 'related_endpoint', 'relation-id': 'relation_id', 'unit-relation-data': 'unit_relation_data'}
+
     def __init__(self, applicationdata=None, cross_model=None, endpoint=None, related_endpoint=None, relation_id=None, unit_relation_data=None, **unknown_fields):
         '''
         applicationdata : typing.Mapping[str, typing.Any]
@@ -9148,6 +9436,7 @@ class EndpointRelationData(Type):
 class EndpointStatus(Type):
     _toSchema = {'application': 'application', 'name': 'name', 'role': 'role', 'subordinate': 'subordinate'}
     _toPy = {'application': 'application', 'name': 'name', 'role': 'role', 'subordinate': 'subordinate'}
+
     def __init__(self, application=None, name=None, role=None, subordinate=None, **unknown_fields):
         '''
         application : str
@@ -9184,6 +9473,7 @@ class EndpointStatus(Type):
 class EnqueuedActions(Type):
     _toSchema = {'actions': 'actions', 'operation': 'operation'}
     _toPy = {'actions': 'actions', 'operation': 'operation'}
+
     def __init__(self, actions=None, operation=None, **unknown_fields):
         '''
         actions : typing.Sequence[~ActionResult]
@@ -9208,6 +9498,7 @@ class EnqueuedActions(Type):
 class Entities(Type):
     _toSchema = {'entities': 'entities'}
     _toPy = {'entities': 'entities'}
+
     def __init__(self, entities=None, **unknown_fields):
         '''
         entities : typing.Sequence[~Entity]
@@ -9226,6 +9517,7 @@ class Entities(Type):
 class EntitiesCharmURL(Type):
     _toSchema = {'entities': 'entities'}
     _toPy = {'entities': 'entities'}
+
     def __init__(self, entities=None, **unknown_fields):
         '''
         entities : typing.Sequence[~EntityCharmURL]
@@ -9244,6 +9536,7 @@ class EntitiesCharmURL(Type):
 class EntitiesResult(Type):
     _toSchema = {'entities': 'entities', 'error': 'error'}
     _toPy = {'entities': 'entities', 'error': 'error'}
+
     def __init__(self, entities=None, error=None, **unknown_fields):
         '''
         entities : typing.Sequence[~Entity]
@@ -9268,6 +9561,7 @@ class EntitiesResult(Type):
 class EntitiesResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~EntitiesResult]
@@ -9286,6 +9580,7 @@ class EntitiesResults(Type):
 class EntitiesVersion(Type):
     _toSchema = {'agent_tools': 'agent-tools'}
     _toPy = {'agent-tools': 'agent_tools'}
+
     def __init__(self, agent_tools=None, **unknown_fields):
         '''
         agent_tools : typing.Sequence[~EntityVersion]
@@ -9304,6 +9599,7 @@ class EntitiesVersion(Type):
 class EntitiesWatchResult(Type):
     _toSchema = {'changes': 'changes', 'error': 'error', 'watcher_id': 'watcher-id'}
     _toPy = {'changes': 'changes', 'error': 'error', 'watcher-id': 'watcher_id'}
+
     def __init__(self, changes=None, error=None, watcher_id=None, **unknown_fields):
         '''
         changes : typing.Sequence[str]
@@ -9334,6 +9630,7 @@ class EntitiesWatchResult(Type):
 class Entity(Type):
     _toSchema = {'tag': 'tag'}
     _toPy = {'tag': 'tag'}
+
     def __init__(self, tag=None, **unknown_fields):
         '''
         tag : str
@@ -9352,6 +9649,7 @@ class Entity(Type):
 class EntityAnnotations(Type):
     _toSchema = {'annotations': 'annotations', 'entity': 'entity'}
     _toPy = {'annotations': 'annotations', 'entity': 'entity'}
+
     def __init__(self, annotations=None, entity=None, **unknown_fields):
         '''
         annotations : typing.Mapping[str, str]
@@ -9376,6 +9674,7 @@ class EntityAnnotations(Type):
 class EntityCharmURL(Type):
     _toSchema = {'charm_url': 'charm-url', 'tag': 'tag'}
     _toPy = {'charm-url': 'charm_url', 'tag': 'tag'}
+
     def __init__(self, charm_url=None, tag=None, **unknown_fields):
         '''
         charm_url : str
@@ -9400,6 +9699,7 @@ class EntityCharmURL(Type):
 class EntityMacaroonArg(Type):
     _toSchema = {'macaroon': 'macaroon', 'tag': 'tag'}
     _toPy = {'macaroon': 'macaroon', 'tag': 'tag'}
+
     def __init__(self, macaroon=None, tag=None, **unknown_fields):
         '''
         macaroon : Macaroon
@@ -9424,6 +9724,7 @@ class EntityMacaroonArg(Type):
 class EntityMacaroonArgs(Type):
     _toSchema = {'args': 'Args'}
     _toPy = {'Args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~EntityMacaroonArg]
@@ -9442,6 +9743,7 @@ class EntityMacaroonArgs(Type):
 class EntityMetrics(Type):
     _toSchema = {'error': 'error', 'metrics': 'metrics'}
     _toPy = {'error': 'error', 'metrics': 'metrics'}
+
     def __init__(self, error=None, metrics=None, **unknown_fields):
         '''
         error : Error
@@ -9466,6 +9768,7 @@ class EntityMetrics(Type):
 class EntityPassword(Type):
     _toSchema = {'password': 'password', 'tag': 'tag'}
     _toPy = {'password': 'password', 'tag': 'tag'}
+
     def __init__(self, password=None, tag=None, **unknown_fields):
         '''
         password : str
@@ -9490,6 +9793,7 @@ class EntityPassword(Type):
 class EntityPasswords(Type):
     _toSchema = {'changes': 'changes'}
     _toPy = {'changes': 'changes'}
+
     def __init__(self, changes=None, **unknown_fields):
         '''
         changes : typing.Sequence[~EntityPassword]
@@ -9508,6 +9812,7 @@ class EntityPasswords(Type):
 class EntityPortRange(Type):
     _toSchema = {'endpoint': 'endpoint', 'from_port': 'from-port', 'protocol': 'protocol', 'tag': 'tag', 'to_port': 'to-port'}
     _toPy = {'endpoint': 'endpoint', 'from-port': 'from_port', 'protocol': 'protocol', 'tag': 'tag', 'to-port': 'to_port'}
+
     def __init__(self, endpoint=None, from_port=None, protocol=None, tag=None, to_port=None, **unknown_fields):
         '''
         endpoint : str
@@ -9550,6 +9855,7 @@ class EntityPortRange(Type):
 class EntityStatus(Type):
     _toSchema = {'data': 'data', 'info': 'info', 'since': 'since', 'status': 'status'}
     _toPy = {'data': 'data', 'info': 'info', 'since': 'since', 'status': 'status'}
+
     def __init__(self, data=None, info=None, since=None, status=None, **unknown_fields):
         '''
         data : typing.Mapping[str, typing.Any]
@@ -9586,6 +9892,7 @@ class EntityStatus(Type):
 class EntityStatusArgs(Type):
     _toSchema = {'data': 'data', 'info': 'info', 'status': 'status', 'tag': 'tag'}
     _toPy = {'data': 'data', 'info': 'info', 'status': 'status', 'tag': 'tag'}
+
     def __init__(self, data=None, info=None, status=None, tag=None, **unknown_fields):
         '''
         data : typing.Mapping[str, typing.Any]
@@ -9622,6 +9929,7 @@ class EntityStatusArgs(Type):
 class EntityString(Type):
     _toSchema = {'tag': 'tag', 'value': 'value'}
     _toPy = {'tag': 'tag', 'value': 'value'}
+
     def __init__(self, tag=None, value=None, **unknown_fields):
         '''
         tag : str
@@ -9646,6 +9954,7 @@ class EntityString(Type):
 class EntityVersion(Type):
     _toSchema = {'tag': 'tag', 'tools': 'tools'}
     _toPy = {'tag': 'tag', 'tools': 'tools'}
+
     def __init__(self, tag=None, tools=None, **unknown_fields):
         '''
         tag : str
@@ -9670,6 +9979,7 @@ class EntityVersion(Type):
 class EntityWorkloadVersion(Type):
     _toSchema = {'tag': 'tag', 'workload_version': 'workload-version'}
     _toPy = {'tag': 'tag', 'workload-version': 'workload_version'}
+
     def __init__(self, tag=None, workload_version=None, **unknown_fields):
         '''
         tag : str
@@ -9694,6 +10004,7 @@ class EntityWorkloadVersion(Type):
 class EntityWorkloadVersions(Type):
     _toSchema = {'entities': 'entities'}
     _toPy = {'entities': 'entities'}
+
     def __init__(self, entities=None, **unknown_fields):
         '''
         entities : typing.Sequence[~EntityWorkloadVersion]
@@ -9712,6 +10023,7 @@ class EntityWorkloadVersions(Type):
 class Error(Type):
     _toSchema = {'code': 'code', 'info': 'info', 'message': 'message'}
     _toPy = {'code': 'code', 'info': 'info', 'message': 'message'}
+
     def __init__(self, code=None, info=None, message=None, **unknown_fields):
         '''
         code : str
@@ -9742,6 +10054,7 @@ class Error(Type):
 class ErrorResult(Type):
     _toSchema = {'error': 'error'}
     _toPy = {'error': 'error'}
+
     def __init__(self, error=None, **unknown_fields):
         '''
         error : Error
@@ -9760,6 +10073,7 @@ class ErrorResult(Type):
 class ErrorResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ErrorResult]
@@ -9778,6 +10092,7 @@ class ErrorResults(Type):
 class ExportBundleParams(Type):
     _toSchema = {'include_charm_defaults': 'include-charm-defaults', 'include_series': 'include-series'}
     _toPy = {'include-charm-defaults': 'include_charm_defaults', 'include-series': 'include_series'}
+
     def __init__(self, include_charm_defaults=None, include_series=None, **unknown_fields):
         '''
         include_charm_defaults : bool
@@ -9802,6 +10117,7 @@ class ExportBundleParams(Type):
 class ExposeInfoResult(Type):
     _toSchema = {'error': 'error', 'exposed': 'exposed', 'exposed_endpoints': 'exposed-endpoints'}
     _toPy = {'error': 'error', 'exposed': 'exposed', 'exposed-endpoints': 'exposed_endpoints'}
+
     def __init__(self, error=None, exposed=None, exposed_endpoints=None, **unknown_fields):
         '''
         error : Error
@@ -9832,6 +10148,7 @@ class ExposeInfoResult(Type):
 class ExposeInfoResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ExposeInfoResult]
@@ -9850,6 +10167,7 @@ class ExposeInfoResults(Type):
 class ExposedEndpoint(Type):
     _toSchema = {'expose_to_cidrs': 'expose-to-cidrs', 'expose_to_spaces': 'expose-to-spaces'}
     _toPy = {'expose-to-cidrs': 'expose_to_cidrs', 'expose-to-spaces': 'expose_to_spaces'}
+
     def __init__(self, expose_to_cidrs=None, expose_to_spaces=None, **unknown_fields):
         '''
         expose_to_cidrs : typing.Sequence[str]
@@ -9874,6 +10192,7 @@ class ExposedEndpoint(Type):
 class ExpressionTree(Type):
     _toSchema = {'expression': 'Expression'}
     _toPy = {'Expression': 'expression'}
+
     def __init__(self, expression=None, **unknown_fields):
         '''
         expression : Any
@@ -9889,6 +10208,7 @@ class ExpressionTree(Type):
 class ExternalControllerInfo(Type):
     _toSchema = {'addrs': 'addrs', 'ca_cert': 'ca-cert', 'controller_alias': 'controller-alias', 'controller_tag': 'controller-tag'}
     _toPy = {'addrs': 'addrs', 'ca-cert': 'ca_cert', 'controller-alias': 'controller_alias', 'controller-tag': 'controller_tag'}
+
     def __init__(self, addrs=None, ca_cert=None, controller_alias=None, controller_tag=None, **unknown_fields):
         '''
         addrs : typing.Sequence[str]
@@ -9925,6 +10245,7 @@ class ExternalControllerInfo(Type):
 class ExternalControllerInfoResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -9949,6 +10270,7 @@ class ExternalControllerInfoResult(Type):
 class ExternalControllerInfoResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ExternalControllerInfoResult]
@@ -9967,6 +10289,7 @@ class ExternalControllerInfoResults(Type):
 class FanConfigEntry(Type):
     _toSchema = {'overlay': 'overlay', 'underlay': 'underlay'}
     _toPy = {'overlay': 'overlay', 'underlay': 'underlay'}
+
     def __init__(self, overlay=None, underlay=None, **unknown_fields):
         '''
         overlay : str
@@ -9991,6 +10314,7 @@ class FanConfigEntry(Type):
 class FanConfigResult(Type):
     _toSchema = {'fans': 'fans'}
     _toPy = {'fans': 'fans'}
+
     def __init__(self, fans=None, **unknown_fields):
         '''
         fans : typing.Sequence[~FanConfigEntry]
@@ -10009,6 +10333,7 @@ class FanConfigResult(Type):
 class Filesystem(Type):
     _toSchema = {'filesystem_tag': 'filesystem-tag', 'info': 'info', 'volume_tag': 'volume-tag'}
     _toPy = {'filesystem-tag': 'filesystem_tag', 'info': 'info', 'volume-tag': 'volume_tag'}
+
     def __init__(self, filesystem_tag=None, info=None, volume_tag=None, **unknown_fields):
         '''
         filesystem_tag : str
@@ -10039,6 +10364,7 @@ class Filesystem(Type):
 class FilesystemAttachment(Type):
     _toSchema = {'filesystem_tag': 'filesystem-tag', 'info': 'info', 'machine_tag': 'machine-tag'}
     _toPy = {'filesystem-tag': 'filesystem_tag', 'info': 'info', 'machine-tag': 'machine_tag'}
+
     def __init__(self, filesystem_tag=None, info=None, machine_tag=None, **unknown_fields):
         '''
         filesystem_tag : str
@@ -10069,6 +10395,7 @@ class FilesystemAttachment(Type):
 class FilesystemAttachmentDetails(Type):
     _toSchema = {'filesystemattachmentinfo': 'FilesystemAttachmentInfo', 'life': 'life', 'mount_point': 'mount-point', 'read_only': 'read-only'}
     _toPy = {'FilesystemAttachmentInfo': 'filesystemattachmentinfo', 'life': 'life', 'mount-point': 'mount_point', 'read-only': 'read_only'}
+
     def __init__(self, filesystemattachmentinfo=None, life=None, mount_point=None, read_only=None, **unknown_fields):
         '''
         filesystemattachmentinfo : FilesystemAttachmentInfo
@@ -10105,6 +10432,7 @@ class FilesystemAttachmentDetails(Type):
 class FilesystemAttachmentInfo(Type):
     _toSchema = {'mount_point': 'mount-point', 'read_only': 'read-only'}
     _toPy = {'mount-point': 'mount_point', 'read-only': 'read_only'}
+
     def __init__(self, mount_point=None, read_only=None, **unknown_fields):
         '''
         mount_point : str
@@ -10129,6 +10457,7 @@ class FilesystemAttachmentInfo(Type):
 class FilesystemAttachmentParams(Type):
     _toSchema = {'filesystem_id': 'filesystem-id', 'filesystem_tag': 'filesystem-tag', 'instance_id': 'instance-id', 'machine_tag': 'machine-tag', 'mount_point': 'mount-point', 'provider': 'provider', 'read_only': 'read-only'}
     _toPy = {'filesystem-id': 'filesystem_id', 'filesystem-tag': 'filesystem_tag', 'instance-id': 'instance_id', 'machine-tag': 'machine_tag', 'mount-point': 'mount_point', 'provider': 'provider', 'read-only': 'read_only'}
+
     def __init__(self, filesystem_id=None, filesystem_tag=None, instance_id=None, machine_tag=None, mount_point=None, provider=None, read_only=None, **unknown_fields):
         '''
         filesystem_id : str
@@ -10183,6 +10512,7 @@ class FilesystemAttachmentParams(Type):
 class FilesystemAttachmentParamsResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -10207,6 +10537,7 @@ class FilesystemAttachmentParamsResult(Type):
 class FilesystemAttachmentParamsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~FilesystemAttachmentParamsResult]
@@ -10225,6 +10556,7 @@ class FilesystemAttachmentParamsResults(Type):
 class FilesystemAttachmentResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -10249,6 +10581,7 @@ class FilesystemAttachmentResult(Type):
 class FilesystemAttachmentResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~FilesystemAttachmentResult]
@@ -10267,6 +10600,7 @@ class FilesystemAttachmentResults(Type):
 class FilesystemAttachments(Type):
     _toSchema = {'filesystem_attachments': 'filesystem-attachments'}
     _toPy = {'filesystem-attachments': 'filesystem_attachments'}
+
     def __init__(self, filesystem_attachments=None, **unknown_fields):
         '''
         filesystem_attachments : typing.Sequence[~FilesystemAttachment]
@@ -10285,6 +10619,7 @@ class FilesystemAttachments(Type):
 class FilesystemDetails(Type):
     _toSchema = {'filesystem_tag': 'filesystem-tag', 'info': 'info', 'life': 'life', 'machine_attachments': 'machine-attachments', 'status': 'status', 'storage': 'storage', 'unit_attachments': 'unit-attachments', 'volume_tag': 'volume-tag'}
     _toPy = {'filesystem-tag': 'filesystem_tag', 'info': 'info', 'life': 'life', 'machine-attachments': 'machine_attachments', 'status': 'status', 'storage': 'storage', 'unit-attachments': 'unit_attachments', 'volume-tag': 'volume_tag'}
+
     def __init__(self, filesystem_tag=None, info=None, life=None, machine_attachments=None, status=None, storage=None, unit_attachments=None, volume_tag=None, **unknown_fields):
         '''
         filesystem_tag : str
@@ -10345,6 +10680,7 @@ class FilesystemDetails(Type):
 class FilesystemDetailsListResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -10369,6 +10705,7 @@ class FilesystemDetailsListResult(Type):
 class FilesystemDetailsListResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~FilesystemDetailsListResult]
@@ -10387,6 +10724,7 @@ class FilesystemDetailsListResults(Type):
 class FilesystemFilter(Type):
     _toSchema = {'machines': 'machines'}
     _toPy = {'machines': 'machines'}
+
     def __init__(self, machines=None, **unknown_fields):
         '''
         machines : typing.Sequence[str]
@@ -10405,6 +10743,7 @@ class FilesystemFilter(Type):
 class FilesystemFilters(Type):
     _toSchema = {'filters': 'filters'}
     _toPy = {'filters': 'filters'}
+
     def __init__(self, filters=None, **unknown_fields):
         '''
         filters : typing.Sequence[~FilesystemFilter]
@@ -10423,6 +10762,7 @@ class FilesystemFilters(Type):
 class FilesystemInfo(Type):
     _toSchema = {'filesystem_id': 'filesystem-id', 'pool': 'pool', 'size': 'size'}
     _toPy = {'filesystem-id': 'filesystem_id', 'pool': 'pool', 'size': 'size'}
+
     def __init__(self, filesystem_id=None, pool=None, size=None, **unknown_fields):
         '''
         filesystem_id : str
@@ -10453,6 +10793,7 @@ class FilesystemInfo(Type):
 class FilesystemParams(Type):
     _toSchema = {'attachment': 'attachment', 'attributes': 'attributes', 'filesystem_tag': 'filesystem-tag', 'provider': 'provider', 'size': 'size', 'tags': 'tags', 'volume_tag': 'volume-tag'}
     _toPy = {'attachment': 'attachment', 'attributes': 'attributes', 'filesystem-tag': 'filesystem_tag', 'provider': 'provider', 'size': 'size', 'tags': 'tags', 'volume-tag': 'volume_tag'}
+
     def __init__(self, attachment=None, attributes=None, filesystem_tag=None, provider=None, size=None, tags=None, volume_tag=None, **unknown_fields):
         '''
         attachment : FilesystemAttachmentParams
@@ -10507,6 +10848,7 @@ class FilesystemParams(Type):
 class FilesystemParamsResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -10531,6 +10873,7 @@ class FilesystemParamsResult(Type):
 class FilesystemParamsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~FilesystemParamsResult]
@@ -10549,6 +10892,7 @@ class FilesystemParamsResults(Type):
 class FilesystemResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -10573,6 +10917,7 @@ class FilesystemResult(Type):
 class FilesystemResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~FilesystemResult]
@@ -10591,6 +10936,7 @@ class FilesystemResults(Type):
 class Filesystems(Type):
     _toSchema = {'filesystems': 'filesystems'}
     _toPy = {'filesystems': 'filesystems'}
+
     def __init__(self, filesystems=None, **unknown_fields):
         '''
         filesystems : typing.Sequence[~Filesystem]
@@ -10609,6 +10955,7 @@ class Filesystems(Type):
 class FindToolsParams(Type):
     _toSchema = {'agentstream': 'agentstream', 'arch': 'arch', 'major': 'major', 'number': 'number', 'os_type': 'os-type'}
     _toPy = {'agentstream': 'agentstream', 'arch': 'arch', 'major': 'major', 'number': 'number', 'os-type': 'os_type'}
+
     def __init__(self, agentstream=None, arch=None, major=None, number=None, os_type=None, **unknown_fields):
         '''
         agentstream : str
@@ -10651,6 +10998,7 @@ class FindToolsParams(Type):
 class FindToolsResult(Type):
     _toSchema = {'error': 'error', 'list_': 'list'}
     _toPy = {'error': 'error', 'list': 'list_'}
+
     def __init__(self, error=None, list_=None, **unknown_fields):
         '''
         error : Error
@@ -10675,6 +11023,7 @@ class FindToolsResult(Type):
 class FirewallRule(Type):
     _toSchema = {'known_service': 'known-service', 'whitelist_cidrs': 'whitelist-cidrs'}
     _toPy = {'known-service': 'known_service', 'whitelist-cidrs': 'whitelist_cidrs'}
+
     def __init__(self, known_service=None, whitelist_cidrs=None, **unknown_fields):
         '''
         known_service : str
@@ -10699,6 +11048,7 @@ class FirewallRule(Type):
 class FirewallRuleArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~FirewallRule]
@@ -10717,6 +11067,7 @@ class FirewallRuleArgs(Type):
 class FullStatus(Type):
     _toSchema = {'applications': 'applications', 'branches': 'branches', 'controller_timestamp': 'controller-timestamp', 'filesystems': 'filesystems', 'machines': 'machines', 'model': 'model', 'offers': 'offers', 'relations': 'relations', 'remote_applications': 'remote-applications', 'storage': 'storage', 'volumes': 'volumes'}
     _toPy = {'applications': 'applications', 'branches': 'branches', 'controller-timestamp': 'controller_timestamp', 'filesystems': 'filesystems', 'machines': 'machines', 'model': 'model', 'offers': 'offers', 'relations': 'relations', 'remote-applications': 'remote_applications', 'storage': 'storage', 'volumes': 'volumes'}
+
     def __init__(self, applications=None, branches=None, controller_timestamp=None, filesystems=None, machines=None, model=None, offers=None, relations=None, remote_applications=None, storage=None, volumes=None, **unknown_fields):
         '''
         applications : typing.Mapping[str, ~ApplicationStatus]
@@ -10795,6 +11146,7 @@ class FullStatus(Type):
 class Generation(Type):
     _toSchema = {'applications': 'applications', 'branch': 'branch', 'completed': 'completed', 'completed_by': 'completed-by', 'created': 'created', 'created_by': 'created-by', 'generation_id': 'generation-id'}
     _toPy = {'applications': 'applications', 'branch': 'branch', 'completed': 'completed', 'completed-by': 'completed_by', 'created': 'created', 'created-by': 'created_by', 'generation-id': 'generation_id'}
+
     def __init__(self, applications=None, branch=None, completed=None, completed_by=None, created=None, created_by=None, generation_id=None, **unknown_fields):
         '''
         applications : typing.Sequence[~GenerationApplication]
@@ -10849,6 +11201,7 @@ class Generation(Type):
 class GenerationApplication(Type):
     _toSchema = {'application': 'application', 'config': 'config', 'pending': 'pending', 'progress': 'progress', 'tracking': 'tracking'}
     _toPy = {'application': 'application', 'config': 'config', 'pending': 'pending', 'progress': 'progress', 'tracking': 'tracking'}
+
     def __init__(self, application=None, config=None, pending=None, progress=None, tracking=None, **unknown_fields):
         '''
         application : str
@@ -10891,6 +11244,7 @@ class GenerationApplication(Type):
 class GenerationId(Type):
     _toSchema = {'generation_id': 'generation-id'}
     _toPy = {'generation-id': 'generation_id'}
+
     def __init__(self, generation_id=None, **unknown_fields):
         '''
         generation_id : int
@@ -10909,6 +11263,7 @@ class GenerationId(Type):
 class GenerationResult(Type):
     _toSchema = {'error': 'error', 'generation': 'generation'}
     _toPy = {'error': 'error', 'generation': 'generation'}
+
     def __init__(self, error=None, generation=None, **unknown_fields):
         '''
         error : Error
@@ -10933,6 +11288,7 @@ class GenerationResult(Type):
 class GetConstraintsResults(Type):
     _toSchema = {'constraints': 'constraints'}
     _toPy = {'constraints': 'constraints'}
+
     def __init__(self, constraints=None, **unknown_fields):
         '''
         constraints : Value
@@ -10951,6 +11307,7 @@ class GetConstraintsResults(Type):
 class GetLeadershipSettingsBulkResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~GetLeadershipSettingsResult]
@@ -10969,6 +11326,7 @@ class GetLeadershipSettingsBulkResults(Type):
 class GetLeadershipSettingsResult(Type):
     _toSchema = {'error': 'error', 'settings': 'settings'}
     _toPy = {'error': 'error', 'settings': 'settings'}
+
     def __init__(self, error=None, settings=None, **unknown_fields):
         '''
         error : Error
@@ -10993,6 +11351,7 @@ class GetLeadershipSettingsResult(Type):
 class GetRemoteSecretAccessArg(Type):
     _toSchema = {'application_token': 'application-token', 'unit_id': 'unit-id', 'uri': 'uri'}
     _toPy = {'application-token': 'application_token', 'unit-id': 'unit_id', 'uri': 'uri'}
+
     def __init__(self, application_token=None, unit_id=None, uri=None, **unknown_fields):
         '''
         application_token : str
@@ -11023,6 +11382,7 @@ class GetRemoteSecretAccessArg(Type):
 class GetRemoteSecretAccessArgs(Type):
     _toSchema = {'relations': 'relations'}
     _toPy = {'relations': 'relations'}
+
     def __init__(self, relations=None, **unknown_fields):
         '''
         relations : typing.Sequence[~GetRemoteSecretAccessArg]
@@ -11041,6 +11401,7 @@ class GetRemoteSecretAccessArgs(Type):
 class GetRemoteSecretContentArg(Type):
     _toSchema = {'application_token': 'application-token', 'bakery_version': 'bakery-version', 'macaroons': 'macaroons', 'peek': 'peek', 'refresh': 'refresh', 'revision': 'revision', 'source_controller_uuid': 'source-controller-uuid', 'unit_id': 'unit-id', 'uri': 'uri'}
     _toPy = {'application-token': 'application_token', 'bakery-version': 'bakery_version', 'macaroons': 'macaroons', 'peek': 'peek', 'refresh': 'refresh', 'revision': 'revision', 'source-controller-uuid': 'source_controller_uuid', 'unit-id': 'unit_id', 'uri': 'uri'}
+
     def __init__(self, application_token=None, bakery_version=None, macaroons=None, peek=None, refresh=None, revision=None, source_controller_uuid=None, unit_id=None, uri=None, **unknown_fields):
         '''
         application_token : str
@@ -11107,6 +11468,7 @@ class GetRemoteSecretContentArg(Type):
 class GetRemoteSecretContentArgs(Type):
     _toSchema = {'relations': 'relations'}
     _toPy = {'relations': 'relations'}
+
     def __init__(self, relations=None, **unknown_fields):
         '''
         relations : typing.Sequence[~GetRemoteSecretContentArg]
@@ -11125,6 +11487,7 @@ class GetRemoteSecretContentArgs(Type):
 class GetSecretConsumerInfoArgs(Type):
     _toSchema = {'consumer_tag': 'consumer-tag', 'uris': 'uris'}
     _toPy = {'consumer-tag': 'consumer_tag', 'uris': 'uris'}
+
     def __init__(self, consumer_tag=None, uris=None, **unknown_fields):
         '''
         consumer_tag : str
@@ -11149,6 +11512,7 @@ class GetSecretConsumerInfoArgs(Type):
 class GetSecretContentArg(Type):
     _toSchema = {'label': 'label', 'peek': 'peek', 'refresh': 'refresh', 'uri': 'uri'}
     _toPy = {'label': 'label', 'peek': 'peek', 'refresh': 'refresh', 'uri': 'uri'}
+
     def __init__(self, label=None, peek=None, refresh=None, uri=None, **unknown_fields):
         '''
         label : str
@@ -11185,6 +11549,7 @@ class GetSecretContentArg(Type):
 class GetSecretContentArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~GetSecretContentArg]
@@ -11203,6 +11568,7 @@ class GetSecretContentArgs(Type):
 class GetTokenArg(Type):
     _toSchema = {'tag': 'tag'}
     _toPy = {'tag': 'tag'}
+
     def __init__(self, tag=None, **unknown_fields):
         '''
         tag : str
@@ -11221,6 +11587,7 @@ class GetTokenArg(Type):
 class GetTokenArgs(Type):
     _toSchema = {'args': 'Args'}
     _toPy = {'Args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~GetTokenArg]
@@ -11239,6 +11606,7 @@ class GetTokenArgs(Type):
 class GoalState(Type):
     _toSchema = {'relations': 'relations', 'units': 'units'}
     _toPy = {'relations': 'relations', 'units': 'units'}
+
     def __init__(self, relations=None, units=None, **unknown_fields):
         '''
         relations : typing.Mapping[str, typing.Any]
@@ -11263,6 +11631,7 @@ class GoalState(Type):
 class GoalStateResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -11287,6 +11656,7 @@ class GoalStateResult(Type):
 class GoalStateResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~GoalStateResult]
@@ -11305,6 +11675,7 @@ class GoalStateResults(Type):
 class GoalStateStatus(Type):
     _toSchema = {'since': 'since', 'status': 'status'}
     _toPy = {'since': 'since', 'status': 'status'}
+
     def __init__(self, since=None, status=None, **unknown_fields):
         '''
         since : str
@@ -11329,6 +11700,7 @@ class GoalStateStatus(Type):
 class GrantRevokeSecretArg(Type):
     _toSchema = {'role': 'role', 'scope_tag': 'scope-tag', 'subject_tags': 'subject-tags', 'uri': 'uri'}
     _toPy = {'role': 'role', 'scope-tag': 'scope_tag', 'subject-tags': 'subject_tags', 'uri': 'uri'}
+
     def __init__(self, role=None, scope_tag=None, subject_tags=None, uri=None, **unknown_fields):
         '''
         role : str
@@ -11365,6 +11737,7 @@ class GrantRevokeSecretArg(Type):
 class GrantRevokeSecretArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~GrantRevokeSecretArg]
@@ -11383,6 +11756,7 @@ class GrantRevokeSecretArgs(Type):
 class GrantRevokeUserSecretArg(Type):
     _toSchema = {'applications': 'applications', 'label': 'label', 'uri': 'uri'}
     _toPy = {'applications': 'applications', 'label': 'label', 'uri': 'uri'}
+
     def __init__(self, applications=None, label=None, uri=None, **unknown_fields):
         '''
         applications : typing.Sequence[str]
@@ -11413,6 +11787,7 @@ class GrantRevokeUserSecretArg(Type):
 class HardwareCharacteristics(Type):
     _toSchema = {'arch': 'arch', 'availability_zone': 'availability-zone', 'cpu_cores': 'cpu-cores', 'cpu_power': 'cpu-power', 'mem': 'mem', 'root_disk': 'root-disk', 'root_disk_source': 'root-disk-source', 'tags': 'tags', 'virt_type': 'virt-type'}
     _toPy = {'arch': 'arch', 'availability-zone': 'availability_zone', 'cpu-cores': 'cpu_cores', 'cpu-power': 'cpu_power', 'mem': 'mem', 'root-disk': 'root_disk', 'root-disk-source': 'root_disk_source', 'tags': 'tags', 'virt-type': 'virt_type'}
+
     def __init__(self, arch=None, availability_zone=None, cpu_cores=None, cpu_power=None, mem=None, root_disk=None, root_disk_source=None, tags=None, virt_type=None, **unknown_fields):
         '''
         arch : str
@@ -11479,6 +11854,7 @@ class HardwareCharacteristics(Type):
 class History(Type):
     _toSchema = {'error': 'error', 'statuses': 'statuses'}
     _toPy = {'error': 'error', 'statuses': 'statuses'}
+
     def __init__(self, error=None, statuses=None, **unknown_fields):
         '''
         error : Error
@@ -11503,6 +11879,7 @@ class History(Type):
 class HostNetworkChange(Type):
     _toSchema = {'error': 'error', 'new_bridges': 'new-bridges', 'reconfigure_delay': 'reconfigure-delay'}
     _toPy = {'error': 'error', 'new-bridges': 'new_bridges', 'reconfigure-delay': 'reconfigure_delay'}
+
     def __init__(self, error=None, new_bridges=None, reconfigure_delay=None, **unknown_fields):
         '''
         error : Error
@@ -11533,6 +11910,7 @@ class HostNetworkChange(Type):
 class HostNetworkChangeResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~HostNetworkChange]
@@ -11551,6 +11929,7 @@ class HostNetworkChangeResults(Type):
 class HostPort(Type):
     _toSchema = {'address': 'Address', 'cidr': 'cidr', 'config_type': 'config-type', 'is_secondary': 'is-secondary', 'port': 'port', 'scope': 'scope', 'space_id': 'space-id', 'space_name': 'space-name', 'type_': 'type', 'value': 'value'}
     _toPy = {'Address': 'address', 'cidr': 'cidr', 'config-type': 'config_type', 'is-secondary': 'is_secondary', 'port': 'port', 'scope': 'scope', 'space-id': 'space_id', 'space-name': 'space_name', 'type': 'type_', 'value': 'value'}
+
     def __init__(self, address=None, cidr=None, config_type=None, is_secondary=None, port=None, scope=None, space_id=None, space_name=None, type_=None, value=None, **unknown_fields):
         '''
         address : Address
@@ -11623,6 +12002,7 @@ class HostPort(Type):
 class HostedModelConfig(Type):
     _toSchema = {'cloud_spec': 'cloud-spec', 'config': 'config', 'error': 'error', 'name': 'name', 'owner': 'owner'}
     _toPy = {'cloud-spec': 'cloud_spec', 'config': 'config', 'error': 'error', 'name': 'name', 'owner': 'owner'}
+
     def __init__(self, cloud_spec=None, config=None, error=None, name=None, owner=None, **unknown_fields):
         '''
         cloud_spec : CloudSpec
@@ -11665,6 +12045,7 @@ class HostedModelConfig(Type):
 class HostedModelConfigsResults(Type):
     _toSchema = {'models': 'models'}
     _toPy = {'models': 'models'}
+
     def __init__(self, models=None, **unknown_fields):
         '''
         models : typing.Sequence[~HostedModelConfig]
@@ -11683,6 +12064,7 @@ class HostedModelConfigsResults(Type):
 class ImageMetadataFilter(Type):
     _toSchema = {'arches': 'arches', 'region': 'region', 'root_storage_type': 'root-storage-type', 'stream': 'stream', 'versions': 'versions', 'virt_type': 'virt-type'}
     _toPy = {'arches': 'arches', 'region': 'region', 'root-storage-type': 'root_storage_type', 'stream': 'stream', 'versions': 'versions', 'virt-type': 'virt_type'}
+
     def __init__(self, arches=None, region=None, root_storage_type=None, stream=None, versions=None, virt_type=None, **unknown_fields):
         '''
         arches : typing.Sequence[str]
@@ -11731,6 +12113,7 @@ class ImageMetadataFilter(Type):
 class ImportStorageDetails(Type):
     _toSchema = {'storage_tag': 'storage-tag'}
     _toPy = {'storage-tag': 'storage_tag'}
+
     def __init__(self, storage_tag=None, **unknown_fields):
         '''
         storage_tag : str
@@ -11749,6 +12132,7 @@ class ImportStorageDetails(Type):
 class ImportStorageParams(Type):
     _toSchema = {'kind': 'kind', 'pool': 'pool', 'provider_id': 'provider-id', 'storage_name': 'storage-name'}
     _toPy = {'kind': 'kind', 'pool': 'pool', 'provider-id': 'provider_id', 'storage-name': 'storage_name'}
+
     def __init__(self, kind=None, pool=None, provider_id=None, storage_name=None, **unknown_fields):
         '''
         kind : int
@@ -11785,6 +12169,7 @@ class ImportStorageParams(Type):
 class ImportStorageResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -11809,6 +12194,7 @@ class ImportStorageResult(Type):
 class ImportStorageResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ImportStorageResult]
@@ -11827,6 +12213,7 @@ class ImportStorageResults(Type):
 class IngressNetworksChangeEvent(Type):
     _toSchema = {'bakery_version': 'bakery-version', 'ingress_required': 'ingress-required', 'macaroons': 'macaroons', 'networks': 'networks', 'relation_token': 'relation-token'}
     _toPy = {'bakery-version': 'bakery_version', 'ingress-required': 'ingress_required', 'macaroons': 'macaroons', 'networks': 'networks', 'relation-token': 'relation_token'}
+
     def __init__(self, bakery_version=None, ingress_required=None, macaroons=None, networks=None, relation_token=None, **unknown_fields):
         '''
         bakery_version : int
@@ -11869,6 +12256,7 @@ class IngressNetworksChangeEvent(Type):
 class IngressNetworksChanges(Type):
     _toSchema = {'changes': 'changes'}
     _toPy = {'changes': 'changes'}
+
     def __init__(self, changes=None, **unknown_fields):
         '''
         changes : typing.Sequence[~IngressNetworksChangeEvent]
@@ -11887,6 +12275,7 @@ class IngressNetworksChanges(Type):
 class IngressRule(Type):
     _toSchema = {'port_range': 'port-range', 'source_cidrs': 'source-cidrs'}
     _toPy = {'port-range': 'port_range', 'source-cidrs': 'source_cidrs'}
+
     def __init__(self, port_range=None, source_cidrs=None, **unknown_fields):
         '''
         port_range : PortRange
@@ -11911,6 +12300,7 @@ class IngressRule(Type):
 class IngressRulesResult(Type):
     _toSchema = {'error': 'error', 'rules': 'rules'}
     _toPy = {'error': 'error', 'rules': 'rules'}
+
     def __init__(self, error=None, rules=None, **unknown_fields):
         '''
         error : Error
@@ -11935,6 +12325,7 @@ class IngressRulesResult(Type):
 class InitiateMigrationArgs(Type):
     _toSchema = {'specs': 'specs'}
     _toPy = {'specs': 'specs'}
+
     def __init__(self, specs=None, **unknown_fields):
         '''
         specs : typing.Sequence[~MigrationSpec]
@@ -11953,6 +12344,7 @@ class InitiateMigrationArgs(Type):
 class InitiateMigrationResult(Type):
     _toSchema = {'error': 'error', 'migration_id': 'migration-id', 'model_tag': 'model-tag'}
     _toPy = {'error': 'error', 'migration-id': 'migration_id', 'model-tag': 'model_tag'}
+
     def __init__(self, error=None, migration_id=None, model_tag=None, **unknown_fields):
         '''
         error : Error
@@ -11983,6 +12375,7 @@ class InitiateMigrationResult(Type):
 class InitiateMigrationResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~InitiateMigrationResult]
@@ -12001,6 +12394,7 @@ class InitiateMigrationResults(Type):
 class InstanceInfo(Type):
     _toSchema = {'characteristics': 'characteristics', 'charm_profiles': 'charm-profiles', 'display_name': 'display-name', 'instance_id': 'instance-id', 'network_config': 'network-config', 'nonce': 'nonce', 'tag': 'tag', 'volume_attachments': 'volume-attachments', 'volumes': 'volumes'}
     _toPy = {'characteristics': 'characteristics', 'charm-profiles': 'charm_profiles', 'display-name': 'display_name', 'instance-id': 'instance_id', 'network-config': 'network_config', 'nonce': 'nonce', 'tag': 'tag', 'volume-attachments': 'volume_attachments', 'volumes': 'volumes'}
+
     def __init__(self, characteristics=None, charm_profiles=None, display_name=None, instance_id=None, network_config=None, nonce=None, tag=None, volume_attachments=None, volumes=None, **unknown_fields):
         '''
         characteristics : HardwareCharacteristics
@@ -12067,6 +12461,7 @@ class InstanceInfo(Type):
 class InstanceType(Type):
     _toSchema = {'arches': 'arches', 'cost': 'cost', 'cpu_cores': 'cpu-cores', 'memory': 'memory', 'name': 'name', 'root_disk': 'root-disk', 'virt_type': 'virt-type'}
     _toPy = {'arches': 'arches', 'cost': 'cost', 'cpu-cores': 'cpu_cores', 'memory': 'memory', 'name': 'name', 'root-disk': 'root_disk', 'virt-type': 'virt_type'}
+
     def __init__(self, arches=None, cost=None, cpu_cores=None, memory=None, name=None, root_disk=None, virt_type=None, **unknown_fields):
         '''
         arches : typing.Sequence[str]
@@ -12121,6 +12516,7 @@ class InstanceType(Type):
 class InstanceTypesResult(Type):
     _toSchema = {'cost_currency': 'cost-currency', 'cost_divisor': 'cost-divisor', 'cost_unit': 'cost-unit', 'error': 'error', 'instance_types': 'instance-types'}
     _toPy = {'cost-currency': 'cost_currency', 'cost-divisor': 'cost_divisor', 'cost-unit': 'cost_unit', 'error': 'error', 'instance-types': 'instance_types'}
+
     def __init__(self, cost_currency=None, cost_divisor=None, cost_unit=None, error=None, instance_types=None, **unknown_fields):
         '''
         cost_currency : str
@@ -12163,6 +12559,7 @@ class InstanceTypesResult(Type):
 class InstanceTypesResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~InstanceTypesResult]
@@ -12181,6 +12578,7 @@ class InstanceTypesResults(Type):
 class InstancesInfo(Type):
     _toSchema = {'machines': 'machines'}
     _toPy = {'machines': 'machines'}
+
     def __init__(self, machines=None, **unknown_fields):
         '''
         machines : typing.Sequence[~InstanceInfo]
@@ -12199,6 +12597,7 @@ class InstancesInfo(Type):
 class IntResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -12223,6 +12622,7 @@ class IntResult(Type):
 class IntResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~IntResult]
@@ -12241,6 +12641,7 @@ class IntResults(Type):
 class InterfaceAddress(Type):
     _toSchema = {'cidr': 'cidr', 'hostname': 'hostname', 'value': 'value'}
     _toPy = {'cidr': 'cidr', 'hostname': 'hostname', 'value': 'value'}
+
     def __init__(self, cidr=None, hostname=None, value=None, **unknown_fields):
         '''
         cidr : str
@@ -12271,6 +12672,7 @@ class InterfaceAddress(Type):
 class InvalidateCredentialArg(Type):
     _toSchema = {'reason': 'reason'}
     _toPy = {'reason': 'reason'}
+
     def __init__(self, reason=None, **unknown_fields):
         '''
         reason : str
@@ -12289,6 +12691,7 @@ class InvalidateCredentialArg(Type):
 class IsMasterResult(Type):
     _toSchema = {'master': 'master'}
     _toPy = {'master': 'master'}
+
     def __init__(self, master=None, **unknown_fields):
         '''
         master : bool
@@ -12307,6 +12710,7 @@ class IsMasterResult(Type):
 class IsMeteredResult(Type):
     _toSchema = {'metered': 'metered'}
     _toPy = {'metered': 'metered'}
+
     def __init__(self, metered=None, **unknown_fields):
         '''
         metered : bool
@@ -12325,6 +12729,7 @@ class IsMeteredResult(Type):
 class IssueOperatorCertificateResult(Type):
     _toSchema = {'ca_cert': 'ca-cert', 'cert': 'cert', 'error': 'error', 'private_key': 'private-key'}
     _toPy = {'ca-cert': 'ca_cert', 'cert': 'cert', 'error': 'error', 'private-key': 'private_key'}
+
     def __init__(self, ca_cert=None, cert=None, error=None, private_key=None, **unknown_fields):
         '''
         ca_cert : str
@@ -12361,6 +12766,7 @@ class IssueOperatorCertificateResult(Type):
 class IssueOperatorCertificateResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~IssueOperatorCertificateResult]
@@ -12379,6 +12785,7 @@ class IssueOperatorCertificateResults(Type):
 class JobsResult(Type):
     _toSchema = {'error': 'error', 'jobs': 'jobs'}
     _toPy = {'error': 'error', 'jobs': 'jobs'}
+
     def __init__(self, error=None, jobs=None, **unknown_fields):
         '''
         error : Error
@@ -12403,6 +12810,7 @@ class JobsResult(Type):
 class JobsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~JobsResult]
@@ -12421,6 +12829,7 @@ class JobsResults(Type):
 class KnownServiceArgs(Type):
     _toSchema = {'known_services': 'known-services'}
     _toPy = {'known-services': 'known_services'}
+
     def __init__(self, known_services=None, **unknown_fields):
         '''
         known_services : typing.Sequence[str]
@@ -12439,6 +12848,7 @@ class KnownServiceArgs(Type):
 class KubernetesDeploymentInfo(Type):
     _toSchema = {'deployment_type': 'deployment-type', 'service_type': 'service-type'}
     _toPy = {'deployment-type': 'deployment_type', 'service-type': 'service_type'}
+
     def __init__(self, deployment_type=None, service_type=None, **unknown_fields):
         '''
         deployment_type : str
@@ -12463,6 +12873,7 @@ class KubernetesDeploymentInfo(Type):
 class KubernetesDeviceParams(Type):
     _toSchema = {'attributes': 'Attributes', 'count': 'Count', 'type_': 'Type'}
     _toPy = {'Attributes': 'attributes', 'Count': 'count', 'Type': 'type_'}
+
     def __init__(self, attributes=None, count=None, type_=None, **unknown_fields):
         '''
         attributes : typing.Mapping[str, str]
@@ -12493,6 +12904,7 @@ class KubernetesDeviceParams(Type):
 class KubernetesFilesystemAttachmentParams(Type):
     _toSchema = {'mount_point': 'mount-point', 'provider': 'provider', 'read_only': 'read-only'}
     _toPy = {'mount-point': 'mount_point', 'provider': 'provider', 'read-only': 'read_only'}
+
     def __init__(self, mount_point=None, provider=None, read_only=None, **unknown_fields):
         '''
         mount_point : str
@@ -12523,6 +12935,7 @@ class KubernetesFilesystemAttachmentParams(Type):
 class KubernetesFilesystemInfo(Type):
     _toSchema = {'data': 'data', 'filesystem_id': 'filesystem-id', 'info': 'info', 'mount_point': 'mount-point', 'pool': 'pool', 'read_only': 'read-only', 'size': 'size', 'status': 'status', 'storagename': 'storagename', 'volume': 'volume'}
     _toPy = {'data': 'data', 'filesystem-id': 'filesystem_id', 'info': 'info', 'mount-point': 'mount_point', 'pool': 'pool', 'read-only': 'read_only', 'size': 'size', 'status': 'status', 'storagename': 'storagename', 'volume': 'volume'}
+
     def __init__(self, data=None, filesystem_id=None, info=None, mount_point=None, pool=None, read_only=None, size=None, status=None, storagename=None, volume=None, **unknown_fields):
         '''
         data : typing.Mapping[str, typing.Any]
@@ -12595,6 +13008,7 @@ class KubernetesFilesystemInfo(Type):
 class KubernetesFilesystemParams(Type):
     _toSchema = {'attachment': 'attachment', 'attributes': 'attributes', 'provider': 'provider', 'size': 'size', 'storagename': 'storagename', 'tags': 'tags'}
     _toPy = {'attachment': 'attachment', 'attributes': 'attributes', 'provider': 'provider', 'size': 'size', 'storagename': 'storagename', 'tags': 'tags'}
+
     def __init__(self, attachment=None, attributes=None, provider=None, size=None, storagename=None, tags=None, **unknown_fields):
         '''
         attachment : KubernetesFilesystemAttachmentParams
@@ -12643,6 +13057,7 @@ class KubernetesFilesystemParams(Type):
 class KubernetesProvisioningInfo(Type):
     _toSchema = {'charm_modified_version': 'charm-modified-version', 'constraints': 'constraints', 'deployment_info': 'deployment-info', 'devices': 'devices', 'filesystems': 'filesystems', 'image_repo': 'image-repo', 'pod_spec': 'pod-spec', 'raw_k8s_spec': 'raw-k8s-spec', 'tags': 'tags', 'volumes': 'volumes'}
     _toPy = {'charm-modified-version': 'charm_modified_version', 'constraints': 'constraints', 'deployment-info': 'deployment_info', 'devices': 'devices', 'filesystems': 'filesystems', 'image-repo': 'image_repo', 'pod-spec': 'pod_spec', 'raw-k8s-spec': 'raw_k8s_spec', 'tags': 'tags', 'volumes': 'volumes'}
+
     def __init__(self, charm_modified_version=None, constraints=None, deployment_info=None, devices=None, filesystems=None, image_repo=None, pod_spec=None, raw_k8s_spec=None, tags=None, volumes=None, **unknown_fields):
         '''
         charm_modified_version : int
@@ -12715,6 +13130,7 @@ class KubernetesProvisioningInfo(Type):
 class KubernetesProvisioningInfoResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -12739,6 +13155,7 @@ class KubernetesProvisioningInfoResult(Type):
 class KubernetesProvisioningInfoResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~KubernetesProvisioningInfoResult]
@@ -12757,6 +13174,7 @@ class KubernetesProvisioningInfoResults(Type):
 class KubernetesUpgradeArg(Type):
     _toSchema = {'agent_tag': 'agent-tag', 'version': 'version'}
     _toPy = {'agent-tag': 'agent_tag', 'version': 'version'}
+
     def __init__(self, agent_tag=None, version=None, **unknown_fields):
         '''
         agent_tag : str
@@ -12781,6 +13199,7 @@ class KubernetesUpgradeArg(Type):
 class KubernetesVolumeAttachmentParams(Type):
     _toSchema = {'provider': 'provider', 'read_only': 'read-only'}
     _toPy = {'provider': 'provider', 'read-only': 'read_only'}
+
     def __init__(self, provider=None, read_only=None, **unknown_fields):
         '''
         provider : str
@@ -12805,6 +13224,7 @@ class KubernetesVolumeAttachmentParams(Type):
 class KubernetesVolumeInfo(Type):
     _toSchema = {'data': 'data', 'info': 'info', 'persistent': 'persistent', 'pool': 'pool', 'size': 'size', 'status': 'status', 'volume_id': 'volume-id'}
     _toPy = {'data': 'data', 'info': 'info', 'persistent': 'persistent', 'pool': 'pool', 'size': 'size', 'status': 'status', 'volume-id': 'volume_id'}
+
     def __init__(self, data=None, info=None, persistent=None, pool=None, size=None, status=None, volume_id=None, **unknown_fields):
         '''
         data : typing.Mapping[str, typing.Any]
@@ -12859,6 +13279,7 @@ class KubernetesVolumeInfo(Type):
 class KubernetesVolumeParams(Type):
     _toSchema = {'attachment': 'attachment', 'attributes': 'attributes', 'provider': 'provider', 'size': 'size', 'storagename': 'storagename', 'tags': 'tags'}
     _toPy = {'attachment': 'attachment', 'attributes': 'attributes', 'provider': 'provider', 'size': 'size', 'storagename': 'storagename', 'tags': 'tags'}
+
     def __init__(self, attachment=None, attributes=None, provider=None, size=None, storagename=None, tags=None, **unknown_fields):
         '''
         attachment : KubernetesVolumeAttachmentParams
@@ -12907,6 +13328,7 @@ class KubernetesVolumeParams(Type):
 class LXDProfile(Type):
     _toSchema = {'config': 'config', 'description': 'description', 'devices': 'devices'}
     _toPy = {'config': 'config', 'description': 'description', 'devices': 'devices'}
+
     def __init__(self, config=None, description=None, devices=None, **unknown_fields):
         '''
         config : typing.Mapping[str, str]
@@ -12937,6 +13359,7 @@ class LXDProfile(Type):
 class LatestSecretRevisionChanges(Type):
     _toSchema = {'changes': 'changes'}
     _toPy = {'changes': 'changes'}
+
     def __init__(self, changes=None, **unknown_fields):
         '''
         changes : typing.Sequence[~SecretRevisionChange]
@@ -12955,6 +13378,7 @@ class LatestSecretRevisionChanges(Type):
 class LeaseOperationCommand(Type):
     _toSchema = {'duration': 'duration', 'holder': 'holder', 'lease': 'lease', 'model_uuid': 'model-uuid', 'namespace': 'namespace', 'new_time': 'new-time', 'old_time': 'old-time', 'operation': 'operation', 'pin_entity': 'pin-entity', 'version': 'version'}
     _toPy = {'duration': 'duration', 'holder': 'holder', 'lease': 'lease', 'model-uuid': 'model_uuid', 'namespace': 'namespace', 'new-time': 'new_time', 'old-time': 'old_time', 'operation': 'operation', 'pin-entity': 'pin_entity', 'version': 'version'}
+
     def __init__(self, duration=None, holder=None, lease=None, model_uuid=None, namespace=None, new_time=None, old_time=None, operation=None, pin_entity=None, version=None, **unknown_fields):
         '''
         duration : int
@@ -13027,6 +13451,7 @@ class LeaseOperationCommand(Type):
 class LeaseOperationsV2(Type):
     _toSchema = {'commands': 'commands'}
     _toPy = {'commands': 'commands'}
+
     def __init__(self, commands=None, **unknown_fields):
         '''
         commands : typing.Sequence[~LeaseOperationCommand]
@@ -13045,6 +13470,7 @@ class LeaseOperationsV2(Type):
 class LifeResult(Type):
     _toSchema = {'error': 'error', 'life': 'life'}
     _toPy = {'error': 'error', 'life': 'life'}
+
     def __init__(self, error=None, life=None, **unknown_fields):
         '''
         error : Error
@@ -13069,6 +13495,7 @@ class LifeResult(Type):
 class LifeResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~LifeResult]
@@ -13087,6 +13514,7 @@ class LifeResults(Type):
 class ListCloudImageMetadataResult(Type):
     _toSchema = {'result': 'result'}
     _toPy = {'result': 'result'}
+
     def __init__(self, result=None, **unknown_fields):
         '''
         result : typing.Sequence[~CloudImageMetadata]
@@ -13105,6 +13533,7 @@ class ListCloudImageMetadataResult(Type):
 class ListCloudInfo(Type):
     _toSchema = {'clouddetails': 'CloudDetails', 'user_access': 'user-access'}
     _toPy = {'CloudDetails': 'clouddetails', 'user-access': 'user_access'}
+
     def __init__(self, clouddetails=None, user_access=None, **unknown_fields):
         '''
         clouddetails : CloudDetails
@@ -13129,6 +13558,7 @@ class ListCloudInfo(Type):
 class ListCloudInfoResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -13153,6 +13583,7 @@ class ListCloudInfoResult(Type):
 class ListCloudInfoResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ListCloudInfoResult]
@@ -13171,6 +13602,7 @@ class ListCloudInfoResults(Type):
 class ListCloudsRequest(Type):
     _toSchema = {'all_': 'all', 'user_tag': 'user-tag'}
     _toPy = {'all': 'all_', 'user-tag': 'user_tag'}
+
     def __init__(self, all_=None, user_tag=None, **unknown_fields):
         '''
         all_ : bool
@@ -13195,6 +13627,7 @@ class ListCloudsRequest(Type):
 class ListFirewallRulesResults(Type):
     _toSchema = {'rules': 'Rules'}
     _toPy = {'Rules': 'rules'}
+
     def __init__(self, rules=None, **unknown_fields):
         '''
         rules : typing.Sequence[~FirewallRule]
@@ -13213,6 +13646,7 @@ class ListFirewallRulesResults(Type):
 class ListResourcesArgs(Type):
     _toSchema = {'entities': 'entities'}
     _toPy = {'entities': 'entities'}
+
     def __init__(self, entities=None, **unknown_fields):
         '''
         entities : typing.Sequence[~Entity]
@@ -13231,6 +13665,7 @@ class ListResourcesArgs(Type):
 class ListSSHKeys(Type):
     _toSchema = {'entities': 'entities', 'mode': 'mode'}
     _toPy = {'entities': 'entities', 'mode': 'mode'}
+
     def __init__(self, entities=None, mode=None, **unknown_fields):
         '''
         entities : Entities
@@ -13255,6 +13690,7 @@ class ListSSHKeys(Type):
 class ListSecretBackendsArgs(Type):
     _toSchema = {'names': 'names', 'reveal': 'reveal'}
     _toPy = {'names': 'names', 'reveal': 'reveal'}
+
     def __init__(self, names=None, reveal=None, **unknown_fields):
         '''
         names : typing.Sequence[str]
@@ -13279,6 +13715,7 @@ class ListSecretBackendsArgs(Type):
 class ListSecretBackendsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~SecretBackendResult]
@@ -13297,6 +13734,7 @@ class ListSecretBackendsResults(Type):
 class ListSecretResult(Type):
     _toSchema = {'access': 'access', 'create_time': 'create-time', 'description': 'description', 'label': 'label', 'latest_expire_time': 'latest-expire-time', 'latest_revision': 'latest-revision', 'next_rotate_time': 'next-rotate-time', 'owner_tag': 'owner-tag', 'revisions': 'revisions', 'rotate_policy': 'rotate-policy', 'update_time': 'update-time', 'uri': 'uri', 'value': 'value', 'version': 'version'}
     _toPy = {'access': 'access', 'create-time': 'create_time', 'description': 'description', 'label': 'label', 'latest-expire-time': 'latest_expire_time', 'latest-revision': 'latest_revision', 'next-rotate-time': 'next_rotate_time', 'owner-tag': 'owner_tag', 'revisions': 'revisions', 'rotate-policy': 'rotate_policy', 'update-time': 'update_time', 'uri': 'uri', 'value': 'value', 'version': 'version'}
+
     def __init__(self, access=None, create_time=None, description=None, label=None, latest_expire_time=None, latest_revision=None, next_rotate_time=None, owner_tag=None, revisions=None, rotate_policy=None, update_time=None, uri=None, value=None, version=None, **unknown_fields):
         '''
         access : typing.Sequence[~AccessInfo]
@@ -13393,6 +13831,7 @@ class ListSecretResult(Type):
 class ListSecretResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ListSecretResult]
@@ -13411,6 +13850,7 @@ class ListSecretResults(Type):
 class ListSecretsArgs(Type):
     _toSchema = {'filter_': 'filter', 'show_secrets': 'show-secrets'}
     _toPy = {'filter': 'filter_', 'show-secrets': 'show_secrets'}
+
     def __init__(self, filter_=None, show_secrets=None, **unknown_fields):
         '''
         filter_ : SecretsFilter
@@ -13435,6 +13875,7 @@ class ListSecretsArgs(Type):
 class ListSpacesResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~Space]
@@ -13453,6 +13894,7 @@ class ListSpacesResults(Type):
 class ListSubnetsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~Subnet]
@@ -13471,6 +13913,7 @@ class ListSubnetsResults(Type):
 class ListUnitResourcesArgs(Type):
     _toSchema = {'resource_names': 'resource-names'}
     _toPy = {'resource-names': 'resource_names'}
+
     def __init__(self, resource_names=None, **unknown_fields):
         '''
         resource_names : typing.Sequence[str]
@@ -13489,6 +13932,7 @@ class ListUnitResourcesArgs(Type):
 class LogForwardingGetLastSentParams(Type):
     _toSchema = {'ids': 'ids'}
     _toPy = {'ids': 'ids'}
+
     def __init__(self, ids=None, **unknown_fields):
         '''
         ids : typing.Sequence[~LogForwardingID]
@@ -13507,6 +13951,7 @@ class LogForwardingGetLastSentParams(Type):
 class LogForwardingGetLastSentResult(Type):
     _toSchema = {'err': 'err', 'record_id': 'record-id', 'record_timestamp': 'record-timestamp'}
     _toPy = {'err': 'err', 'record-id': 'record_id', 'record-timestamp': 'record_timestamp'}
+
     def __init__(self, err=None, record_id=None, record_timestamp=None, **unknown_fields):
         '''
         err : Error
@@ -13537,6 +13982,7 @@ class LogForwardingGetLastSentResult(Type):
 class LogForwardingGetLastSentResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~LogForwardingGetLastSentResult]
@@ -13555,6 +14001,7 @@ class LogForwardingGetLastSentResults(Type):
 class LogForwardingID(Type):
     _toSchema = {'model': 'model', 'sink': 'sink'}
     _toPy = {'model': 'model', 'sink': 'sink'}
+
     def __init__(self, model=None, sink=None, **unknown_fields):
         '''
         model : str
@@ -13579,6 +14026,7 @@ class LogForwardingID(Type):
 class LogForwardingSetLastSentParam(Type):
     _toSchema = {'logforwardingid': 'LogForwardingID', 'model': 'model', 'record_id': 'record-id', 'record_timestamp': 'record-timestamp', 'sink': 'sink'}
     _toPy = {'LogForwardingID': 'logforwardingid', 'model': 'model', 'record-id': 'record_id', 'record-timestamp': 'record_timestamp', 'sink': 'sink'}
+
     def __init__(self, logforwardingid=None, model=None, record_id=None, record_timestamp=None, sink=None, **unknown_fields):
         '''
         logforwardingid : LogForwardingID
@@ -13621,6 +14069,7 @@ class LogForwardingSetLastSentParam(Type):
 class LogForwardingSetLastSentParams(Type):
     _toSchema = {'params': 'params'}
     _toPy = {'params': 'params'}
+
     def __init__(self, params=None, **unknown_fields):
         '''
         params : typing.Sequence[~LogForwardingSetLastSentParam]
@@ -13639,6 +14088,7 @@ class LogForwardingSetLastSentParams(Type):
 class LoginRequest(Type):
     _toSchema = {'auth_tag': 'auth-tag', 'bakery_version': 'bakery-version', 'cli_args': 'cli-args', 'client_version': 'client-version', 'credentials': 'credentials', 'macaroons': 'macaroons', 'nonce': 'nonce', 'token': 'token', 'user_data': 'user-data'}
     _toPy = {'auth-tag': 'auth_tag', 'bakery-version': 'bakery_version', 'cli-args': 'cli_args', 'client-version': 'client_version', 'credentials': 'credentials', 'macaroons': 'macaroons', 'nonce': 'nonce', 'token': 'token', 'user-data': 'user_data'}
+
     def __init__(self, auth_tag=None, bakery_version=None, cli_args=None, client_version=None, credentials=None, macaroons=None, nonce=None, token=None, user_data=None, **unknown_fields):
         '''
         auth_tag : str
@@ -13705,6 +14155,7 @@ class LoginRequest(Type):
 class LoginResult(Type):
     _toSchema = {'bakery_discharge_required': 'bakery-discharge-required', 'controller_tag': 'controller-tag', 'discharge_required': 'discharge-required', 'discharge_required_error': 'discharge-required-error', 'facades': 'facades', 'model_tag': 'model-tag', 'public_dns_name': 'public-dns-name', 'server_version': 'server-version', 'servers': 'servers', 'user_info': 'user-info'}
     _toPy = {'bakery-discharge-required': 'bakery_discharge_required', 'controller-tag': 'controller_tag', 'discharge-required': 'discharge_required', 'discharge-required-error': 'discharge_required_error', 'facades': 'facades', 'model-tag': 'model_tag', 'public-dns-name': 'public_dns_name', 'server-version': 'server_version', 'servers': 'servers', 'user-info': 'user_info'}
+
     def __init__(self, bakery_discharge_required=None, controller_tag=None, discharge_required=None, discharge_required_error=None, facades=None, model_tag=None, public_dns_name=None, server_version=None, servers=None, user_info=None, **unknown_fields):
         '''
         bakery_discharge_required : Macaroon
@@ -13777,6 +14228,7 @@ class LoginResult(Type):
 class LookUpPayloadArg(Type):
     _toSchema = {'id_': 'id', 'name': 'name'}
     _toPy = {'id': 'id_', 'name': 'name'}
+
     def __init__(self, id_=None, name=None, **unknown_fields):
         '''
         id_ : str
@@ -13801,6 +14253,7 @@ class LookUpPayloadArg(Type):
 class LookUpPayloadArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~LookUpPayloadArg]
@@ -13819,6 +14272,7 @@ class LookUpPayloadArgs(Type):
 class Macaroon(Type):
     _toSchema = {}
     _toPy = {}
+
     def __init__(self, **unknown_fields):
         '''
 
@@ -13830,6 +14284,7 @@ class Macaroon(Type):
 class MacaroonResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -13854,6 +14309,7 @@ class MacaroonResult(Type):
 class MacaroonResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~MacaroonResult]
@@ -13872,6 +14328,7 @@ class MacaroonResults(Type):
 class MachineAddresses(Type):
     _toSchema = {'addresses': 'addresses', 'tag': 'tag'}
     _toPy = {'addresses': 'addresses', 'tag': 'tag'}
+
     def __init__(self, addresses=None, tag=None, **unknown_fields):
         '''
         addresses : typing.Sequence[~Address]
@@ -13896,6 +14353,7 @@ class MachineAddresses(Type):
 class MachineAddressesResult(Type):
     _toSchema = {'addresses': 'addresses', 'error': 'error'}
     _toPy = {'addresses': 'addresses', 'error': 'error'}
+
     def __init__(self, addresses=None, error=None, **unknown_fields):
         '''
         addresses : typing.Sequence[~Address]
@@ -13920,6 +14378,7 @@ class MachineAddressesResult(Type):
 class MachineAddressesResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~MachineAddressesResult]
@@ -13938,6 +14397,7 @@ class MachineAddressesResults(Type):
 class MachineBlockDevices(Type):
     _toSchema = {'block_devices': 'block-devices', 'machine': 'machine'}
     _toPy = {'block-devices': 'block_devices', 'machine': 'machine'}
+
     def __init__(self, block_devices=None, machine=None, **unknown_fields):
         '''
         block_devices : typing.Sequence[~BlockDevice]
@@ -13962,6 +14422,7 @@ class MachineBlockDevices(Type):
 class MachineContainerResult(Type):
     _toSchema = {'container_types': 'container-types', 'determined': 'determined', 'error': 'error'}
     _toPy = {'container-types': 'container_types', 'determined': 'determined', 'error': 'error'}
+
     def __init__(self, container_types=None, determined=None, error=None, **unknown_fields):
         '''
         container_types : typing.Sequence[str]
@@ -13992,6 +14453,7 @@ class MachineContainerResult(Type):
 class MachineContainerResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~MachineContainerResult]
@@ -14010,6 +14472,7 @@ class MachineContainerResults(Type):
 class MachineContainers(Type):
     _toSchema = {'container_types': 'container-types', 'machine_tag': 'machine-tag'}
     _toPy = {'container-types': 'container_types', 'machine-tag': 'machine_tag'}
+
     def __init__(self, container_types=None, machine_tag=None, **unknown_fields):
         '''
         container_types : typing.Sequence[str]
@@ -14034,6 +14497,7 @@ class MachineContainers(Type):
 class MachineContainersParams(Type):
     _toSchema = {'params': 'params'}
     _toPy = {'params': 'params'}
+
     def __init__(self, params=None, **unknown_fields):
         '''
         params : typing.Sequence[~MachineContainers]
@@ -14052,6 +14516,7 @@ class MachineContainersParams(Type):
 class MachineHardware(Type):
     _toSchema = {'arch': 'arch', 'availability_zone': 'availability-zone', 'cores': 'cores', 'cpu_power': 'cpu-power', 'mem': 'mem', 'root_disk': 'root-disk', 'tags': 'tags', 'virt_type': 'virt-type'}
     _toPy = {'arch': 'arch', 'availability-zone': 'availability_zone', 'cores': 'cores', 'cpu-power': 'cpu_power', 'mem': 'mem', 'root-disk': 'root_disk', 'tags': 'tags', 'virt-type': 'virt_type'}
+
     def __init__(self, arch=None, availability_zone=None, cores=None, cpu_power=None, mem=None, root_disk=None, tags=None, virt_type=None, **unknown_fields):
         '''
         arch : str
@@ -14112,6 +14577,7 @@ class MachineHardware(Type):
 class MachineNetworkConfigResult(Type):
     _toSchema = {'error': 'error', 'info': 'info'}
     _toPy = {'error': 'error', 'info': 'info'}
+
     def __init__(self, error=None, info=None, **unknown_fields):
         '''
         error : Error
@@ -14136,6 +14602,7 @@ class MachineNetworkConfigResult(Type):
 class MachineNetworkConfigResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~MachineNetworkConfigResult]
@@ -14154,6 +14621,7 @@ class MachineNetworkConfigResults(Type):
 class MachineStatus(Type):
     _toSchema = {'agent_status': 'agent-status', 'base': 'base', 'constraints': 'constraints', 'containers': 'containers', 'display_name': 'display-name', 'dns_name': 'dns-name', 'hardware': 'hardware', 'has_vote': 'has-vote', 'hostname': 'hostname', 'id_': 'id', 'instance_id': 'instance-id', 'instance_status': 'instance-status', 'ip_addresses': 'ip-addresses', 'jobs': 'jobs', 'lxd_profiles': 'lxd-profiles', 'modification_status': 'modification-status', 'network_interfaces': 'network-interfaces', 'primary_controller_machine': 'primary-controller-machine', 'wants_vote': 'wants-vote'}
     _toPy = {'agent-status': 'agent_status', 'base': 'base', 'constraints': 'constraints', 'containers': 'containers', 'display-name': 'display_name', 'dns-name': 'dns_name', 'hardware': 'hardware', 'has-vote': 'has_vote', 'hostname': 'hostname', 'id': 'id_', 'instance-id': 'instance_id', 'instance-status': 'instance_status', 'ip-addresses': 'ip_addresses', 'jobs': 'jobs', 'lxd-profiles': 'lxd_profiles', 'modification-status': 'modification_status', 'network-interfaces': 'network_interfaces', 'primary-controller-machine': 'primary_controller_machine', 'wants-vote': 'wants_vote'}
+
     def __init__(self, agent_status=None, base=None, constraints=None, containers=None, display_name=None, dns_name=None, hardware=None, has_vote=None, hostname=None, id_=None, instance_id=None, instance_status=None, ip_addresses=None, jobs=None, lxd_profiles=None, modification_status=None, network_interfaces=None, primary_controller_machine=None, wants_vote=None, **unknown_fields):
         '''
         agent_status : DetailedStatus
@@ -14280,6 +14748,7 @@ class MachineStatus(Type):
 class MachineStorageId(Type):
     _toSchema = {'attachment_tag': 'attachment-tag', 'machine_tag': 'machine-tag'}
     _toPy = {'attachment-tag': 'attachment_tag', 'machine-tag': 'machine_tag'}
+
     def __init__(self, attachment_tag=None, machine_tag=None, **unknown_fields):
         '''
         attachment_tag : str
@@ -14304,6 +14773,7 @@ class MachineStorageId(Type):
 class MachineStorageIds(Type):
     _toSchema = {'ids': 'ids'}
     _toPy = {'ids': 'ids'}
+
     def __init__(self, ids=None, **unknown_fields):
         '''
         ids : typing.Sequence[~MachineStorageId]
@@ -14322,6 +14792,7 @@ class MachineStorageIds(Type):
 class MachineStorageIdsWatchResult(Type):
     _toSchema = {'changes': 'changes', 'error': 'error', 'watcher_id': 'watcher-id'}
     _toPy = {'changes': 'changes', 'error': 'error', 'watcher-id': 'watcher_id'}
+
     def __init__(self, changes=None, error=None, watcher_id=None, **unknown_fields):
         '''
         changes : typing.Sequence[~MachineStorageId]
@@ -14352,6 +14823,7 @@ class MachineStorageIdsWatchResult(Type):
 class MachineStorageIdsWatchResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~MachineStorageIdsWatchResult]
@@ -14370,6 +14842,7 @@ class MachineStorageIdsWatchResults(Type):
 class MapResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -14394,6 +14867,7 @@ class MapResult(Type):
 class MapResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~MapResult]
@@ -14412,6 +14886,7 @@ class MapResults(Type):
 class MasterMigrationStatus(Type):
     _toSchema = {'migration_id': 'migration-id', 'phase': 'phase', 'phase_changed_time': 'phase-changed-time', 'spec': 'spec'}
     _toPy = {'migration-id': 'migration_id', 'phase': 'phase', 'phase-changed-time': 'phase_changed_time', 'spec': 'spec'}
+
     def __init__(self, migration_id=None, phase=None, phase_changed_time=None, spec=None, **unknown_fields):
         '''
         migration_id : str
@@ -14448,6 +14923,7 @@ class MasterMigrationStatus(Type):
 class MergeLeadershipSettingsBulkParams(Type):
     _toSchema = {'params': 'params'}
     _toPy = {'params': 'params'}
+
     def __init__(self, params=None, **unknown_fields):
         '''
         params : typing.Sequence[~MergeLeadershipSettingsParam]
@@ -14466,6 +14942,7 @@ class MergeLeadershipSettingsBulkParams(Type):
 class MergeLeadershipSettingsParam(Type):
     _toSchema = {'application_tag': 'application-tag', 'settings': 'settings', 'unit_tag': 'unit-tag'}
     _toPy = {'application-tag': 'application_tag', 'settings': 'settings', 'unit-tag': 'unit_tag'}
+
     def __init__(self, application_tag=None, settings=None, unit_tag=None, **unknown_fields):
         '''
         application_tag : str
@@ -14496,6 +14973,7 @@ class MergeLeadershipSettingsParam(Type):
 class MetadataImageIds(Type):
     _toSchema = {'image_ids': 'image-ids'}
     _toPy = {'image-ids': 'image_ids'}
+
     def __init__(self, image_ids=None, **unknown_fields):
         '''
         image_ids : typing.Sequence[str]
@@ -14514,6 +14992,7 @@ class MetadataImageIds(Type):
 class MetadataSaveParams(Type):
     _toSchema = {'metadata': 'metadata'}
     _toPy = {'metadata': 'metadata'}
+
     def __init__(self, metadata=None, **unknown_fields):
         '''
         metadata : typing.Sequence[~CloudImageMetadataList]
@@ -14532,6 +15011,7 @@ class MetadataSaveParams(Type):
 class MeterStatus(Type):
     _toSchema = {'color': 'color', 'message': 'message'}
     _toPy = {'color': 'color', 'message': 'message'}
+
     def __init__(self, color=None, message=None, **unknown_fields):
         '''
         color : str
@@ -14556,6 +15036,7 @@ class MeterStatus(Type):
 class MeterStatusParam(Type):
     _toSchema = {'code': 'code', 'info': 'info', 'tag': 'tag'}
     _toPy = {'code': 'code', 'info': 'info', 'tag': 'tag'}
+
     def __init__(self, code=None, info=None, tag=None, **unknown_fields):
         '''
         code : str
@@ -14586,6 +15067,7 @@ class MeterStatusParam(Type):
 class MeterStatusParams(Type):
     _toSchema = {'statues': 'statues'}
     _toPy = {'statues': 'statues'}
+
     def __init__(self, statues=None, **unknown_fields):
         '''
         statues : typing.Sequence[~MeterStatusParam]
@@ -14604,6 +15086,7 @@ class MeterStatusParams(Type):
 class MeterStatusResult(Type):
     _toSchema = {'code': 'code', 'error': 'error', 'info': 'info'}
     _toPy = {'code': 'code', 'error': 'error', 'info': 'info'}
+
     def __init__(self, code=None, error=None, info=None, **unknown_fields):
         '''
         code : str
@@ -14634,6 +15117,7 @@ class MeterStatusResult(Type):
 class MeterStatusResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~MeterStatusResult]
@@ -14652,6 +15136,7 @@ class MeterStatusResults(Type):
 class Metric(Type):
     _toSchema = {'key': 'key', 'labels': 'labels', 'time': 'time', 'value': 'value'}
     _toPy = {'key': 'key', 'labels': 'labels', 'time': 'time', 'value': 'value'}
+
     def __init__(self, key=None, labels=None, time=None, value=None, **unknown_fields):
         '''
         key : str
@@ -14688,6 +15173,7 @@ class Metric(Type):
 class MetricBatch(Type):
     _toSchema = {'charm_url': 'charm-url', 'created': 'created', 'metrics': 'metrics', 'uuid': 'uuid'}
     _toPy = {'charm-url': 'charm_url', 'created': 'created', 'metrics': 'metrics', 'uuid': 'uuid'}
+
     def __init__(self, charm_url=None, created=None, metrics=None, uuid=None, **unknown_fields):
         '''
         charm_url : str
@@ -14724,6 +15210,7 @@ class MetricBatch(Type):
 class MetricBatchParam(Type):
     _toSchema = {'batch': 'batch', 'tag': 'tag'}
     _toPy = {'batch': 'batch', 'tag': 'tag'}
+
     def __init__(self, batch=None, tag=None, **unknown_fields):
         '''
         batch : MetricBatch
@@ -14748,6 +15235,7 @@ class MetricBatchParam(Type):
 class MetricBatchParams(Type):
     _toSchema = {'batches': 'batches'}
     _toPy = {'batches': 'batches'}
+
     def __init__(self, batches=None, **unknown_fields):
         '''
         batches : typing.Sequence[~MetricBatchParam]
@@ -14766,6 +15254,7 @@ class MetricBatchParams(Type):
 class MetricResult(Type):
     _toSchema = {'key': 'key', 'labels': 'labels', 'time': 'time', 'unit': 'unit', 'value': 'value'}
     _toPy = {'key': 'key', 'labels': 'labels', 'time': 'time', 'unit': 'unit', 'value': 'value'}
+
     def __init__(self, key=None, labels=None, time=None, unit=None, value=None, **unknown_fields):
         '''
         key : str
@@ -14808,6 +15297,7 @@ class MetricResult(Type):
 class MetricResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~EntityMetrics]
@@ -14826,6 +15316,7 @@ class MetricResults(Type):
 class MigrationModelInfo(Type):
     _toSchema = {'agent_version': 'agent-version', 'controller_agent_version': 'controller-agent-version', 'facade_versions': 'facade-versions', 'name': 'name', 'owner_tag': 'owner-tag', 'uuid': 'uuid'}
     _toPy = {'agent-version': 'agent_version', 'controller-agent-version': 'controller_agent_version', 'facade-versions': 'facade_versions', 'name': 'name', 'owner-tag': 'owner_tag', 'uuid': 'uuid'}
+
     def __init__(self, agent_version=None, controller_agent_version=None, facade_versions=None, name=None, owner_tag=None, uuid=None, **unknown_fields):
         '''
         agent_version : Number
@@ -14874,6 +15365,7 @@ class MigrationModelInfo(Type):
 class MigrationSourceInfo(Type):
     _toSchema = {'addrs': 'addrs', 'ca_cert': 'ca-cert', 'controller_alias': 'controller-alias', 'controller_tag': 'controller-tag', 'local_related_models': 'local-related-models'}
     _toPy = {'addrs': 'addrs', 'ca-cert': 'ca_cert', 'controller-alias': 'controller_alias', 'controller-tag': 'controller_tag', 'local-related-models': 'local_related_models'}
+
     def __init__(self, addrs=None, ca_cert=None, controller_alias=None, controller_tag=None, local_related_models=None, **unknown_fields):
         '''
         addrs : typing.Sequence[str]
@@ -14916,6 +15408,7 @@ class MigrationSourceInfo(Type):
 class MigrationSpec(Type):
     _toSchema = {'model_tag': 'model-tag', 'target_info': 'target-info'}
     _toPy = {'model-tag': 'model_tag', 'target-info': 'target_info'}
+
     def __init__(self, model_tag=None, target_info=None, **unknown_fields):
         '''
         model_tag : str
@@ -14940,6 +15433,7 @@ class MigrationSpec(Type):
 class MigrationStatus(Type):
     _toSchema = {'attempt': 'attempt', 'migration_id': 'migration-id', 'phase': 'phase', 'source_api_addrs': 'source-api-addrs', 'source_ca_cert': 'source-ca-cert', 'target_api_addrs': 'target-api-addrs', 'target_ca_cert': 'target-ca-cert'}
     _toPy = {'attempt': 'attempt', 'migration-id': 'migration_id', 'phase': 'phase', 'source-api-addrs': 'source_api_addrs', 'source-ca-cert': 'source_ca_cert', 'target-api-addrs': 'target_api_addrs', 'target-ca-cert': 'target_ca_cert'}
+
     def __init__(self, attempt=None, migration_id=None, phase=None, source_api_addrs=None, source_ca_cert=None, target_api_addrs=None, target_ca_cert=None, **unknown_fields):
         '''
         attempt : int
@@ -14994,6 +15488,7 @@ class MigrationStatus(Type):
 class MigrationTargetInfo(Type):
     _toSchema = {'addrs': 'addrs', 'auth_tag': 'auth-tag', 'ca_cert': 'ca-cert', 'controller_alias': 'controller-alias', 'controller_tag': 'controller-tag', 'macaroons': 'macaroons', 'password': 'password'}
     _toPy = {'addrs': 'addrs', 'auth-tag': 'auth_tag', 'ca-cert': 'ca_cert', 'controller-alias': 'controller_alias', 'controller-tag': 'controller_tag', 'macaroons': 'macaroons', 'password': 'password'}
+
     def __init__(self, addrs=None, auth_tag=None, ca_cert=None, controller_alias=None, controller_tag=None, macaroons=None, password=None, **unknown_fields):
         '''
         addrs : typing.Sequence[str]
@@ -15048,6 +15543,7 @@ class MigrationTargetInfo(Type):
 class MinionReport(Type):
     _toSchema = {'migration_id': 'migration-id', 'phase': 'phase', 'success': 'success'}
     _toPy = {'migration-id': 'migration_id', 'phase': 'phase', 'success': 'success'}
+
     def __init__(self, migration_id=None, phase=None, success=None, **unknown_fields):
         '''
         migration_id : str
@@ -15078,6 +15574,7 @@ class MinionReport(Type):
 class MinionReports(Type):
     _toSchema = {'failed': 'failed', 'migration_id': 'migration-id', 'phase': 'phase', 'success_count': 'success-count', 'unknown_count': 'unknown-count', 'unknown_sample': 'unknown-sample'}
     _toPy = {'failed': 'failed', 'migration-id': 'migration_id', 'phase': 'phase', 'success-count': 'success_count', 'unknown-count': 'unknown_count', 'unknown-sample': 'unknown_sample'}
+
     def __init__(self, failed=None, migration_id=None, phase=None, success_count=None, unknown_count=None, unknown_sample=None, **unknown_fields):
         '''
         failed : typing.Sequence[str]
@@ -15126,6 +15623,7 @@ class MinionReports(Type):
 class Model(Type):
     _toSchema = {'name': 'name', 'owner_tag': 'owner-tag', 'type_': 'type', 'uuid': 'uuid'}
     _toPy = {'name': 'name', 'owner-tag': 'owner_tag', 'type': 'type_', 'uuid': 'uuid'}
+
     def __init__(self, name=None, owner_tag=None, type_=None, uuid=None, **unknown_fields):
         '''
         name : str
@@ -15162,6 +15660,7 @@ class Model(Type):
 class ModelAbstract(Type):
     _toSchema = {'admins': 'admins', 'annotations': 'annotations', 'cloud': 'cloud', 'controller': 'controller', 'credential': 'credential', 'messages': 'messages', 'name': 'name', 'region': 'region', 'removed': 'removed', 'size': 'size', 'status': 'status', 'uuid': 'uuid'}
     _toPy = {'admins': 'admins', 'annotations': 'annotations', 'cloud': 'cloud', 'controller': 'controller', 'credential': 'credential', 'messages': 'messages', 'name': 'name', 'region': 'region', 'removed': 'removed', 'size': 'size', 'status': 'status', 'uuid': 'uuid'}
+
     def __init__(self, admins=None, annotations=None, cloud=None, controller=None, credential=None, messages=None, name=None, region=None, removed=None, size=None, status=None, uuid=None, **unknown_fields):
         '''
         admins : typing.Sequence[str]
@@ -15246,6 +15745,7 @@ class ModelAbstract(Type):
 class ModelAccess(Type):
     _toSchema = {'access': 'access', 'model': 'model'}
     _toPy = {'access': 'access', 'model': 'model'}
+
     def __init__(self, access=None, model=None, **unknown_fields):
         '''
         access : str
@@ -15270,6 +15770,7 @@ class ModelAccess(Type):
 class ModelApplicationInfo(Type):
     _toSchema = {'name': 'name'}
     _toPy = {'name': 'name'}
+
     def __init__(self, name=None, **unknown_fields):
         '''
         name : str
@@ -15288,6 +15789,7 @@ class ModelApplicationInfo(Type):
 class ModelArgs(Type):
     _toSchema = {'model_tag': 'model-tag'}
     _toPy = {'model-tag': 'model_tag'}
+
     def __init__(self, model_tag=None, **unknown_fields):
         '''
         model_tag : str
@@ -15306,6 +15808,7 @@ class ModelArgs(Type):
 class ModelBlockInfo(Type):
     _toSchema = {'blocks': 'blocks', 'model_uuid': 'model-uuid', 'name': 'name', 'owner_tag': 'owner-tag'}
     _toPy = {'blocks': 'blocks', 'model-uuid': 'model_uuid', 'name': 'name', 'owner-tag': 'owner_tag'}
+
     def __init__(self, blocks=None, model_uuid=None, name=None, owner_tag=None, **unknown_fields):
         '''
         blocks : typing.Sequence[str]
@@ -15342,6 +15845,7 @@ class ModelBlockInfo(Type):
 class ModelBlockInfoList(Type):
     _toSchema = {'models': 'models'}
     _toPy = {'models': 'models'}
+
     def __init__(self, models=None, **unknown_fields):
         '''
         models : typing.Sequence[~ModelBlockInfo]
@@ -15360,6 +15864,7 @@ class ModelBlockInfoList(Type):
 class ModelConfigResult(Type):
     _toSchema = {'config': 'config'}
     _toPy = {'config': 'config'}
+
     def __init__(self, config=None, **unknown_fields):
         '''
         config : typing.Mapping[str, typing.Any]
@@ -15378,6 +15883,7 @@ class ModelConfigResult(Type):
 class ModelConfigResults(Type):
     _toSchema = {'config': 'config'}
     _toPy = {'config': 'config'}
+
     def __init__(self, config=None, **unknown_fields):
         '''
         config : typing.Mapping[str, ~ConfigValue]
@@ -15396,6 +15902,7 @@ class ModelConfigResults(Type):
 class ModelCreateArgs(Type):
     _toSchema = {'cloud_tag': 'cloud-tag', 'config': 'config', 'credential': 'credential', 'name': 'name', 'owner_tag': 'owner-tag', 'region': 'region'}
     _toPy = {'cloud-tag': 'cloud_tag', 'config': 'config', 'credential': 'credential', 'name': 'name', 'owner-tag': 'owner_tag', 'region': 'region'}
+
     def __init__(self, cloud_tag=None, config=None, credential=None, name=None, owner_tag=None, region=None, **unknown_fields):
         '''
         cloud_tag : str
@@ -15444,6 +15951,7 @@ class ModelCreateArgs(Type):
 class ModelCredential(Type):
     _toSchema = {'credential_tag': 'credential-tag', 'exists': 'exists', 'model_tag': 'model-tag', 'valid': 'valid'}
     _toPy = {'credential-tag': 'credential_tag', 'exists': 'exists', 'model-tag': 'model_tag', 'valid': 'valid'}
+
     def __init__(self, credential_tag=None, exists=None, model_tag=None, valid=None, **unknown_fields):
         '''
         credential_tag : str
@@ -15480,6 +15988,7 @@ class ModelCredential(Type):
 class ModelDefaultValues(Type):
     _toSchema = {'cloud_region': 'cloud-region', 'cloud_tag': 'cloud-tag', 'config': 'config'}
     _toPy = {'cloud-region': 'cloud_region', 'cloud-tag': 'cloud_tag', 'config': 'config'}
+
     def __init__(self, cloud_region=None, cloud_tag=None, config=None, **unknown_fields):
         '''
         cloud_region : str
@@ -15510,6 +16019,7 @@ class ModelDefaultValues(Type):
 class ModelDefaults(Type):
     _toSchema = {'controller': 'controller', 'default': 'default', 'regions': 'regions'}
     _toPy = {'controller': 'controller', 'default': 'default', 'regions': 'regions'}
+
     def __init__(self, controller=None, default=None, regions=None, **unknown_fields):
         '''
         controller : Any
@@ -15534,6 +16044,7 @@ class ModelDefaults(Type):
 class ModelDefaultsResult(Type):
     _toSchema = {'config': 'config', 'error': 'error'}
     _toPy = {'config': 'config', 'error': 'error'}
+
     def __init__(self, config=None, error=None, **unknown_fields):
         '''
         config : typing.Mapping[str, ~ModelDefaults]
@@ -15558,6 +16069,7 @@ class ModelDefaultsResult(Type):
 class ModelDefaultsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ModelDefaultsResult]
@@ -15576,6 +16088,7 @@ class ModelDefaultsResults(Type):
 class ModelEntityCount(Type):
     _toSchema = {'count': 'count', 'entity': 'entity'}
     _toPy = {'count': 'count', 'entity': 'entity'}
+
     def __init__(self, count=None, entity=None, **unknown_fields):
         '''
         count : int
@@ -15600,6 +16113,7 @@ class ModelEntityCount(Type):
 class ModelFilesystemInfo(Type):
     _toSchema = {'detachable': 'detachable', 'id_': 'id', 'message': 'message', 'provider_id': 'provider-id', 'status': 'status'}
     _toPy = {'detachable': 'detachable', 'id': 'id_', 'message': 'message', 'provider-id': 'provider_id', 'status': 'status'}
+
     def __init__(self, detachable=None, id_=None, message=None, provider_id=None, status=None, **unknown_fields):
         '''
         detachable : bool
@@ -15642,6 +16156,7 @@ class ModelFilesystemInfo(Type):
 class ModelInfo(Type):
     _toSchema = {'agent_version': 'agent-version', 'cloud_credential_tag': 'cloud-credential-tag', 'cloud_credential_validity': 'cloud-credential-validity', 'cloud_region': 'cloud-region', 'cloud_tag': 'cloud-tag', 'controller_uuid': 'controller-uuid', 'default_base': 'default-base', 'default_series': 'default-series', 'is_controller': 'is-controller', 'life': 'life', 'machines': 'machines', 'migration': 'migration', 'name': 'name', 'owner_tag': 'owner-tag', 'provider_type': 'provider-type', 'secret_backends': 'secret-backends', 'sla': 'sla', 'status': 'status', 'supported_features': 'supported-features', 'type_': 'type', 'users': 'users', 'uuid': 'uuid'}
     _toPy = {'agent-version': 'agent_version', 'cloud-credential-tag': 'cloud_credential_tag', 'cloud-credential-validity': 'cloud_credential_validity', 'cloud-region': 'cloud_region', 'cloud-tag': 'cloud_tag', 'controller-uuid': 'controller_uuid', 'default-base': 'default_base', 'default-series': 'default_series', 'is-controller': 'is_controller', 'life': 'life', 'machines': 'machines', 'migration': 'migration', 'name': 'name', 'owner-tag': 'owner_tag', 'provider-type': 'provider_type', 'secret-backends': 'secret_backends', 'sla': 'sla', 'status': 'status', 'supported-features': 'supported_features', 'type': 'type_', 'users': 'users', 'uuid': 'uuid'}
+
     def __init__(self, agent_version=None, cloud_credential_tag=None, cloud_credential_validity=None, cloud_region=None, cloud_tag=None, controller_uuid=None, default_base=None, default_series=None, is_controller=None, life=None, machines=None, migration=None, name=None, owner_tag=None, provider_type=None, secret_backends=None, sla=None, status=None, supported_features=None, type_=None, users=None, uuid=None, **unknown_fields):
         '''
         agent_version : Number
@@ -15786,6 +16301,7 @@ class ModelInfo(Type):
 class ModelInfoResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -15810,6 +16326,7 @@ class ModelInfoResult(Type):
 class ModelInfoResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ModelInfoResult]
@@ -15828,6 +16345,7 @@ class ModelInfoResults(Type):
 class ModelInstanceTypesConstraint(Type):
     _toSchema = {'value': 'value'}
     _toPy = {'value': 'value'}
+
     def __init__(self, value=None, **unknown_fields):
         '''
         value : Value
@@ -15846,6 +16364,7 @@ class ModelInstanceTypesConstraint(Type):
 class ModelInstanceTypesConstraints(Type):
     _toSchema = {'constraints': 'constraints'}
     _toPy = {'constraints': 'constraints'}
+
     def __init__(self, constraints=None, **unknown_fields):
         '''
         constraints : typing.Sequence[~ModelInstanceTypesConstraint]
@@ -15864,6 +16383,7 @@ class ModelInstanceTypesConstraints(Type):
 class ModelMachineInfo(Type):
     _toSchema = {'display_name': 'display-name', 'ha_primary': 'ha-primary', 'hardware': 'hardware', 'has_vote': 'has-vote', 'id_': 'id', 'instance_id': 'instance-id', 'message': 'message', 'status': 'status', 'wants_vote': 'wants-vote'}
     _toPy = {'display-name': 'display_name', 'ha-primary': 'ha_primary', 'hardware': 'hardware', 'has-vote': 'has_vote', 'id': 'id_', 'instance-id': 'instance_id', 'message': 'message', 'status': 'status', 'wants-vote': 'wants_vote'}
+
     def __init__(self, display_name=None, ha_primary=None, hardware=None, has_vote=None, id_=None, instance_id=None, message=None, status=None, wants_vote=None, **unknown_fields):
         '''
         display_name : str
@@ -15930,6 +16450,7 @@ class ModelMachineInfo(Type):
 class ModelMigrationStatus(Type):
     _toSchema = {'end': 'end', 'start': 'start', 'status': 'status'}
     _toPy = {'end': 'end', 'start': 'start', 'status': 'status'}
+
     def __init__(self, end=None, start=None, status=None, **unknown_fields):
         '''
         end : str
@@ -15960,6 +16481,7 @@ class ModelMigrationStatus(Type):
 class ModelOperatorInfo(Type):
     _toSchema = {'api_addresses': 'api-addresses', 'image_details': 'image-details', 'version': 'version'}
     _toPy = {'api-addresses': 'api_addresses', 'image-details': 'image_details', 'version': 'version'}
+
     def __init__(self, api_addresses=None, image_details=None, version=None, **unknown_fields):
         '''
         api_addresses : typing.Sequence[str]
@@ -15990,6 +16512,7 @@ class ModelOperatorInfo(Type):
 class ModelParam(Type):
     _toSchema = {'model_tag': 'model-tag'}
     _toPy = {'model-tag': 'model_tag'}
+
     def __init__(self, model_tag=None, **unknown_fields):
         '''
         model_tag : str
@@ -16008,6 +16531,7 @@ class ModelParam(Type):
 class ModelResult(Type):
     _toSchema = {'error': 'error', 'name': 'name', 'type_': 'type', 'uuid': 'uuid'}
     _toPy = {'error': 'error', 'name': 'name', 'type': 'type_', 'uuid': 'uuid'}
+
     def __init__(self, error=None, name=None, type_=None, uuid=None, **unknown_fields):
         '''
         error : Error
@@ -16044,6 +16568,7 @@ class ModelResult(Type):
 class ModelSLA(Type):
     _toSchema = {'creds': 'creds', 'level': 'level', 'modelslainfo': 'ModelSLAInfo', 'owner': 'owner'}
     _toPy = {'ModelSLAInfo': 'modelslainfo', 'creds': 'creds', 'level': 'level', 'owner': 'owner'}
+
     def __init__(self, modelslainfo=None, creds=None, level=None, owner=None, **unknown_fields):
         '''
         modelslainfo : ModelSLAInfo
@@ -16080,6 +16605,7 @@ class ModelSLA(Type):
 class ModelSLAInfo(Type):
     _toSchema = {'level': 'level', 'owner': 'owner'}
     _toPy = {'level': 'level', 'owner': 'owner'}
+
     def __init__(self, level=None, owner=None, **unknown_fields):
         '''
         level : str
@@ -16104,6 +16630,7 @@ class ModelSLAInfo(Type):
 class ModelSequencesResult(Type):
     _toSchema = {'sequences': 'sequences'}
     _toPy = {'sequences': 'sequences'}
+
     def __init__(self, sequences=None, **unknown_fields):
         '''
         sequences : typing.Mapping[str, int]
@@ -16122,6 +16649,7 @@ class ModelSequencesResult(Type):
 class ModelSet(Type):
     _toSchema = {'config': 'config'}
     _toPy = {'config': 'config'}
+
     def __init__(self, config=None, **unknown_fields):
         '''
         config : typing.Mapping[str, typing.Any]
@@ -16140,6 +16668,7 @@ class ModelSet(Type):
 class ModelStatus(Type):
     _toSchema = {'application_count': 'application-count', 'applications': 'applications', 'error': 'error', 'filesystems': 'filesystems', 'hosted_machine_count': 'hosted-machine-count', 'life': 'life', 'machines': 'machines', 'model_tag': 'model-tag', 'owner_tag': 'owner-tag', 'type_': 'type', 'unit_count': 'unit-count', 'volumes': 'volumes'}
     _toPy = {'application-count': 'application_count', 'applications': 'applications', 'error': 'error', 'filesystems': 'filesystems', 'hosted-machine-count': 'hosted_machine_count', 'life': 'life', 'machines': 'machines', 'model-tag': 'model_tag', 'owner-tag': 'owner_tag', 'type': 'type_', 'unit-count': 'unit_count', 'volumes': 'volumes'}
+
     def __init__(self, application_count=None, applications=None, error=None, filesystems=None, hosted_machine_count=None, life=None, machines=None, model_tag=None, owner_tag=None, type_=None, unit_count=None, volumes=None, **unknown_fields):
         '''
         application_count : int
@@ -16224,6 +16753,7 @@ class ModelStatus(Type):
 class ModelStatusInfo(Type):
     _toSchema = {'available_version': 'available-version', 'cloud_tag': 'cloud-tag', 'meter_status': 'meter-status', 'model_status': 'model-status', 'name': 'name', 'region': 'region', 'sla': 'sla', 'type_': 'type', 'version': 'version'}
     _toPy = {'available-version': 'available_version', 'cloud-tag': 'cloud_tag', 'meter-status': 'meter_status', 'model-status': 'model_status', 'name': 'name', 'region': 'region', 'sla': 'sla', 'type': 'type_', 'version': 'version'}
+
     def __init__(self, available_version=None, cloud_tag=None, meter_status=None, model_status=None, name=None, region=None, sla=None, type_=None, version=None, **unknown_fields):
         '''
         available_version : str
@@ -16290,6 +16820,7 @@ class ModelStatusInfo(Type):
 class ModelStatusResults(Type):
     _toSchema = {'models': 'models'}
     _toPy = {'models': 'models'}
+
     def __init__(self, models=None, **unknown_fields):
         '''
         models : typing.Sequence[~ModelStatus]
@@ -16308,6 +16839,7 @@ class ModelStatusResults(Type):
 class ModelSummariesRequest(Type):
     _toSchema = {'all_': 'all', 'user_tag': 'user-tag'}
     _toPy = {'all': 'all_', 'user-tag': 'user_tag'}
+
     def __init__(self, all_=None, user_tag=None, **unknown_fields):
         '''
         all_ : bool
@@ -16332,6 +16864,7 @@ class ModelSummariesRequest(Type):
 class ModelSummary(Type):
     _toSchema = {'agent_version': 'agent-version', 'cloud_credential_tag': 'cloud-credential-tag', 'cloud_region': 'cloud-region', 'cloud_tag': 'cloud-tag', 'controller_uuid': 'controller-uuid', 'counts': 'counts', 'default_series': 'default-series', 'is_controller': 'is-controller', 'last_connection': 'last-connection', 'life': 'life', 'migration': 'migration', 'name': 'name', 'owner_tag': 'owner-tag', 'provider_type': 'provider-type', 'sla': 'sla', 'status': 'status', 'type_': 'type', 'user_access': 'user-access', 'uuid': 'uuid'}
     _toPy = {'agent-version': 'agent_version', 'cloud-credential-tag': 'cloud_credential_tag', 'cloud-region': 'cloud_region', 'cloud-tag': 'cloud_tag', 'controller-uuid': 'controller_uuid', 'counts': 'counts', 'default-series': 'default_series', 'is-controller': 'is_controller', 'last-connection': 'last_connection', 'life': 'life', 'migration': 'migration', 'name': 'name', 'owner-tag': 'owner_tag', 'provider-type': 'provider_type', 'sla': 'sla', 'status': 'status', 'type': 'type_', 'user-access': 'user_access', 'uuid': 'uuid'}
+
     def __init__(self, agent_version=None, cloud_credential_tag=None, cloud_region=None, cloud_tag=None, controller_uuid=None, counts=None, default_series=None, is_controller=None, last_connection=None, life=None, migration=None, name=None, owner_tag=None, provider_type=None, sla=None, status=None, type_=None, user_access=None, uuid=None, **unknown_fields):
         '''
         agent_version : Number
@@ -16458,6 +16991,7 @@ class ModelSummary(Type):
 class ModelSummaryMessage(Type):
     _toSchema = {'agent': 'agent', 'message': 'message'}
     _toPy = {'agent': 'agent', 'message': 'message'}
+
     def __init__(self, agent=None, message=None, **unknown_fields):
         '''
         agent : str
@@ -16482,6 +17016,7 @@ class ModelSummaryMessage(Type):
 class ModelSummaryResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -16506,6 +17041,7 @@ class ModelSummaryResult(Type):
 class ModelSummaryResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ModelSummaryResult]
@@ -16524,6 +17060,7 @@ class ModelSummaryResults(Type):
 class ModelSummarySize(Type):
     _toSchema = {'applications': 'applications', 'containers': 'containers', 'machines': 'machines', 'relations': 'relations', 'units': 'units'}
     _toPy = {'applications': 'applications', 'containers': 'containers', 'machines': 'machines', 'relations': 'relations', 'units': 'units'}
+
     def __init__(self, applications=None, containers=None, machines=None, relations=None, units=None, **unknown_fields):
         '''
         applications : int
@@ -16566,6 +17103,7 @@ class ModelSummarySize(Type):
 class ModelTag(Type):
     _toSchema = {}
     _toPy = {}
+
     def __init__(self, **unknown_fields):
         '''
 
@@ -16577,6 +17115,7 @@ class ModelTag(Type):
 class ModelUnset(Type):
     _toSchema = {'keys': 'keys'}
     _toPy = {'keys': 'keys'}
+
     def __init__(self, keys=None, **unknown_fields):
         '''
         keys : typing.Sequence[str]
@@ -16595,6 +17134,7 @@ class ModelUnset(Type):
 class ModelUnsetKeys(Type):
     _toSchema = {'cloud_region': 'cloud-region', 'cloud_tag': 'cloud-tag', 'keys': 'keys'}
     _toPy = {'cloud-region': 'cloud_region', 'cloud-tag': 'cloud_tag', 'keys': 'keys'}
+
     def __init__(self, cloud_region=None, cloud_tag=None, keys=None, **unknown_fields):
         '''
         cloud_region : str
@@ -16625,6 +17165,7 @@ class ModelUnsetKeys(Type):
 class ModelUserInfo(Type):
     _toSchema = {'access': 'access', 'display_name': 'display-name', 'last_connection': 'last-connection', 'model_tag': 'model-tag', 'user': 'user'}
     _toPy = {'access': 'access', 'display-name': 'display_name', 'last-connection': 'last_connection', 'model-tag': 'model_tag', 'user': 'user'}
+
     def __init__(self, access=None, display_name=None, last_connection=None, model_tag=None, user=None, **unknown_fields):
         '''
         access : str
@@ -16667,6 +17208,7 @@ class ModelUserInfo(Type):
 class ModelUserInfoResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -16691,6 +17233,7 @@ class ModelUserInfoResult(Type):
 class ModelUserInfoResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ModelUserInfoResult]
@@ -16709,6 +17252,7 @@ class ModelUserInfoResults(Type):
 class ModelVolumeInfo(Type):
     _toSchema = {'detachable': 'detachable', 'id_': 'id', 'message': 'message', 'provider_id': 'provider-id', 'status': 'status'}
     _toPy = {'detachable': 'detachable', 'id': 'id_', 'message': 'message', 'provider-id': 'provider_id', 'status': 'status'}
+
     def __init__(self, detachable=None, id_=None, message=None, provider_id=None, status=None, **unknown_fields):
         '''
         detachable : bool
@@ -16751,6 +17295,7 @@ class ModelVolumeInfo(Type):
 class ModifyCloudAccess(Type):
     _toSchema = {'access': 'access', 'action': 'action', 'cloud_tag': 'cloud-tag', 'user_tag': 'user-tag'}
     _toPy = {'access': 'access', 'action': 'action', 'cloud-tag': 'cloud_tag', 'user-tag': 'user_tag'}
+
     def __init__(self, access=None, action=None, cloud_tag=None, user_tag=None, **unknown_fields):
         '''
         access : str
@@ -16787,6 +17332,7 @@ class ModifyCloudAccess(Type):
 class ModifyCloudAccessRequest(Type):
     _toSchema = {'changes': 'changes'}
     _toPy = {'changes': 'changes'}
+
     def __init__(self, changes=None, **unknown_fields):
         '''
         changes : typing.Sequence[~ModifyCloudAccess]
@@ -16805,6 +17351,7 @@ class ModifyCloudAccessRequest(Type):
 class ModifyControllerAccess(Type):
     _toSchema = {'access': 'access', 'action': 'action', 'user_tag': 'user-tag'}
     _toPy = {'access': 'access', 'action': 'action', 'user-tag': 'user_tag'}
+
     def __init__(self, access=None, action=None, user_tag=None, **unknown_fields):
         '''
         access : str
@@ -16835,6 +17382,7 @@ class ModifyControllerAccess(Type):
 class ModifyControllerAccessRequest(Type):
     _toSchema = {'changes': 'changes'}
     _toPy = {'changes': 'changes'}
+
     def __init__(self, changes=None, **unknown_fields):
         '''
         changes : typing.Sequence[~ModifyControllerAccess]
@@ -16853,6 +17401,7 @@ class ModifyControllerAccessRequest(Type):
 class ModifyModelAccess(Type):
     _toSchema = {'access': 'access', 'action': 'action', 'model_tag': 'model-tag', 'user_tag': 'user-tag'}
     _toPy = {'access': 'access', 'action': 'action', 'model-tag': 'model_tag', 'user-tag': 'user_tag'}
+
     def __init__(self, access=None, action=None, model_tag=None, user_tag=None, **unknown_fields):
         '''
         access : str
@@ -16889,6 +17438,7 @@ class ModifyModelAccess(Type):
 class ModifyModelAccessRequest(Type):
     _toSchema = {'changes': 'changes'}
     _toPy = {'changes': 'changes'}
+
     def __init__(self, changes=None, **unknown_fields):
         '''
         changes : typing.Sequence[~ModifyModelAccess]
@@ -16907,6 +17457,7 @@ class ModifyModelAccessRequest(Type):
 class ModifyOfferAccess(Type):
     _toSchema = {'access': 'access', 'action': 'action', 'offer_url': 'offer-url', 'user_tag': 'user-tag'}
     _toPy = {'access': 'access', 'action': 'action', 'offer-url': 'offer_url', 'user-tag': 'user_tag'}
+
     def __init__(self, access=None, action=None, offer_url=None, user_tag=None, **unknown_fields):
         '''
         access : str
@@ -16943,6 +17494,7 @@ class ModifyOfferAccess(Type):
 class ModifyOfferAccessRequest(Type):
     _toSchema = {'changes': 'changes'}
     _toPy = {'changes': 'changes'}
+
     def __init__(self, changes=None, **unknown_fields):
         '''
         changes : typing.Sequence[~ModifyOfferAccess]
@@ -16961,6 +17513,7 @@ class ModifyOfferAccessRequest(Type):
 class ModifyUserSSHKeys(Type):
     _toSchema = {'ssh_keys': 'ssh-keys', 'user': 'user'}
     _toPy = {'ssh-keys': 'ssh_keys', 'user': 'user'}
+
     def __init__(self, ssh_keys=None, user=None, **unknown_fields):
         '''
         ssh_keys : typing.Sequence[str]
@@ -16985,6 +17538,7 @@ class ModifyUserSSHKeys(Type):
 class MoveSubnetsParam(Type):
     _toSchema = {'force': 'force', 'space_tag': 'space-tag', 'subnets': 'subnets'}
     _toPy = {'force': 'force', 'space-tag': 'space_tag', 'subnets': 'subnets'}
+
     def __init__(self, force=None, space_tag=None, subnets=None, **unknown_fields):
         '''
         force : bool
@@ -17015,6 +17569,7 @@ class MoveSubnetsParam(Type):
 class MoveSubnetsParams(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~MoveSubnetsParam]
@@ -17033,6 +17588,7 @@ class MoveSubnetsParams(Type):
 class MoveSubnetsResult(Type):
     _toSchema = {'error': 'error', 'moved_subnets': 'moved-subnets', 'new_space': 'new-space'}
     _toPy = {'error': 'error', 'moved-subnets': 'moved_subnets', 'new-space': 'new_space'}
+
     def __init__(self, error=None, moved_subnets=None, new_space=None, **unknown_fields):
         '''
         error : Error
@@ -17063,6 +17619,7 @@ class MoveSubnetsResult(Type):
 class MoveSubnetsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~MoveSubnetsResult]
@@ -17081,6 +17638,7 @@ class MoveSubnetsResults(Type):
 class MovedSubnet(Type):
     _toSchema = {'cidr': 'cidr', 'old_space': 'old-space', 'subnet': 'subnet'}
     _toPy = {'cidr': 'cidr', 'old-space': 'old_space', 'subnet': 'subnet'}
+
     def __init__(self, cidr=None, old_space=None, subnet=None, **unknown_fields):
         '''
         cidr : str
@@ -17111,6 +17669,7 @@ class MovedSubnet(Type):
 class NetworkConfig(Type):
     _toSchema = {'address': 'address', 'addresses': 'addresses', 'cidr': 'cidr', 'config_type': 'config-type', 'device_index': 'device-index', 'disabled': 'disabled', 'dns_search_domains': 'dns-search-domains', 'dns_servers': 'dns-servers', 'gateway_address': 'gateway-address', 'interface_name': 'interface-name', 'interface_type': 'interface-type', 'is_default_gateway': 'is-default-gateway', 'mac_address': 'mac-address', 'mtu': 'mtu', 'no_auto_start': 'no-auto-start', 'origin': 'origin', 'parent_interface_name': 'parent-interface-name', 'provider_address_id': 'provider-address-id', 'provider_id': 'provider-id', 'provider_network_id': 'provider-network-id', 'provider_space_id': 'provider-space-id', 'provider_subnet_id': 'provider-subnet-id', 'provider_vlan_id': 'provider-vlan-id', 'routes': 'routes', 'shadow_addresses': 'shadow-addresses', 'virtual_port_type': 'virtual-port-type', 'vlan_tag': 'vlan-tag'}
     _toPy = {'address': 'address', 'addresses': 'addresses', 'cidr': 'cidr', 'config-type': 'config_type', 'device-index': 'device_index', 'disabled': 'disabled', 'dns-search-domains': 'dns_search_domains', 'dns-servers': 'dns_servers', 'gateway-address': 'gateway_address', 'interface-name': 'interface_name', 'interface-type': 'interface_type', 'is-default-gateway': 'is_default_gateway', 'mac-address': 'mac_address', 'mtu': 'mtu', 'no-auto-start': 'no_auto_start', 'origin': 'origin', 'parent-interface-name': 'parent_interface_name', 'provider-address-id': 'provider_address_id', 'provider-id': 'provider_id', 'provider-network-id': 'provider_network_id', 'provider-space-id': 'provider_space_id', 'provider-subnet-id': 'provider_subnet_id', 'provider-vlan-id': 'provider_vlan_id', 'routes': 'routes', 'shadow-addresses': 'shadow_addresses', 'virtual-port-type': 'virtual_port_type', 'vlan-tag': 'vlan_tag'}
+
     def __init__(self, address=None, addresses=None, cidr=None, config_type=None, device_index=None, disabled=None, dns_search_domains=None, dns_servers=None, gateway_address=None, interface_name=None, interface_type=None, is_default_gateway=None, mac_address=None, mtu=None, no_auto_start=None, origin=None, parent_interface_name=None, provider_address_id=None, provider_id=None, provider_network_id=None, provider_space_id=None, provider_subnet_id=None, provider_vlan_id=None, routes=None, shadow_addresses=None, virtual_port_type=None, vlan_tag=None, **unknown_fields):
         '''
         address : str
@@ -17285,6 +17844,7 @@ class NetworkConfig(Type):
 class NetworkInfo(Type):
     _toSchema = {'addresses': 'addresses', 'interface_name': 'interface-name', 'mac_address': 'mac-address'}
     _toPy = {'addresses': 'addresses', 'interface-name': 'interface_name', 'mac-address': 'mac_address'}
+
     def __init__(self, addresses=None, interface_name=None, mac_address=None, **unknown_fields):
         '''
         addresses : typing.Sequence[~InterfaceAddress]
@@ -17315,6 +17875,7 @@ class NetworkInfo(Type):
 class NetworkInfoParams(Type):
     _toSchema = {'bindings': 'bindings', 'relation_id': 'relation-id', 'unit': 'unit'}
     _toPy = {'bindings': 'bindings', 'relation-id': 'relation_id', 'unit': 'unit'}
+
     def __init__(self, bindings=None, relation_id=None, unit=None, **unknown_fields):
         '''
         bindings : typing.Sequence[str]
@@ -17345,6 +17906,7 @@ class NetworkInfoParams(Type):
 class NetworkInfoResult(Type):
     _toSchema = {'bind_addresses': 'bind-addresses', 'egress_subnets': 'egress-subnets', 'error': 'error', 'ingress_addresses': 'ingress-addresses'}
     _toPy = {'bind-addresses': 'bind_addresses', 'egress-subnets': 'egress_subnets', 'error': 'error', 'ingress-addresses': 'ingress_addresses'}
+
     def __init__(self, bind_addresses=None, egress_subnets=None, error=None, ingress_addresses=None, **unknown_fields):
         '''
         bind_addresses : typing.Sequence[~NetworkInfo]
@@ -17381,6 +17943,7 @@ class NetworkInfoResult(Type):
 class NetworkInfoResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Mapping[str, ~NetworkInfoResult]
@@ -17399,6 +17962,7 @@ class NetworkInfoResults(Type):
 class NetworkInterface(Type):
     _toSchema = {'dns_nameservers': 'dns-nameservers', 'gateway': 'gateway', 'ip_addresses': 'ip-addresses', 'is_up': 'is-up', 'mac_address': 'mac-address', 'space': 'space'}
     _toPy = {'dns-nameservers': 'dns_nameservers', 'gateway': 'gateway', 'ip-addresses': 'ip_addresses', 'is-up': 'is_up', 'mac-address': 'mac_address', 'space': 'space'}
+
     def __init__(self, dns_nameservers=None, gateway=None, ip_addresses=None, is_up=None, mac_address=None, space=None, **unknown_fields):
         '''
         dns_nameservers : typing.Sequence[str]
@@ -17447,6 +18011,7 @@ class NetworkInterface(Type):
 class NetworkRoute(Type):
     _toSchema = {'destination_cidr': 'destination-cidr', 'gateway_ip': 'gateway-ip', 'metric': 'metric'}
     _toPy = {'destination-cidr': 'destination_cidr', 'gateway-ip': 'gateway_ip', 'metric': 'metric'}
+
     def __init__(self, destination_cidr=None, gateway_ip=None, metric=None, **unknown_fields):
         '''
         destination_cidr : str
@@ -17477,6 +18042,7 @@ class NetworkRoute(Type):
 class NotifyWatchResult(Type):
     _toSchema = {'error': 'error', 'notifywatcherid': 'NotifyWatcherId'}
     _toPy = {'NotifyWatcherId': 'notifywatcherid', 'error': 'error'}
+
     def __init__(self, notifywatcherid=None, error=None, **unknown_fields):
         '''
         notifywatcherid : str
@@ -17501,6 +18067,7 @@ class NotifyWatchResult(Type):
 class NotifyWatchResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~NotifyWatchResult]
@@ -17519,6 +18086,7 @@ class NotifyWatchResults(Type):
 class Number(Type):
     _toSchema = {'build': 'Build', 'major': 'Major', 'minor': 'Minor', 'patch': 'Patch', 'tag': 'Tag'}
     _toPy = {'Build': 'build', 'Major': 'major', 'Minor': 'minor', 'Patch': 'patch', 'Tag': 'tag'}
+
     def __init__(self, build=None, major=None, minor=None, patch=None, tag=None, **unknown_fields):
         '''
         build : int
@@ -17561,6 +18129,7 @@ class Number(Type):
 class OfferArg(Type):
     _toSchema = {'bakery_version': 'bakery-version', 'macaroons': 'macaroons', 'offer_uuid': 'offer-uuid'}
     _toPy = {'bakery-version': 'bakery_version', 'macaroons': 'macaroons', 'offer-uuid': 'offer_uuid'}
+
     def __init__(self, bakery_version=None, macaroons=None, offer_uuid=None, **unknown_fields):
         '''
         bakery_version : int
@@ -17591,6 +18160,7 @@ class OfferArg(Type):
 class OfferArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~OfferArg]
@@ -17609,6 +18179,7 @@ class OfferArgs(Type):
 class OfferConnection(Type):
     _toSchema = {'endpoint': 'endpoint', 'ingress_subnets': 'ingress-subnets', 'relation_id': 'relation-id', 'source_model_tag': 'source-model-tag', 'status': 'status', 'username': 'username'}
     _toPy = {'endpoint': 'endpoint', 'ingress-subnets': 'ingress_subnets', 'relation-id': 'relation_id', 'source-model-tag': 'source_model_tag', 'status': 'status', 'username': 'username'}
+
     def __init__(self, endpoint=None, ingress_subnets=None, relation_id=None, source_model_tag=None, status=None, username=None, **unknown_fields):
         '''
         endpoint : str
@@ -17657,6 +18228,7 @@ class OfferConnection(Type):
 class OfferFilter(Type):
     _toSchema = {'allowed_users': 'allowed-users', 'application_description': 'application-description', 'application_name': 'application-name', 'application_user': 'application-user', 'connected_users': 'connected-users', 'endpoints': 'endpoints', 'model_name': 'model-name', 'offer_name': 'offer-name', 'owner_name': 'owner-name'}
     _toPy = {'allowed-users': 'allowed_users', 'application-description': 'application_description', 'application-name': 'application_name', 'application-user': 'application_user', 'connected-users': 'connected_users', 'endpoints': 'endpoints', 'model-name': 'model_name', 'offer-name': 'offer_name', 'owner-name': 'owner_name'}
+
     def __init__(self, allowed_users=None, application_description=None, application_name=None, application_user=None, connected_users=None, endpoints=None, model_name=None, offer_name=None, owner_name=None, **unknown_fields):
         '''
         allowed_users : typing.Sequence[str]
@@ -17723,6 +18295,7 @@ class OfferFilter(Type):
 class OfferFilters(Type):
     _toSchema = {'filters': 'Filters'}
     _toPy = {'Filters': 'filters'}
+
     def __init__(self, filters=None, **unknown_fields):
         '''
         filters : typing.Sequence[~OfferFilter]
@@ -17741,6 +18314,7 @@ class OfferFilters(Type):
 class OfferStatusChange(Type):
     _toSchema = {'offer_name': 'offer-name', 'status': 'status'}
     _toPy = {'offer-name': 'offer_name', 'status': 'status'}
+
     def __init__(self, offer_name=None, status=None, **unknown_fields):
         '''
         offer_name : str
@@ -17765,6 +18339,7 @@ class OfferStatusChange(Type):
 class OfferStatusWatchResult(Type):
     _toSchema = {'changes': 'changes', 'error': 'error', 'watcher_id': 'watcher-id'}
     _toPy = {'changes': 'changes', 'error': 'error', 'watcher-id': 'watcher_id'}
+
     def __init__(self, changes=None, error=None, watcher_id=None, **unknown_fields):
         '''
         changes : typing.Sequence[~OfferStatusChange]
@@ -17795,6 +18370,7 @@ class OfferStatusWatchResult(Type):
 class OfferStatusWatchResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~OfferStatusWatchResult]
@@ -17813,6 +18389,7 @@ class OfferStatusWatchResults(Type):
 class OfferURLs(Type):
     _toSchema = {'bakery_version': 'bakery-version', 'offer_urls': 'offer-urls'}
     _toPy = {'bakery-version': 'bakery_version', 'offer-urls': 'offer_urls'}
+
     def __init__(self, bakery_version=None, offer_urls=None, **unknown_fields):
         '''
         bakery_version : int
@@ -17837,6 +18414,7 @@ class OfferURLs(Type):
 class OfferUserDetails(Type):
     _toSchema = {'access': 'access', 'display_name': 'display-name', 'user': 'user'}
     _toPy = {'access': 'access', 'display-name': 'display_name', 'user': 'user'}
+
     def __init__(self, access=None, display_name=None, user=None, **unknown_fields):
         '''
         access : str
@@ -17867,6 +18445,7 @@ class OfferUserDetails(Type):
 class OpenMachinePortRangesByEndpointResult(Type):
     _toSchema = {'error': 'error', 'unit_port_ranges': 'unit-port-ranges'}
     _toPy = {'error': 'error', 'unit-port-ranges': 'unit_port_ranges'}
+
     def __init__(self, error=None, unit_port_ranges=None, **unknown_fields):
         '''
         error : Error
@@ -17891,6 +18470,7 @@ class OpenMachinePortRangesByEndpointResult(Type):
 class OpenMachinePortRangesByEndpointResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~OpenMachinePortRangesByEndpointResult]
@@ -17909,6 +18489,7 @@ class OpenMachinePortRangesByEndpointResults(Type):
 class OpenMachinePortRangesResult(Type):
     _toSchema = {'error': 'error', 'unit_port_ranges': 'unit-port-ranges'}
     _toPy = {'error': 'error', 'unit-port-ranges': 'unit_port_ranges'}
+
     def __init__(self, error=None, unit_port_ranges=None, **unknown_fields):
         '''
         error : Error
@@ -17933,6 +18514,7 @@ class OpenMachinePortRangesResult(Type):
 class OpenMachinePortRangesResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~OpenMachinePortRangesResult]
@@ -17951,6 +18533,7 @@ class OpenMachinePortRangesResults(Type):
 class OpenPortRangesByEndpointResult(Type):
     _toSchema = {'error': 'error', 'unit_port_ranges': 'unit-port-ranges'}
     _toPy = {'error': 'error', 'unit-port-ranges': 'unit_port_ranges'}
+
     def __init__(self, error=None, unit_port_ranges=None, **unknown_fields):
         '''
         error : Error
@@ -17975,6 +18558,7 @@ class OpenPortRangesByEndpointResult(Type):
 class OpenPortRangesByEndpointResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~OpenPortRangesByEndpointResult]
@@ -17993,6 +18577,7 @@ class OpenPortRangesByEndpointResults(Type):
 class OpenUnitPortRanges(Type):
     _toSchema = {'endpoint': 'endpoint', 'port_ranges': 'port-ranges', 'subnet_cidrs': 'subnet-cidrs'}
     _toPy = {'endpoint': 'endpoint', 'port-ranges': 'port_ranges', 'subnet-cidrs': 'subnet_cidrs'}
+
     def __init__(self, endpoint=None, port_ranges=None, subnet_cidrs=None, **unknown_fields):
         '''
         endpoint : str
@@ -18023,6 +18608,7 @@ class OpenUnitPortRanges(Type):
 class OpenUnitPortRangesByEndpoint(Type):
     _toSchema = {'endpoint': 'endpoint', 'port_ranges': 'port-ranges'}
     _toPy = {'endpoint': 'endpoint', 'port-ranges': 'port_ranges'}
+
     def __init__(self, endpoint=None, port_ranges=None, **unknown_fields):
         '''
         endpoint : str
@@ -18047,6 +18633,7 @@ class OpenUnitPortRangesByEndpoint(Type):
 class OperationQueryArgs(Type):
     _toSchema = {'actions': 'actions', 'applications': 'applications', 'limit': 'limit', 'machines': 'machines', 'offset': 'offset', 'status': 'status', 'units': 'units'}
     _toPy = {'actions': 'actions', 'applications': 'applications', 'limit': 'limit', 'machines': 'machines', 'offset': 'offset', 'status': 'status', 'units': 'units'}
+
     def __init__(self, actions=None, applications=None, limit=None, machines=None, offset=None, status=None, units=None, **unknown_fields):
         '''
         actions : typing.Sequence[str]
@@ -18101,6 +18688,7 @@ class OperationQueryArgs(Type):
 class OperationResult(Type):
     _toSchema = {'actions': 'actions', 'completed': 'completed', 'enqueued': 'enqueued', 'error': 'error', 'fail': 'fail', 'operation': 'operation', 'started': 'started', 'status': 'status', 'summary': 'summary'}
     _toPy = {'actions': 'actions', 'completed': 'completed', 'enqueued': 'enqueued', 'error': 'error', 'fail': 'fail', 'operation': 'operation', 'started': 'started', 'status': 'status', 'summary': 'summary'}
+
     def __init__(self, actions=None, completed=None, enqueued=None, error=None, fail=None, operation=None, started=None, status=None, summary=None, **unknown_fields):
         '''
         actions : typing.Sequence[~ActionResult]
@@ -18167,6 +18755,7 @@ class OperationResult(Type):
 class OperationResults(Type):
     _toSchema = {'results': 'results', 'truncated': 'truncated'}
     _toPy = {'results': 'results', 'truncated': 'truncated'}
+
     def __init__(self, results=None, truncated=None, **unknown_fields):
         '''
         results : typing.Sequence[~OperationResult]
@@ -18191,6 +18780,7 @@ class OperationResults(Type):
 class OperatorProvisioningInfo(Type):
     _toSchema = {'api_addresses': 'api-addresses', 'base_image_details': 'base-image-details', 'charm_storage': 'charm-storage', 'error': 'error', 'image_details': 'image-details', 'tags': 'tags', 'version': 'version'}
     _toPy = {'api-addresses': 'api_addresses', 'base-image-details': 'base_image_details', 'charm-storage': 'charm_storage', 'error': 'error', 'image-details': 'image_details', 'tags': 'tags', 'version': 'version'}
+
     def __init__(self, api_addresses=None, base_image_details=None, charm_storage=None, error=None, image_details=None, tags=None, version=None, **unknown_fields):
         '''
         api_addresses : typing.Sequence[str]
@@ -18245,6 +18835,7 @@ class OperatorProvisioningInfo(Type):
 class OperatorProvisioningInfoResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~OperatorProvisioningInfo]
@@ -18263,6 +18854,7 @@ class OperatorProvisioningInfoResults(Type):
 class Payload(Type):
     _toSchema = {'class_': 'class', 'id_': 'id', 'labels': 'labels', 'machine': 'machine', 'status': 'status', 'type_': 'type', 'unit': 'unit'}
     _toPy = {'class': 'class_', 'id': 'id_', 'labels': 'labels', 'machine': 'machine', 'status': 'status', 'type': 'type_', 'unit': 'unit'}
+
     def __init__(self, class_=None, id_=None, labels=None, machine=None, status=None, type_=None, unit=None, **unknown_fields):
         '''
         class_ : str
@@ -18317,6 +18909,7 @@ class Payload(Type):
 class PayloadListArgs(Type):
     _toSchema = {'patterns': 'patterns'}
     _toPy = {'patterns': 'patterns'}
+
     def __init__(self, patterns=None, **unknown_fields):
         '''
         patterns : typing.Sequence[str]
@@ -18335,6 +18928,7 @@ class PayloadListArgs(Type):
 class PayloadListResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~Payload]
@@ -18353,6 +18947,7 @@ class PayloadListResults(Type):
 class PayloadResult(Type):
     _toSchema = {'entity': 'Entity', 'error': 'error', 'not_found': 'not-found', 'payload': 'payload', 'tag': 'tag'}
     _toPy = {'Entity': 'entity', 'error': 'error', 'not-found': 'not_found', 'payload': 'payload', 'tag': 'tag'}
+
     def __init__(self, entity=None, error=None, not_found=None, payload=None, tag=None, **unknown_fields):
         '''
         entity : Entity
@@ -18395,6 +18990,7 @@ class PayloadResult(Type):
 class PayloadResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~PayloadResult]
@@ -18413,6 +19009,7 @@ class PayloadResults(Type):
 class PendingResourceUpload(Type):
     _toSchema = {'filename': 'Filename', 'name': 'Name', 'type_': 'Type'}
     _toPy = {'Filename': 'filename', 'Name': 'name', 'Type': 'type_'}
+
     def __init__(self, filename=None, name=None, type_=None, **unknown_fields):
         '''
         filename : str
@@ -18443,6 +19040,7 @@ class PendingResourceUpload(Type):
 class PhaseResult(Type):
     _toSchema = {'error': 'error', 'phase': 'phase'}
     _toPy = {'error': 'error', 'phase': 'phase'}
+
     def __init__(self, error=None, phase=None, **unknown_fields):
         '''
         error : Error
@@ -18467,6 +19065,7 @@ class PhaseResult(Type):
 class PhaseResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~PhaseResult]
@@ -18485,6 +19084,7 @@ class PhaseResults(Type):
 class PinApplicationResult(Type):
     _toSchema = {'application_name': 'application-name', 'error': 'error'}
     _toPy = {'application-name': 'application_name', 'error': 'error'}
+
     def __init__(self, application_name=None, error=None, **unknown_fields):
         '''
         application_name : str
@@ -18509,6 +19109,7 @@ class PinApplicationResult(Type):
 class PinApplicationsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~PinApplicationResult]
@@ -18527,6 +19128,7 @@ class PinApplicationsResults(Type):
 class PinnedLeadershipResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -18551,6 +19153,7 @@ class PinnedLeadershipResult(Type):
 class Placement(Type):
     _toSchema = {'directive': 'directive', 'scope': 'scope'}
     _toPy = {'directive': 'directive', 'scope': 'scope'}
+
     def __init__(self, directive=None, scope=None, **unknown_fields):
         '''
         directive : str
@@ -18575,6 +19178,7 @@ class Placement(Type):
 class PodSpec(Type):
     _toSchema = {'spec': 'spec', 'tag': 'tag'}
     _toPy = {'spec': 'spec', 'tag': 'tag'}
+
     def __init__(self, spec=None, tag=None, **unknown_fields):
         '''
         spec : str
@@ -18599,6 +19203,7 @@ class PodSpec(Type):
 class PortRange(Type):
     _toSchema = {'from_port': 'from-port', 'protocol': 'protocol', 'to_port': 'to-port'}
     _toPy = {'from-port': 'from_port', 'protocol': 'protocol', 'to-port': 'to_port'}
+
     def __init__(self, from_port=None, protocol=None, to_port=None, **unknown_fields):
         '''
         from_port : int
@@ -18629,6 +19234,7 @@ class PortRange(Type):
 class PrechecksArgs(Type):
     _toSchema = {'target_controller_version': 'target-controller-version'}
     _toPy = {'target-controller-version': 'target_controller_version'}
+
     def __init__(self, target_controller_version=None, **unknown_fields):
         '''
         target_controller_version : Number
@@ -18647,6 +19253,7 @@ class PrechecksArgs(Type):
 class ProcessRelations(Type):
     _toSchema = {'controller_alias': 'controller-alias'}
     _toPy = {'controller-alias': 'controller_alias'}
+
     def __init__(self, controller_alias=None, **unknown_fields):
         '''
         controller_alias : str
@@ -18665,6 +19272,7 @@ class ProcessRelations(Type):
 class ProfileInfoResult(Type):
     _toSchema = {'application_name': 'application-name', 'error': 'error', 'profile': 'profile', 'revision': 'revision'}
     _toPy = {'application-name': 'application_name', 'error': 'error', 'profile': 'profile', 'revision': 'revision'}
+
     def __init__(self, application_name=None, error=None, profile=None, revision=None, **unknown_fields):
         '''
         application_name : str
@@ -18701,6 +19309,7 @@ class ProfileInfoResult(Type):
 class ProviderInterfaceInfo(Type):
     _toSchema = {'interface_name': 'interface-name', 'mac_address': 'mac-address', 'provider_id': 'provider-id'}
     _toPy = {'interface-name': 'interface_name', 'mac-address': 'mac_address', 'provider-id': 'provider_id'}
+
     def __init__(self, interface_name=None, mac_address=None, provider_id=None, **unknown_fields):
         '''
         interface_name : str
@@ -18731,6 +19340,7 @@ class ProviderInterfaceInfo(Type):
 class ProviderInterfaceInfoResult(Type):
     _toSchema = {'error': 'error', 'interfaces': 'interfaces', 'machine_tag': 'machine-tag'}
     _toPy = {'error': 'error', 'interfaces': 'interfaces', 'machine-tag': 'machine_tag'}
+
     def __init__(self, error=None, interfaces=None, machine_tag=None, **unknown_fields):
         '''
         error : Error
@@ -18761,6 +19371,7 @@ class ProviderInterfaceInfoResult(Type):
 class ProviderInterfaceInfoResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ProviderInterfaceInfoResult]
@@ -18779,6 +19390,7 @@ class ProviderInterfaceInfoResults(Type):
 class ProviderNetworkConfig(Type):
     _toSchema = {'config': 'config', 'tag': 'tag'}
     _toPy = {'config': 'config', 'tag': 'tag'}
+
     def __init__(self, config=None, tag=None, **unknown_fields):
         '''
         config : typing.Sequence[~NetworkConfig]
@@ -18803,6 +19415,7 @@ class ProviderNetworkConfig(Type):
 class ProvisioningInfo(Type):
     _toSchema = {'base': 'base', 'charm_lxd_profiles': 'charm-lxd-profiles', 'cloudinit_userdata': 'cloudinit-userdata', 'constraints': 'constraints', 'controller_config': 'controller-config', 'endpoint_bindings': 'endpoint-bindings', 'image_metadata': 'image-metadata', 'jobs': 'jobs', 'placement': 'placement', 'provisioningnetworktopology': 'ProvisioningNetworkTopology', 'root_disk': 'root-disk', 'space_subnets': 'space-subnets', 'subnet_zones': 'subnet-zones', 'tags': 'tags', 'volume_attachments': 'volume-attachments', 'volumes': 'volumes'}
     _toPy = {'ProvisioningNetworkTopology': 'provisioningnetworktopology', 'base': 'base', 'charm-lxd-profiles': 'charm_lxd_profiles', 'cloudinit-userdata': 'cloudinit_userdata', 'constraints': 'constraints', 'controller-config': 'controller_config', 'endpoint-bindings': 'endpoint_bindings', 'image-metadata': 'image_metadata', 'jobs': 'jobs', 'placement': 'placement', 'root-disk': 'root_disk', 'space-subnets': 'space_subnets', 'subnet-zones': 'subnet_zones', 'tags': 'tags', 'volume-attachments': 'volume_attachments', 'volumes': 'volumes'}
+
     def __init__(self, provisioningnetworktopology=None, base=None, charm_lxd_profiles=None, cloudinit_userdata=None, constraints=None, controller_config=None, endpoint_bindings=None, image_metadata=None, jobs=None, placement=None, root_disk=None, space_subnets=None, subnet_zones=None, tags=None, volume_attachments=None, volumes=None, **unknown_fields):
         '''
         provisioningnetworktopology : ProvisioningNetworkTopology
@@ -18911,6 +19524,7 @@ class ProvisioningInfo(Type):
 class ProvisioningInfoResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -18935,6 +19549,7 @@ class ProvisioningInfoResult(Type):
 class ProvisioningInfoResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ProvisioningInfoResult]
@@ -18953,6 +19568,7 @@ class ProvisioningInfoResults(Type):
 class ProvisioningNetworkTopology(Type):
     _toSchema = {'space_subnets': 'space-subnets', 'subnet_zones': 'subnet-zones'}
     _toPy = {'space-subnets': 'space_subnets', 'subnet-zones': 'subnet_zones'}
+
     def __init__(self, space_subnets=None, subnet_zones=None, **unknown_fields):
         '''
         space_subnets : typing.Mapping[str, typing.Sequence[str]]
@@ -18977,6 +19593,7 @@ class ProvisioningNetworkTopology(Type):
 class ProvisioningScriptParams(Type):
     _toSchema = {'data_dir': 'data-dir', 'disable_package_commands': 'disable-package-commands', 'machine_id': 'machine-id', 'nonce': 'nonce'}
     _toPy = {'data-dir': 'data_dir', 'disable-package-commands': 'disable_package_commands', 'machine-id': 'machine_id', 'nonce': 'nonce'}
+
     def __init__(self, data_dir=None, disable_package_commands=None, machine_id=None, nonce=None, **unknown_fields):
         '''
         data_dir : str
@@ -19013,6 +19630,7 @@ class ProvisioningScriptParams(Type):
 class ProvisioningScriptResult(Type):
     _toSchema = {'script': 'script'}
     _toPy = {'script': 'script'}
+
     def __init__(self, script=None, **unknown_fields):
         '''
         script : str
@@ -19031,6 +19649,7 @@ class ProvisioningScriptResult(Type):
 class Proxy(Type):
     _toSchema = {'config': 'config', 'type_': 'type'}
     _toPy = {'config': 'config', 'type': 'type_'}
+
     def __init__(self, config=None, type_=None, **unknown_fields):
         '''
         config : typing.Mapping[str, typing.Any]
@@ -19055,6 +19674,7 @@ class Proxy(Type):
 class ProxyConfig(Type):
     _toSchema = {'ftp': 'ftp', 'http': 'http', 'https': 'https', 'no_proxy': 'no-proxy'}
     _toPy = {'ftp': 'ftp', 'http': 'http', 'https': 'https', 'no-proxy': 'no_proxy'}
+
     def __init__(self, ftp=None, http=None, https=None, no_proxy=None, **unknown_fields):
         '''
         ftp : str
@@ -19091,6 +19711,7 @@ class ProxyConfig(Type):
 class ProxyConfigResult(Type):
     _toSchema = {'apt_mirror': 'apt-mirror', 'apt_proxy_settings': 'apt-proxy-settings', 'error': 'error', 'juju_proxy_settings': 'juju-proxy-settings', 'legacy_proxy_settings': 'legacy-proxy-settings', 'snap_proxy_settings': 'snap-proxy-settings', 'snap_store_assertions': 'snap-store-assertions', 'snap_store_id': 'snap-store-id', 'snap_store_proxy_url': 'snap-store-proxy-url'}
     _toPy = {'apt-mirror': 'apt_mirror', 'apt-proxy-settings': 'apt_proxy_settings', 'error': 'error', 'juju-proxy-settings': 'juju_proxy_settings', 'legacy-proxy-settings': 'legacy_proxy_settings', 'snap-proxy-settings': 'snap_proxy_settings', 'snap-store-assertions': 'snap_store_assertions', 'snap-store-id': 'snap_store_id', 'snap-store-proxy-url': 'snap_store_proxy_url'}
+
     def __init__(self, apt_mirror=None, apt_proxy_settings=None, error=None, juju_proxy_settings=None, legacy_proxy_settings=None, snap_proxy_settings=None, snap_store_assertions=None, snap_store_id=None, snap_store_proxy_url=None, **unknown_fields):
         '''
         apt_mirror : str
@@ -19157,6 +19778,7 @@ class ProxyConfigResult(Type):
 class ProxyConfigResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ProxyConfigResult]
@@ -19175,6 +19797,7 @@ class ProxyConfigResults(Type):
 class QueryApplicationOffersResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ApplicationOfferAdminDetails]
@@ -19193,6 +19816,7 @@ class QueryApplicationOffersResults(Type):
 class QueryApplicationOffersResultsV5(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ApplicationOfferAdminDetailsV5]
@@ -19211,6 +19835,7 @@ class QueryApplicationOffersResultsV5(Type):
 class RebootActionResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -19235,6 +19860,7 @@ class RebootActionResult(Type):
 class RebootActionResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~RebootActionResult]
@@ -19253,6 +19879,7 @@ class RebootActionResults(Type):
 class RecordAgentStartInformationArg(Type):
     _toSchema = {'hostname': 'hostname', 'tag': 'tag'}
     _toPy = {'hostname': 'hostname', 'tag': 'tag'}
+
     def __init__(self, hostname=None, tag=None, **unknown_fields):
         '''
         hostname : str
@@ -19277,6 +19904,7 @@ class RecordAgentStartInformationArg(Type):
 class RecordAgentStartInformationArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~RecordAgentStartInformationArg]
@@ -19295,6 +19923,7 @@ class RecordAgentStartInformationArgs(Type):
 class RedirectInfoResult(Type):
     _toSchema = {'ca_cert': 'ca-cert', 'servers': 'servers'}
     _toPy = {'ca-cert': 'ca_cert', 'servers': 'servers'}
+
     def __init__(self, ca_cert=None, servers=None, **unknown_fields):
         '''
         ca_cert : str
@@ -19319,6 +19948,7 @@ class RedirectInfoResult(Type):
 class RegionDefaults(Type):
     _toSchema = {'region_name': 'region-name', 'value': 'value'}
     _toPy = {'region-name': 'region_name', 'value': 'value'}
+
     def __init__(self, region_name=None, value=None, **unknown_fields):
         '''
         region_name : str
@@ -19340,6 +19970,7 @@ class RegionDefaults(Type):
 class RegisterRemoteRelationArg(Type):
     _toSchema = {'application_token': 'application-token', 'bakery_version': 'bakery-version', 'consume_version': 'consume-version', 'local_endpoint_name': 'local-endpoint-name', 'macaroons': 'macaroons', 'offer_uuid': 'offer-uuid', 'relation_token': 'relation-token', 'remote_endpoint': 'remote-endpoint', 'source_model_tag': 'source-model-tag'}
     _toPy = {'application-token': 'application_token', 'bakery-version': 'bakery_version', 'consume-version': 'consume_version', 'local-endpoint-name': 'local_endpoint_name', 'macaroons': 'macaroons', 'offer-uuid': 'offer_uuid', 'relation-token': 'relation_token', 'remote-endpoint': 'remote_endpoint', 'source-model-tag': 'source_model_tag'}
+
     def __init__(self, application_token=None, bakery_version=None, consume_version=None, local_endpoint_name=None, macaroons=None, offer_uuid=None, relation_token=None, remote_endpoint=None, source_model_tag=None, **unknown_fields):
         '''
         application_token : str
@@ -19406,6 +20037,7 @@ class RegisterRemoteRelationArg(Type):
 class RegisterRemoteRelationArgs(Type):
     _toSchema = {'relations': 'relations'}
     _toPy = {'relations': 'relations'}
+
     def __init__(self, relations=None, **unknown_fields):
         '''
         relations : typing.Sequence[~RegisterRemoteRelationArg]
@@ -19424,6 +20056,7 @@ class RegisterRemoteRelationArgs(Type):
 class RegisterRemoteRelationResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -19448,6 +20081,7 @@ class RegisterRemoteRelationResult(Type):
 class RegisterRemoteRelationResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~RegisterRemoteRelationResult]
@@ -19466,6 +20100,7 @@ class RegisterRemoteRelationResults(Type):
 class RelationData(Type):
     _toSchema = {'inscope': 'InScope', 'unitdata': 'UnitData'}
     _toPy = {'InScope': 'inscope', 'UnitData': 'unitdata'}
+
     def __init__(self, inscope=None, unitdata=None, **unknown_fields):
         '''
         inscope : bool
@@ -19490,6 +20125,7 @@ class RelationData(Type):
 class RelationIds(Type):
     _toSchema = {'relation_ids': 'relation-ids'}
     _toPy = {'relation-ids': 'relation_ids'}
+
     def __init__(self, relation_ids=None, **unknown_fields):
         '''
         relation_ids : typing.Sequence[int]
@@ -19508,6 +20144,7 @@ class RelationIds(Type):
 class RelationLifeSuspendedStatusChange(Type):
     _toSchema = {'key': 'key', 'life': 'life', 'suspended': 'suspended', 'suspended_reason': 'suspended-reason'}
     _toPy = {'key': 'key', 'life': 'life', 'suspended': 'suspended', 'suspended-reason': 'suspended_reason'}
+
     def __init__(self, key=None, life=None, suspended=None, suspended_reason=None, **unknown_fields):
         '''
         key : str
@@ -19544,6 +20181,7 @@ class RelationLifeSuspendedStatusChange(Type):
 class RelationLifeSuspendedStatusWatchResult(Type):
     _toSchema = {'changes': 'changes', 'error': 'error', 'watcher_id': 'watcher-id'}
     _toPy = {'changes': 'changes', 'error': 'error', 'watcher-id': 'watcher_id'}
+
     def __init__(self, changes=None, error=None, watcher_id=None, **unknown_fields):
         '''
         changes : typing.Sequence[~RelationLifeSuspendedStatusChange]
@@ -19574,6 +20212,7 @@ class RelationLifeSuspendedStatusWatchResult(Type):
 class RelationResult(Type):
     _toSchema = {'bool_': 'bool', 'endpoint': 'endpoint', 'error': 'error', 'id_': 'id', 'key': 'key', 'life': 'life', 'other_application': 'other-application'}
     _toPy = {'bool': 'bool_', 'endpoint': 'endpoint', 'error': 'error', 'id': 'id_', 'key': 'key', 'life': 'life', 'other-application': 'other_application'}
+
     def __init__(self, bool_=None, endpoint=None, error=None, id_=None, key=None, life=None, other_application=None, **unknown_fields):
         '''
         bool_ : bool
@@ -19628,6 +20267,7 @@ class RelationResult(Type):
 class RelationResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~RelationResult]
@@ -19646,6 +20286,7 @@ class RelationResults(Type):
 class RelationStatus(Type):
     _toSchema = {'endpoints': 'endpoints', 'id_': 'id', 'interface': 'interface', 'key': 'key', 'scope': 'scope', 'status': 'status'}
     _toPy = {'endpoints': 'endpoints', 'id': 'id_', 'interface': 'interface', 'key': 'key', 'scope': 'scope', 'status': 'status'}
+
     def __init__(self, endpoints=None, id_=None, interface=None, key=None, scope=None, status=None, **unknown_fields):
         '''
         endpoints : typing.Sequence[~EndpointStatus]
@@ -19694,6 +20335,7 @@ class RelationStatus(Type):
 class RelationStatusArg(Type):
     _toSchema = {'message': 'message', 'relation_id': 'relation-id', 'status': 'status', 'unit_tag': 'unit-tag'}
     _toPy = {'message': 'message', 'relation-id': 'relation_id', 'status': 'status', 'unit-tag': 'unit_tag'}
+
     def __init__(self, message=None, relation_id=None, status=None, unit_tag=None, **unknown_fields):
         '''
         message : str
@@ -19730,6 +20372,7 @@ class RelationStatusArg(Type):
 class RelationStatusArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~RelationStatusArg]
@@ -19748,6 +20391,7 @@ class RelationStatusArgs(Type):
 class RelationStatusWatchResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~RelationLifeSuspendedStatusWatchResult]
@@ -19766,6 +20410,7 @@ class RelationStatusWatchResults(Type):
 class RelationSuspendedArg(Type):
     _toSchema = {'message': 'message', 'relation_id': 'relation-id', 'suspended': 'suspended'}
     _toPy = {'message': 'message', 'relation-id': 'relation_id', 'suspended': 'suspended'}
+
     def __init__(self, message=None, relation_id=None, suspended=None, **unknown_fields):
         '''
         message : str
@@ -19796,6 +20441,7 @@ class RelationSuspendedArg(Type):
 class RelationSuspendedArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~RelationSuspendedArg]
@@ -19814,6 +20460,7 @@ class RelationSuspendedArgs(Type):
 class RelationUnit(Type):
     _toSchema = {'relation': 'relation', 'unit': 'unit'}
     _toPy = {'relation': 'relation', 'unit': 'unit'}
+
     def __init__(self, relation=None, unit=None, **unknown_fields):
         '''
         relation : str
@@ -19838,6 +20485,7 @@ class RelationUnit(Type):
 class RelationUnitPair(Type):
     _toSchema = {'local_unit': 'local-unit', 'relation': 'relation', 'remote_unit': 'remote-unit'}
     _toPy = {'local-unit': 'local_unit', 'relation': 'relation', 'remote-unit': 'remote_unit'}
+
     def __init__(self, local_unit=None, relation=None, remote_unit=None, **unknown_fields):
         '''
         local_unit : str
@@ -19868,6 +20516,7 @@ class RelationUnitPair(Type):
 class RelationUnitPairs(Type):
     _toSchema = {'relation_unit_pairs': 'relation-unit-pairs'}
     _toPy = {'relation-unit-pairs': 'relation_unit_pairs'}
+
     def __init__(self, relation_unit_pairs=None, **unknown_fields):
         '''
         relation_unit_pairs : typing.Sequence[~RelationUnitPair]
@@ -19886,6 +20535,7 @@ class RelationUnitPairs(Type):
 class RelationUnitSettings(Type):
     _toSchema = {'application_settings': 'application-settings', 'relation': 'relation', 'settings': 'settings', 'unit': 'unit'}
     _toPy = {'application-settings': 'application_settings', 'relation': 'relation', 'settings': 'settings', 'unit': 'unit'}
+
     def __init__(self, application_settings=None, relation=None, settings=None, unit=None, **unknown_fields):
         '''
         application_settings : typing.Mapping[str, str]
@@ -19922,6 +20572,7 @@ class RelationUnitSettings(Type):
 class RelationUnitStatus(Type):
     _toSchema = {'in_scope': 'in-scope', 'relation_tag': 'relation-tag', 'suspended': 'suspended'}
     _toPy = {'in-scope': 'in_scope', 'relation-tag': 'relation_tag', 'suspended': 'suspended'}
+
     def __init__(self, in_scope=None, relation_tag=None, suspended=None, **unknown_fields):
         '''
         in_scope : bool
@@ -19952,6 +20603,7 @@ class RelationUnitStatus(Type):
 class RelationUnitStatusResult(Type):
     _toSchema = {'error': 'error', 'results': 'results'}
     _toPy = {'error': 'error', 'results': 'results'}
+
     def __init__(self, error=None, results=None, **unknown_fields):
         '''
         error : Error
@@ -19976,6 +20628,7 @@ class RelationUnitStatusResult(Type):
 class RelationUnitStatusResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~RelationUnitStatusResult]
@@ -19994,6 +20647,7 @@ class RelationUnitStatusResults(Type):
 class RelationUnits(Type):
     _toSchema = {'relation_units': 'relation-units'}
     _toPy = {'relation-units': 'relation_units'}
+
     def __init__(self, relation_units=None, **unknown_fields):
         '''
         relation_units : typing.Sequence[~RelationUnit]
@@ -20012,6 +20666,7 @@ class RelationUnits(Type):
 class RelationUnitsChange(Type):
     _toSchema = {'app_changed': 'app-changed', 'changed': 'changed', 'departed': 'departed'}
     _toPy = {'app-changed': 'app_changed', 'changed': 'changed', 'departed': 'departed'}
+
     def __init__(self, app_changed=None, changed=None, departed=None, **unknown_fields):
         '''
         app_changed : typing.Mapping[str, int]
@@ -20042,6 +20697,7 @@ class RelationUnitsChange(Type):
 class RelationUnitsWatchResult(Type):
     _toSchema = {'changes': 'changes', 'error': 'error', 'watcher_id': 'watcher-id'}
     _toPy = {'changes': 'changes', 'error': 'error', 'watcher-id': 'watcher_id'}
+
     def __init__(self, changes=None, error=None, watcher_id=None, **unknown_fields):
         '''
         changes : RelationUnitsChange
@@ -20072,6 +20728,7 @@ class RelationUnitsWatchResult(Type):
 class RelationUnitsWatchResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~RelationUnitsWatchResult]
@@ -20090,6 +20747,7 @@ class RelationUnitsWatchResults(Type):
 class RemoteApplication(Type):
     _toSchema = {'consume_version': 'consume-version', 'is_consumer_proxy': 'is-consumer-proxy', 'life': 'life', 'macaroon': 'macaroon', 'model_uuid': 'model-uuid', 'name': 'name', 'offer_uuid': 'offer-uuid', 'status': 'status'}
     _toPy = {'consume-version': 'consume_version', 'is-consumer-proxy': 'is_consumer_proxy', 'life': 'life', 'macaroon': 'macaroon', 'model-uuid': 'model_uuid', 'name': 'name', 'offer-uuid': 'offer_uuid', 'status': 'status'}
+
     def __init__(self, consume_version=None, is_consumer_proxy=None, life=None, macaroon=None, model_uuid=None, name=None, offer_uuid=None, status=None, **unknown_fields):
         '''
         consume_version : int
@@ -20150,6 +20808,7 @@ class RemoteApplication(Type):
 class RemoteApplicationInfo(Type):
     _toSchema = {'description': 'description', 'endpoints': 'endpoints', 'icon_url_path': 'icon-url-path', 'model_tag': 'model-tag', 'name': 'name', 'offer_url': 'offer-url', 'source_model_label': 'source-model-label'}
     _toPy = {'description': 'description', 'endpoints': 'endpoints', 'icon-url-path': 'icon_url_path', 'model-tag': 'model_tag', 'name': 'name', 'offer-url': 'offer_url', 'source-model-label': 'source_model_label'}
+
     def __init__(self, description=None, endpoints=None, icon_url_path=None, model_tag=None, name=None, offer_url=None, source_model_label=None, **unknown_fields):
         '''
         description : str
@@ -20204,6 +20863,7 @@ class RemoteApplicationInfo(Type):
 class RemoteApplicationInfoResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -20228,6 +20888,7 @@ class RemoteApplicationInfoResult(Type):
 class RemoteApplicationInfoResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~RemoteApplicationInfoResult]
@@ -20246,6 +20907,7 @@ class RemoteApplicationInfoResults(Type):
 class RemoteApplicationResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -20270,6 +20932,7 @@ class RemoteApplicationResult(Type):
 class RemoteApplicationResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~RemoteApplicationResult]
@@ -20288,6 +20951,7 @@ class RemoteApplicationResults(Type):
 class RemoteApplicationStatus(Type):
     _toSchema = {'endpoints': 'endpoints', 'err': 'err', 'life': 'life', 'offer_name': 'offer-name', 'offer_url': 'offer-url', 'relations': 'relations', 'status': 'status'}
     _toPy = {'endpoints': 'endpoints', 'err': 'err', 'life': 'life', 'offer-name': 'offer_name', 'offer-url': 'offer_url', 'relations': 'relations', 'status': 'status'}
+
     def __init__(self, endpoints=None, err=None, life=None, offer_name=None, offer_url=None, relations=None, status=None, **unknown_fields):
         '''
         endpoints : typing.Sequence[~RemoteEndpoint]
@@ -20342,6 +21006,7 @@ class RemoteApplicationStatus(Type):
 class RemoteEndpoint(Type):
     _toSchema = {'interface': 'interface', 'limit': 'limit', 'name': 'name', 'role': 'role'}
     _toPy = {'interface': 'interface', 'limit': 'limit', 'name': 'name', 'role': 'role'}
+
     def __init__(self, interface=None, limit=None, name=None, role=None, **unknown_fields):
         '''
         interface : str
@@ -20378,6 +21043,7 @@ class RemoteEndpoint(Type):
 class RemoteEntityArg(Type):
     _toSchema = {'bakery_version': 'bakery-version', 'macaroons': 'macaroons', 'relation_token': 'relation-token'}
     _toPy = {'bakery-version': 'bakery_version', 'macaroons': 'macaroons', 'relation-token': 'relation_token'}
+
     def __init__(self, bakery_version=None, macaroons=None, relation_token=None, **unknown_fields):
         '''
         bakery_version : int
@@ -20408,6 +21074,7 @@ class RemoteEntityArg(Type):
 class RemoteEntityArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~RemoteEntityArg]
@@ -20426,6 +21093,7 @@ class RemoteEntityArgs(Type):
 class RemoteEntityTokenArg(Type):
     _toSchema = {'tag': 'tag', 'token': 'token'}
     _toPy = {'tag': 'tag', 'token': 'token'}
+
     def __init__(self, tag=None, token=None, **unknown_fields):
         '''
         tag : str
@@ -20450,6 +21118,7 @@ class RemoteEntityTokenArg(Type):
 class RemoteEntityTokenArgs(Type):
     _toSchema = {'args': 'Args'}
     _toPy = {'Args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~RemoteEntityTokenArg]
@@ -20468,6 +21137,7 @@ class RemoteEntityTokenArgs(Type):
 class RemoteRelation(Type):
     _toSchema = {'application_name': 'application-name', 'endpoint': 'endpoint', 'id_': 'id', 'key': 'key', 'life': 'life', 'remote_application_name': 'remote-application-name', 'remote_endpoint_name': 'remote-endpoint-name', 'source_model_uuid': 'source-model-uuid', 'suspended': 'suspended', 'unit_count': 'unit-count'}
     _toPy = {'application-name': 'application_name', 'endpoint': 'endpoint', 'id': 'id_', 'key': 'key', 'life': 'life', 'remote-application-name': 'remote_application_name', 'remote-endpoint-name': 'remote_endpoint_name', 'source-model-uuid': 'source_model_uuid', 'suspended': 'suspended', 'unit-count': 'unit_count'}
+
     def __init__(self, application_name=None, endpoint=None, id_=None, key=None, life=None, remote_application_name=None, remote_endpoint_name=None, source_model_uuid=None, suspended=None, unit_count=None, **unknown_fields):
         '''
         application_name : str
@@ -20540,6 +21210,7 @@ class RemoteRelation(Type):
 class RemoteRelationChangeEvent(Type):
     _toSchema = {'application_settings': 'application-settings', 'application_token': 'application-token', 'bakery_version': 'bakery-version', 'changed_units': 'changed-units', 'departed_units': 'departed-units', 'force_cleanup': 'force-cleanup', 'life': 'life', 'macaroons': 'macaroons', 'relation_token': 'relation-token', 'suspended': 'suspended', 'suspended_reason': 'suspended-reason', 'unit_count': 'unit-count'}
     _toPy = {'application-settings': 'application_settings', 'application-token': 'application_token', 'bakery-version': 'bakery_version', 'changed-units': 'changed_units', 'departed-units': 'departed_units', 'force-cleanup': 'force_cleanup', 'life': 'life', 'macaroons': 'macaroons', 'relation-token': 'relation_token', 'suspended': 'suspended', 'suspended-reason': 'suspended_reason', 'unit-count': 'unit_count'}
+
     def __init__(self, application_settings=None, application_token=None, bakery_version=None, changed_units=None, departed_units=None, force_cleanup=None, life=None, macaroons=None, relation_token=None, suspended=None, suspended_reason=None, unit_count=None, **unknown_fields):
         '''
         application_settings : typing.Mapping[str, typing.Any]
@@ -20624,6 +21295,7 @@ class RemoteRelationChangeEvent(Type):
 class RemoteRelationDetails(Type):
     _toSchema = {'bakery_version': 'bakery-version', 'macaroon': 'macaroon', 'relation_token': 'relation-token'}
     _toPy = {'bakery-version': 'bakery_version', 'macaroon': 'macaroon', 'relation-token': 'relation_token'}
+
     def __init__(self, bakery_version=None, macaroon=None, relation_token=None, **unknown_fields):
         '''
         bakery_version : int
@@ -20654,6 +21326,7 @@ class RemoteRelationDetails(Type):
 class RemoteRelationResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -20678,6 +21351,7 @@ class RemoteRelationResult(Type):
 class RemoteRelationResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~RemoteRelationResult]
@@ -20696,6 +21370,7 @@ class RemoteRelationResults(Type):
 class RemoteRelationUnitChange(Type):
     _toSchema = {'settings': 'settings', 'unit_id': 'unit-id'}
     _toPy = {'settings': 'settings', 'unit-id': 'unit_id'}
+
     def __init__(self, settings=None, unit_id=None, **unknown_fields):
         '''
         settings : typing.Mapping[str, typing.Any]
@@ -20720,6 +21395,7 @@ class RemoteRelationUnitChange(Type):
 class RemoteRelationWatchResult(Type):
     _toSchema = {'changes': 'changes', 'error': 'error', 'watcher_id': 'watcher-id'}
     _toPy = {'changes': 'changes', 'error': 'error', 'watcher-id': 'watcher_id'}
+
     def __init__(self, changes=None, error=None, watcher_id=None, **unknown_fields):
         '''
         changes : RemoteRelationChangeEvent
@@ -20750,6 +21426,7 @@ class RemoteRelationWatchResult(Type):
 class RemoteRelationWatchResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~RemoteRelationWatchResult]
@@ -20768,6 +21445,7 @@ class RemoteRelationWatchResults(Type):
 class RemoteRelationsChanges(Type):
     _toSchema = {'changes': 'changes'}
     _toPy = {'changes': 'changes'}
+
     def __init__(self, changes=None, **unknown_fields):
         '''
         changes : typing.Sequence[~RemoteRelationChangeEvent]
@@ -20786,6 +21464,7 @@ class RemoteRelationsChanges(Type):
 class RemoteSpace(Type):
     _toSchema = {'cloud_type': 'cloud-type', 'name': 'name', 'provider_attributes': 'provider-attributes', 'provider_id': 'provider-id', 'subnets': 'subnets'}
     _toPy = {'cloud-type': 'cloud_type', 'name': 'name', 'provider-attributes': 'provider_attributes', 'provider-id': 'provider_id', 'subnets': 'subnets'}
+
     def __init__(self, cloud_type=None, name=None, provider_attributes=None, provider_id=None, subnets=None, **unknown_fields):
         '''
         cloud_type : str
@@ -20828,6 +21507,7 @@ class RemoteSpace(Type):
 class RemoveBlocksArgs(Type):
     _toSchema = {'all_': 'all'}
     _toPy = {'all': 'all_'}
+
     def __init__(self, all_=None, **unknown_fields):
         '''
         all_ : bool
@@ -20846,6 +21526,7 @@ class RemoveBlocksArgs(Type):
 class RemoveFilesystemParams(Type):
     _toSchema = {'destroy': 'destroy', 'filesystem_id': 'filesystem-id', 'provider': 'provider'}
     _toPy = {'destroy': 'destroy', 'filesystem-id': 'filesystem_id', 'provider': 'provider'}
+
     def __init__(self, destroy=None, filesystem_id=None, provider=None, **unknown_fields):
         '''
         destroy : bool
@@ -20876,6 +21557,7 @@ class RemoveFilesystemParams(Type):
 class RemoveFilesystemParamsResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -20900,6 +21582,7 @@ class RemoveFilesystemParamsResult(Type):
 class RemoveFilesystemParamsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~RemoveFilesystemParamsResult]
@@ -20918,6 +21601,7 @@ class RemoveFilesystemParamsResults(Type):
 class RemoveSecretBackendArg(Type):
     _toSchema = {'force': 'force', 'name': 'name'}
     _toPy = {'force': 'force', 'name': 'name'}
+
     def __init__(self, force=None, name=None, **unknown_fields):
         '''
         force : bool
@@ -20942,6 +21626,7 @@ class RemoveSecretBackendArg(Type):
 class RemoveSecretBackendArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~RemoveSecretBackendArg]
@@ -20960,6 +21645,7 @@ class RemoveSecretBackendArgs(Type):
 class RemoveSpaceParam(Type):
     _toSchema = {'dry_run': 'dry-run', 'force': 'force', 'space': 'space'}
     _toPy = {'dry-run': 'dry_run', 'force': 'force', 'space': 'space'}
+
     def __init__(self, dry_run=None, force=None, space=None, **unknown_fields):
         '''
         dry_run : bool
@@ -20990,6 +21676,7 @@ class RemoveSpaceParam(Type):
 class RemoveSpaceParams(Type):
     _toSchema = {'space_param': 'space-param'}
     _toPy = {'space-param': 'space_param'}
+
     def __init__(self, space_param=None, **unknown_fields):
         '''
         space_param : typing.Sequence[~RemoveSpaceParam]
@@ -21008,6 +21695,7 @@ class RemoveSpaceParams(Type):
 class RemoveSpaceResult(Type):
     _toSchema = {'bindings': 'bindings', 'constraints': 'constraints', 'controller_settings': 'controller-settings', 'error': 'error'}
     _toPy = {'bindings': 'bindings', 'constraints': 'constraints', 'controller-settings': 'controller_settings', 'error': 'error'}
+
     def __init__(self, bindings=None, constraints=None, controller_settings=None, error=None, **unknown_fields):
         '''
         bindings : typing.Sequence[~Entity]
@@ -21044,6 +21732,7 @@ class RemoveSpaceResult(Type):
 class RemoveSpaceResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~RemoveSpaceResult]
@@ -21062,6 +21751,7 @@ class RemoveSpaceResults(Type):
 class RemoveStorage(Type):
     _toSchema = {'storage': 'storage'}
     _toPy = {'storage': 'storage'}
+
     def __init__(self, storage=None, **unknown_fields):
         '''
         storage : typing.Sequence[~RemoveStorageInstance]
@@ -21080,6 +21770,7 @@ class RemoveStorage(Type):
 class RemoveStorageInstance(Type):
     _toSchema = {'destroy_attachments': 'destroy-attachments', 'destroy_storage': 'destroy-storage', 'force': 'force', 'max_wait': 'max-wait', 'tag': 'tag'}
     _toPy = {'destroy-attachments': 'destroy_attachments', 'destroy-storage': 'destroy_storage', 'force': 'force', 'max-wait': 'max_wait', 'tag': 'tag'}
+
     def __init__(self, destroy_attachments=None, destroy_storage=None, force=None, max_wait=None, tag=None, **unknown_fields):
         '''
         destroy_attachments : bool
@@ -21122,6 +21813,7 @@ class RemoveStorageInstance(Type):
 class RemoveVolumeParams(Type):
     _toSchema = {'destroy': 'destroy', 'provider': 'provider', 'volume_id': 'volume-id'}
     _toPy = {'destroy': 'destroy', 'provider': 'provider', 'volume-id': 'volume_id'}
+
     def __init__(self, destroy=None, provider=None, volume_id=None, **unknown_fields):
         '''
         destroy : bool
@@ -21152,6 +21844,7 @@ class RemoveVolumeParams(Type):
 class RemoveVolumeParamsResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -21176,6 +21869,7 @@ class RemoveVolumeParamsResult(Type):
 class RemoveVolumeParamsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~RemoveVolumeParamsResult]
@@ -21194,6 +21888,7 @@ class RemoveVolumeParamsResults(Type):
 class RenameSpaceParams(Type):
     _toSchema = {'from_space_tag': 'from-space-tag', 'to_space_tag': 'to-space-tag'}
     _toPy = {'from-space-tag': 'from_space_tag', 'to-space-tag': 'to_space_tag'}
+
     def __init__(self, from_space_tag=None, to_space_tag=None, **unknown_fields):
         '''
         from_space_tag : str
@@ -21218,6 +21913,7 @@ class RenameSpaceParams(Type):
 class RenameSpacesParams(Type):
     _toSchema = {'changes': 'changes'}
     _toPy = {'changes': 'changes'}
+
     def __init__(self, changes=None, **unknown_fields):
         '''
         changes : typing.Sequence[~RenameSpaceParams]
@@ -21236,6 +21932,7 @@ class RenameSpacesParams(Type):
 class ResolveCharmWithChannel(Type):
     _toSchema = {'charm_origin': 'charm-origin', 'reference': 'reference', 'switch_charm': 'switch-charm'}
     _toPy = {'charm-origin': 'charm_origin', 'reference': 'reference', 'switch-charm': 'switch_charm'}
+
     def __init__(self, charm_origin=None, reference=None, switch_charm=None, **unknown_fields):
         '''
         charm_origin : CharmOrigin
@@ -21266,6 +21963,7 @@ class ResolveCharmWithChannel(Type):
 class ResolveCharmWithChannelResult(Type):
     _toSchema = {'charm_origin': 'charm-origin', 'error': 'error', 'supported_bases': 'supported-bases', 'url': 'url'}
     _toPy = {'charm-origin': 'charm_origin', 'error': 'error', 'supported-bases': 'supported_bases', 'url': 'url'}
+
     def __init__(self, charm_origin=None, error=None, supported_bases=None, url=None, **unknown_fields):
         '''
         charm_origin : CharmOrigin
@@ -21302,6 +22000,7 @@ class ResolveCharmWithChannelResult(Type):
 class ResolveCharmWithChannelResults(Type):
     _toSchema = {'results': 'Results'}
     _toPy = {'Results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ResolveCharmWithChannelResult]
@@ -21320,6 +22019,7 @@ class ResolveCharmWithChannelResults(Type):
 class ResolveCharmsWithChannel(Type):
     _toSchema = {'macaroon': 'macaroon', 'resolve': 'resolve'}
     _toPy = {'macaroon': 'macaroon', 'resolve': 'resolve'}
+
     def __init__(self, macaroon=None, resolve=None, **unknown_fields):
         '''
         macaroon : Macaroon
@@ -21344,6 +22044,7 @@ class ResolveCharmsWithChannel(Type):
 class ResolvedModeResult(Type):
     _toSchema = {'error': 'error', 'mode': 'mode'}
     _toPy = {'error': 'error', 'mode': 'mode'}
+
     def __init__(self, error=None, mode=None, **unknown_fields):
         '''
         error : Error
@@ -21368,6 +22069,7 @@ class ResolvedModeResult(Type):
 class ResolvedModeResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ResolvedModeResult]
@@ -21386,6 +22088,7 @@ class ResolvedModeResults(Type):
 class Resource(Type):
     _toSchema = {'application': 'application', 'charmresource': 'CharmResource', 'description': 'description', 'fingerprint': 'fingerprint', 'id_': 'id', 'name': 'name', 'origin': 'origin', 'path': 'path', 'pending_id': 'pending-id', 'revision': 'revision', 'size': 'size', 'timestamp': 'timestamp', 'type_': 'type', 'username': 'username'}
     _toPy = {'CharmResource': 'charmresource', 'application': 'application', 'description': 'description', 'fingerprint': 'fingerprint', 'id': 'id_', 'name': 'name', 'origin': 'origin', 'path': 'path', 'pending-id': 'pending_id', 'revision': 'revision', 'size': 'size', 'timestamp': 'timestamp', 'type': 'type_', 'username': 'username'}
+
     def __init__(self, charmresource=None, application=None, description=None, fingerprint=None, id_=None, name=None, origin=None, path=None, pending_id=None, revision=None, size=None, timestamp=None, type_=None, username=None, **unknown_fields):
         '''
         charmresource : CharmResource
@@ -21482,6 +22185,7 @@ class Resource(Type):
 class ResourcesResult(Type):
     _toSchema = {'charm_store_resources': 'charm-store-resources', 'error': 'error', 'errorresult': 'ErrorResult', 'resources': 'resources', 'unit_resources': 'unit-resources'}
     _toPy = {'ErrorResult': 'errorresult', 'charm-store-resources': 'charm_store_resources', 'error': 'error', 'resources': 'resources', 'unit-resources': 'unit_resources'}
+
     def __init__(self, errorresult=None, charm_store_resources=None, error=None, resources=None, unit_resources=None, **unknown_fields):
         '''
         errorresult : ErrorResult
@@ -21524,6 +22228,7 @@ class ResourcesResult(Type):
 class ResourcesResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ResourcesResult]
@@ -21542,6 +22247,7 @@ class ResourcesResults(Type):
 class RetryProvisioningArgs(Type):
     _toSchema = {'all_': 'all', 'machines': 'machines'}
     _toPy = {'all': 'all_', 'machines': 'machines'}
+
     def __init__(self, all_=None, machines=None, **unknown_fields):
         '''
         all_ : bool
@@ -21566,6 +22272,7 @@ class RetryProvisioningArgs(Type):
 class RetryStrategy(Type):
     _toSchema = {'jitter_retry_time': 'jitter-retry-time', 'max_retry_time': 'max-retry-time', 'min_retry_time': 'min-retry-time', 'retry_time_factor': 'retry-time-factor', 'should_retry': 'should-retry'}
     _toPy = {'jitter-retry-time': 'jitter_retry_time', 'max-retry-time': 'max_retry_time', 'min-retry-time': 'min_retry_time', 'retry-time-factor': 'retry_time_factor', 'should-retry': 'should_retry'}
+
     def __init__(self, jitter_retry_time=None, max_retry_time=None, min_retry_time=None, retry_time_factor=None, should_retry=None, **unknown_fields):
         '''
         jitter_retry_time : bool
@@ -21608,6 +22315,7 @@ class RetryStrategy(Type):
 class RetryStrategyResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -21632,6 +22340,7 @@ class RetryStrategyResult(Type):
 class RetryStrategyResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~RetryStrategyResult]
@@ -21650,6 +22359,7 @@ class RetryStrategyResults(Type):
 class RevokeCredentialArg(Type):
     _toSchema = {'force': 'force', 'tag': 'tag'}
     _toPy = {'force': 'force', 'tag': 'tag'}
+
     def __init__(self, force=None, tag=None, **unknown_fields):
         '''
         force : bool
@@ -21674,6 +22384,7 @@ class RevokeCredentialArg(Type):
 class RevokeCredentialArgs(Type):
     _toSchema = {'credentials': 'credentials'}
     _toPy = {'credentials': 'credentials'}
+
     def __init__(self, credentials=None, **unknown_fields):
         '''
         credentials : typing.Sequence[~RevokeCredentialArg]
@@ -21692,6 +22403,7 @@ class RevokeCredentialArgs(Type):
 class RotateSecretBackendArgs(Type):
     _toSchema = {'backend_ids': 'backend-ids'}
     _toPy = {'backend-ids': 'backend_ids'}
+
     def __init__(self, backend_ids=None, **unknown_fields):
         '''
         backend_ids : typing.Sequence[str]
@@ -21710,6 +22422,7 @@ class RotateSecretBackendArgs(Type):
 class RunParams(Type):
     _toSchema = {'applications': 'applications', 'commands': 'commands', 'execution_group': 'execution-group', 'machines': 'machines', 'parallel': 'parallel', 'timeout': 'timeout', 'units': 'units', 'workload_context': 'workload-context'}
     _toPy = {'applications': 'applications', 'commands': 'commands', 'execution-group': 'execution_group', 'machines': 'machines', 'parallel': 'parallel', 'timeout': 'timeout', 'units': 'units', 'workload-context': 'workload_context'}
+
     def __init__(self, applications=None, commands=None, execution_group=None, machines=None, parallel=None, timeout=None, units=None, workload_context=None, **unknown_fields):
         '''
         applications : typing.Sequence[str]
@@ -21770,6 +22483,7 @@ class RunParams(Type):
 class SSHAddressResult(Type):
     _toSchema = {'address': 'address', 'error': 'error'}
     _toPy = {'address': 'address', 'error': 'error'}
+
     def __init__(self, address=None, error=None, **unknown_fields):
         '''
         address : str
@@ -21794,6 +22508,7 @@ class SSHAddressResult(Type):
 class SSHAddressResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~SSHAddressResult]
@@ -21812,6 +22527,7 @@ class SSHAddressResults(Type):
 class SSHAddressesResult(Type):
     _toSchema = {'addresses': 'addresses', 'error': 'error'}
     _toPy = {'addresses': 'addresses', 'error': 'error'}
+
     def __init__(self, addresses=None, error=None, **unknown_fields):
         '''
         addresses : typing.Sequence[str]
@@ -21836,6 +22552,7 @@ class SSHAddressesResult(Type):
 class SSHAddressesResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~SSHAddressesResult]
@@ -21854,6 +22571,7 @@ class SSHAddressesResults(Type):
 class SSHHostKeySet(Type):
     _toSchema = {'entity_keys': 'entity-keys'}
     _toPy = {'entity-keys': 'entity_keys'}
+
     def __init__(self, entity_keys=None, **unknown_fields):
         '''
         entity_keys : typing.Sequence[~SSHHostKeys]
@@ -21872,6 +22590,7 @@ class SSHHostKeySet(Type):
 class SSHHostKeys(Type):
     _toSchema = {'public_keys': 'public-keys', 'tag': 'tag'}
     _toPy = {'public-keys': 'public_keys', 'tag': 'tag'}
+
     def __init__(self, public_keys=None, tag=None, **unknown_fields):
         '''
         public_keys : typing.Sequence[str]
@@ -21896,6 +22615,7 @@ class SSHHostKeys(Type):
 class SSHProxyResult(Type):
     _toSchema = {'use_proxy': 'use-proxy'}
     _toPy = {'use-proxy': 'use_proxy'}
+
     def __init__(self, use_proxy=None, **unknown_fields):
         '''
         use_proxy : bool
@@ -21914,6 +22634,7 @@ class SSHProxyResult(Type):
 class SSHPublicKeysResult(Type):
     _toSchema = {'error': 'error', 'public_keys': 'public-keys'}
     _toPy = {'error': 'error', 'public-keys': 'public_keys'}
+
     def __init__(self, error=None, public_keys=None, **unknown_fields):
         '''
         error : Error
@@ -21938,6 +22659,7 @@ class SSHPublicKeysResult(Type):
 class SSHPublicKeysResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~SSHPublicKeysResult]
@@ -21956,6 +22678,7 @@ class SSHPublicKeysResults(Type):
 class ScaleApplicationInfo(Type):
     _toSchema = {'num_units': 'num-units'}
     _toPy = {'num-units': 'num_units'}
+
     def __init__(self, num_units=None, **unknown_fields):
         '''
         num_units : int
@@ -21974,6 +22697,7 @@ class ScaleApplicationInfo(Type):
 class ScaleApplicationParams(Type):
     _toSchema = {'application_tag': 'application-tag', 'force': 'force', 'scale': 'scale', 'scale_change': 'scale-change'}
     _toPy = {'application-tag': 'application_tag', 'force': 'force', 'scale': 'scale', 'scale-change': 'scale_change'}
+
     def __init__(self, application_tag=None, force=None, scale=None, scale_change=None, **unknown_fields):
         '''
         application_tag : str
@@ -22010,6 +22734,7 @@ class ScaleApplicationParams(Type):
 class ScaleApplicationResult(Type):
     _toSchema = {'error': 'error', 'info': 'info'}
     _toPy = {'error': 'error', 'info': 'info'}
+
     def __init__(self, error=None, info=None, **unknown_fields):
         '''
         error : Error
@@ -22034,6 +22759,7 @@ class ScaleApplicationResult(Type):
 class ScaleApplicationResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ScaleApplicationResult]
@@ -22052,6 +22778,7 @@ class ScaleApplicationResults(Type):
 class ScaleApplicationsParams(Type):
     _toSchema = {'applications': 'applications'}
     _toPy = {'applications': 'applications'}
+
     def __init__(self, applications=None, **unknown_fields):
         '''
         applications : typing.Sequence[~ScaleApplicationParams]
@@ -22070,6 +22797,7 @@ class ScaleApplicationsParams(Type):
 class SecretBackend(Type):
     _toSchema = {'backend_type': 'backend-type', 'config': 'config', 'name': 'name', 'token_rotate_interval': 'token-rotate-interval'}
     _toPy = {'backend-type': 'backend_type', 'config': 'config', 'name': 'name', 'token-rotate-interval': 'token_rotate_interval'}
+
     def __init__(self, backend_type=None, config=None, name=None, token_rotate_interval=None, **unknown_fields):
         '''
         backend_type : str
@@ -22106,6 +22834,7 @@ class SecretBackend(Type):
 class SecretBackendArgs(Type):
     _toSchema = {'backend_ids': 'backend-ids', 'for_drain': 'for-drain'}
     _toPy = {'backend-ids': 'backend_ids', 'for-drain': 'for_drain'}
+
     def __init__(self, backend_ids=None, for_drain=None, **unknown_fields):
         '''
         backend_ids : typing.Sequence[str]
@@ -22130,6 +22859,7 @@ class SecretBackendArgs(Type):
 class SecretBackendConfig(Type):
     _toSchema = {'params': 'params', 'type_': 'type'}
     _toPy = {'params': 'params', 'type': 'type_'}
+
     def __init__(self, params=None, type_=None, **unknown_fields):
         '''
         params : typing.Mapping[str, typing.Any]
@@ -22154,6 +22884,7 @@ class SecretBackendConfig(Type):
 class SecretBackendConfigResult(Type):
     _toSchema = {'config': 'config', 'draining': 'draining', 'model_controller': 'model-controller', 'model_name': 'model-name', 'model_uuid': 'model-uuid'}
     _toPy = {'config': 'config', 'draining': 'draining', 'model-controller': 'model_controller', 'model-name': 'model_name', 'model-uuid': 'model_uuid'}
+
     def __init__(self, config=None, draining=None, model_controller=None, model_name=None, model_uuid=None, **unknown_fields):
         '''
         config : SecretBackendConfig
@@ -22196,6 +22927,7 @@ class SecretBackendConfigResult(Type):
 class SecretBackendConfigResults(Type):
     _toSchema = {'active_id': 'active-id', 'results': 'results'}
     _toPy = {'active-id': 'active_id', 'results': 'results'}
+
     def __init__(self, active_id=None, results=None, **unknown_fields):
         '''
         active_id : str
@@ -22220,6 +22952,7 @@ class SecretBackendConfigResults(Type):
 class SecretBackendResult(Type):
     _toSchema = {'error': 'error', 'id_': 'id', 'message': 'message', 'num_secrets': 'num-secrets', 'result': 'result', 'status': 'status'}
     _toPy = {'error': 'error', 'id': 'id_', 'message': 'message', 'num-secrets': 'num_secrets', 'result': 'result', 'status': 'status'}
+
     def __init__(self, error=None, id_=None, message=None, num_secrets=None, result=None, status=None, **unknown_fields):
         '''
         error : Error
@@ -22268,6 +23001,7 @@ class SecretBackendResult(Type):
 class SecretBackendRotateChange(Type):
     _toSchema = {'backend_name': 'backend-name', 'id_': 'id', 'next_trigger_time': 'next-trigger-time'}
     _toPy = {'backend-name': 'backend_name', 'id': 'id_', 'next-trigger-time': 'next_trigger_time'}
+
     def __init__(self, backend_name=None, id_=None, next_trigger_time=None, **unknown_fields):
         '''
         backend_name : str
@@ -22298,6 +23032,7 @@ class SecretBackendRotateChange(Type):
 class SecretBackendRotateWatchResult(Type):
     _toSchema = {'changes': 'changes', 'error': 'error', 'watcher_id': 'watcher-id'}
     _toPy = {'changes': 'changes', 'error': 'error', 'watcher-id': 'watcher_id'}
+
     def __init__(self, changes=None, error=None, watcher_id=None, **unknown_fields):
         '''
         changes : typing.Sequence[~SecretBackendRotateChange]
@@ -22328,6 +23063,7 @@ class SecretBackendRotateWatchResult(Type):
 class SecretConsumerInfoResult(Type):
     _toSchema = {'error': 'error', 'label': 'label', 'revision': 'revision'}
     _toPy = {'error': 'error', 'label': 'label', 'revision': 'revision'}
+
     def __init__(self, error=None, label=None, revision=None, **unknown_fields):
         '''
         error : Error
@@ -22358,6 +23094,7 @@ class SecretConsumerInfoResult(Type):
 class SecretConsumerInfoResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~SecretConsumerInfoResult]
@@ -22376,6 +23113,7 @@ class SecretConsumerInfoResults(Type):
 class SecretContentParams(Type):
     _toSchema = {'data': 'data', 'value_ref': 'value-ref'}
     _toPy = {'data': 'data', 'value-ref': 'value_ref'}
+
     def __init__(self, data=None, value_ref=None, **unknown_fields):
         '''
         data : typing.Mapping[str, str]
@@ -22400,6 +23138,7 @@ class SecretContentParams(Type):
 class SecretContentResult(Type):
     _toSchema = {'backend_config': 'backend-config', 'content': 'content', 'error': 'error', 'latest_revision': 'latest-revision'}
     _toPy = {'backend-config': 'backend_config', 'content': 'content', 'error': 'error', 'latest-revision': 'latest_revision'}
+
     def __init__(self, backend_config=None, content=None, error=None, latest_revision=None, **unknown_fields):
         '''
         backend_config : SecretBackendConfigResult
@@ -22436,6 +23175,7 @@ class SecretContentResult(Type):
 class SecretContentResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~SecretContentResult]
@@ -22454,6 +23194,7 @@ class SecretContentResults(Type):
 class SecretRevision(Type):
     _toSchema = {'backend_name': 'backend-name', 'create_time': 'create-time', 'expire_time': 'expire-time', 'revision': 'revision', 'update_time': 'update-time', 'value_ref': 'value-ref'}
     _toPy = {'backend-name': 'backend_name', 'create-time': 'create_time', 'expire-time': 'expire_time', 'revision': 'revision', 'update-time': 'update_time', 'value-ref': 'value_ref'}
+
     def __init__(self, backend_name=None, create_time=None, expire_time=None, revision=None, update_time=None, value_ref=None, **unknown_fields):
         '''
         backend_name : str
@@ -22502,6 +23243,7 @@ class SecretRevision(Type):
 class SecretRevisionArg(Type):
     _toSchema = {'pending_delete': 'pending-delete', 'revisions': 'revisions', 'uri': 'uri'}
     _toPy = {'pending-delete': 'pending_delete', 'revisions': 'revisions', 'uri': 'uri'}
+
     def __init__(self, pending_delete=None, revisions=None, uri=None, **unknown_fields):
         '''
         pending_delete : bool
@@ -22532,6 +23274,7 @@ class SecretRevisionArg(Type):
 class SecretRevisionChange(Type):
     _toSchema = {'revision': 'revision', 'uri': 'uri'}
     _toPy = {'revision': 'revision', 'uri': 'uri'}
+
     def __init__(self, revision=None, uri=None, **unknown_fields):
         '''
         revision : int
@@ -22556,6 +23299,7 @@ class SecretRevisionChange(Type):
 class SecretRevisionWatchResult(Type):
     _toSchema = {'changes': 'changes', 'error': 'error', 'watcher_id': 'watcher-id'}
     _toPy = {'changes': 'changes', 'error': 'error', 'watcher-id': 'watcher_id'}
+
     def __init__(self, changes=None, error=None, watcher_id=None, **unknown_fields):
         '''
         changes : typing.Sequence[~SecretRevisionChange]
@@ -22586,6 +23330,7 @@ class SecretRevisionWatchResult(Type):
 class SecretRevisionWatchResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~SecretRevisionWatchResult]
@@ -22604,6 +23349,7 @@ class SecretRevisionWatchResults(Type):
 class SecretRotatedArg(Type):
     _toSchema = {'original_revision': 'original-revision', 'skip': 'skip', 'uri': 'uri'}
     _toPy = {'original-revision': 'original_revision', 'skip': 'skip', 'uri': 'uri'}
+
     def __init__(self, original_revision=None, skip=None, uri=None, **unknown_fields):
         '''
         original_revision : int
@@ -22634,6 +23380,7 @@ class SecretRotatedArg(Type):
 class SecretRotatedArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~SecretRotatedArg]
@@ -22652,6 +23399,7 @@ class SecretRotatedArgs(Type):
 class SecretTriggerChange(Type):
     _toSchema = {'next_trigger_time': 'next-trigger-time', 'revision': 'revision', 'uri': 'uri'}
     _toPy = {'next-trigger-time': 'next_trigger_time', 'revision': 'revision', 'uri': 'uri'}
+
     def __init__(self, next_trigger_time=None, revision=None, uri=None, **unknown_fields):
         '''
         next_trigger_time : str
@@ -22682,6 +23430,7 @@ class SecretTriggerChange(Type):
 class SecretTriggerWatchResult(Type):
     _toSchema = {'changes': 'changes', 'error': 'error', 'watcher_id': 'watcher-id'}
     _toPy = {'changes': 'changes', 'error': 'error', 'watcher-id': 'watcher_id'}
+
     def __init__(self, changes=None, error=None, watcher_id=None, **unknown_fields):
         '''
         changes : typing.Sequence[~SecretTriggerChange]
@@ -22712,6 +23461,7 @@ class SecretTriggerWatchResult(Type):
 class SecretValueRef(Type):
     _toSchema = {'backend_id': 'backend-id', 'revision_id': 'revision-id'}
     _toPy = {'backend-id': 'backend_id', 'revision-id': 'revision_id'}
+
     def __init__(self, backend_id=None, revision_id=None, **unknown_fields):
         '''
         backend_id : str
@@ -22736,6 +23486,7 @@ class SecretValueRef(Type):
 class SecretValueResult(Type):
     _toSchema = {'data': 'data', 'error': 'error'}
     _toPy = {'data': 'data', 'error': 'error'}
+
     def __init__(self, data=None, error=None, **unknown_fields):
         '''
         data : typing.Mapping[str, str]
@@ -22760,6 +23511,7 @@ class SecretValueResult(Type):
 class SecretsFilter(Type):
     _toSchema = {'label': 'label', 'owner_tag': 'owner-tag', 'revision': 'revision', 'uri': 'uri'}
     _toPy = {'label': 'label', 'owner-tag': 'owner_tag', 'revision': 'revision', 'uri': 'uri'}
+
     def __init__(self, label=None, owner_tag=None, revision=None, uri=None, **unknown_fields):
         '''
         label : str
@@ -22796,6 +23548,7 @@ class SecretsFilter(Type):
 class SerializedModel(Type):
     _toSchema = {'bytes_': 'bytes', 'charms': 'charms', 'resources': 'resources', 'tools': 'tools'}
     _toPy = {'bytes': 'bytes_', 'charms': 'charms', 'resources': 'resources', 'tools': 'tools'}
+
     def __init__(self, bytes_=None, charms=None, resources=None, tools=None, **unknown_fields):
         '''
         bytes_ : typing.Sequence[int]
@@ -22832,6 +23585,7 @@ class SerializedModel(Type):
 class SerializedModelResource(Type):
     _toSchema = {'application': 'application', 'application_revision': 'application-revision', 'charmstore_revision': 'charmstore-revision', 'name': 'name', 'unit_revisions': 'unit-revisions'}
     _toPy = {'application': 'application', 'application-revision': 'application_revision', 'charmstore-revision': 'charmstore_revision', 'name': 'name', 'unit-revisions': 'unit_revisions'}
+
     def __init__(self, application=None, application_revision=None, charmstore_revision=None, name=None, unit_revisions=None, **unknown_fields):
         '''
         application : str
@@ -22874,6 +23628,7 @@ class SerializedModelResource(Type):
 class SerializedModelResourceRevision(Type):
     _toSchema = {'description': 'description', 'fingerprint': 'fingerprint', 'origin': 'origin', 'path': 'path', 'revision': 'revision', 'size': 'size', 'timestamp': 'timestamp', 'type_': 'type', 'username': 'username'}
     _toPy = {'description': 'description', 'fingerprint': 'fingerprint', 'origin': 'origin', 'path': 'path', 'revision': 'revision', 'size': 'size', 'timestamp': 'timestamp', 'type': 'type_', 'username': 'username'}
+
     def __init__(self, description=None, fingerprint=None, origin=None, path=None, revision=None, size=None, timestamp=None, type_=None, username=None, **unknown_fields):
         '''
         description : str
@@ -22940,6 +23695,7 @@ class SerializedModelResourceRevision(Type):
 class SerializedModelTools(Type):
     _toSchema = {'uri': 'uri', 'version': 'version'}
     _toPy = {'uri': 'uri', 'version': 'version'}
+
     def __init__(self, uri=None, version=None, **unknown_fields):
         '''
         uri : str
@@ -22964,6 +23720,7 @@ class SerializedModelTools(Type):
 class SetConstraints(Type):
     _toSchema = {'application': 'application', 'constraints': 'constraints'}
     _toPy = {'application': 'application', 'constraints': 'constraints'}
+
     def __init__(self, application=None, constraints=None, **unknown_fields):
         '''
         application : str
@@ -22988,6 +23745,7 @@ class SetConstraints(Type):
 class SetExternalControllerInfoParams(Type):
     _toSchema = {'info': 'info'}
     _toPy = {'info': 'info'}
+
     def __init__(self, info=None, **unknown_fields):
         '''
         info : ExternalControllerInfo
@@ -23006,6 +23764,7 @@ class SetExternalControllerInfoParams(Type):
 class SetExternalControllersInfoParams(Type):
     _toSchema = {'controllers': 'controllers'}
     _toPy = {'controllers': 'controllers'}
+
     def __init__(self, controllers=None, **unknown_fields):
         '''
         controllers : typing.Sequence[~SetExternalControllerInfoParams]
@@ -23024,6 +23783,7 @@ class SetExternalControllersInfoParams(Type):
 class SetMachineBlockDevices(Type):
     _toSchema = {'machine_block_devices': 'machine-block-devices'}
     _toPy = {'machine-block-devices': 'machine_block_devices'}
+
     def __init__(self, machine_block_devices=None, **unknown_fields):
         '''
         machine_block_devices : typing.Sequence[~MachineBlockDevices]
@@ -23042,6 +23802,7 @@ class SetMachineBlockDevices(Type):
 class SetMachineNetworkConfig(Type):
     _toSchema = {'config': 'config', 'tag': 'tag'}
     _toPy = {'config': 'config', 'tag': 'tag'}
+
     def __init__(self, config=None, tag=None, **unknown_fields):
         '''
         config : typing.Sequence[~NetworkConfig]
@@ -23066,6 +23827,7 @@ class SetMachineNetworkConfig(Type):
 class SetMachinesAddresses(Type):
     _toSchema = {'machine_addresses': 'machine-addresses'}
     _toPy = {'machine-addresses': 'machine_addresses'}
+
     def __init__(self, machine_addresses=None, **unknown_fields):
         '''
         machine_addresses : typing.Sequence[~MachineAddresses]
@@ -23084,6 +23846,7 @@ class SetMachinesAddresses(Type):
 class SetMigrationPhaseArgs(Type):
     _toSchema = {'phase': 'phase'}
     _toPy = {'phase': 'phase'}
+
     def __init__(self, phase=None, **unknown_fields):
         '''
         phase : str
@@ -23102,6 +23865,7 @@ class SetMigrationPhaseArgs(Type):
 class SetMigrationStatusMessageArgs(Type):
     _toSchema = {'message': 'message'}
     _toPy = {'message': 'message'}
+
     def __init__(self, message=None, **unknown_fields):
         '''
         message : str
@@ -23120,6 +23884,7 @@ class SetMigrationStatusMessageArgs(Type):
 class SetModelDefaults(Type):
     _toSchema = {'config': 'config'}
     _toPy = {'config': 'config'}
+
     def __init__(self, config=None, **unknown_fields):
         '''
         config : typing.Sequence[~ModelDefaultValues]
@@ -23138,6 +23903,7 @@ class SetModelDefaults(Type):
 class SetModelEnvironVersion(Type):
     _toSchema = {'model_tag': 'model-tag', 'version': 'version'}
     _toPy = {'model-tag': 'model_tag', 'version': 'version'}
+
     def __init__(self, model_tag=None, version=None, **unknown_fields):
         '''
         model_tag : str
@@ -23162,6 +23928,7 @@ class SetModelEnvironVersion(Type):
 class SetModelEnvironVersions(Type):
     _toSchema = {'models': 'models'}
     _toPy = {'models': 'models'}
+
     def __init__(self, models=None, **unknown_fields):
         '''
         models : typing.Sequence[~SetModelEnvironVersion]
@@ -23180,6 +23947,7 @@ class SetModelEnvironVersions(Type):
 class SetPayloadStatusArg(Type):
     _toSchema = {'entity': 'Entity', 'status': 'status', 'tag': 'tag'}
     _toPy = {'Entity': 'entity', 'status': 'status', 'tag': 'tag'}
+
     def __init__(self, entity=None, status=None, tag=None, **unknown_fields):
         '''
         entity : Entity
@@ -23210,6 +23978,7 @@ class SetPayloadStatusArg(Type):
 class SetPayloadStatusArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~SetPayloadStatusArg]
@@ -23228,6 +23997,7 @@ class SetPayloadStatusArgs(Type):
 class SetPodSpecParams(Type):
     _toSchema = {'specs': 'specs'}
     _toPy = {'specs': 'specs'}
+
     def __init__(self, specs=None, **unknown_fields):
         '''
         specs : typing.Sequence[~EntityString]
@@ -23246,6 +24016,7 @@ class SetPodSpecParams(Type):
 class SetProfileArg(Type):
     _toSchema = {'entity': 'entity', 'profiles': 'profiles'}
     _toPy = {'entity': 'entity', 'profiles': 'profiles'}
+
     def __init__(self, entity=None, profiles=None, **unknown_fields):
         '''
         entity : Entity
@@ -23270,6 +24041,7 @@ class SetProfileArg(Type):
 class SetProfileArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~SetProfileArg]
@@ -23288,6 +24060,7 @@ class SetProfileArgs(Type):
 class SetProviderNetworkConfig(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~ProviderNetworkConfig]
@@ -23306,6 +24079,7 @@ class SetProviderNetworkConfig(Type):
 class SetProviderNetworkConfigResult(Type):
     _toSchema = {'addresses': 'addresses', 'error': 'error', 'modified': 'modified'}
     _toPy = {'addresses': 'addresses', 'error': 'error', 'modified': 'modified'}
+
     def __init__(self, addresses=None, error=None, modified=None, **unknown_fields):
         '''
         addresses : typing.Sequence[~Address]
@@ -23336,6 +24110,7 @@ class SetProviderNetworkConfigResult(Type):
 class SetProviderNetworkConfigResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~SetProviderNetworkConfigResult]
@@ -23354,6 +24129,7 @@ class SetProviderNetworkConfigResults(Type):
 class SetStatus(Type):
     _toSchema = {'entities': 'entities'}
     _toPy = {'entities': 'entities'}
+
     def __init__(self, entities=None, **unknown_fields):
         '''
         entities : typing.Sequence[~EntityStatusArgs]
@@ -23372,6 +24148,7 @@ class SetStatus(Type):
 class SetUnitStateArg(Type):
     _toSchema = {'charm_state': 'charm-state', 'meter_status_state': 'meter-status-state', 'relation_state': 'relation-state', 'secret_state': 'secret-state', 'storage_state': 'storage-state', 'tag': 'tag', 'uniter_state': 'uniter-state'}
     _toPy = {'charm-state': 'charm_state', 'meter-status-state': 'meter_status_state', 'relation-state': 'relation_state', 'secret-state': 'secret_state', 'storage-state': 'storage_state', 'tag': 'tag', 'uniter-state': 'uniter_state'}
+
     def __init__(self, charm_state=None, meter_status_state=None, relation_state=None, secret_state=None, storage_state=None, tag=None, uniter_state=None, **unknown_fields):
         '''
         charm_state : typing.Mapping[str, str]
@@ -23426,6 +24203,7 @@ class SetUnitStateArg(Type):
 class SetUnitStateArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~SetUnitStateArg]
@@ -23444,6 +24222,7 @@ class SetUnitStateArgs(Type):
 class Settings(Type):
     _toSchema = {'autonoproxy': 'AutoNoProxy', 'ftp': 'Ftp', 'http': 'Http', 'https': 'Https', 'noproxy': 'NoProxy'}
     _toPy = {'AutoNoProxy': 'autonoproxy', 'Ftp': 'ftp', 'Http': 'http', 'Https': 'https', 'NoProxy': 'noproxy'}
+
     def __init__(self, autonoproxy=None, ftp=None, http=None, https=None, noproxy=None, **unknown_fields):
         '''
         autonoproxy : str
@@ -23486,6 +24265,7 @@ class Settings(Type):
 class SettingsResult(Type):
     _toSchema = {'error': 'error', 'settings': 'settings'}
     _toPy = {'error': 'error', 'settings': 'settings'}
+
     def __init__(self, error=None, settings=None, **unknown_fields):
         '''
         error : Error
@@ -23510,6 +24290,7 @@ class SettingsResult(Type):
 class SettingsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~SettingsResult]
@@ -23528,6 +24309,7 @@ class SettingsResults(Type):
 class ShowSpaceResult(Type):
     _toSchema = {'applications': 'applications', 'error': 'error', 'machine_count': 'machine-count', 'space': 'space'}
     _toPy = {'applications': 'applications', 'error': 'error', 'machine-count': 'machine_count', 'space': 'space'}
+
     def __init__(self, applications=None, error=None, machine_count=None, space=None, **unknown_fields):
         '''
         applications : typing.Sequence[str]
@@ -23564,6 +24346,7 @@ class ShowSpaceResult(Type):
 class ShowSpaceResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ShowSpaceResult]
@@ -23582,6 +24365,7 @@ class ShowSpaceResults(Type):
 class SingularClaim(Type):
     _toSchema = {'claimant_tag': 'claimant-tag', 'duration': 'duration', 'entity_tag': 'entity-tag'}
     _toPy = {'claimant-tag': 'claimant_tag', 'duration': 'duration', 'entity-tag': 'entity_tag'}
+
     def __init__(self, claimant_tag=None, duration=None, entity_tag=None, **unknown_fields):
         '''
         claimant_tag : str
@@ -23612,6 +24396,7 @@ class SingularClaim(Type):
 class SingularClaims(Type):
     _toSchema = {'claims': 'claims'}
     _toPy = {'claims': 'claims'}
+
     def __init__(self, claims=None, **unknown_fields):
         '''
         claims : typing.Sequence[~SingularClaim]
@@ -23630,6 +24415,7 @@ class SingularClaims(Type):
 class Space(Type):
     _toSchema = {'error': 'error', 'id_': 'id', 'name': 'name', 'subnets': 'subnets'}
     _toPy = {'error': 'error', 'id': 'id_', 'name': 'name', 'subnets': 'subnets'}
+
     def __init__(self, error=None, id_=None, name=None, subnets=None, **unknown_fields):
         '''
         error : Error
@@ -23666,6 +24452,7 @@ class Space(Type):
 class SpaceInfo(Type):
     _toSchema = {'id_': 'id', 'name': 'name', 'provider_id': 'provider-id', 'subnets': 'subnets'}
     _toPy = {'id': 'id_', 'name': 'name', 'provider-id': 'provider_id', 'subnets': 'subnets'}
+
     def __init__(self, id_=None, name=None, provider_id=None, subnets=None, **unknown_fields):
         '''
         id_ : str
@@ -23702,6 +24489,7 @@ class SpaceInfo(Type):
 class SpaceInfos(Type):
     _toSchema = {'space_infos': 'space-infos'}
     _toPy = {'space-infos': 'space_infos'}
+
     def __init__(self, space_infos=None, **unknown_fields):
         '''
         space_infos : typing.Sequence[~SpaceInfo]
@@ -23720,6 +24508,7 @@ class SpaceInfos(Type):
 class SpaceInfosParams(Type):
     _toSchema = {'space_ids': 'space-ids'}
     _toPy = {'space-ids': 'space_ids'}
+
     def __init__(self, space_ids=None, **unknown_fields):
         '''
         space_ids : typing.Sequence[str]
@@ -23738,6 +24527,7 @@ class SpaceInfosParams(Type):
 class StateServingInfo(Type):
     _toSchema = {'api_port': 'api-port', 'ca_private_key': 'ca-private-key', 'cert': 'cert', 'controller_api_port': 'controller-api-port', 'private_key': 'private-key', 'shared_secret': 'shared-secret', 'state_port': 'state-port', 'system_identity': 'system-identity'}
     _toPy = {'api-port': 'api_port', 'ca-private-key': 'ca_private_key', 'cert': 'cert', 'controller-api-port': 'controller_api_port', 'private-key': 'private_key', 'shared-secret': 'shared_secret', 'state-port': 'state_port', 'system-identity': 'system_identity'}
+
     def __init__(self, api_port=None, ca_private_key=None, cert=None, controller_api_port=None, private_key=None, shared_secret=None, state_port=None, system_identity=None, **unknown_fields):
         '''
         api_port : int
@@ -23798,6 +24588,7 @@ class StateServingInfo(Type):
 class StatusHistoryFilter(Type):
     _toSchema = {'date': 'date', 'delta': 'delta', 'exclude': 'exclude', 'size': 'size'}
     _toPy = {'date': 'date', 'delta': 'delta', 'exclude': 'exclude', 'size': 'size'}
+
     def __init__(self, date=None, delta=None, exclude=None, size=None, **unknown_fields):
         '''
         date : str
@@ -23834,6 +24625,7 @@ class StatusHistoryFilter(Type):
 class StatusHistoryPruneArgs(Type):
     _toSchema = {'max_history_mb': 'max-history-mb', 'max_history_time': 'max-history-time'}
     _toPy = {'max-history-mb': 'max_history_mb', 'max-history-time': 'max_history_time'}
+
     def __init__(self, max_history_mb=None, max_history_time=None, **unknown_fields):
         '''
         max_history_mb : int
@@ -23858,6 +24650,7 @@ class StatusHistoryPruneArgs(Type):
 class StatusHistoryRequest(Type):
     _toSchema = {'filter_': 'filter', 'historykind': 'historyKind', 'size': 'size', 'tag': 'tag'}
     _toPy = {'filter': 'filter_', 'historyKind': 'historykind', 'size': 'size', 'tag': 'tag'}
+
     def __init__(self, filter_=None, historykind=None, size=None, tag=None, **unknown_fields):
         '''
         filter_ : StatusHistoryFilter
@@ -23894,6 +24687,7 @@ class StatusHistoryRequest(Type):
 class StatusHistoryRequests(Type):
     _toSchema = {'requests': 'requests'}
     _toPy = {'requests': 'requests'}
+
     def __init__(self, requests=None, **unknown_fields):
         '''
         requests : typing.Sequence[~StatusHistoryRequest]
@@ -23912,6 +24706,7 @@ class StatusHistoryRequests(Type):
 class StatusHistoryResult(Type):
     _toSchema = {'error': 'error', 'history': 'history'}
     _toPy = {'error': 'error', 'history': 'history'}
+
     def __init__(self, error=None, history=None, **unknown_fields):
         '''
         error : Error
@@ -23936,6 +24731,7 @@ class StatusHistoryResult(Type):
 class StatusHistoryResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~StatusHistoryResult]
@@ -23954,6 +24750,7 @@ class StatusHistoryResults(Type):
 class StatusParams(Type):
     _toSchema = {'include_storage': 'include-storage', 'patterns': 'patterns'}
     _toPy = {'include-storage': 'include_storage', 'patterns': 'patterns'}
+
     def __init__(self, include_storage=None, patterns=None, **unknown_fields):
         '''
         include_storage : bool
@@ -23978,6 +24775,7 @@ class StatusParams(Type):
 class StatusResult(Type):
     _toSchema = {'data': 'data', 'error': 'error', 'id_': 'id', 'info': 'info', 'life': 'life', 'since': 'since', 'status': 'status'}
     _toPy = {'data': 'data', 'error': 'error', 'id': 'id_', 'info': 'info', 'life': 'life', 'since': 'since', 'status': 'status'}
+
     def __init__(self, data=None, error=None, id_=None, info=None, life=None, since=None, status=None, **unknown_fields):
         '''
         data : typing.Mapping[str, typing.Any]
@@ -24032,6 +24830,7 @@ class StatusResult(Type):
 class StatusResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~StatusResult]
@@ -24050,6 +24849,7 @@ class StatusResults(Type):
 class StorageAddParams(Type):
     _toSchema = {'name': 'name', 'storage': 'storage', 'unit': 'unit'}
     _toPy = {'name': 'name', 'storage': 'storage', 'unit': 'unit'}
+
     def __init__(self, name=None, storage=None, unit=None, **unknown_fields):
         '''
         name : str
@@ -24080,6 +24880,7 @@ class StorageAddParams(Type):
 class StorageAttachment(Type):
     _toSchema = {'kind': 'kind', 'life': 'life', 'location': 'location', 'owner_tag': 'owner-tag', 'storage_tag': 'storage-tag', 'unit_tag': 'unit-tag'}
     _toPy = {'kind': 'kind', 'life': 'life', 'location': 'location', 'owner-tag': 'owner_tag', 'storage-tag': 'storage_tag', 'unit-tag': 'unit_tag'}
+
     def __init__(self, kind=None, life=None, location=None, owner_tag=None, storage_tag=None, unit_tag=None, **unknown_fields):
         '''
         kind : int
@@ -24128,6 +24929,7 @@ class StorageAttachment(Type):
 class StorageAttachmentDetails(Type):
     _toSchema = {'life': 'life', 'location': 'location', 'machine_tag': 'machine-tag', 'storage_tag': 'storage-tag', 'unit_tag': 'unit-tag'}
     _toPy = {'life': 'life', 'location': 'location', 'machine-tag': 'machine_tag', 'storage-tag': 'storage_tag', 'unit-tag': 'unit_tag'}
+
     def __init__(self, life=None, location=None, machine_tag=None, storage_tag=None, unit_tag=None, **unknown_fields):
         '''
         life : str
@@ -24170,6 +24972,7 @@ class StorageAttachmentDetails(Type):
 class StorageAttachmentId(Type):
     _toSchema = {'storage_tag': 'storage-tag', 'unit_tag': 'unit-tag'}
     _toPy = {'storage-tag': 'storage_tag', 'unit-tag': 'unit_tag'}
+
     def __init__(self, storage_tag=None, unit_tag=None, **unknown_fields):
         '''
         storage_tag : str
@@ -24194,6 +24997,7 @@ class StorageAttachmentId(Type):
 class StorageAttachmentIds(Type):
     _toSchema = {'ids': 'ids'}
     _toPy = {'ids': 'ids'}
+
     def __init__(self, ids=None, **unknown_fields):
         '''
         ids : typing.Sequence[~StorageAttachmentId]
@@ -24212,6 +25016,7 @@ class StorageAttachmentIds(Type):
 class StorageAttachmentIdsResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -24236,6 +25041,7 @@ class StorageAttachmentIdsResult(Type):
 class StorageAttachmentIdsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~StorageAttachmentIdsResult]
@@ -24254,6 +25060,7 @@ class StorageAttachmentIdsResults(Type):
 class StorageAttachmentResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -24278,6 +25085,7 @@ class StorageAttachmentResult(Type):
 class StorageAttachmentResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~StorageAttachmentResult]
@@ -24296,6 +25104,7 @@ class StorageAttachmentResults(Type):
 class StorageConstraints(Type):
     _toSchema = {'count': 'count', 'pool': 'pool', 'size': 'size'}
     _toPy = {'count': 'count', 'pool': 'pool', 'size': 'size'}
+
     def __init__(self, count=None, pool=None, size=None, **unknown_fields):
         '''
         count : int
@@ -24326,6 +25135,7 @@ class StorageConstraints(Type):
 class StorageDetachmentParams(Type):
     _toSchema = {'force': 'force', 'ids': 'ids', 'max_wait': 'max-wait'}
     _toPy = {'force': 'force', 'ids': 'ids', 'max-wait': 'max_wait'}
+
     def __init__(self, force=None, ids=None, max_wait=None, **unknown_fields):
         '''
         force : bool
@@ -24356,6 +25166,7 @@ class StorageDetachmentParams(Type):
 class StorageDetails(Type):
     _toSchema = {'attachments': 'attachments', 'kind': 'kind', 'life': 'life', 'owner_tag': 'owner-tag', 'persistent': 'persistent', 'status': 'status', 'storage_tag': 'storage-tag'}
     _toPy = {'attachments': 'attachments', 'kind': 'kind', 'life': 'life', 'owner-tag': 'owner_tag', 'persistent': 'persistent', 'status': 'status', 'storage-tag': 'storage_tag'}
+
     def __init__(self, attachments=None, kind=None, life=None, owner_tag=None, persistent=None, status=None, storage_tag=None, **unknown_fields):
         '''
         attachments : typing.Mapping[str, ~StorageAttachmentDetails]
@@ -24410,6 +25221,7 @@ class StorageDetails(Type):
 class StorageDetailsListResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -24434,6 +25246,7 @@ class StorageDetailsListResult(Type):
 class StorageDetailsListResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~StorageDetailsListResult]
@@ -24452,6 +25265,7 @@ class StorageDetailsListResults(Type):
 class StorageDetailsResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -24476,6 +25290,7 @@ class StorageDetailsResult(Type):
 class StorageDetailsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~StorageDetailsResult]
@@ -24494,6 +25309,7 @@ class StorageDetailsResults(Type):
 class StorageFilter(Type):
     _toSchema = {}
     _toPy = {}
+
     def __init__(self, **unknown_fields):
         '''
 
@@ -24505,6 +25321,7 @@ class StorageFilter(Type):
 class StorageFilters(Type):
     _toSchema = {'filters': 'filters'}
     _toPy = {'filters': 'filters'}
+
     def __init__(self, filters=None, **unknown_fields):
         '''
         filters : typing.Sequence[~StorageFilter]
@@ -24523,6 +25340,7 @@ class StorageFilters(Type):
 class StoragePool(Type):
     _toSchema = {'attrs': 'attrs', 'name': 'name', 'provider': 'provider'}
     _toPy = {'attrs': 'attrs', 'name': 'name', 'provider': 'provider'}
+
     def __init__(self, attrs=None, name=None, provider=None, **unknown_fields):
         '''
         attrs : typing.Mapping[str, typing.Any]
@@ -24553,6 +25371,7 @@ class StoragePool(Type):
 class StoragePoolArgs(Type):
     _toSchema = {'pools': 'pools'}
     _toPy = {'pools': 'pools'}
+
     def __init__(self, pools=None, **unknown_fields):
         '''
         pools : typing.Sequence[~StoragePool]
@@ -24571,6 +25390,7 @@ class StoragePoolArgs(Type):
 class StoragePoolDeleteArg(Type):
     _toSchema = {'name': 'name'}
     _toPy = {'name': 'name'}
+
     def __init__(self, name=None, **unknown_fields):
         '''
         name : str
@@ -24589,6 +25409,7 @@ class StoragePoolDeleteArg(Type):
 class StoragePoolDeleteArgs(Type):
     _toSchema = {'pools': 'pools'}
     _toPy = {'pools': 'pools'}
+
     def __init__(self, pools=None, **unknown_fields):
         '''
         pools : typing.Sequence[~StoragePoolDeleteArg]
@@ -24607,6 +25428,7 @@ class StoragePoolDeleteArgs(Type):
 class StoragePoolFilter(Type):
     _toSchema = {'names': 'names', 'providers': 'providers'}
     _toPy = {'names': 'names', 'providers': 'providers'}
+
     def __init__(self, names=None, providers=None, **unknown_fields):
         '''
         names : typing.Sequence[str]
@@ -24631,6 +25453,7 @@ class StoragePoolFilter(Type):
 class StoragePoolFilters(Type):
     _toSchema = {'filters': 'filters'}
     _toPy = {'filters': 'filters'}
+
     def __init__(self, filters=None, **unknown_fields):
         '''
         filters : typing.Sequence[~StoragePoolFilter]
@@ -24649,6 +25472,7 @@ class StoragePoolFilters(Type):
 class StoragePoolsResult(Type):
     _toSchema = {'error': 'error', 'storage_pools': 'storage-pools'}
     _toPy = {'error': 'error', 'storage-pools': 'storage_pools'}
+
     def __init__(self, error=None, storage_pools=None, **unknown_fields):
         '''
         error : Error
@@ -24673,6 +25497,7 @@ class StoragePoolsResult(Type):
 class StoragePoolsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~StoragePoolsResult]
@@ -24691,6 +25516,7 @@ class StoragePoolsResults(Type):
 class StoragesAddParams(Type):
     _toSchema = {'storages': 'storages'}
     _toPy = {'storages': 'storages'}
+
     def __init__(self, storages=None, **unknown_fields):
         '''
         storages : typing.Sequence[~StorageAddParams]
@@ -24709,6 +25535,7 @@ class StoragesAddParams(Type):
 class StringBoolResult(Type):
     _toSchema = {'error': 'error', 'ok': 'ok', 'result': 'result'}
     _toPy = {'error': 'error', 'ok': 'ok', 'result': 'result'}
+
     def __init__(self, error=None, ok=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -24739,6 +25566,7 @@ class StringBoolResult(Type):
 class StringBoolResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~StringBoolResult]
@@ -24757,6 +25585,7 @@ class StringBoolResults(Type):
 class StringResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -24781,6 +25610,7 @@ class StringResult(Type):
 class StringResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~StringResult]
@@ -24799,6 +25629,7 @@ class StringResults(Type):
 class StringsResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -24823,6 +25654,7 @@ class StringsResult(Type):
 class StringsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~StringsResult]
@@ -24841,6 +25673,7 @@ class StringsResults(Type):
 class StringsWatchResult(Type):
     _toSchema = {'changes': 'changes', 'error': 'error', 'watcher_id': 'watcher-id'}
     _toPy = {'changes': 'changes', 'error': 'error', 'watcher-id': 'watcher_id'}
+
     def __init__(self, changes=None, error=None, watcher_id=None, **unknown_fields):
         '''
         changes : typing.Sequence[str]
@@ -24871,6 +25704,7 @@ class StringsWatchResult(Type):
 class StringsWatchResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~StringsWatchResult]
@@ -24889,6 +25723,7 @@ class StringsWatchResults(Type):
 class Subnet(Type):
     _toSchema = {'cidr': 'cidr', 'life': 'life', 'provider_id': 'provider-id', 'provider_network_id': 'provider-network-id', 'provider_space_id': 'provider-space-id', 'space_tag': 'space-tag', 'status': 'status', 'vlan_tag': 'vlan-tag', 'zones': 'zones'}
     _toPy = {'cidr': 'cidr', 'life': 'life', 'provider-id': 'provider_id', 'provider-network-id': 'provider_network_id', 'provider-space-id': 'provider_space_id', 'space-tag': 'space_tag', 'status': 'status', 'vlan-tag': 'vlan_tag', 'zones': 'zones'}
+
     def __init__(self, cidr=None, life=None, provider_id=None, provider_network_id=None, provider_space_id=None, space_tag=None, status=None, vlan_tag=None, zones=None, **unknown_fields):
         '''
         cidr : str
@@ -24955,6 +25790,7 @@ class Subnet(Type):
 class SubnetV2(Type):
     _toSchema = {'cidr': 'cidr', 'id_': 'id', 'life': 'life', 'provider_id': 'provider-id', 'provider_network_id': 'provider-network-id', 'provider_space_id': 'provider-space-id', 'space_tag': 'space-tag', 'status': 'status', 'subnet': 'Subnet', 'vlan_tag': 'vlan-tag', 'zones': 'zones'}
     _toPy = {'Subnet': 'subnet', 'cidr': 'cidr', 'id': 'id_', 'life': 'life', 'provider-id': 'provider_id', 'provider-network-id': 'provider_network_id', 'provider-space-id': 'provider_space_id', 'space-tag': 'space_tag', 'status': 'status', 'vlan-tag': 'vlan_tag', 'zones': 'zones'}
+
     def __init__(self, subnet=None, cidr=None, id_=None, life=None, provider_id=None, provider_network_id=None, provider_space_id=None, space_tag=None, status=None, vlan_tag=None, zones=None, **unknown_fields):
         '''
         subnet : Subnet
@@ -25033,6 +25869,7 @@ class SubnetV2(Type):
 class SubnetV3(Type):
     _toSchema = {'cidr': 'cidr', 'fan_info': 'fan-info', 'id_': 'id', 'is_public': 'is-public', 'life': 'life', 'provider_id': 'provider-id', 'provider_network_id': 'provider-network-id', 'provider_space_id': 'provider-space-id', 'space_id': 'space-id', 'space_tag': 'space-tag', 'status': 'status', 'subnet': 'Subnet', 'subnetv2': 'SubnetV2', 'vlan_tag': 'vlan-tag', 'zones': 'zones'}
     _toPy = {'Subnet': 'subnet', 'SubnetV2': 'subnetv2', 'cidr': 'cidr', 'fan-info': 'fan_info', 'id': 'id_', 'is-public': 'is_public', 'life': 'life', 'provider-id': 'provider_id', 'provider-network-id': 'provider_network_id', 'provider-space-id': 'provider_space_id', 'space-id': 'space_id', 'space-tag': 'space_tag', 'status': 'status', 'vlan-tag': 'vlan_tag', 'zones': 'zones'}
+
     def __init__(self, subnet=None, subnetv2=None, cidr=None, fan_info=None, id_=None, is_public=None, life=None, provider_id=None, provider_network_id=None, provider_space_id=None, space_id=None, space_tag=None, status=None, vlan_tag=None, zones=None, **unknown_fields):
         '''
         subnet : Subnet
@@ -25135,6 +25972,7 @@ class SubnetV3(Type):
 class SubnetsFilters(Type):
     _toSchema = {'space_tag': 'space-tag', 'zone': 'zone'}
     _toPy = {'space-tag': 'space_tag', 'zone': 'zone'}
+
     def __init__(self, space_tag=None, zone=None, **unknown_fields):
         '''
         space_tag : str
@@ -25159,6 +25997,7 @@ class SubnetsFilters(Type):
 class SubnetsResult(Type):
     _toSchema = {'error': 'error', 'subnets': 'subnets'}
     _toPy = {'error': 'error', 'subnets': 'subnets'}
+
     def __init__(self, error=None, subnets=None, **unknown_fields):
         '''
         error : Error
@@ -25183,6 +26022,7 @@ class SubnetsResult(Type):
 class SubnetsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~SubnetsResult]
@@ -25201,6 +26041,7 @@ class SubnetsResults(Type):
 class SummaryWatcherID(Type):
     _toSchema = {'watcher_id': 'watcher-id'}
     _toPy = {'watcher-id': 'watcher_id'}
+
     def __init__(self, watcher_id=None, **unknown_fields):
         '''
         watcher_id : str
@@ -25219,6 +26060,7 @@ class SummaryWatcherID(Type):
 class SummaryWatcherNextResults(Type):
     _toSchema = {'models': 'models'}
     _toPy = {'models': 'models'}
+
     def __init__(self, models=None, **unknown_fields):
         '''
         models : typing.Sequence[~ModelAbstract]
@@ -25237,6 +26079,7 @@ class SummaryWatcherNextResults(Type):
 class SupportedFeature(Type):
     _toSchema = {'description': 'description', 'name': 'name', 'version': 'version'}
     _toPy = {'description': 'description', 'name': 'name', 'version': 'version'}
+
     def __init__(self, description=None, name=None, version=None, **unknown_fields):
         '''
         description : str
@@ -25267,6 +26110,7 @@ class SupportedFeature(Type):
 class TaggedCredential(Type):
     _toSchema = {'credential': 'credential', 'tag': 'tag'}
     _toPy = {'credential': 'credential', 'tag': 'tag'}
+
     def __init__(self, credential=None, tag=None, **unknown_fields):
         '''
         credential : CloudCredential
@@ -25291,6 +26135,7 @@ class TaggedCredential(Type):
 class TaggedCredentials(Type):
     _toSchema = {'credentials': 'credentials'}
     _toPy = {'credentials': 'credentials'}
+
     def __init__(self, credentials=None, **unknown_fields):
         '''
         credentials : typing.Sequence[~TaggedCredential]
@@ -25309,6 +26154,7 @@ class TaggedCredentials(Type):
 class TokenResult(Type):
     _toSchema = {'error': 'error', 'token': 'token'}
     _toPy = {'error': 'error', 'token': 'token'}
+
     def __init__(self, error=None, token=None, **unknown_fields):
         '''
         error : Error
@@ -25333,6 +26179,7 @@ class TokenResult(Type):
 class TokenResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~TokenResult]
@@ -25351,6 +26198,7 @@ class TokenResults(Type):
 class Tools(Type):
     _toSchema = {'sha256': 'sha256', 'size': 'size', 'url': 'url', 'version': 'version'}
     _toPy = {'sha256': 'sha256', 'size': 'size', 'url': 'url', 'version': 'version'}
+
     def __init__(self, sha256=None, size=None, url=None, version=None, **unknown_fields):
         '''
         sha256 : str
@@ -25387,6 +26235,7 @@ class Tools(Type):
 class ToolsResult(Type):
     _toSchema = {'error': 'error', 'tools': 'tools'}
     _toPy = {'error': 'error', 'tools': 'tools'}
+
     def __init__(self, error=None, tools=None, **unknown_fields):
         '''
         error : Error
@@ -25411,6 +26260,7 @@ class ToolsResult(Type):
 class ToolsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ToolsResult]
@@ -25429,6 +26279,7 @@ class ToolsResults(Type):
 class TrackPayloadArgs(Type):
     _toSchema = {'payloads': 'payloads'}
     _toPy = {'payloads': 'payloads'}
+
     def __init__(self, payloads=None, **unknown_fields):
         '''
         payloads : typing.Sequence[~Payload]
@@ -25447,6 +26298,7 @@ class TrackPayloadArgs(Type):
 class UndertakerModelInfo(Type):
     _toSchema = {'destroy_timeout': 'destroy-timeout', 'force_destroyed': 'force-destroyed', 'global_name': 'global-name', 'is_system': 'is-system', 'life': 'life', 'name': 'name', 'uuid': 'uuid'}
     _toPy = {'destroy-timeout': 'destroy_timeout', 'force-destroyed': 'force_destroyed', 'global-name': 'global_name', 'is-system': 'is_system', 'life': 'life', 'name': 'name', 'uuid': 'uuid'}
+
     def __init__(self, destroy_timeout=None, force_destroyed=None, global_name=None, is_system=None, life=None, name=None, uuid=None, **unknown_fields):
         '''
         destroy_timeout : int
@@ -25501,6 +26353,7 @@ class UndertakerModelInfo(Type):
 class UndertakerModelInfoResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -25525,6 +26378,7 @@ class UndertakerModelInfoResult(Type):
 class UnitInfoResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -25549,6 +26403,7 @@ class UnitInfoResult(Type):
 class UnitInfoResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~UnitInfoResult]
@@ -25567,6 +26422,7 @@ class UnitInfoResults(Type):
 class UnitRefreshResult(Type):
     _toSchema = {'error': 'Error', 'life': 'Life', 'provider_id': 'provider-id', 'resolved': 'Resolved'}
     _toPy = {'Error': 'error', 'Life': 'life', 'Resolved': 'resolved', 'provider-id': 'provider_id'}
+
     def __init__(self, error=None, life=None, resolved=None, provider_id=None, **unknown_fields):
         '''
         error : Error
@@ -25603,6 +26459,7 @@ class UnitRefreshResult(Type):
 class UnitRefreshResults(Type):
     _toSchema = {'results': 'Results'}
     _toPy = {'Results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~UnitRefreshResult]
@@ -25621,6 +26478,7 @@ class UnitRefreshResults(Type):
 class UnitResourceResult(Type):
     _toSchema = {'error': 'error', 'errorresult': 'ErrorResult', 'resource': 'resource'}
     _toPy = {'ErrorResult': 'errorresult', 'error': 'error', 'resource': 'resource'}
+
     def __init__(self, errorresult=None, error=None, resource=None, **unknown_fields):
         '''
         errorresult : ErrorResult
@@ -25651,6 +26509,7 @@ class UnitResourceResult(Type):
 class UnitResources(Type):
     _toSchema = {'download_progress': 'download-progress', 'entity': 'Entity', 'resources': 'resources', 'tag': 'tag'}
     _toPy = {'Entity': 'entity', 'download-progress': 'download_progress', 'resources': 'resources', 'tag': 'tag'}
+
     def __init__(self, entity=None, download_progress=None, resources=None, tag=None, **unknown_fields):
         '''
         entity : Entity
@@ -25687,6 +26546,7 @@ class UnitResources(Type):
 class UnitResourcesResult(Type):
     _toSchema = {'error': 'error', 'errorresult': 'ErrorResult', 'resources': 'resources'}
     _toPy = {'ErrorResult': 'errorresult', 'error': 'error', 'resources': 'resources'}
+
     def __init__(self, errorresult=None, error=None, resources=None, **unknown_fields):
         '''
         errorresult : ErrorResult
@@ -25717,6 +26577,7 @@ class UnitResourcesResult(Type):
 class UnitResult(Type):
     _toSchema = {'address': 'address', 'charm': 'charm', 'leader': 'leader', 'life': 'life', 'machine': 'machine', 'opened_ports': 'opened-ports', 'provider_id': 'provider-id', 'public_address': 'public-address', 'relation_data': 'relation-data', 'tag': 'tag', 'workload_version': 'workload-version'}
     _toPy = {'address': 'address', 'charm': 'charm', 'leader': 'leader', 'life': 'life', 'machine': 'machine', 'opened-ports': 'opened_ports', 'provider-id': 'provider_id', 'public-address': 'public_address', 'relation-data': 'relation_data', 'tag': 'tag', 'workload-version': 'workload_version'}
+
     def __init__(self, address=None, charm=None, leader=None, life=None, machine=None, opened_ports=None, provider_id=None, public_address=None, relation_data=None, tag=None, workload_version=None, **unknown_fields):
         '''
         address : str
@@ -25795,6 +26656,7 @@ class UnitResult(Type):
 class UnitSettings(Type):
     _toSchema = {'version': 'version'}
     _toPy = {'version': 'version'}
+
     def __init__(self, version=None, **unknown_fields):
         '''
         version : int
@@ -25813,6 +26675,7 @@ class UnitSettings(Type):
 class UnitStateResult(Type):
     _toSchema = {'charm_state': 'charm-state', 'error': 'error', 'meter_status_state': 'meter-status-state', 'relation_state': 'relation-state', 'secret_state': 'secret-state', 'storage_state': 'storage-state', 'uniter_state': 'uniter-state'}
     _toPy = {'charm-state': 'charm_state', 'error': 'error', 'meter-status-state': 'meter_status_state', 'relation-state': 'relation_state', 'secret-state': 'secret_state', 'storage-state': 'storage_state', 'uniter-state': 'uniter_state'}
+
     def __init__(self, charm_state=None, error=None, meter_status_state=None, relation_state=None, secret_state=None, storage_state=None, uniter_state=None, **unknown_fields):
         '''
         charm_state : typing.Mapping[str, str]
@@ -25867,6 +26730,7 @@ class UnitStateResult(Type):
 class UnitStateResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~UnitStateResult]
@@ -25885,6 +26749,7 @@ class UnitStateResults(Type):
 class UnitStatus(Type):
     _toSchema = {'address': 'address', 'agent_status': 'agent-status', 'charm': 'charm', 'leader': 'leader', 'machine': 'machine', 'opened_ports': 'opened-ports', 'provider_id': 'provider-id', 'public_address': 'public-address', 'subordinates': 'subordinates', 'workload_status': 'workload-status', 'workload_version': 'workload-version'}
     _toPy = {'address': 'address', 'agent-status': 'agent_status', 'charm': 'charm', 'leader': 'leader', 'machine': 'machine', 'opened-ports': 'opened_ports', 'provider-id': 'provider_id', 'public-address': 'public_address', 'subordinates': 'subordinates', 'workload-status': 'workload_status', 'workload-version': 'workload_version'}
+
     def __init__(self, address=None, agent_status=None, charm=None, leader=None, machine=None, opened_ports=None, provider_id=None, public_address=None, subordinates=None, workload_status=None, workload_version=None, **unknown_fields):
         '''
         address : str
@@ -25963,6 +26828,7 @@ class UnitStatus(Type):
 class UnitsResolved(Type):
     _toSchema = {'all_': 'all', 'retry': 'retry', 'tags': 'tags'}
     _toPy = {'all': 'all_', 'retry': 'retry', 'tags': 'tags'}
+
     def __init__(self, all_=None, retry=None, tags=None, **unknown_fields):
         '''
         all_ : bool
@@ -25993,6 +26859,7 @@ class UnitsResolved(Type):
 class UnsetModelDefaults(Type):
     _toSchema = {'keys': 'keys'}
     _toPy = {'keys': 'keys'}
+
     def __init__(self, keys=None, **unknown_fields):
         '''
         keys : typing.Sequence[~ModelUnsetKeys]
@@ -26011,6 +26878,7 @@ class UnsetModelDefaults(Type):
 class UpdateApplicationServiceArg(Type):
     _toSchema = {'addresses': 'addresses', 'application_tag': 'application-tag', 'generation': 'generation', 'provider_id': 'provider-id', 'scale': 'scale'}
     _toPy = {'addresses': 'addresses', 'application-tag': 'application_tag', 'generation': 'generation', 'provider-id': 'provider_id', 'scale': 'scale'}
+
     def __init__(self, addresses=None, application_tag=None, generation=None, provider_id=None, scale=None, **unknown_fields):
         '''
         addresses : typing.Sequence[~Address]
@@ -26053,6 +26921,7 @@ class UpdateApplicationServiceArg(Type):
 class UpdateApplicationServiceArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~UpdateApplicationServiceArg]
@@ -26071,6 +26940,7 @@ class UpdateApplicationServiceArgs(Type):
 class UpdateApplicationUnitArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~UpdateApplicationUnits]
@@ -26089,6 +26959,7 @@ class UpdateApplicationUnitArgs(Type):
 class UpdateApplicationUnitResult(Type):
     _toSchema = {'error': 'error', 'info': 'info'}
     _toPy = {'error': 'error', 'info': 'info'}
+
     def __init__(self, error=None, info=None, **unknown_fields):
         '''
         error : Error
@@ -26113,6 +26984,7 @@ class UpdateApplicationUnitResult(Type):
 class UpdateApplicationUnitResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~UpdateApplicationUnitResult]
@@ -26131,6 +27003,7 @@ class UpdateApplicationUnitResults(Type):
 class UpdateApplicationUnits(Type):
     _toSchema = {'application_tag': 'application-tag', 'generation': 'generation', 'scale': 'scale', 'status': 'status', 'units': 'units'}
     _toPy = {'application-tag': 'application_tag', 'generation': 'generation', 'scale': 'scale', 'status': 'status', 'units': 'units'}
+
     def __init__(self, application_tag=None, generation=None, scale=None, status=None, units=None, **unknown_fields):
         '''
         application_tag : str
@@ -26173,6 +27046,7 @@ class UpdateApplicationUnits(Type):
 class UpdateApplicationUnitsInfo(Type):
     _toSchema = {'units': 'units'}
     _toPy = {'units': 'units'}
+
     def __init__(self, units=None, **unknown_fields):
         '''
         units : typing.Sequence[~ApplicationUnitInfo]
@@ -26191,6 +27065,7 @@ class UpdateApplicationUnitsInfo(Type):
 class UpdateBehavior(Type):
     _toSchema = {'enable_os_refresh_update': 'enable-os-refresh-update', 'enable_os_upgrade': 'enable-os-upgrade'}
     _toPy = {'enable-os-refresh-update': 'enable_os_refresh_update', 'enable-os-upgrade': 'enable_os_upgrade'}
+
     def __init__(self, enable_os_refresh_update=None, enable_os_upgrade=None, **unknown_fields):
         '''
         enable_os_refresh_update : bool
@@ -26215,6 +27090,7 @@ class UpdateBehavior(Type):
 class UpdateChannelArg(Type):
     _toSchema = {'channel': 'channel', 'force': 'force', 'tag': 'tag'}
     _toPy = {'channel': 'channel', 'force': 'force', 'tag': 'tag'}
+
     def __init__(self, channel=None, force=None, tag=None, **unknown_fields):
         '''
         channel : str
@@ -26245,6 +27121,7 @@ class UpdateChannelArg(Type):
 class UpdateChannelArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~UpdateChannelArg]
@@ -26263,6 +27140,7 @@ class UpdateChannelArgs(Type):
 class UpdateCloudArgs(Type):
     _toSchema = {'clouds': 'clouds'}
     _toPy = {'clouds': 'clouds'}
+
     def __init__(self, clouds=None, **unknown_fields):
         '''
         clouds : typing.Sequence[~AddCloudArgs]
@@ -26281,6 +27159,7 @@ class UpdateCloudArgs(Type):
 class UpdateControllerForModel(Type):
     _toSchema = {'info': 'info', 'model_tag': 'model-tag'}
     _toPy = {'info': 'info', 'model-tag': 'model_tag'}
+
     def __init__(self, info=None, model_tag=None, **unknown_fields):
         '''
         info : ExternalControllerInfo
@@ -26305,6 +27184,7 @@ class UpdateControllerForModel(Type):
 class UpdateControllersForModelsParams(Type):
     _toSchema = {'changes': 'changes'}
     _toPy = {'changes': 'changes'}
+
     def __init__(self, changes=None, **unknown_fields):
         '''
         changes : typing.Sequence[~UpdateControllerForModel]
@@ -26323,6 +27203,7 @@ class UpdateControllersForModelsParams(Type):
 class UpdateCredentialArgs(Type):
     _toSchema = {'credentials': 'credentials', 'force': 'force'}
     _toPy = {'credentials': 'credentials', 'force': 'force'}
+
     def __init__(self, credentials=None, force=None, **unknown_fields):
         '''
         credentials : typing.Sequence[~TaggedCredential]
@@ -26347,6 +27228,7 @@ class UpdateCredentialArgs(Type):
 class UpdateCredentialModelResult(Type):
     _toSchema = {'errors': 'errors', 'name': 'name', 'uuid': 'uuid'}
     _toPy = {'errors': 'errors', 'name': 'name', 'uuid': 'uuid'}
+
     def __init__(self, errors=None, name=None, uuid=None, **unknown_fields):
         '''
         errors : typing.Sequence[~ErrorResult]
@@ -26377,6 +27259,7 @@ class UpdateCredentialModelResult(Type):
 class UpdateCredentialResult(Type):
     _toSchema = {'error': 'error', 'models': 'models', 'tag': 'tag'}
     _toPy = {'error': 'error', 'models': 'models', 'tag': 'tag'}
+
     def __init__(self, error=None, models=None, tag=None, **unknown_fields):
         '''
         error : Error
@@ -26407,6 +27290,7 @@ class UpdateCredentialResult(Type):
 class UpdateCredentialResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~UpdateCredentialResult]
@@ -26425,6 +27309,7 @@ class UpdateCredentialResults(Type):
 class UpdateSecretArg(Type):
     _toSchema = {'content': 'content', 'description': 'description', 'expire_time': 'expire-time', 'label': 'label', 'params': 'params', 'rotate_policy': 'rotate-policy', 'upsertsecretarg': 'UpsertSecretArg', 'uri': 'uri'}
     _toPy = {'UpsertSecretArg': 'upsertsecretarg', 'content': 'content', 'description': 'description', 'expire-time': 'expire_time', 'label': 'label', 'params': 'params', 'rotate-policy': 'rotate_policy', 'uri': 'uri'}
+
     def __init__(self, upsertsecretarg=None, content=None, description=None, expire_time=None, label=None, params=None, rotate_policy=None, uri=None, **unknown_fields):
         '''
         upsertsecretarg : UpsertSecretArg
@@ -26485,6 +27370,7 @@ class UpdateSecretArg(Type):
 class UpdateSecretArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~UpdateSecretArg]
@@ -26503,6 +27389,7 @@ class UpdateSecretArgs(Type):
 class UpdateSecretBackendArg(Type):
     _toSchema = {'config': 'config', 'force': 'force', 'name': 'name', 'name_change': 'name-change', 'reset': 'reset', 'token_rotate_interval': 'token-rotate-interval'}
     _toPy = {'config': 'config', 'force': 'force', 'name': 'name', 'name-change': 'name_change', 'reset': 'reset', 'token-rotate-interval': 'token_rotate_interval'}
+
     def __init__(self, config=None, force=None, name=None, name_change=None, reset=None, token_rotate_interval=None, **unknown_fields):
         '''
         config : typing.Mapping[str, typing.Any]
@@ -26551,6 +27438,7 @@ class UpdateSecretBackendArg(Type):
 class UpdateSecretBackendArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~UpdateSecretBackendArg]
@@ -26569,6 +27457,7 @@ class UpdateSecretBackendArgs(Type):
 class UpdateUserSecretArg(Type):
     _toSchema = {'auto_prune': 'auto-prune', 'content': 'content', 'description': 'description', 'existing_label': 'existing-label', 'expire_time': 'expire-time', 'label': 'label', 'params': 'params', 'rotate_policy': 'rotate-policy', 'upsertsecretarg': 'UpsertSecretArg', 'uri': 'uri'}
     _toPy = {'UpsertSecretArg': 'upsertsecretarg', 'auto-prune': 'auto_prune', 'content': 'content', 'description': 'description', 'existing-label': 'existing_label', 'expire-time': 'expire_time', 'label': 'label', 'params': 'params', 'rotate-policy': 'rotate_policy', 'uri': 'uri'}
+
     def __init__(self, upsertsecretarg=None, auto_prune=None, content=None, description=None, existing_label=None, expire_time=None, label=None, params=None, rotate_policy=None, uri=None, **unknown_fields):
         '''
         upsertsecretarg : UpsertSecretArg
@@ -26641,6 +27530,7 @@ class UpdateUserSecretArg(Type):
 class UpdateUserSecretArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~UpdateUserSecretArg]
@@ -26659,6 +27549,7 @@ class UpdateUserSecretArgs(Type):
 class UpgradeModelParams(Type):
     _toSchema = {'agent_stream': 'agent-stream', 'dry_run': 'dry-run', 'ignore_agent_versions': 'ignore-agent-versions', 'model_tag': 'model-tag', 'target_version': 'target-version'}
     _toPy = {'agent-stream': 'agent_stream', 'dry-run': 'dry_run', 'ignore-agent-versions': 'ignore_agent_versions', 'model-tag': 'model_tag', 'target-version': 'target_version'}
+
     def __init__(self, agent_stream=None, dry_run=None, ignore_agent_versions=None, model_tag=None, target_version=None, **unknown_fields):
         '''
         agent_stream : str
@@ -26701,6 +27592,7 @@ class UpgradeModelParams(Type):
 class UpgradeModelResult(Type):
     _toSchema = {'chosen_version': 'chosen-version', 'error': 'error'}
     _toPy = {'chosen-version': 'chosen_version', 'error': 'error'}
+
     def __init__(self, chosen_version=None, error=None, **unknown_fields):
         '''
         chosen_version : Number
@@ -26725,6 +27617,7 @@ class UpgradeModelResult(Type):
 class UpgradeSeriesNotificationParam(Type):
     _toSchema = {'entity': 'entity', 'watcher_id': 'watcher-id'}
     _toPy = {'entity': 'entity', 'watcher-id': 'watcher_id'}
+
     def __init__(self, entity=None, watcher_id=None, **unknown_fields):
         '''
         entity : Entity
@@ -26749,6 +27642,7 @@ class UpgradeSeriesNotificationParam(Type):
 class UpgradeSeriesNotificationParams(Type):
     _toSchema = {'params': 'params'}
     _toPy = {'params': 'params'}
+
     def __init__(self, params=None, **unknown_fields):
         '''
         params : typing.Sequence[~UpgradeSeriesNotificationParam]
@@ -26767,6 +27661,7 @@ class UpgradeSeriesNotificationParams(Type):
 class UpgradeSeriesStartUnitCompletionParam(Type):
     _toSchema = {'entities': 'entities', 'message': 'message'}
     _toPy = {'entities': 'entities', 'message': 'message'}
+
     def __init__(self, entities=None, message=None, **unknown_fields):
         '''
         entities : typing.Sequence[~Entity]
@@ -26791,6 +27686,7 @@ class UpgradeSeriesStartUnitCompletionParam(Type):
 class UpgradeSeriesStatusParam(Type):
     _toSchema = {'entity': 'entity', 'message': 'message', 'status': 'status'}
     _toPy = {'entity': 'entity', 'message': 'message', 'status': 'status'}
+
     def __init__(self, entity=None, message=None, status=None, **unknown_fields):
         '''
         entity : Entity
@@ -26821,6 +27717,7 @@ class UpgradeSeriesStatusParam(Type):
 class UpgradeSeriesStatusParams(Type):
     _toSchema = {'params': 'params'}
     _toPy = {'params': 'params'}
+
     def __init__(self, params=None, **unknown_fields):
         '''
         params : typing.Sequence[~UpgradeSeriesStatusParam]
@@ -26839,6 +27736,7 @@ class UpgradeSeriesStatusParams(Type):
 class UpgradeSeriesStatusResult(Type):
     _toSchema = {'error': 'error', 'status': 'status', 'target': 'target'}
     _toPy = {'error': 'error', 'status': 'status', 'target': 'target'}
+
     def __init__(self, error=None, status=None, target=None, **unknown_fields):
         '''
         error : Error
@@ -26869,6 +27767,7 @@ class UpgradeSeriesStatusResult(Type):
 class UpgradeSeriesStatusResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~UpgradeSeriesStatusResult]
@@ -26887,6 +27786,7 @@ class UpgradeSeriesStatusResults(Type):
 class UpgradeSeriesUnitsResult(Type):
     _toSchema = {'error': 'error', 'unit_names': 'unit-names'}
     _toPy = {'error': 'error', 'unit-names': 'unit_names'}
+
     def __init__(self, error=None, unit_names=None, **unknown_fields):
         '''
         error : Error
@@ -26911,6 +27811,7 @@ class UpgradeSeriesUnitsResult(Type):
 class UpgradeSeriesUnitsResults(Type):
     _toSchema = {'results': 'Results'}
     _toPy = {'Results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~UpgradeSeriesUnitsResult]
@@ -26929,6 +27830,7 @@ class UpgradeSeriesUnitsResults(Type):
 class UpsertSecretArg(Type):
     _toSchema = {'content': 'content', 'description': 'description', 'expire_time': 'expire-time', 'label': 'label', 'params': 'params', 'rotate_policy': 'rotate-policy'}
     _toPy = {'content': 'content', 'description': 'description', 'expire-time': 'expire_time', 'label': 'label', 'params': 'params', 'rotate-policy': 'rotate_policy'}
+
     def __init__(self, content=None, description=None, expire_time=None, label=None, params=None, rotate_policy=None, **unknown_fields):
         '''
         content : SecretContentParams
@@ -26977,6 +27879,7 @@ class UpsertSecretArg(Type):
 class UserAccess(Type):
     _toSchema = {'access': 'access', 'user_tag': 'user-tag'}
     _toPy = {'access': 'access', 'user-tag': 'user_tag'}
+
     def __init__(self, access=None, user_tag=None, **unknown_fields):
         '''
         access : str
@@ -27001,6 +27904,7 @@ class UserAccess(Type):
 class UserAccessResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -27025,6 +27929,7 @@ class UserAccessResult(Type):
 class UserAccessResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~UserAccessResult]
@@ -27043,6 +27948,7 @@ class UserAccessResults(Type):
 class UserCloud(Type):
     _toSchema = {'cloud_tag': 'cloud-tag', 'user_tag': 'user-tag'}
     _toPy = {'cloud-tag': 'cloud_tag', 'user-tag': 'user_tag'}
+
     def __init__(self, cloud_tag=None, user_tag=None, **unknown_fields):
         '''
         cloud_tag : str
@@ -27067,6 +27973,7 @@ class UserCloud(Type):
 class UserClouds(Type):
     _toSchema = {'user_clouds': 'user-clouds'}
     _toPy = {'user-clouds': 'user_clouds'}
+
     def __init__(self, user_clouds=None, **unknown_fields):
         '''
         user_clouds : typing.Sequence[~UserCloud]
@@ -27085,6 +27992,7 @@ class UserClouds(Type):
 class UserInfo(Type):
     _toSchema = {'access': 'access', 'created_by': 'created-by', 'date_created': 'date-created', 'disabled': 'disabled', 'display_name': 'display-name', 'last_connection': 'last-connection', 'username': 'username'}
     _toPy = {'access': 'access', 'created-by': 'created_by', 'date-created': 'date_created', 'disabled': 'disabled', 'display-name': 'display_name', 'last-connection': 'last_connection', 'username': 'username'}
+
     def __init__(self, access=None, created_by=None, date_created=None, disabled=None, display_name=None, last_connection=None, username=None, **unknown_fields):
         '''
         access : str
@@ -27139,6 +28047,7 @@ class UserInfo(Type):
 class UserInfoRequest(Type):
     _toSchema = {'entities': 'entities', 'include_disabled': 'include-disabled'}
     _toPy = {'entities': 'entities', 'include-disabled': 'include_disabled'}
+
     def __init__(self, entities=None, include_disabled=None, **unknown_fields):
         '''
         entities : typing.Sequence[~Entity]
@@ -27163,6 +28072,7 @@ class UserInfoRequest(Type):
 class UserInfoResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -27187,6 +28097,7 @@ class UserInfoResult(Type):
 class UserInfoResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~UserInfoResult]
@@ -27205,6 +28116,7 @@ class UserInfoResults(Type):
 class UserModel(Type):
     _toSchema = {'last_connection': 'last-connection', 'model': 'model'}
     _toPy = {'last-connection': 'last_connection', 'model': 'model'}
+
     def __init__(self, last_connection=None, model=None, **unknown_fields):
         '''
         last_connection : str
@@ -27229,6 +28141,7 @@ class UserModel(Type):
 class UserModelList(Type):
     _toSchema = {'user_models': 'user-models'}
     _toPy = {'user-models': 'user_models'}
+
     def __init__(self, user_models=None, **unknown_fields):
         '''
         user_models : typing.Sequence[~UserModel]
@@ -27247,6 +28160,7 @@ class UserModelList(Type):
 class Value(Type):
     _toSchema = {'allocate_public_ip': 'allocate-public-ip', 'arch': 'arch', 'container': 'container', 'cores': 'cores', 'cpu_power': 'cpu-power', 'image_id': 'image-id', 'instance_role': 'instance-role', 'instance_type': 'instance-type', 'mem': 'mem', 'root_disk': 'root-disk', 'root_disk_source': 'root-disk-source', 'spaces': 'spaces', 'tags': 'tags', 'virt_type': 'virt-type', 'zones': 'zones'}
     _toPy = {'allocate-public-ip': 'allocate_public_ip', 'arch': 'arch', 'container': 'container', 'cores': 'cores', 'cpu-power': 'cpu_power', 'image-id': 'image_id', 'instance-role': 'instance_role', 'instance-type': 'instance_type', 'mem': 'mem', 'root-disk': 'root_disk', 'root-disk-source': 'root_disk_source', 'spaces': 'spaces', 'tags': 'tags', 'virt-type': 'virt_type', 'zones': 'zones'}
+
     def __init__(self, allocate_public_ip=None, arch=None, container=None, cores=None, cpu_power=None, image_id=None, instance_role=None, instance_type=None, mem=None, root_disk=None, root_disk_source=None, spaces=None, tags=None, virt_type=None, zones=None, **unknown_fields):
         '''
         allocate_public_ip : bool
@@ -27349,6 +28263,7 @@ class Value(Type):
 class Version(Type):
     _toSchema = {'version': 'version'}
     _toPy = {'version': 'version'}
+
     def __init__(self, version=None, **unknown_fields):
         '''
         version : Binary
@@ -27367,6 +28282,7 @@ class Version(Type):
 class VersionResult(Type):
     _toSchema = {'error': 'error', 'version': 'version'}
     _toPy = {'error': 'error', 'version': 'version'}
+
     def __init__(self, error=None, version=None, **unknown_fields):
         '''
         error : Error
@@ -27391,6 +28307,7 @@ class VersionResult(Type):
 class VersionResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~VersionResult]
@@ -27409,6 +28326,7 @@ class VersionResults(Type):
 class Volume(Type):
     _toSchema = {'info': 'info', 'volume_tag': 'volume-tag'}
     _toPy = {'info': 'info', 'volume-tag': 'volume_tag'}
+
     def __init__(self, info=None, volume_tag=None, **unknown_fields):
         '''
         info : VolumeInfo
@@ -27433,6 +28351,7 @@ class Volume(Type):
 class VolumeAttachment(Type):
     _toSchema = {'info': 'info', 'machine_tag': 'machine-tag', 'volume_tag': 'volume-tag'}
     _toPy = {'info': 'info', 'machine-tag': 'machine_tag', 'volume-tag': 'volume_tag'}
+
     def __init__(self, info=None, machine_tag=None, volume_tag=None, **unknown_fields):
         '''
         info : VolumeAttachmentInfo
@@ -27463,6 +28382,7 @@ class VolumeAttachment(Type):
 class VolumeAttachmentDetails(Type):
     _toSchema = {'bus_address': 'bus-address', 'device_link': 'device-link', 'device_name': 'device-name', 'life': 'life', 'plan_info': 'plan-info', 'read_only': 'read-only', 'volumeattachmentinfo': 'VolumeAttachmentInfo'}
     _toPy = {'VolumeAttachmentInfo': 'volumeattachmentinfo', 'bus-address': 'bus_address', 'device-link': 'device_link', 'device-name': 'device_name', 'life': 'life', 'plan-info': 'plan_info', 'read-only': 'read_only'}
+
     def __init__(self, volumeattachmentinfo=None, bus_address=None, device_link=None, device_name=None, life=None, plan_info=None, read_only=None, **unknown_fields):
         '''
         volumeattachmentinfo : VolumeAttachmentInfo
@@ -27517,6 +28437,7 @@ class VolumeAttachmentDetails(Type):
 class VolumeAttachmentInfo(Type):
     _toSchema = {'bus_address': 'bus-address', 'device_link': 'device-link', 'device_name': 'device-name', 'plan_info': 'plan-info', 'read_only': 'read-only'}
     _toPy = {'bus-address': 'bus_address', 'device-link': 'device_link', 'device-name': 'device_name', 'plan-info': 'plan_info', 'read-only': 'read_only'}
+
     def __init__(self, bus_address=None, device_link=None, device_name=None, plan_info=None, read_only=None, **unknown_fields):
         '''
         bus_address : str
@@ -27559,6 +28480,7 @@ class VolumeAttachmentInfo(Type):
 class VolumeAttachmentParams(Type):
     _toSchema = {'instance_id': 'instance-id', 'machine_tag': 'machine-tag', 'provider': 'provider', 'read_only': 'read-only', 'volume_id': 'volume-id', 'volume_tag': 'volume-tag'}
     _toPy = {'instance-id': 'instance_id', 'machine-tag': 'machine_tag', 'provider': 'provider', 'read-only': 'read_only', 'volume-id': 'volume_id', 'volume-tag': 'volume_tag'}
+
     def __init__(self, instance_id=None, machine_tag=None, provider=None, read_only=None, volume_id=None, volume_tag=None, **unknown_fields):
         '''
         instance_id : str
@@ -27607,6 +28529,7 @@ class VolumeAttachmentParams(Type):
 class VolumeAttachmentParamsResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -27631,6 +28554,7 @@ class VolumeAttachmentParamsResult(Type):
 class VolumeAttachmentParamsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~VolumeAttachmentParamsResult]
@@ -27649,6 +28573,7 @@ class VolumeAttachmentParamsResults(Type):
 class VolumeAttachmentPlan(Type):
     _toSchema = {'block_device': 'block-device', 'life': 'life', 'machine_tag': 'machine-tag', 'plan_info': 'plan-info', 'volume_tag': 'volume-tag'}
     _toPy = {'block-device': 'block_device', 'life': 'life', 'machine-tag': 'machine_tag', 'plan-info': 'plan_info', 'volume-tag': 'volume_tag'}
+
     def __init__(self, block_device=None, life=None, machine_tag=None, plan_info=None, volume_tag=None, **unknown_fields):
         '''
         block_device : BlockDevice
@@ -27691,6 +28616,7 @@ class VolumeAttachmentPlan(Type):
 class VolumeAttachmentPlanInfo(Type):
     _toSchema = {'device_attributes': 'device-attributes', 'device_type': 'device-type'}
     _toPy = {'device-attributes': 'device_attributes', 'device-type': 'device_type'}
+
     def __init__(self, device_attributes=None, device_type=None, **unknown_fields):
         '''
         device_attributes : typing.Mapping[str, str]
@@ -27715,6 +28641,7 @@ class VolumeAttachmentPlanInfo(Type):
 class VolumeAttachmentPlanResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -27739,6 +28666,7 @@ class VolumeAttachmentPlanResult(Type):
 class VolumeAttachmentPlanResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~VolumeAttachmentPlanResult]
@@ -27757,6 +28685,7 @@ class VolumeAttachmentPlanResults(Type):
 class VolumeAttachmentPlans(Type):
     _toSchema = {'volume_plans': 'volume-plans'}
     _toPy = {'volume-plans': 'volume_plans'}
+
     def __init__(self, volume_plans=None, **unknown_fields):
         '''
         volume_plans : typing.Sequence[~VolumeAttachmentPlan]
@@ -27775,6 +28704,7 @@ class VolumeAttachmentPlans(Type):
 class VolumeAttachmentResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -27799,6 +28729,7 @@ class VolumeAttachmentResult(Type):
 class VolumeAttachmentResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~VolumeAttachmentResult]
@@ -27817,6 +28748,7 @@ class VolumeAttachmentResults(Type):
 class VolumeAttachments(Type):
     _toSchema = {'volume_attachments': 'volume-attachments'}
     _toPy = {'volume-attachments': 'volume_attachments'}
+
     def __init__(self, volume_attachments=None, **unknown_fields):
         '''
         volume_attachments : typing.Sequence[~VolumeAttachment]
@@ -27835,6 +28767,7 @@ class VolumeAttachments(Type):
 class VolumeDetails(Type):
     _toSchema = {'info': 'info', 'life': 'life', 'machine_attachments': 'machine-attachments', 'status': 'status', 'storage': 'storage', 'unit_attachments': 'unit-attachments', 'volume_tag': 'volume-tag'}
     _toPy = {'info': 'info', 'life': 'life', 'machine-attachments': 'machine_attachments', 'status': 'status', 'storage': 'storage', 'unit-attachments': 'unit_attachments', 'volume-tag': 'volume_tag'}
+
     def __init__(self, info=None, life=None, machine_attachments=None, status=None, storage=None, unit_attachments=None, volume_tag=None, **unknown_fields):
         '''
         info : VolumeInfo
@@ -27889,6 +28822,7 @@ class VolumeDetails(Type):
 class VolumeDetailsListResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -27913,6 +28847,7 @@ class VolumeDetailsListResult(Type):
 class VolumeDetailsListResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~VolumeDetailsListResult]
@@ -27931,6 +28866,7 @@ class VolumeDetailsListResults(Type):
 class VolumeFilter(Type):
     _toSchema = {'machines': 'machines'}
     _toPy = {'machines': 'machines'}
+
     def __init__(self, machines=None, **unknown_fields):
         '''
         machines : typing.Sequence[str]
@@ -27949,6 +28885,7 @@ class VolumeFilter(Type):
 class VolumeFilters(Type):
     _toSchema = {'filters': 'filters'}
     _toPy = {'filters': 'filters'}
+
     def __init__(self, filters=None, **unknown_fields):
         '''
         filters : typing.Sequence[~VolumeFilter]
@@ -27967,6 +28904,7 @@ class VolumeFilters(Type):
 class VolumeInfo(Type):
     _toSchema = {'hardware_id': 'hardware-id', 'persistent': 'persistent', 'pool': 'pool', 'size': 'size', 'volume_id': 'volume-id', 'wwn': 'wwn'}
     _toPy = {'hardware-id': 'hardware_id', 'persistent': 'persistent', 'pool': 'pool', 'size': 'size', 'volume-id': 'volume_id', 'wwn': 'wwn'}
+
     def __init__(self, hardware_id=None, persistent=None, pool=None, size=None, volume_id=None, wwn=None, **unknown_fields):
         '''
         hardware_id : str
@@ -28015,6 +28953,7 @@ class VolumeInfo(Type):
 class VolumeParams(Type):
     _toSchema = {'attachment': 'attachment', 'attributes': 'attributes', 'provider': 'provider', 'size': 'size', 'tags': 'tags', 'volume_tag': 'volume-tag'}
     _toPy = {'attachment': 'attachment', 'attributes': 'attributes', 'provider': 'provider', 'size': 'size', 'tags': 'tags', 'volume-tag': 'volume_tag'}
+
     def __init__(self, attachment=None, attributes=None, provider=None, size=None, tags=None, volume_tag=None, **unknown_fields):
         '''
         attachment : VolumeAttachmentParams
@@ -28063,6 +29002,7 @@ class VolumeParams(Type):
 class VolumeParamsResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -28087,6 +29027,7 @@ class VolumeParamsResult(Type):
 class VolumeParamsResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~VolumeParamsResult]
@@ -28105,6 +29046,7 @@ class VolumeParamsResults(Type):
 class VolumeResult(Type):
     _toSchema = {'error': 'error', 'result': 'result'}
     _toPy = {'error': 'error', 'result': 'result'}
+
     def __init__(self, error=None, result=None, **unknown_fields):
         '''
         error : Error
@@ -28129,6 +29071,7 @@ class VolumeResult(Type):
 class VolumeResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~VolumeResult]
@@ -28147,6 +29090,7 @@ class VolumeResults(Type):
 class Volumes(Type):
     _toSchema = {'volumes': 'volumes'}
     _toPy = {'volumes': 'volumes'}
+
     def __init__(self, volumes=None, **unknown_fields):
         '''
         volumes : typing.Sequence[~Volume]
@@ -28165,6 +29109,7 @@ class Volumes(Type):
 class WatchContainer(Type):
     _toSchema = {'container_type': 'container-type', 'machine_tag': 'machine-tag'}
     _toPy = {'container-type': 'container_type', 'machine-tag': 'machine_tag'}
+
     def __init__(self, container_type=None, machine_tag=None, **unknown_fields):
         '''
         container_type : str
@@ -28189,6 +29134,7 @@ class WatchContainer(Type):
 class WatchContainerStartArg(Type):
     _toSchema = {'container': 'container', 'entity': 'entity'}
     _toPy = {'container': 'container', 'entity': 'entity'}
+
     def __init__(self, container=None, entity=None, **unknown_fields):
         '''
         container : str
@@ -28213,6 +29159,7 @@ class WatchContainerStartArg(Type):
 class WatchContainerStartArgs(Type):
     _toSchema = {'args': 'args'}
     _toPy = {'args': 'args'}
+
     def __init__(self, args=None, **unknown_fields):
         '''
         args : typing.Sequence[~WatchContainerStartArg]
@@ -28231,6 +29178,7 @@ class WatchContainerStartArgs(Type):
 class WatchContainers(Type):
     _toSchema = {'params': 'params'}
     _toPy = {'params': 'params'}
+
     def __init__(self, params=None, **unknown_fields):
         '''
         params : typing.Sequence[~WatchContainer]
@@ -28249,6 +29197,7 @@ class WatchContainers(Type):
 class WatchRemoteSecretChangesArg(Type):
     _toSchema = {'application_token': 'application-token', 'bakery_version': 'bakery-version', 'macaroons': 'macaroons', 'relation_token': 'relation-token'}
     _toPy = {'application-token': 'application_token', 'bakery-version': 'bakery_version', 'macaroons': 'macaroons', 'relation-token': 'relation_token'}
+
     def __init__(self, application_token=None, bakery_version=None, macaroons=None, relation_token=None, **unknown_fields):
         '''
         application_token : str
@@ -28285,6 +29234,7 @@ class WatchRemoteSecretChangesArg(Type):
 class WatchRemoteSecretChangesArgs(Type):
     _toSchema = {'relations': 'relations'}
     _toPy = {'relations': 'relations'}
+
     def __init__(self, relations=None, **unknown_fields):
         '''
         relations : typing.Sequence[~WatchRemoteSecretChangesArg]
@@ -28303,6 +29253,7 @@ class WatchRemoteSecretChangesArgs(Type):
 class ZoneResult(Type):
     _toSchema = {'available': 'available', 'error': 'error', 'name': 'name'}
     _toPy = {'available': 'available', 'error': 'error', 'name': 'name'}
+
     def __init__(self, available=None, error=None, name=None, **unknown_fields):
         '''
         available : bool
@@ -28333,6 +29284,7 @@ class ZoneResult(Type):
 class ZoneResults(Type):
     _toSchema = {'results': 'results'}
     _toPy = {'results': 'results'}
+
     def __init__(self, results=None, **unknown_fields):
         '''
         results : typing.Sequence[~ZoneResult]
