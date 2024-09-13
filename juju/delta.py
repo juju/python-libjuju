@@ -2,6 +2,7 @@
 # Licensed under the Apache V2, see LICENCE file for details.
 
 from .client import client
+from .model import ModelEntity
 
 
 def get_entity_delta(d):
@@ -13,17 +14,19 @@ def get_entity_class(entity_type):
 
 
 class EntityDelta(client.Delta):
-    def get_id(self):
+    data: dict[str, str]
+
+    def get_id(self) -> str:
         return self.data['id']
 
     @classmethod
-    def get_entity_class(self):
-        return None
+    def get_entity_class(cls) -> type[ModelEntity]:
+        raise NotImplementedError()
 
 
 class ActionDelta(EntityDelta):
     @classmethod
-    def get_entity_class(self):
+    def get_entity_class(cls):
         from .action import Action
         return Action
 
@@ -33,7 +36,7 @@ class ApplicationDelta(EntityDelta):
         return self.data['name']
 
     @classmethod
-    def get_entity_class(self):
+    def get_entity_class(cls):
         from .application import Application
         return Application
 
@@ -43,7 +46,7 @@ class AnnotationDelta(EntityDelta):
         return self.data['tag']
 
     @classmethod
-    def get_entity_class(self):
+    def get_entity_class(cls):
         from .annotation import Annotation
         return Annotation
 
@@ -53,14 +56,14 @@ class ModelDelta(EntityDelta):
         return self.data['model-uuid']
 
     @classmethod
-    def get_entity_class(self):
+    def get_entity_class(cls):
         from .model import ModelInfo
         return ModelInfo
 
 
 class MachineDelta(EntityDelta):
     @classmethod
-    def get_entity_class(self):
+    def get_entity_class(cls):
         from .machine import Machine
         return Machine
 
@@ -70,14 +73,14 @@ class UnitDelta(EntityDelta):
         return self.data['name']
 
     @classmethod
-    def get_entity_class(self):
+    def get_entity_class(cls):
         from .unit import Unit
         return Unit
 
 
 class RelationDelta(EntityDelta):
     @classmethod
-    def get_entity_class(self):
+    def get_entity_class(cls):
         from .relation import Relation
         return Relation
 
@@ -87,7 +90,7 @@ class RemoteApplicationDelta(EntityDelta):
         return self.data['name']
 
     @classmethod
-    def get_entity_class(self):
+    def get_entity_class(cls):
         from .remoteapplication import RemoteApplication
         return RemoteApplication
 
@@ -97,7 +100,7 @@ class CharmDelta(EntityDelta):
         return self.data['charm-url']
 
     @classmethod
-    def get_entity_class(self):
+    def get_entity_class(cls):
         from .charm import Charm
         return Charm
 
@@ -107,7 +110,7 @@ class ApplicationOfferDelta(EntityDelta):
         return self.data['application-name']
 
     @classmethod
-    def get_entity_class(self):
+    def get_entity_class(cls):
         from .remoteapplication import ApplicationOffer
         return ApplicationOffer
 
