@@ -32,7 +32,7 @@ class _SyncCache:
     # FIXME check if None is ever a valid cached thing, maybe replace with _SENTINEL
     def update(self, value: Any = None, exception: Exception|None = None) -> None:
         if value is None and exception is None:
-            raise ValueError("At least one must be set")
+            raise ValueError("At least one of {value, exception} must be set")
         self.value = value
         self.exception = exception
         self.stale = False
@@ -177,7 +177,7 @@ async def block_until_with_coroutine(condition_coroutine, timeout=None, wait_per
     await jasyncio.shield(jasyncio.wait_for(_block(), timeout=timeout))
 
 
-async def wait_for_bundle(model, bundle, **kwargs):
+async def wait_for_bundle(model, bundle: str, **kwargs):
     """Helper to wait for just the apps in a specific bundle.
 
     Equivalent to loading the bundle, pulling out the app names, and calling::
@@ -189,11 +189,12 @@ async def wait_for_bundle(model, bundle, **kwargs):
         if bundle_path.is_file():
             bundle = bundle_path.read_text()
         elif (bundle_path / "bundle.yaml").is_file():
-            bundle = (bundle_path / "bundle.yaml")
+            bundle = (bundle_path / "bundle.yaml").read_text()
     except OSError:
+        # FIXME this is weird... bundle arg can also be a yaml string too?
         pass
-    bundle = yaml.safe_load(textwrap.dedent(bundle).strip())
-    apps = list(bundle.get("applications", bundle.get("services")).keys())
+    content: dict = yaml.safe_load(textwrap.dedent(bundle).strip())
+    apps = list(content.get("applications", content.get("services")).keys())
     await model.wait_for_idle(apps, **kwargs)
 
 
