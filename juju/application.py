@@ -1,12 +1,12 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-import copy
 import hashlib
 import json
 import logging
+import pathlib
+import warnings
 from typing import Any, List
-from pathlib import Path
 
 import juju.client.facade
 from . import jasyncio, model, tag, utils
@@ -78,9 +78,9 @@ class Application(model.ModelEntity):
     name: str
     exposed: bool  # present on ApplicationResult, ApplicationStatus
     charm_url: str
-    owner_tag: str  # This is weird, present on Model, Secret, Storage, ApplicationOffer, MigrationModel; not app
+    # owner_tag: str  # This is weird, present on Model, Secret, Storage, ApplicationOffer, MigrationModel; not app
     life: Any  # Life, present on ApplicationStatus
-    min_units: int
+    # min_units: int
     constraints: _definitions.Value
     config: dict[str, Any]  # json-able  # FIXME may be omitted
     subordinate: bool
@@ -137,6 +137,24 @@ class Application(model.ModelEntity):
         """
         self.model.add_observer(
             callable_, 'unit', 'remove', self._unit_match_pattern)
+
+    @property
+    def min_units(self) -> int:
+        warnings.warn(
+            "`Application.min_units` is deprecated and will soon be removed",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.__getattr__("min_units")
+
+    @property
+    def owner_tag(self) -> str:
+        warnings.warn(
+            "`Application.owner_tag` is deprecated and will soon be removed",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.__getattr__("owner_tag")
 
     @property
     def units(self):
@@ -750,7 +768,7 @@ class Application(model.ModelEntity):
 
     async def refresh(
             self, channel=None, force=False, force_series=False, force_units=False,
-            path=None, resources=None, revision=None, switch=None):
+            path: str|None =None, resources=None, revision=None, switch: str|None =None):
         """Refresh the charm for this application.
 
         :param str channel: Channel to use when getting the charm from the
@@ -786,8 +804,9 @@ class Application(model.ModelEntity):
 
         current_origin = charm_url_origin_result.charm_origin
         if path is not None or (switch is not None and is_local_charm(switch)):
-            await self.local_refresh(current_origin, force, force_series,
-                                     force_units, path or switch, resources)
+            charm_path: str = path or switch  # type: ignore  # validated above
+            await self.local_refresh(charm_origin=current_origin, force=force, force_series=force_series,
+                                     force_units=force_units, path=charm_path, resources=resources)
             return
 
         origin = _refresh_origin(current_origin, channel, revision)
@@ -913,9 +932,15 @@ class Application(model.ModelEntity):
     upgrade_charm = refresh
 
     async def local_refresh(
-            self, charm_origin=None, force=False, force_series=False,
+            self,
+            *,
+            charm_origin: _definitions.CharmOrigin,
+            force=False,
+            force_series=False,
             force_units=False,
-            path=None, resources=None):
+            path: str,
+            resources=None,
+            ):
         """Refresh the charm for this application with a local charm.
 
         :param dict charm_origin: The charm origin of the destination charm
@@ -933,8 +958,8 @@ class Application(model.ModelEntity):
 
         if isinstance(path, str) and path.startswith("local:"):
             path = path[6:]
-        path = Path(path)
-        charm_dir = path.expanduser().resolve()
+        charm_path = pathlib.Path(path)
+        charm_dir = charm_path.expanduser().resolve()
         model_config = await self.get_config()
 
         series = (
@@ -950,7 +975,7 @@ class Application(model.ModelEntity):
             if default_series:
                 series = default_series.value
         charm_url = await self.model.add_local_charm_dir(charm_dir, series)
-        metadata = utils.get_local_charm_metadata(path)
+        metadata = utils.get_local_charm_metadata(charm_path)
         if resources is not None:
             resources = await self.model.add_local_resources(self.entity_id,
                                                              charm_url,
