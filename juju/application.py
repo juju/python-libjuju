@@ -85,7 +85,7 @@ class Application(model.ModelEntity):
     config: dict[str, Any]  # json-able  # FIXME may be omitted
     subordinate: bool
     # status: Any  # Status  # @property
-    workload_version: str  # e.g. ApplicationStatus, maybe EntityXxx
+    # workload_version: str  # e.g. ApplicationStatus, maybe EntityXxx
 
     _pk: str|int
 
@@ -155,6 +155,15 @@ class Application(model.ModelEntity):
             stacklevel=2,
         )
         return self.__getattr__("owner_tag")
+
+    @property
+    def workload_version(self) -> str:
+        warnings.warn(
+            "`Application.workload_version` is deprecated, use Unit.workload_version instead",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.__getattr__("workload_version")
 
     @property
     def units(self):
@@ -892,7 +901,7 @@ class Application(model.ModelEntity):
                     revision=_arg_res_revisions.get(res_name, -1),
                     type_=resource.get('Type', resource.get('type')),
                     origin='store',
-                ))
+                ))  # type: ignore  # FIXME later
 
             response = await resources_facade.AddPendingResources(
                 application_tag=self.tag,
