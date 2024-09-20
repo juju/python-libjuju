@@ -6,7 +6,7 @@ import json
 import logging
 import pathlib
 import warnings
-from typing import Any, List
+from typing import Any, List, TYPE_CHECKING
 
 import juju.client.facade
 from . import jasyncio, model, tag, utils
@@ -21,6 +21,9 @@ from .status import derive_status
 from .url import URL
 from .utils import block_until
 from .version import DEFAULT_ARCHITECTURE
+
+if TYPE_CHECKING:
+    from .unit import Unit
 
 log = logging.getLogger(__name__)
 
@@ -166,7 +169,7 @@ class Application(model.ModelEntity):
         return self.__getattr__("workload_version")
 
     @property
-    def units(self):
+    def units(self) -> list[Unit]:
         return [
             unit for unit in self.model.units.values()
             if unit.application == self.name
