@@ -97,6 +97,7 @@ jobs:
     timeout-minutes: 150
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python:
           # We will reduce the workload to 3.10 to
@@ -113,8 +114,7 @@ jobs:
           # * test_destroy_unit
           # * test_ssh
           # * ...
-          # - "3.6/beta"
-    continue-on-error: false  # ultimately fail a run if one of the matrix combinations fails
+          - "3.6/beta"
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -166,6 +166,7 @@ jobs:
     timeout-minutes: 150
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python:
           - "3.10"
@@ -174,10 +175,9 @@ jobs:
           - "3.3/stable"
           - "3.4/stable"
           - "3.5/stable"
-    continue-on-error: false  # ultimately fail the run if one of the matrix combinations fails
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Python
         uses: actions/setup-python@v5
         with:

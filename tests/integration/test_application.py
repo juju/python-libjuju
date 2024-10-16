@@ -102,10 +102,32 @@ async def test_add_units():
             assert isinstance(unit, Unit)
 
 
+@pytest.mark.parametrize("thebase", [
+    None,
+    "ubuntu@15.04",
+    "ubuntu@15.04/stable",
+    "ubuntu@19.04",
+    "ubuntu@19.04/stable",
+    "ubuntu@20.04",
+    "ubuntu@20.04/stable",
+    "ubuntu@24.04",
+    "ubuntu@24.04/stable",
+])
+@base.bootstrapped
+async def test_deploy_charmhub_charm_ex(thebase: str):
+    async with base.CleanModel() as model:
+        app = await model.deploy('ubuntu', base=thebase)
+        assert False, "fail on purpose to get the logs"
+        await model.block_until(lambda: (len(app.units) > 0 and
+                                         app.units[0].machine))
+        assert 'ubuntu' in app.data['charm-url']
+
+
 @base.bootstrapped
 async def test_deploy_charmhub_charm():
     async with base.CleanModel() as model:
         app = await model.deploy('ubuntu')
+        assert False, "fail on purpose to get the logs"
         await model.block_until(lambda: (len(app.units) > 0 and
                                          app.units[0].machine))
         assert 'ubuntu' in app.data['charm-url']

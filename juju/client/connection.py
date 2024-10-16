@@ -579,6 +579,7 @@ class Connection:
                     raise
         result = await self._recv(msg['request-id'])
         log.debug('connection id : {} <--- {}'.format(id(self), result))
+        log.warning("DUMP\n%s\n%s", outgoing, result)
 
         if not result:
             return result
