@@ -97,6 +97,7 @@ jobs:
     timeout-minutes: 150
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python:
           # We will reduce the workload to 3.10 to
@@ -114,7 +115,6 @@ jobs:
           # * test_ssh
           # * ...
           # - "3.6/beta"
-    continue-on-error: false  # ultimately fail a run if one of the matrix combinations fails
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -158,7 +158,6 @@ jobs:
       - name: Run integration
         # Force one single concurrent test
         run: tox -e integration
-        continue-on-error: true  # don't fail early, let other matrix combinations get tested
 
   integration-quarantine:
     name: Quarantined Integration Tests
@@ -166,6 +165,7 @@ jobs:
     timeout-minutes: 150
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python:
           - "3.10"
@@ -174,7 +174,6 @@ jobs:
           - "3.3/stable"
           - "3.4/stable"
           - "3.5/stable"
-    continue-on-error: false  # ultimately fail the run if one of the matrix combinations fails
     steps:
       - name: Check out code
         uses: actions/checkout@v3
@@ -189,4 +188,3 @@ jobs:
           juju-channel: ${{ matrix.juju }}
       - name: Run integration
         run: tox -e integration-quarantine
-        continue-on-error: true  # don't fail early, let other matrix combinations get tested
