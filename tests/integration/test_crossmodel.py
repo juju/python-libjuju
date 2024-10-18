@@ -98,6 +98,10 @@ async def test_remove_saas():
 async def test_relate_with_offer():
     # pytest.skip('Revise: intermittent problem with the remove_saas call')
     async with base.CleanModel() as model_1:
+        assert model_1._info
+        if str(model_1._info.agent_version) < "3.4.3":
+            pytest.skip("postgresql charm requires Juju 3.4.3 or later")
+
         application = await model_1.deploy(
             'postgresql',
             application_name='postgresql',
