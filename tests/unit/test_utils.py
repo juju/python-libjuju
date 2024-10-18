@@ -49,7 +49,7 @@ class TestSeriesSelector(unittest.TestCase):
         assert series_selector(model_config=mconf, supported_series=['jammy']) == 'jammy'
 
     def test_charm_list_series(self):
-        assert series_selector(supported_series=['focal', 'jammy']) == 'jammy'
+        assert series_selector(supported_series=["jammy", "focal"]) == "jammy"
 
     def test_return_lts(self):
         assert series_selector() == DEFAULT_SUPPORTED_LTS
