@@ -109,12 +109,7 @@ jobs:
           - "3.3/stable"
           - "3.4/stable"
           - "3.5/stable"
-          # A bunch of tests fail with juju.errors.JujuError: base: ubuntu@15.04/stable
-          # * test_subordinate_units
-          # * test_destroy_unit
-          # * test_ssh
-          # * ...
-          # - "3.6/beta"
+          - "3.6/beta"
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -174,6 +169,7 @@ jobs:
           - "3.3/stable"
           - "3.4/stable"
           - "3.5/stable"
+          - "3.6/beta"
     steps:
       - name: Check out code
         uses: actions/checkout@v4
