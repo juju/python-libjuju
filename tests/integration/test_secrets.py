@@ -10,6 +10,10 @@ from ..utils import TESTS_DIR
 @pytest.mark.bundle
 async def test_add_secret():
     async with base.CleanModel() as model:
+        assert model._info
+        if str(model._info.agent_version) < "3.3.0":
+            pytest.skip("Juju too old, need Secrets API v2")
+
         secret = await model.add_secret(name='my-apitoken', data_args=['token=34ae35facd4'])
         assert secret.startswith('secret:')
 
@@ -28,6 +32,10 @@ async def test_list_secrets():
     charm_path = TESTS_DIR / 'charm-secret/charm-secret_ubuntu-22.04-amd64.charm'
 
     async with base.CleanModel() as model:
+        assert model._info
+        if str(model._info.agent_version) < "3.3.0":
+            pytest.skip("Juju too old, need Secrets API v2")
+
         await model.deploy(str(charm_path))
         assert 'charm-secret' in model.applications
         await model.wait_for_idle(status="active")
@@ -42,6 +50,10 @@ async def test_list_secrets():
 @pytest.mark.bundle
 async def test_update_secret():
     async with base.CleanModel() as model:
+        assert model._info
+        if str(model._info.agent_version) < "3.3.0":
+            pytest.skip("Juju too old, need Secrets API v2")
+
         secret = await model.add_secret(name='my-apitoken', data_args=['token=34ae35facd4'])
         assert secret.startswith('secret:')
 
@@ -56,6 +68,10 @@ async def test_update_secret():
 @pytest.mark.bundle
 async def test_remove_secret():
     async with base.CleanModel() as model:
+        assert model._info
+        if str(model._info.agent_version) < "3.3.0":
+            pytest.skip("Juju too old, need Secrets API v2")
+
         secret = await model.add_secret(name='my-apitoken', data_args=['token=34ae35facd4'])
         assert secret.startswith('secret:')
 
@@ -69,6 +85,10 @@ async def test_remove_secret():
 @pytest.mark.bundle
 async def test_grant_secret():
     async with base.CleanModel() as model:
+        assert model._info
+        if str(model._info.agent_version) < "3.3.0":
+            pytest.skip("Juju too old, need Secrets API v2")
+
         secret = await model.add_secret(name='my-apitoken', data_args=['token=34ae35facd4'])
         assert secret.startswith('secret:')
 
@@ -81,6 +101,10 @@ async def test_grant_secret():
 @pytest.mark.bundle
 async def test_revoke_secret():
     async with base.CleanModel() as model:
+        assert model._info
+        if str(model._info.agent_version) < "3.3.0":
+            pytest.skip("Juju too old, need Secrets API v2")
+
         secret = await model.add_secret(name='my-apitoken', data_args=['token=34ae35facd4'])
         assert secret.startswith('secret:')
         await model.revoke_secret('my-apitoken', 'ubuntu')
