@@ -349,6 +349,10 @@ async def test_deploy_bundle_with_overlay_as_argument():
 @pytest.mark.bundle
 async def test_deploy_bundle_with_multi_overlay_as_argument():
     async with base.CleanModel() as model:
+        assert model._info
+        if str(model._info.agent_version) < "3.4.3":
+            pytest.skip("bundle/postgresql charm requires Juju 3.4.3 or later")
+
         overlay_path = OVERLAYS_DIR / 'test-multi-overlay.yaml'
 
         await model.deploy('juju-qa-bundle-test', overlays=[overlay_path])
