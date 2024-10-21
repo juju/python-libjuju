@@ -219,7 +219,9 @@ async def test_deploy_bundle_with_storage_constraint():
     async with base.CleanModel() as model:
         assert model._info
         if str(model._info.agent_version) < "3.4.3":
-            pytest.skip("bundle/postgresql charm requires Juju 3.4.3 or later")
+            pass
+            # fail on purpose
+            # pytest.skip("bundle/postgresql charm requires Juju 3.4.3 or later")
 
         await model.deploy(bundle_path)
         await wait_for_bundle(model, bundle_path)
