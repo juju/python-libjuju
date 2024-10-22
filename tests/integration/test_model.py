@@ -245,7 +245,8 @@ async def test_deploy_charm_assumes():
     async with base.CleanModel() as model:
         assert model._info
         if str(model._info.agent_version) < "3.4.3":
-            pytest.skip("postgresql charm requires Juju 3.4.3 or later")
+            pass  # fail on purpose
+            # pytest.skip("postgresql charm requires Juju 3.4.3 or later")
 
         await model.deploy('postgresql', channel='14/edge')
 
@@ -310,7 +311,8 @@ async def test_deploy_local_bundle_with_overlay_multi():
     async with base.CleanModel() as model:
         assert model._info
         if str(model._info.agent_version) < "3.4.3":
-            pytest.skip("bundle/postgresql charm requires Juju 3.4.3 or later")
+            pass  # fail on purpose
+            # pytest.skip("bundle/postgresql charm requires Juju 3.4.3 or later")
 
         bundle_with_overlay_path = OVERLAYS_DIR / 'bundle-with-overlay-multi.yaml'
         await model.deploy(bundle_with_overlay_path)
@@ -328,7 +330,8 @@ async def test_deploy_bundle_with_overlay_as_argument():
     async with base.CleanModel() as model:
         assert model._info
         if str(model._info.agent_version) < "3.4.3":
-            pytest.skip("bundle/postgresql charm requires Juju 3.4.3 or later")
+            pass  # fail on purpose
+            # pytest.skip("bundle/postgresql charm requires Juju 3.4.3 or later")
 
         overlay_path = OVERLAYS_DIR / 'test-overlay.yaml'
 
@@ -353,7 +356,8 @@ async def test_deploy_bundle_with_multi_overlay_as_argument():
     async with base.CleanModel() as model:
         assert model._info
         if str(model._info.agent_version) < "3.4.3":
-            pytest.skip("bundle/postgresql charm requires Juju 3.4.3 or later")
+            pass
+            # pytest.skip("bundle/postgresql charm requires Juju 3.4.3 or later")
 
         overlay_path = OVERLAYS_DIR / 'test-multi-overlay.yaml'
 
@@ -405,7 +409,8 @@ async def test_deploy_from_ch_channel_revision_success():
     async with base.CleanModel() as model:
         assert model._info
         if str(model._info.agent_version) < "3.4.3":
-            pytest.skip("postgresql charm requires Juju 3.4.3 or later")
+            pass  # fail on purpose
+            # pytest.skip("postgresql charm requires Juju 3.4.3 or later")
 
         # Ensure we're able to resolve charm these with channel and revision,
         # or channel without revision (note that revision requires channel,
