@@ -549,6 +549,7 @@ class Connection:
                     log.error('RPC: Automatic reconnect failed')
                     raise
         result = await self._recv(msg['request-id'])
+        log.warning("DUMP\n%s\n%s\n", outgoing, result)
         log.debug('connection id : {} <--- {}'.format(id(self), result))
 
         if not result:
