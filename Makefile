@@ -43,18 +43,23 @@ docs:
 .PHONY: build-test
 build-test:
 	rm -rf venv
-	python3 -m venv venv
-	. venv/bin/activate
-	python3 setup.py sdist
-	pip install ./dist/juju-${VERSION}.tar.gz
-	python3 -c "from juju.controller import Controller"
-	rm ./dist/juju-${VERSION}.tar.gz
+	$(PY) -m venv venv
+	. venv/bin/activate && \
+		pip install build && \
+		python -m build && \
+		pip install ./dist/juju-${VERSION}.tar.gz && \
+		python -c "from juju.controller import Controller"
+	rm -rf dist
 
 .PHONY: release
 release:
 	git fetch --tags
-	rm dist/*.tar.gz || true
-	$(PY) setup.py sdist
+	rm -rf dist
+	rm -rf venv
+	$(PY) -m venv venv
+	. venv/bin/activate && \
+		pip install build && \
+		python -m build
 	$(BIN)/twine check dist/*
 	$(BIN)/twine upload --repository juju dist/*
 	git tag ${VERSION}
