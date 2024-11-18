@@ -30,6 +30,8 @@ log = logging.getLogger("juju.client.connection")
 def facade_versions(name, versions):
     """facade_versions returns a new object that correctly returns a object in
     format expected by the connection facades inspection.
+    FIXME
+
     :param name: name of the facade
     :param versions: versions to support by the facade
     """
