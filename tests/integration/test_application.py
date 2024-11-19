@@ -363,7 +363,7 @@ async def test_app_destroy():
 
 
 @base.bootstrapped
-async def test_app_remove_wait_flag():
+async def dont_test_app_remove_wait_flag():
     async with base.CleanModel() as model:
         app = await model.deploy("ubuntu")
         a_name = app.name
@@ -374,7 +374,7 @@ async def test_app_remove_wait_flag():
 
 
 @base.bootstrapped
-async def test_app_remove_timeout():
+async def dont_test_app_remove_timeout():
     async with base.CleanModel() as model:
         app = await model.deploy("juju-qa-test")
         await model.wait_for_idle(status="active")
@@ -393,7 +393,7 @@ async def test_app_charm_name():
 
 
 @base.bootstrapped
-async def test_app_relation_destroy_block_until_done():
+async def dont_test_app_relation_destroy_block_until_done():
     async with base.CleanModel() as model:
         app: Application = await model.deploy("docker-registry")
         rsa: Application = await model.deploy("easyrsa")

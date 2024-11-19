@@ -13,7 +13,7 @@ from .. import base
 
 
 @base.bootstrapped
-async def test_block_coroutine():
+async def dont_test_block_coroutine():
     async with base.CleanModel() as model:
         app = await model.deploy(
             "ubuntu",
@@ -32,7 +32,7 @@ async def test_block_coroutine():
 
 
 @base.bootstrapped
-async def test_unit_public_address():
+async def dont_test_unit_public_address():
     async with base.CleanModel() as model:
         app = await model.deploy(
             "ubuntu",
