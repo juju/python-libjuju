@@ -1,10 +1,10 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-"""
-Example to show how to connect to the current model and query the charm-hub
+"""Example to show how to connect to the current model and query the charm-hub
 repository for information about a given charm.
 """
+
 import logging
 
 from juju import jasyncio
@@ -23,10 +23,10 @@ async def main():
         print(charm)
     finally:
         if model.is_connected():
-            print('Disconnecting from model')
+            print("Disconnecting from model")
             await model.disconnect()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     jasyncio.run(main())

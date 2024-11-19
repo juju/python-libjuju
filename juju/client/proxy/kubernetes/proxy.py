@@ -1,25 +1,25 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
-import os
-import tempfile
 import logging
+import tempfile
 
-from juju.client.proxy.proxy import Proxy, ProxyNotConnectedError
 from kubernetes import client
 from kubernetes.stream import portforward
 
-log = logging.getLogger('juju.client.connection')
+from juju.client.proxy.proxy import Proxy, ProxyNotConnectedError
+
+log = logging.getLogger("juju.client.connection")
 
 
 class KubernetesProxy(Proxy):
     def __init__(
-            self,
-            api_host,
-            namespace,
-            remote_port,
-            service,
-            service_account_token,
-            ca_cert=None,
+        self,
+        api_host,
+        namespace,
+        remote_port,
+        service,
+        service_account_token,
+        ca_cert=None,
     ):
         config = client.Configuration()
         config.host = api_host
@@ -33,13 +33,17 @@ class KubernetesProxy(Proxy):
         try:
             self.remote_port = int(remote_port)
         except ValueError:
-            raise ValueError("Invalid port number: {}".format(remote_port))
+            raise ValueError(f"Invalid port number: {remote_port}")
+
+        self.port_forwarder = None
 
         if ca_cert:
-            self.temp_ca_file = tempfile.NamedTemporaryFile(delete=False)
-            self.temp_ca_file.write(bytes(ca_cert, 'utf-8'))
+            self.temp_ca_file = tempfile.NamedTemporaryFile()  # noqa: SIM115
+            self.temp_ca_file.write(bytes(ca_cert, "utf-8"))
             self.temp_ca_file.flush()
             config.ssl_ca_cert = self.temp_ca_file.name
+        else:
+            self.temp_ca_file = None
 
         self.api_client = client.ApiClient(config)
 
@@ -47,7 +51,7 @@ class KubernetesProxy(Proxy):
         corev1 = client.CoreV1Api(self.api_client)
         service = corev1.read_namespaced_service(self.service, self.namespace)
 
-        label_selector = ','.join(k + '=' + v for k, v in service.spec.selector.items())
+        label_selector = ",".join(k + "=" + v for k, v in service.spec.selector.items())
 
         pods = corev1.list_namespaced_pod(
             namespace=self.namespace,
@@ -63,15 +67,13 @@ class KubernetesProxy(Proxy):
 
     def __del__(self):
         self.close()
-        try:
-            os.unlink(self.temp_ca_file.name)
-        except FileNotFoundError:
-            log.debug(f"file {self.temp_ca_file.name} not found")
 
     def close(self):
         try:
-            self.port_forwarder.close()
-            self.temp_ca_file.close()
+            if self.port_forwarder:
+                self.port_forwarder.close()
+            if self.temp_ca_file:
+                self.temp_ca_file.close()
         except AttributeError:
             pass
 

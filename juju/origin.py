@@ -2,9 +2,9 @@
 # Licensed under the Apache V2, see LICENCE file for details.
 
 from enum import Enum
-from .errors import JujuError
 
 from . import utils
+from .errors import JujuError
 
 
 class Source(Enum):
@@ -12,6 +12,7 @@ class Source(Enum):
     what the charm identity is from the URL and origin source.
 
     """
+
     LOCAL = "local"
     CHARM_HUB = "charm-hub"
 
@@ -26,7 +27,7 @@ class Origin:
         self.platform = platform
 
     def __str__(self):
-        return "origin using source {} for channel {} and platform {}".format(str(self.source), self.channel, self.platform)
+        return f"origin using source {self.source!s} for channel {self.channel} and platform {self.platform}"
 
 
 class Risk(Enum):
@@ -49,28 +50,29 @@ class Risk(Enum):
 class Channel:
     """Channel identifies and describes completely a store channel.
 
-     A channel consists of, and is subdivided by, tracks, risk-levels and
-      - Tracks enable snap developers to publish multiple supported releases of
-        their application under the same snap name.
-      - Risk-levels represent a progressive potential trade-off between stability
-        and new features.
+    A channel consists of, and is subdivided by, tracks, risk-levels and
+     - Tracks enable snap developers to publish multiple supported releases of
+       their application under the same snap name.
+     - Risk-levels represent a progressive potential trade-off between stability
+       and new features.
 
-     The complete channel name can be structured as three distinct parts separated
-     by slashes:
+    The complete channel name can be structured as three distinct parts separated
+    by slashes:
 
-        <track>/<risk>
+       <track>/<risk>
 
     """
+
     def __init__(self, track=None, risk=None):
         if not Risk.valid(risk):
-            raise JujuError("unexpected risk {}".format(risk))
+            raise JujuError(f"unexpected risk {risk}")
 
         self.track = track or ""
         self.risk = risk
 
     @staticmethod
-    def parse(s):
-        """parse a channel from a given string.
+    def parse(s: str):
+        """Parse a channel from a given string.
         Parse does not take into account branches.
 
         """
@@ -91,12 +93,12 @@ class Channel:
             track = p[0]
             risk = p[1]
         else:
-            raise JujuError("channel is malformed and has too many components {}".format(s))
+            raise JujuError(f"channel is malformed and has too many components {s}")
 
         if risk is not None and not Risk.valid(risk):
-            raise JujuError("risk in channel {} is not valid".format(s))
+            raise JujuError(f"risk in channel {s} is not valid")
         if track is not None and track == "":
-            raise JujuError("track in channel {} is not valid".format(s))
+            raise JujuError(f"track in channel {s} is not valid")
 
         return Channel(track, risk)
 
@@ -113,7 +115,7 @@ class Channel:
     def __str__(self):
         path = self.risk
         if self.track != "":
-            path = "{}/{}".format(self.track, path)
+            path = f"{self.track}/{path}"
         return path
 
     def compute_base_channel(self, series):
@@ -124,7 +126,7 @@ class Channel:
         _ch = [self.risk]
         tr = utils.get_series_version(series)
         if tr:
-            _ch = [tr] + _ch
+            _ch = [tr, *_ch]
         return "/".join(_ch)
 
 
@@ -140,13 +142,13 @@ class Platform:
     To indicate something is missing `unknown` can be used in place.
 
     Examples:
-
      1. `<arch>/<os>/<series>`
      2. `<arch>`
      3. `<arch>/<series>`
      4. `<arch>/unknown/<series>`
 
     """
+
     def __init__(self, arch, series=None, os=None):
         self.arch = arch
         self.series = series
@@ -172,14 +174,14 @@ class Platform:
             os = p[1]
             series = p[2]
         else:
-            raise JujuError("platform is malformed and has too many components {}".format(s))
+            raise JujuError(f"platform is malformed and has too many components {s}")
 
         if not arch:
-            raise JujuError("architecture in platform {} is not valid".format(s))
+            raise JujuError(f"architecture in platform {s} is not valid")
         if os is not None and os == "":
-            raise JujuError("os in platform {} is not valid".format(s))
+            raise JujuError(f"os in platform {s} is not valid")
         if series is not None and series == "":
-            raise JujuError("series in platform {} is not valid".format(s))
+            raise JujuError(f"series in platform {s} is not valid")
 
         return Platform(arch, series, os)
 
@@ -194,13 +196,17 @@ class Platform:
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self.arch == other.arch and self.os == other.os and self.series == other.series
+            return (
+                self.arch == other.arch
+                and self.os == other.os
+                and self.series == other.series
+            )
         return False
 
     def __str__(self):
         path = self.arch
         if self.os is not None and self.os != "":
-            path = "{}/{}".format(path, self.os)
+            path = f"{path}/{self.os}"
         if self.series is not None and self.series != "":
-            path = "{}/{}".format(path, self.series)
+            path = f"{path}/{self.series}"
         return path

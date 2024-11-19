@@ -29,8 +29,8 @@ class CharmSecretCharm(CharmBase):
     def _on_secrets_start(self, event):
         """Create a secret to play with."""
         content = {
-            'username': 'useradmin',
-            'password': '1234',
+            "username": "useradmin",
+            "password": "1234",
         }
         secret = self.app.add_secret(content)
         logger.info("created secret %s", secret)

@@ -1,8 +1,7 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-"""
-This example:
+"""This example:
 
 1. Connects to the current model
 2. Starts an AllWatcher
@@ -10,6 +9,7 @@ This example:
 4. Runs forever (kill with Ctrl-C)
 
 """
+
 import asyncio
 import logging
 
@@ -26,7 +26,7 @@ async def watch():
     # Need to call the WatchModelSummaries or WatchAllModelSummaries on the
     # controller.
     def callback(summary):
-        print("-- change --\n{}\n".format(summary))
+        print(f"-- change --\n{summary}\n")
 
     await controller.watch_model_summaries(callback)
 
@@ -34,11 +34,11 @@ async def watch():
         await asyncio.sleep(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    ws_logger = logging.getLogger('websockets.protocol')
+    ws_logger = logging.getLogger("websockets.protocol")
     ws_logger.setLevel(logging.INFO)
-    logging.getLogger('juju.client.connection').setLevel(logging.INFO)
+    logging.getLogger("juju.client.connection").setLevel(logging.INFO)
     # Run loop until the process is manually stopped (watch will loop
     # forever).
     jasyncio.run(watch())

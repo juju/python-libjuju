@@ -1,10 +1,8 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-"""
-This example demonstrate how debug-log works
+"""This example demonstrate how debug-log works"""
 
-"""
 from juju import jasyncio
 from juju.model import Model
 
@@ -23,17 +21,17 @@ async def main():
     )
 
     application = await model.deploy(
-        'ch:ubuntu',
-        application_name='ubuntu',
-        series='trusty',
-        channel='stable',
+        "ch:ubuntu",
+        application_name="ubuntu",
+        series="trusty",
+        channel="stable",
     )
 
-    await model.wait_for_idle(status='active')
+    await model.wait_for_idle(status="active")
 
     await application.remove()
     await model.disconnect()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     jasyncio.run(main())

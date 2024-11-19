@@ -21,7 +21,7 @@ tags:
   - misc
   - application_development
 subordinate: false
-# check: https://juju.is/docs/sdk/assumes for more details 
+# check: https://juju.is/docs/sdk/assumes for more details
 assumes:
   - any_of:
     - juju >= 2.9

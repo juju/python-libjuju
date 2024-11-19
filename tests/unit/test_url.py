@@ -3,7 +3,7 @@
 
 import unittest
 
-from juju.url import Schema, URL
+from juju.url import URL, Schema
 
 
 class TestURLV1(unittest.TestCase):
@@ -17,24 +17,45 @@ class TestURLV1(unittest.TestCase):
 
     def test_parse_v1_revision(self):
         u = URL.parse("cs:~fred/mysql-1")
-        self.assertEqual(u, URL(Schema.CHARM_STORE, name="mysql", user="fred", revision=1))
+        self.assertEqual(
+            u, URL(Schema.CHARM_STORE, name="mysql", user="fred", revision=1)
+        )
 
     def test_parse_v1_large_revision(self):
         u = URL.parse("cs:~fred/mysql-12345")
-        self.assertEqual(u, URL(Schema.CHARM_STORE, name="mysql", user="fred", revision=12345))
+        self.assertEqual(
+            u, URL(Schema.CHARM_STORE, name="mysql", user="fred", revision=12345)
+        )
 
     def test_parse_v1_series(self):
         u = URL.parse("cs:~fred/bionic/mysql-1")
-        self.assertEqual(u, URL(Schema.CHARM_STORE, name="mysql", user="fred", revision=1, series="bionic"))
+        self.assertEqual(
+            u,
+            URL(
+                Schema.CHARM_STORE,
+                name="mysql",
+                user="fred",
+                revision=1,
+                series="bionic",
+            ),
+        )
 
 
 class TestURLV2(unittest.TestCase):
-
     schema = Schema.CHARM_HUB
 
     def test_parse_charmhub(self):
         u = URL.parse(f"{self.schema}:arm64/bionic/mysql-1")
-        self.assertEqual(u, URL(self.schema, name="mysql", architecture="arm64", series="bionic", revision=1))
+        self.assertEqual(
+            u,
+            URL(
+                self.schema,
+                name="mysql",
+                architecture="arm64",
+                series="bionic",
+                revision=1,
+            ),
+        )
 
     def test_parse_charmhub_with_no_series(self):
         u = URL.parse(f"{self.schema}:arm64/mysql")

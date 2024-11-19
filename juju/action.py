@@ -5,11 +5,10 @@ from . import model
 
 
 class Action(model.ModelEntity):
-
     def __init__(self, entity_id, model, history_index=-1, connected=True):
         super().__init__(entity_id, model, history_index, connected)
         self.results = {}
-        self._status = self.data['status']
+        self._status = self.data["status"]
 
     @property
     def status(self):

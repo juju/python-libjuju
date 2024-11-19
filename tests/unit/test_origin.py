@@ -96,4 +96,7 @@ class TestOrigin(unittest.TestCase):
         p = Platform.parse("amd64/ubuntu/focal")
 
         o = Origin(Source.CHARM_HUB, ch, p)
-        self.assertEqual(str(o), "origin using source charm-hub for channel latest/stable and platform amd64/ubuntu/focal")
+        self.assertEqual(
+            str(o),
+            "origin using source charm-hub for channel latest/stable and platform amd64/ubuntu/focal",
+        )

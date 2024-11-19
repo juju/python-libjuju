@@ -2,8 +2,8 @@
 # Licensed under the Apache V2, see LICENCE file for details.
 
 import unittest
+from unittest import mock
 
-import mock
 import pytest
 
 from juju.client.jujudata import FileJujuData

@@ -1,0 +1,218 @@
+[project]
+name = "juju"
+version = "3.5.2.0"  # Stop-gap until dynamic versioning is done; must be in sync with juju/version.py:CLIENT_VERSION
+description = "Python library for Juju"
+readme = "docs/readme.rst"
+license = { file = "LICENSE" }
+maintainers = [{name = "Juju Ecosystem Engineering", email = "juju@lists.ubuntu.com"}]
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: POSIX :: Linux",
+]
+dependencies = [
+    "macaroonbakery>=1.1,<2.0",
+    "pyRFC3339>=1.0,<2.0",
+    "pyyaml>=5.1.2",
+    "websockets>=8.1,<14.0",
+    "paramiko>=2.4.0",
+    "pyasn1>=0.4.4",
+    "toposort>=1.5,<2",
+    "typing_inspect>=0.6.0",
+    "kubernetes>=12.0.1,<31.0.0",
+    "hvac",
+    "packaging",
+    "typing-extensions>=4.5.0"
+]
+
+[project.urls]
+"Homepage" = "https://juju.is/docs/sdk"
+"Repository" = "https://github.com/juju/python-libjuju"
+"Issues" = "https://github.com/juju/python-libjuju/issues"
+"Documentation" = "https://pythonlibjuju.readthedocs.io/en/latest/"
+"Changelog" = "https://pythonlibjuju.readthedocs.io/en/latest/changelog.html#changelog"
+
+[tool.setuptools.dynamic]
+version = {attr = "juju.version.CLIENT_VERSION"}
+
+# Linting tools configuration
+[tool.ruff]
+target-version = "py38"
+
+[tool.ruff.lint]
+select = [
+    # Pyflakes
+    "F",
+    # Pycodestyle
+    "E",
+    "W",
+    # isort
+    "I001",
+    # pep8-naming
+    "N",
+    # flake8-builtins
+    "A",
+    # flake8-copyright
+    "CPY",
+    # pyupgrade
+    "UP",
+    # flake8-2020
+    "YTT",
+    # flake8-bandit
+    "S",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # Ruff specific
+    "RUF",
+    # Perflint
+    "PERF",
+    # pyflakes-docstrings
+    "D",
+]
+ignore = [
+    # juju.secrets is a part of public API, can't rename or remove it now
+    "A005",
+    # FIXME: change the codegen to remove the schema from auto-generate classes
+    "RUF012",
+    # FIXME: change the codegen to insert a period at the end of the docstring
+    "D415",
+    # FIXME: quite a few mutable default arguments should be refactored
+    "B006",
+    # FIXME: raise from
+    "B904",
+    # FIXME: a bunch of missing docstrings
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    "D105",
+    "D107",
+    # FIXME: a bunch of docstrings without headlines
+    "D205",
+    # FIXME: manually rewrite docstring headlines to git on one line
+    "D400",
+    "D401",
+    # Some arguments are not documented
+    "D417",
+    # FIXME: run `uvx docformatter` to reformat docstrings
+    # Manual fixes are needed for string literals and f-strings
+    "E501",
+    # FIXME: there are some mixedCase members
+    "N815",
+    # Existing exception classes are part of the API, cannot rename now
+    "N818",
+    # try-except in a loop; hardly an issue in async functions
+    "PERF203",
+    # assert
+    "S101",
+    # subprocess module
+    "S404",
+    # FIXME: validate that we use yaml safely
+    "S506",
+    # FIXME: try/except: pass is OK
+    # Note: swallowing CancelledError is most likely a bug
+    "SIM105",
+    # FIXME: refactor if-else
+    "SIM108",
+    # % format is just fine
+    "UP031",
+]
+
+
+[tool.ruff.lint.per-file-ignores]
+"juju/client/_*.py" = [
+    # Copyright
+    "CPY001",
+    # Codegen limitation: empty structs have empty docstrings.
+    "D419",
+    # CamelCase
+    "N802",
+    # star imports
+    "F403",
+    "F405",
+    # FIXME: undefined FacadeVersions...
+    # Is the class from _client.py intended?
+    # How does login even work?
+    "F821",
+]
+
+"examples/*" = [
+    # Docstring format
+    "D404",
+]
+
+"tests/*" = [
+    # assert False to fail
+    "B011",
+    # raise from
+    "B904",
+    # Don't require docstrings
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    "D104",
+    "D105",
+    "D107",
+    # Copyright
+    "CPY001",
+    # Docstring format
+    "D205",
+    "D400",
+    # FIXME do something about long lines in assert v == "aaa..."
+    "E501",
+    # Performance overhead
+    "PERF203",
+    # async function without await
+    "RUF029",
+    # index[0]
+    "RUF015",
+    # Allow asserts
+    "S101",
+    # Hardcoded passwords and secret keys
+    "S105",
+    "S106",
+    # FIXME Hardcoded /tmp path, prevents parallel tests
+    "S108",
+    # Weird URL scheme
+    "S310",
+    # Weak random source
+    "S311",
+    # subprocess
+    "S404",
+    "S603",
+    "S607",
+    # FIXME YAML loader
+    "S506",
+    # FIXME refactor nested if statements
+    "SIM102",
+    # FIXME refactor nested with statements
+    "SIM117",
+    # FIXME refactor to use list comprehensions
+    "PERF401",
+    # FIXME new-style super()
+    "UP008",
+    # %-format
+    "UP031",
+]
+
+[tool.pyright]
+# These are tentative
+include = ["**/*.py"]
+pythonVersion = "3.8"
+typeCheckingMode = "strict"
+useLibraryCodeForTypes = true
+reportGeneralTypeIssues = true

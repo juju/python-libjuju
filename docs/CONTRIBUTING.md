@@ -29,6 +29,12 @@ Check to see what [types of contributions](/contributing/types-of-contributions.
 -->
 
 
+## Tooling
+
+- `uv`, https://docs.astral.sh/uv/
+- `pre-commit`, https://pre-commit.com/
+- Python 3.8 ~ 3.13, https://www.python.org/downloads/
+
 ## Pull Request
 
 Thanks for considering to contribute code to our project! We accept and welcome all kinds of PRs! :tada:
@@ -40,6 +46,7 @@ The process is very simple.
 - Check with `git remote -v`, origin should point to your fork, upstream should point to ours.
 - If your changes are going to be on top of a specific branch (e.g., `2.9`), then fetch and switch to that.
 - `git switch -c your-branch-name`
+- Make sure that you have run `pre-commit install`
 - Make your changes, create your commits.
 - `git push -u origin your-branch-name`
 
@@ -96,3 +103,106 @@ An issue is triaged when it has the track label (e.g. `2.9`, `3.2`). And once it
 Scan through our [existing issues](https://github.com/juju/python-libjuju/issues) to find one that interests you.
 You can narrow down the search using `labels` as filters. See our [Labels](https://github.com/juju/python-libjuju/labels) for more information on that.
 As a general rule, we don’t assign issues to anyone. If you find an issue to work on, you are welcome to open a PR with a fix.
+
+
+## Supporting a new Juju release
+
+When new versions of Juju are released, there may be api (facade) changes, and python-libjuju needs to be updated to support them.
+
+Every Juju build facilitates this with the inclusion of a json schema file (found in the Juju codebase under apiserver/facades/schema.json).
+Juju's continuous integration testing ensures that this file is always kept up to date.
+
+Some Juju releases may not feature any api changes at all.
+Supporting many of the possible changes to the api is taken care of by python-libjuju's code generation.
+The process for python-libjuju to take care of a Juju release is as follows.
+
+### 1. Check previous release was handled correctly
+
+If version X.Y.Z has just been released, where `Z` is 1 or more, then there should be:
+1. A line in python-libjuju's `juju/client/SCHEMAS.md` starting with `X.Y.(Z-1)`
+2. A schema file named `juju/client/schemas-juju-X.Y.(Z-1).json`
+
+For example, if `3.4.17` was just released, we'd expect there to already be a line SCHEMAS.md starting with `3.4.16`, and a `schemas-juju-3.4.16.json` file.
+
+If this is not the case, then you'll need to check what the latest release that has been handled is, and follow the process below for each release that hasn't been handled yet!
+
+
+### 2. Adding the schema file for a Juju release
+
+Now we know what release we're taking care of. Follow these steps to include the new schema file in python-libjuju:
+
+### First release in a series
+
+Is this the first release in a minor version series?
+
+That is, an `X.Y.0` release, for example `3.6.0`?
+
+1. Copy the X.Y.0 Juju release's `apiserver/facades/schema.json` file to `juju/client/schemas-juju-X.Y.0.json`
+2. Add a new section to `juju/client/SCHEMAS.md`: `# X.Y`
+3. Add a new line to that section: `X.Y.0`. For example, you might have:
+```
+# 3.6
+3.6.0
+```
+
+Note: you should also remove any pre-release schemas, which have the naming format `schemas-juju.X.Y-rcN.json`, where `N` is the release candidate version.
+
+
+### Subsequent releases
+
+Otherwise, this is an `X.Y.Z` release where `Z` is 1 or more.
+
+Here we have to check: is the `X.Y.Z` Juju release's `schema.json` file different from python-libjuju's `schemas-juju-X.Y.(Z-1).json`?
+
+You could, for instance, run a command like:
+```
+diff $JUJU_RELEASE_SCHEMA $PREVIOUS_PYTHONLIBJUJU_SCHEMA
+```
+
+If there are **_any_ differences**, then:
+
+1. Copy the X.Y.Z Juju release's `apiserver/facades/schema.json` file to `juju/client/schemas-juju-X.Y.Z.json`
+2. Add a new line to the `# X.Y` section in `juju/client/SCHEMAS.md`:
+```
+X.Y.Z
+```
+
+If there are **<ins>no</ins> differences**, then:
+
+1. Rename the `schemas-juju-X.Y.(Z-1).json` file to `schemas-juju-X.Y.Z.json` - or equivalently, remove the `schemas-juju-X.Y.(Z-1).json` file and add Juju's `schema.json` as `schemas-juju-X.Y.Z.json`
+
+2. Add a new line to the `# X.Y` section in `juju/client/SCHEMAS.md`:
+
+```
+X.Y.Z (identical to $PREV)
+````
+
+Where `$PREV` is either `X.Y.(Z-1)`, or if `X.Y.(Z-1)` was also identical to a previous release, then that release number instead. You can see examples of this in `SCHEMAS.md`.
+
+
+### 3. Generate python-libjuju client code from new schema
+
+In the python-libjuju root directory, run `make client`.
+
+This will run code generation and update the `juju/client/_definitions.py`, `juju/client/_client.py` and `juju/client/_client{N}.py`files as needed.
+
+The `_client{N}.py` files, like `_client1.py` and `_client19.py` contain definitions for specific facade numbers (1 and 19 in this case). Running `make client` might result in the creation of some new numbered files.
+
+
+### 4. Validate with newly generated code
+
+Run the tests under `tests/validate`, for example:
+```
+python -m pytest tests/validate -vv
+```
+
+If the `test_client_facades` test fails, it means that the `client_facades` dictionary in python-libjuju's `juju/client/connection.py` doesn't match the new facades from code generation with the new schema file. In this case, we would expect some differences, so you can update the `client_facades` dictionary based on the output of the test so that it passes.
+
+
+### 5. Open a PR
+
+Check any changed files into version control, as well as any new `_client{N}.py` and `schemas-juju-X.Y.Z.json` files, and open a PR. A good PR title would be `chore: add schemas for juju X.Y.Z`.
+
+Tests on this PR might fail. These failures will need to be investigated. One possible cause of failures would be if python-libjuju requires additional changes to support a new facade version. If this is the case, a potential solution is to manually move the problematic facade number from `client_facades` to `excluded_facade_versions`, and open an issue about supporting that facade.
+
+You can run the integration tests locally, but they can be a bit unpredictable. You could also just push to your fork to have them run on github, but if you open a PR then the other maintainers can help out.

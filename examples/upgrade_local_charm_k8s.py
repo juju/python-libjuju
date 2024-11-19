@@ -1,8 +1,7 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-"""
-This example:
+"""This example:
 
 1. Connects to the current model
 2. Deploy a bundle and waits until it reports itself active
@@ -10,40 +9,41 @@ This example:
 4. Destroys the units and applications
 
 """
+
 from juju import jasyncio
 from juju.model import Model
 
 
 async def main():
     model = Model()
-    print('Connecting to model')
+    print("Connecting to model")
     # Connect to current model with current user, per Juju CLI
     await model.connect()
 
     try:
-        print('Deploying bundle')
+        print("Deploying bundle")
         applications = await model.deploy(
-            './examples/k8s-local-bundle/bundle.yaml',
+            "./examples/k8s-local-bundle/bundle.yaml",
         )
 
-        print('Waiting for active')
-        await model.wait_for_idle(status='active')
+        print("Waiting for active")
+        await model.wait_for_idle(status="active")
         print("Successfully deployed!")
 
-        local_path = './examples/charms/onos.charm'
-        print('Upgrading charm with %s' % local_path)
+        local_path = "./examples/charms/onos.charm"
+        print("Upgrading charm with %s" % local_path)
         await applications[0].upgrade_charm(path=local_path)
 
-        await model.wait_for_idle(status='active')
+        await model.wait_for_idle(status="active")
 
-        print('Removing bundle')
+        print("Removing bundle")
         for application in applications:
             await application.remove()
     finally:
-        print('Disconnecting from model')
+        print("Disconnecting from model")
         await model.disconnect()
         print("Success")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     jasyncio.run(main())

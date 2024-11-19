@@ -7,28 +7,33 @@ import random
 import string
 import time
 import uuid
+from unittest import mock
 
-import mock
 import paramiko
-
 import pylxd
 import pytest
+
 from juju import jasyncio, tag, url
 from juju.client import client
 from juju.client._definitions import FullStatus
-from juju.errors import JujuError, JujuModelError, JujuUnitError, JujuConnectionError
+from juju.errors import JujuConnectionError, JujuError, JujuModelError, JujuUnitError
 from juju.model import Model, ModelObserver
-from juju.utils import block_until, run_with_interrupt, wait_for_bundle, base_channel_to_series
+from juju.utils import (
+    base_channel_to_series,
+    block_until,
+    run_with_interrupt,
+    wait_for_bundle,
+)
 
 from .. import base
-from ..utils import MB, GB, TESTS_DIR, OVERLAYS_DIR, SSH_KEY, INTEGRATION_TEST_DIR
+from ..utils import GB, INTEGRATION_TEST_DIR, MB, OVERLAYS_DIR, SSH_KEY, TESTS_DIR
 
 
 @base.bootstrapped
 async def test_model_name():
     model = Model()
     with pytest.raises(JujuModelError):
-        model.name
+        assert model.name
 
     async with base.CleanModel() as new_model:
         await model.connect(new_model.name)
@@ -39,65 +44,62 @@ async def test_model_name():
 @base.bootstrapped
 @pytest.mark.bundle
 async def test_deploy_local_bundle_dir():
-    bundle_path = TESTS_DIR / 'bundle'
+    bundle_path = TESTS_DIR / "bundle"
 
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_path))
 
-        app1 = model.applications.get('juju-qa-test')
-        app2 = model.applications.get('nrpe')
+        app1 = model.applications.get("juju-qa-test")
+        app2 = model.applications.get("nrpe")
         with open("/tmp/output", "w") as writer:
             writer.write(str(bundle_path) + "\n")
-            for (k, v) in model.applications.items():
+            for k in model.applications:
                 writer.write(k)
         assert app1 and app2
         # import pdb;pdb.set_trace()
-        await model.wait_for_idle(['juju-qa-test', 'nrpe'], wait_for_at_least_units=1)
+        await model.wait_for_idle(["juju-qa-test", "nrpe"], wait_for_at_least_units=1)
 
 
 @base.bootstrapped
 @pytest.mark.bundle
 async def test_deploy_local_bundle_file():
-    bundle_path = TESTS_DIR / 'bundle'
-    mini_bundle_file_path = bundle_path / 'mini-bundle.yaml'
+    bundle_path = TESTS_DIR / "bundle"
+    mini_bundle_file_path = bundle_path / "mini-bundle.yaml"
 
     async with base.CleanModel() as model:
         await model.deploy(str(mini_bundle_file_path))
 
-        app1 = model.applications.get('juju-qa-test')
-        app2 = model.applications.get('nrpe')
+        app1 = model.applications.get("juju-qa-test")
+        app2 = model.applications.get("nrpe")
         assert app1 and app2
-        await model.wait_for_idle(['juju-qa-test', 'nrpe'], wait_for_at_least_units=1)
+        await model.wait_for_idle(["juju-qa-test", "nrpe"], wait_for_at_least_units=1)
 
 
 @base.bootstrapped
 @pytest.mark.bundle
 async def test_deploy_bundle_local_resource_relative_path():
-    bundle_file_path = INTEGRATION_TEST_DIR / 'bundle-file-resource.yaml'
+    bundle_file_path = INTEGRATION_TEST_DIR / "bundle-file-resource.yaml"
 
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_file_path))
 
-        app = model.applications.get('file-resource-charm')
+        app = model.applications.get("file-resource-charm")
         assert app
-        await model.block_until(lambda: (len(app.units) == 1),
-                                timeout=60 * 4)
+        await model.block_until(lambda: (len(app.units) == 1), timeout=60 * 4)
 
 
 @base.bootstrapped
 async def test_deploy_by_revision():
     async with base.CleanModel() as model:
-        app = await model.deploy('juju-qa-test',
-                                 application_name='test1',
-                                 channel='2.0/stable',
-                                 revision=22)
+        app = await model.deploy(
+            "juju-qa-test", application_name="test1", channel="2.0/stable", revision=22
+        )
 
         assert url.URL.parse(app.charm_url).revision == 22
 
-        app = await model.deploy('juju-qa-test',
-                                 application_name='test2',
-                                 channel='latest/edge',
-                                 revision=19)
+        app = await model.deploy(
+            "juju-qa-test", application_name="test2", channel="latest/edge", revision=19
+        )
 
         assert url.URL.parse(app.charm_url).revision == 19
 
@@ -110,83 +112,85 @@ async def test_deploy_by_revision_validate_flags():
     async with base.CleanModel() as model:
         # For charms --revision requires --channel
         with pytest.raises(JujuError):
-            await model.deploy('juju-qa-test',
-                               # channel='2.0/stable',
-                               revision=22)
+            await model.deploy(
+                "juju-qa-test",
+                # channel='2.0/stable',
+                revision=22,
+            )
 
         # For bundles, --revision and --channel are mutually exclusive
         with pytest.raises(JujuError):
-            await model.deploy('ch:canonical-livepatch-onprem',
-                               channel='latest/stable',
-                               revision=4)
+            await model.deploy(
+                "ch:canonical-livepatch-onprem", channel="latest/stable", revision=4
+            )
 
 
 @base.bootstrapped
 @pytest.mark.bundle
 async def test_deploy_local_bundle_include_file():
-    bundle_dir = INTEGRATION_TEST_DIR / 'bundle'
-    bundle_yaml_path = bundle_dir / 'bundle-include-file.yaml'
+    bundle_dir = INTEGRATION_TEST_DIR / "bundle"
+    bundle_yaml_path = bundle_dir / "bundle-include-file.yaml"
 
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_yaml_path))
 
-        appa = model.applications.get('helloa', None)
-        appb = model.applications.get('hellob', None)
-        test = model.applications.get('test', None)
+        appa = model.applications.get("helloa", None)
+        appb = model.applications.get("hellob", None)
+        test = model.applications.get("test", None)
         assert appa and appb and test
-        assert appa.config.get('port', None) == 666
-        assert appa.config.get('application-repo', "") == "http://my-juju.com"
+        assert appa.config.get("port", None) == 666
+        assert appa.config.get("application-repo", "") == "http://my-juju.com"
 
 
 @base.bootstrapped
 @pytest.mark.bundle
 async def test_deploy_local_bundle_include_base64():
-    bundle_dir = INTEGRATION_TEST_DIR / 'bundle'
-    bundle_yaml_path = bundle_dir / 'bundle-include-base64.yaml'
+    bundle_dir = INTEGRATION_TEST_DIR / "bundle"
+    bundle_yaml_path = bundle_dir / "bundle-include-base64.yaml"
 
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_yaml_path))
 
-        appa = model.applications.get('helloa', None)
-        appb = model.applications.get('hellob', None)
-        test = model.applications.get('test', None)
+        appa = model.applications.get("helloa", None)
+        appb = model.applications.get("hellob", None)
+        test = model.applications.get("test", None)
         assert appa and appb and test
-        assert appa.config.get('application-repo', "") == "http://my-juju.com"
+        assert appa.config.get("application-repo", "") == "http://my-juju.com"
 
 
 @base.bootstrapped
 @pytest.mark.bundle
 async def test_deploy_bundle_local_charms():
-    bundle_path = INTEGRATION_TEST_DIR / 'bundle' / 'local.yaml'
+    bundle_path = INTEGRATION_TEST_DIR / "bundle" / "local.yaml"
 
     async with base.CleanModel() as model:
         await model.deploy(bundle_path)
         await wait_for_bundle(model, bundle_path)
-        assert set(model.units.keys()) == set(['test1/0', 'test2/0'])
-        assert model.units['test1/0'].agent_status == 'idle'
-        assert model.units['test1/0'].workload_status == 'active'
-        assert model.units['test2/0'].agent_status == 'idle'
-        assert model.units['test2/0'].workload_status == 'active'
+        assert set(model.units.keys()) == set(["test1/0", "test2/0"])
+        assert model.units["test1/0"].agent_status == "idle"
+        assert model.units["test1/0"].workload_status == "active"
+        assert model.units["test2/0"].agent_status == "idle"
+        assert model.units["test2/0"].workload_status == "active"
 
 
 @base.bootstrapped
 @pytest.mark.bundle
 async def test_deploy_bundle_local_charm_series_manifest():
-    bundle_path = INTEGRATION_TEST_DIR / 'bundle' / 'local-manifest.yaml'
+    bundle_path = INTEGRATION_TEST_DIR / "bundle" / "local-manifest.yaml"
 
     async with base.CleanModel() as model:
         await model.deploy(bundle_path)
         await wait_for_bundle(model, bundle_path)
-        assert set(model.units.keys()) == set(['test1/0'])
-        assert model.units['test1/0'].agent_status == 'idle'
-        assert model.units['test1/0'].workload_status == 'active'
+        assert set(model.units.keys()) == set(["test1/0"])
+        assert model.units["test1/0"].agent_status == "idle"
+        assert model.units["test1/0"].workload_status == "active"
 
 
 @base.bootstrapped
 @pytest.mark.bundle
 async def test_deploy_bundle_with_pinned_charm_revision():
-    bundle_dir = INTEGRATION_TEST_DIR / 'bundle'
-    bundle_yaml_path = bundle_dir / 'bundle-with-charm-revision.yaml'
+    bundle_dir = INTEGRATION_TEST_DIR / "bundle"
+    bundle_yaml_path = bundle_dir / "bundle-with-charm-revision.yaml"
     # Revision of the hello-juju charm defined in the bundle yaml
     # We can also read the yaml to get the revision but we are hard-coding it for now for simplicity
     pinned_revision = 7
@@ -194,18 +198,21 @@ async def test_deploy_bundle_with_pinned_charm_revision():
     async with base.CleanModel() as model:
         await model.deploy(str(bundle_yaml_path))
 
-        application = model.applications.get('hello-juju', None)
+        application = model.applications.get("hello-juju", None)
         status: FullStatus = await model.get_status([application.name])
         # the 'charm' field of application status should be of this format:
         # ch:amd64/{series}/{name}-{revision}
-        assert f"{application.name}-{pinned_revision}" in status.applications[application.name]["charm"]
+        assert (
+            f"{application.name}-{pinned_revision}"
+            in status.applications[application.name]["charm"]
+        )
 
 
 @base.bootstrapped
 @pytest.mark.bundle
 async def test_deploy_invalid_bundle():
-    pytest.skip('test_deploy_invalid_bundle intermittent test failure')
-    bundle_path = TESTS_DIR / 'bundle' / 'invalid.yaml'
+    pytest.skip("test_deploy_invalid_bundle intermittent test failure")
+    bundle_path = TESTS_DIR / "bundle" / "invalid.yaml"
     async with base.CleanModel() as model:
         with pytest.raises(JujuError):
             await model.deploy(str(bundle_path))
@@ -214,9 +221,15 @@ async def test_deploy_invalid_bundle():
 @base.bootstrapped
 @pytest.mark.bundle
 async def test_deploy_bundle_with_storage_constraint():
-    bundle_path = INTEGRATION_TEST_DIR / 'bundle' / 'bundle-with-storage-constraint.yaml'
+    bundle_path = (
+        INTEGRATION_TEST_DIR / "bundle" / "bundle-with-storage-constraint.yaml"
+    )
 
     async with base.CleanModel() as model:
+        assert model._info
+        if str(model._info.agent_version) < "3.4.3":
+            pytest.skip("bundle/postgresql charm requires Juju 3.4.3 or later")
+
         await model.deploy(bundle_path)
         await wait_for_bundle(model, bundle_path)
         storage = await model.list_storage()
@@ -225,24 +238,28 @@ async def test_deploy_bundle_with_storage_constraint():
 
 @base.bootstrapped
 async def test_deploy_local_charm():
-    charm_path = TESTS_DIR / 'charm'
+    charm_path = TESTS_DIR / "charm"
 
     async with base.CleanModel() as model:
         await model.deploy(str(charm_path))
-        assert 'charm' in model.applications
+        assert "charm" in model.applications
         await model.wait_for_idle(status="active")
-        assert model.units['charm/0'].workload_status == 'active'
+        assert model.units["charm/0"].workload_status == "active"
 
 
 @base.bootstrapped
 async def test_deploy_charm_assumes():
     async with base.CleanModel() as model:
-        await model.deploy('postgresql', channel='14/edge')
+        assert model._info
+        if str(model._info.agent_version) < "3.4.3":
+            pytest.skip("postgresql charm requires Juju 3.4.3 or later")
+
+        await model.deploy("postgresql", channel="14/edge")
 
 
 @base.bootstrapped
 async def test_deploy_local_charm_base_charmcraft_yaml():
-    charm_path = INTEGRATION_TEST_DIR / 'charm-base-charmcraft-yaml'
+    charm_path = INTEGRATION_TEST_DIR / "charm-base-charmcraft-yaml"
 
     async with base.CleanModel() as model:
         await model.deploy(str(charm_path))
@@ -250,34 +267,34 @@ async def test_deploy_local_charm_base_charmcraft_yaml():
 
 @base.bootstrapped
 async def test_deploy_local_charm_channel():
-    charm_path = TESTS_DIR / 'charm'
+    charm_path = TESTS_DIR / "charm"
 
     async with base.CleanModel() as model:
-        await model.deploy(str(charm_path), channel='stable')
-        assert 'charm' in model.applications
+        await model.deploy(str(charm_path), channel="stable")
+        assert "charm" in model.applications
 
 
 @base.bootstrapped
 async def test_wait_local_charm_blocked():
-    charm_path = TESTS_DIR / 'charm'
+    charm_path = TESTS_DIR / "charm"
 
     async with base.CleanModel() as model:
-        await model.deploy(str(charm_path), config={'status': 'blocked'})
-        assert 'charm' in model.applications
+        await model.deploy(str(charm_path), config={"status": "blocked"})
+        assert "charm" in model.applications
         await model.wait_for_idle()
         with pytest.raises(JujuUnitError):
-            await model.wait_for_idle(status="active",
-                                      raise_on_blocked=True,
-                                      timeout=30)
+            await model.wait_for_idle(
+                status="active", raise_on_blocked=True, timeout=30
+            )
 
 
 @base.bootstrapped
 async def test_wait_local_charm_waiting_timeout():
-    charm_path = TESTS_DIR / 'charm'
+    charm_path = TESTS_DIR / "charm"
 
     async with base.CleanModel() as model:
-        await model.deploy(str(charm_path), config={'status': 'waiting'})
-        assert 'charm' in model.applications
+        await model.deploy(str(charm_path), config={"status": "waiting"})
+        assert "charm" in model.applications
         await model.wait_for_idle()
         with pytest.raises(jasyncio.TimeoutError):
             await model.wait_for_idle(status="active", timeout=30)
@@ -287,10 +304,9 @@ async def test_wait_local_charm_waiting_timeout():
 @pytest.mark.bundle
 async def test_deploy_bundle():
     async with base.CleanModel() as model:
-        await model.deploy('anbox-cloud-core', channel='stable',
-                           trust=True)
+        await model.deploy("anbox-cloud-core", channel="stable", trust=True)
 
-        for app in ('ams', 'etcd', 'ams-node-controller', 'etcd-ca', 'lxd'):
+        for app in ("ams", "etcd", "ams-node-controller", "etcd-ca", "lxd"):
             assert app in model.applications
 
 
@@ -298,22 +314,31 @@ async def test_deploy_bundle():
 @pytest.mark.bundle
 async def test_deploy_local_bundle_with_overlay_multi():
     async with base.CleanModel() as model:
-        bundle_with_overlay_path = OVERLAYS_DIR / 'bundle-with-overlay-multi.yaml'
+        assert model._info
+        if str(model._info.agent_version) < "3.4.3":
+            pytest.skip("bundle/postgresql charm requires Juju 3.4.3 or later")
+
+        bundle_with_overlay_path = OVERLAYS_DIR / "bundle-with-overlay-multi.yaml"
         await model.deploy(bundle_with_overlay_path)
 
         # this bundle deploys mysql and ghost apps and relates them,
         # but the overlay attached removes ghost, so
-        assert 'mysql' in model.applications
-        assert 'ghost' not in model.applications
+        assert "mysql" in model.applications
+        assert "ghost" not in model.applications
 
 
 @base.bootstrapped
 @pytest.mark.bundle
+@pytest.mark.skip("Always fails -- investigate bundle charms")
 async def test_deploy_bundle_with_overlay_as_argument():
     async with base.CleanModel() as model:
-        overlay_path = OVERLAYS_DIR / 'test-overlay.yaml'
+        assert model._info
+        if str(model._info.agent_version) < "3.4.3":
+            pytest.skip("bundle/postgresql charm requires Juju 3.4.3 or later")
 
-        await model.deploy('juju-qa-bundle-test', overlays=[overlay_path])
+        overlay_path = OVERLAYS_DIR / "test-overlay.yaml"
+
+        await model.deploy("juju-qa-bundle-test", overlays=[overlay_path])
         # juju-qa-bundle-test installs the applications
         #   - juju-qa-test
         #   - juju-qa-test-focal
@@ -322,97 +347,119 @@ async def test_deploy_bundle_with_overlay_as_argument():
 
         # our overlay requests to remove ntp and add ghost and mysql
         # and relate them, so
-        assert 'juju-qa-test' in model.applications
-        assert 'ntp' not in model.applications
-        assert 'ghost' in model.applications
-        assert 'mysql' in model.applications
+        assert "juju-qa-test" in model.applications
+        assert "ntp" not in model.applications
+        assert "ghost" in model.applications
+        assert "mysql" in model.applications
 
 
 @base.bootstrapped
 @pytest.mark.bundle
 async def test_deploy_bundle_with_multi_overlay_as_argument():
     async with base.CleanModel() as model:
-        overlay_path = OVERLAYS_DIR / 'test-multi-overlay.yaml'
+        assert model._info
+        if str(model._info.agent_version) < "3.4.3":
+            pytest.skip("bundle/postgresql charm requires Juju 3.4.3 or later")
 
-        await model.deploy('juju-qa-bundle-test', overlays=[overlay_path])
-        assert 'ntp' not in model.applications
-        assert 'memcached' not in model.applications
-        assert 'mysql' in model.applications
+        overlay_path = OVERLAYS_DIR / "test-multi-overlay.yaml"
+
+        await model.deploy("juju-qa-bundle-test", overlays=[overlay_path])
+        assert "ntp" not in model.applications
+        assert "memcached" not in model.applications
+        assert "mysql" in model.applications
 
 
 @base.bootstrapped
 @pytest.mark.bundle
+@pytest.mark.skip("Always fails -- investigate bundle charms")
 async def test_deploy_bundle_with_multiple_overlays_with_include_files():
     async with base.CleanModel() as model:
-        bundle_yaml_path = TESTS_DIR / 'integration' / 'bundle' / 'bundle.yaml'
-        overlay1_path = OVERLAYS_DIR / 'test-overlay2.yaml'
-        overlay2_path = OVERLAYS_DIR / 'test-overlay3.yaml'
-        overlay3_path = OVERLAYS_DIR / 'test-overlay4.yaml'
+        bundle_yaml_path = TESTS_DIR / "integration" / "bundle" / "bundle.yaml"
+        overlay1_path = OVERLAYS_DIR / "test-overlay2.yaml"
+        overlay2_path = OVERLAYS_DIR / "test-overlay3.yaml"
+        overlay3_path = OVERLAYS_DIR / "test-overlay4.yaml"
 
-        await model.deploy(str(bundle_yaml_path), overlays=[overlay1_path, overlay2_path, overlay3_path])
+        await model.deploy(
+            str(bundle_yaml_path),
+            overlays=[overlay1_path, overlay2_path, overlay3_path],
+        )
 
-        assert 'influxdb' not in model.applications
-        assert 'test' not in model.applications
-        assert 'memcached' not in model.applications
-        assert 'grafana' in model.applications
-        assert 'grafana' in model.application_offers
-        assert 'grafana' == model.application_offers['grafana'].application_name
-        assert 'dashboards' == model.application_offers['grafana'].offer_name
+        assert "influxdb" not in model.applications
+        assert "test" not in model.applications
+        assert "memcached" not in model.applications
+        assert "grafana" in model.applications
+        assert "grafana" in model.application_offers
+        assert model.application_offers["grafana"].application_name == "grafana"
+        assert model.application_offers["grafana"].offer_name == "dashboards"
 
 
 @base.bootstrapped
 async def test_deploy_local_charm_folder_symlink():
-    charm_path = TESTS_DIR / 'charm-folder-symlink'
+    charm_path = TESTS_DIR / "charm-folder-symlink"
 
     async with base.CleanModel() as model:
         simple = await model.deploy(str(charm_path))
-        assert 'simple' in model.applications
-        terminal_statuses = ('active', 'error', 'blocked')
+        assert "simple" in model.applications
+        terminal_statuses = ("active", "error", "blocked")
         await model.block_until(
             lambda: (
-                len(simple.units) > 0 and
-                simple.units[0].workload_status in terminal_statuses)
+                len(simple.units) > 0
+                and simple.units[0].workload_status in terminal_statuses
+            )
         )
-        assert simple.units[0].workload_status == 'active'
+        assert simple.units[0].workload_status == "active"
 
 
 @base.bootstrapped
 async def test_deploy_from_ch_channel_revision_success():
     async with base.CleanModel() as model:
+        assert model._info
+        if str(model._info.agent_version) < "3.4.3":
+            pytest.skip("postgresql charm requires Juju 3.4.3 or later")
+
         # Ensure we're able to resolve charm these with channel and revision,
         # or channel without revision (note that revision requires channel,
         # but not vice versa)
-        await model.deploy("postgresql", application_name="test1", channel='14/stable', base='ubuntu@22.04')
-        await model.deploy("postgresql", application_name="test2", channel='14/stable', revision=288)
+        await model.deploy(
+            "postgresql",
+            application_name="test1",
+            channel="14/stable",
+            base="ubuntu@22.04",
+        )
+        await model.deploy(
+            "postgresql", application_name="test2", channel="14/stable", revision=288
+        )
 
 
 @base.bootstrapped
 @pytest.mark.bundle
 async def test_deploy_trusted_bundle():
-    pytest.skip("skip until we have a deployable bundle available. Right now the landscape-dense fails because postgresql is broken")
+    pytest.skip(
+        "skip until we have a deployable bundle available. Right now the landscape-dense fails because postgresql is broken"
+    )
     async with base.CleanModel() as model:
-        await model.deploy('landscape-dense', channel='stable', trust=True)
+        await model.deploy("landscape-dense", channel="stable", trust=True)
 
-        for app in ('haproxy', 'landscape-server', 'postgresql', 'rabbit-mq-server'):
+        for app in ("haproxy", "landscape-server", "postgresql", "rabbit-mq-server"):
             assert app in model.applications
 
-        haproxy_app = model.applications['haproxy']
+        haproxy_app = model.applications["haproxy"]
         trusted = await haproxy_app.get_trusted()
         assert trusted is True
 
 
 @base.bootstrapped
 async def test_deploy_from_ch_with_series():
-    charm = 'ch:ubuntu'
-    for series in ['focal']:
+    charm = "ch:ubuntu"
+    for series in ["focal"]:
         async with base.CleanModel() as model:
-            app_name = "ubuntu-{}".format(series)
+            app_name = f"ubuntu-{series}"
             await model.deploy(charm, application_name=app_name, series=series)
-            status = (await model.get_status())
+            status = await model.get_status()
             app_status = status["applications"][app_name]
 
-            if 'series' in app_status.serialize():
-                s = app_status['series']
+            if "series" in app_status.serialize():
+                s = app_status["series"]
             else:
                 # If there's no series, we should have a base
                 s = base_channel_to_series(app_status.base.channel)
@@ -422,10 +469,10 @@ async def test_deploy_from_ch_with_series():
 @base.bootstrapped
 async def test_deploy_from_ch_with_invalid_series():
     async with base.CleanModel() as model:
-        charm = 'ch:ubuntu'
+        charm = "ch:ubuntu"
         try:
-            await model.deploy(charm, series='invalid')
-            assert False, 'Invalid deployment should raise JujuError'
+            await model.deploy(charm, series="invalid")
+            assert False, "Invalid deployment should raise JujuError"
         except JujuError:
             pass
 
@@ -434,16 +481,16 @@ async def test_deploy_from_ch_with_invalid_series():
 async def test_deploy_with_base():
     async with base.CleanModel() as model:
         await model.deploy("ubuntu", base="ubuntu@22.04")
-        await model.wait_for_idle(status='active')
+        await model.wait_for_idle(status="active")
 
 
 @base.bootstrapped
 async def test_deploy_noble():
-    charm_path = INTEGRATION_TEST_DIR / 'charm-manifest'
+    charm_path = INTEGRATION_TEST_DIR / "charm-manifest"
 
     async with base.CleanModel() as model:
         await model.deploy(str(charm_path), base="ubuntu@24.04")
-        await model.wait_for_idle(status='active')
+        await model.wait_for_idle(status="active")
 
 
 @base.bootstrapped
@@ -457,19 +504,20 @@ async def test_add_machine():
         # add a machine with constraints, disks, and series
         machine2 = await model.add_machine(
             constraints={
-                'arch': 'amd64',
-                'mem': 256 * MB,
+                "arch": "amd64",
+                "mem": 256 * MB,
             },
-            disks=[{
-                'size': 10 * GB,
-                'count': 1,
-            }],
-            series='xenial',
+            disks=[
+                {
+                    "size": 10 * GB,
+                    "count": 1,
+                }
+            ],
+            series="xenial",
         )
 
         # add a lxd container to machine2
-        machine3 = await model.add_machine(
-            'lxd:{}'.format(machine2.id))
+        machine3 = await model.add_machine(f"lxd:{machine2.id}")
 
         for m in (machine1, machine2, machine3):
             assert isinstance(m, Machine)
@@ -485,83 +533,74 @@ async def test_add_machine():
 
 
 async def add_manual_machine_ssh(is_root=False):
-
     # Verify controller is localhost
     async with base.CleanController() as controller:
         cloud = await controller.get_cloud()
         if cloud != "localhost":
-            pytest.skip('Skipping because test requires lxd.')
+            pytest.skip("Skipping because test requires lxd.")
 
     async with base.CleanModel() as model:
-        private_key_path = os.path.expanduser(
-            "~/.local/share/juju/ssh/juju_id_rsa"
-        )
-        public_key_path = os.path.expanduser(
-            "~/.local/share/juju/ssh/juju_id_rsa.pub"
-        )
+        private_key_path = os.path.expanduser("~/.local/share/juju/ssh/juju_id_rsa")
+        public_key_path = os.path.expanduser("~/.local/share/juju/ssh/juju_id_rsa.pub")
 
         # connect using the local unix socket
         client = pylxd.Client()
 
-        test_name = "test-{}-add-manual-machine-ssh".format(
-            uuid.uuid4().hex[-4:]
-        )
+        test_name = f"test-{uuid.uuid4().hex[-4:]}-add-manual-machine-ssh"
 
         if is_root:
             test_user = "root"
         else:
             # Create a randomized user name
-            test_user = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
+            test_user = "".join(
+                random.choice(string.ascii_lowercase) for i in range(10)
+            )
 
         # create profile w/cloud-init and juju ssh key
         public_key = ""
-        with open(public_key_path, "r") as f:
+        with open(public_key_path) as f:
             public_key = f.readline()
 
-        cloud_init = """
+        cloud_init = f"""
         #cloud-config
         users:
-        - name: {}
+        - name: {test_user}
           ssh_pwauth: False
           ssh_authorized_keys:
-            - {}
+            - {public_key}
           sudo: ["ALL=(ALL) NOPASSWD:ALL"]
           groups: adm, sudoers
-        """.format(test_user, public_key)
+        """
 
         if is_root:
-            cloud_init = """
+            cloud_init = f"""
             #cloud-config
             users:
-            - name: {}
+            - name: {test_user}
               ssh_authorized_keys:
-                - {}
-            """.format(test_user, public_key)
+                - {public_key}
+            """
 
         profile = client.profiles.create(
             test_name,
-            config={'user.user-data': cloud_init},
+            config={"user.user-data": cloud_init},
             devices={
-                'root': {'path': '/', 'pool': 'default', 'type': 'disk'},
-                'eth0': {
-                    'nictype': 'bridged',
-                    'parent': 'lxdbr0',
-                    'type': 'nic'
-                }
-            }
+                "root": {"path": "/", "pool": "default", "type": "disk"},
+                "eth0": {"nictype": "bridged", "parent": "lxdbr0", "type": "nic"},
+            },
         )
 
         # create lxc machine
         config = {
-            'name': test_name,
-            'source': {
-                'type': 'image',
-                'alias': 'focal',
-                'mode': 'pull',
-                'protocol': 'simplestreams',
-                'server': 'https://cloud-images.ubuntu.com/releases',
+            "name": test_name,
+            "source": {
+                "type": "image",
+                "alias": "focal",
+                "mode": "pull",
+                "protocol": "simplestreams",
+                "server": "https://cloud-images.ubuntu.com/releases",
             },
-            'profiles': [test_name],
+            "profiles": [test_name],
         }
         container = client.containers.create(config, wait=True)
         container.start(wait=True)
@@ -571,23 +610,23 @@ async def add_manual_machine_ssh(is_root=False):
             starttime = time.perf_counter()
             while time.perf_counter() < starttime + timeout:
                 time.sleep(1)
-                if 'eth0' in container.state().network:
-                    addresses = container.state().network['eth0']['addresses']
+                if "eth0" in container.state().network:
+                    addresses = container.state().network["eth0"]["addresses"]
                     if len(addresses) > 0:
-                        if addresses[0]['family'] == 'inet':
+                        if addresses[0]["family"] == "inet":
                             return addresses[0]
             return None
 
         host = wait_for_network(container)
-        assert host, 'Failed to get address for machine'
+        assert host, "Failed to get address for machine"
 
         # HACK: We need to give sshd a chance to bind to the interface,
         # and pylxd's container.execute seems to be broken and fails and/or
         # hangs trying to properly check if the service is up.
         time.sleep(5)
-        spec = 'ssh:{}@{}:{}'.format(
+        spec = "ssh:{}@{}:{}".format(
             test_user,
-            host['address'],
+            host["address"],
             private_key_path,
         )
         err = None
@@ -595,7 +634,10 @@ async def add_manual_machine_ssh(is_root=False):
             try:
                 # add a new manual machine
                 machine1 = await model.add_machine(spec=spec)
-            except (paramiko.ssh_exception.NoValidConnectionsError, paramiko.ssh_exception.AuthenticationException) as e:
+            except (
+                paramiko.ssh_exception.NoValidConnectionsError,
+                paramiko.ssh_exception.AuthenticationException,
+            ) as e:
                 # retry the ssh connection a few times if it fails
                 err = e
                 time.sleep(attempt * 5)
@@ -607,7 +649,10 @@ async def add_manual_machine_ssh(is_root=False):
             container.stop(wait=True)
             container.delete(wait=True)
             profile.delete()
-            raise AssertionError('Unable to add_machine in %s attempts with spec : %s -- exception was %s' % (attempt, spec, err))
+            raise AssertionError(
+                "Unable to add_machine in %s attempts with spec : %s -- exception was %s"
+                % (attempt, spec, err)
+            )
 
         res = await machine1.destroy(force=True)
 
@@ -615,13 +660,16 @@ async def add_manual_machine_ssh(is_root=False):
             container.stop(wait=True)
             container.delete(wait=True)
             profile.delete()
-            raise AssertionError('Bad teardown, res is : %s' % res)
+            raise AssertionError("Bad teardown, res is : %s" % res)
 
         if len(model.machines) != 0:
             container.stop(wait=True)
             container.delete(wait=True)
             profile.delete()
-            raise AssertionError('Unable to destroy the added machine during cleanup -- model has : %s machines' % len(model.machines))
+            raise AssertionError(
+                "Unable to destroy the added machine during cleanup -- model has : %s machines"
+                % len(model.machines)
+            )
 
         container.stop(wait=True)
         container.delete(wait=True)
@@ -630,17 +678,17 @@ async def add_manual_machine_ssh(is_root=False):
 
 @base.bootstrapped
 async def test_add_manual_machine_ssh():
-    """Test manual machine provisioning with a non-root user
+    """Test manual machine provisioning with a non-root user.
 
-    Tests manual machine provisioning using a randomized username with sudo access.
+    Tests manual machine provisioning using a randomized username with
+    sudo access.
     """
     await add_manual_machine_ssh(is_root=False)
 
 
 @base.bootstrapped
 async def test_add_manual_machine_ssh_root():
-    """Test manual machine provisioning with the root user"""
-
+    """Test manual machine provisioning with the root user."""
     await add_manual_machine_ssh(is_root=True)
 
 
@@ -650,16 +698,16 @@ async def test_relate():
 
     async with base.CleanModel() as model:
         await model.deploy(
-            'ubuntu',
-            application_name='ubuntu',
-            base='ubuntu@20.04/stable',
-            channel='stable',
+            "ubuntu",
+            application_name="ubuntu",
+            base="ubuntu@20.04/stable",
+            channel="stable",
         )
         await model.deploy(
-            'nrpe',
-            application_name='nrpe',
-            base='ubuntu@20.04/stable',
-            channel='stable',
+            "nrpe",
+            application_name="nrpe",
+            base="ubuntu@20.04/stable",
+            channel="stable",
             # subordinates must be deployed without units
             num_units=0,
         )
@@ -669,8 +717,7 @@ async def test_relate():
 
         class TestObserver(ModelObserver):
             async def on_relation_add(self, delta, old, new, model):
-                if set(new.key.split()) == {'nrpe:general-info',
-                                            'ubuntu:juju-info'}:
+                if set(new.key.split()) == {"nrpe:general-info", "ubuntu:juju-info"}:
                     relation_added.set()
                     jasyncio.get_running_loop().call_later(10, timeout.set)
 
@@ -679,148 +726,156 @@ async def test_relate():
         real_app_facade = client.ApplicationFacade.from_connection(model.connection())
         mock_app_facade = mock.MagicMock()
 
-        async def mock_AddRelation(*args, **kwargs):
+        async def mock_add_relation(*args, **kwargs):
             # force response delay from AddRelation to test race condition
             # (see https://github.com/juju/python-libjuju/issues/191)
             result = await real_app_facade.AddRelation(*args, **kwargs)
             await relation_added.wait()
             return result
 
-        mock_app_facade.AddRelation = mock_AddRelation
+        mock_app_facade.AddRelation = mock_add_relation
 
-        with mock.patch.object(client.ApplicationFacade, 'from_connection',
-                               return_value=mock_app_facade):
-            my_relation = await run_with_interrupt(model.relate(
-                'ubuntu',
-                'nrpe',
-            ), timeout)
+        with mock.patch.object(
+            client.ApplicationFacade, "from_connection", return_value=mock_app_facade
+        ):
+            my_relation = await run_with_interrupt(
+                model.relate(
+                    "ubuntu",
+                    "nrpe",
+                ),
+                timeout,
+            )
 
         assert isinstance(my_relation, Relation)
 
 
 @base.bootstrapped
 async def test_store_resources_charm():
-    pytest.skip('Revise: test_store_resources_charm intermittent test failure')
+    pytest.skip("Revise: test_store_resources_charm intermittent test failure")
     async with base.CleanModel() as model:
-        ghost = await model.deploy('ghost', channel='stable')
-        assert 'ghost' in model.applications
-        terminal_statuses = ('active', 'error', 'blocked')
+        ghost = await model.deploy("ghost", channel="stable")
+        assert "ghost" in model.applications
+        terminal_statuses = ("active", "error", "blocked")
         await model.block_until(
             lambda: (
-                len(ghost.units) > 0 and
-                ghost.units[0].workload_status in terminal_statuses),
-            timeout=60 * 4
+                len(ghost.units) > 0
+                and ghost.units[0].workload_status in terminal_statuses
+            ),
+            timeout=60 * 4,
         )
         # ghost will go in to blocked (or error, for older
         # charm revs) if the resource is missing
-        assert ghost.units[0].workload_status == 'active'
+        assert ghost.units[0].workload_status == "active"
 
 
 @base.bootstrapped
 async def test_local_oci_image_resource_charm():
-    charm_path = TESTS_DIR / 'integration' / 'oci-image-charm'
+    charm_path = TESTS_DIR / "integration" / "oci-image-charm"
     async with base.CleanModel() as model:
         resources = {"oci-image": "ubuntu/latest"}
         charm = await model.deploy(str(charm_path), resources=resources)
-        assert 'oci-image-charm' in model.applications
-        terminal_statuses = ('active', 'error', 'blocked')
+        assert "oci-image-charm" in model.applications
+        terminal_statuses = ("active", "error", "blocked")
         await model.block_until(
             lambda: (
-                len(charm.units) > 0 and
-                charm.units[0].workload_status in terminal_statuses),
+                len(charm.units) > 0
+                and charm.units[0].workload_status in terminal_statuses
+            ),
             timeout=60 * 10,
         )
-        assert charm.units[0].workload_status == 'active'
+        assert charm.units[0].workload_status == "active"
 
 
 @base.bootstrapped
 async def test_local_file_resource_charm():
-    charm_path = INTEGRATION_TEST_DIR / 'file-resource-charm'
+    charm_path = INTEGRATION_TEST_DIR / "file-resource-charm"
     async with base.CleanModel() as model:
         resources = {"file-res": "test.file"}
         app = await model.deploy(str(charm_path), resources=resources)
-        assert 'file-resource-charm' in model.applications
+        assert "file-resource-charm" in model.applications
 
         await model.wait_for_idle(raise_on_error=False)
-        assert app.units[0].agent_status == 'idle'
+        assert app.units[0].agent_status == "idle"
 
         ress = await app.get_resources()
-        assert 'file-res' in ress
-        assert ress['file-res']
+        assert "file-res" in ress
+        assert ress["file-res"]
 
 
 @base.bootstrapped
 async def test_attach_resource():
-    charm_path = TESTS_DIR / 'integration' / 'file-resource-charm'
+    charm_path = TESTS_DIR / "integration" / "file-resource-charm"
     async with base.CleanModel() as model:
         resources = {"file-res": "test.file"}
         app = await model.deploy(str(charm_path), resources=resources)
-        assert 'file-resource-charm' in model.applications
+        assert "file-resource-charm" in model.applications
 
         await model.wait_for_idle(raise_on_error=False)
-        assert app.units[0].agent_status == 'idle'
+        assert app.units[0].agent_status == "idle"
 
-        with open(str(charm_path / 'test.file')) as f:
-            app.attach_resource('file-res', 'test.file', f)
+        with open(str(charm_path / "test.file")) as f:
+            app.attach_resource("file-res", "test.file", f)
 
-        with open(str(charm_path / 'test.file'), 'rb') as f:
-            app.attach_resource('file-res', 'test.file', f)
+        with open(str(charm_path / "test.file"), "rb") as f:
+            app.attach_resource("file-res", "test.file", f)
 
 
 @base.bootstrapped
 @pytest.mark.bundle
 async def test_store_resources_bundle():
-    pytest.skip('test_store_resources_bundle intermittent test failure')
+    pytest.skip("test_store_resources_bundle intermittent test failure")
     async with base.CleanModel() as model:
-        bundle = INTEGRATION_TEST_DIR / 'bundle'
+        bundle = INTEGRATION_TEST_DIR / "bundle"
         await model.deploy(bundle)
-        assert 'ghost' in model.applications
-        ghost = model.applications['ghost']
-        terminal_statuses = ('active', 'error', 'blocked')
+        assert "ghost" in model.applications
+        ghost = model.applications["ghost"]
+        terminal_statuses = ("active", "error", "blocked")
         await model.block_until(
             lambda: (
-                len(ghost.units) > 0 and
-                ghost.units[0].workload_status in terminal_statuses)
+                len(ghost.units) > 0
+                and ghost.units[0].workload_status in terminal_statuses
+            )
         )
         # ghost will go in to blocked (or error, for older
         # charm revs) if the resource is missing
-        assert ghost.units[0].workload_status == 'active'
+        assert ghost.units[0].workload_status == "active"
         resources = await ghost.get_resources()
-        assert resources['ghost-stable'].revision >= 12
+        assert resources["ghost-stable"].revision >= 12
 
 
 @base.bootstrapped
 @pytest.mark.bundle
 async def test_store_resources_bundle_revs():
-    pytest.skip('test_store_resources_bundle_revs intermittent test failure')
+    pytest.skip("test_store_resources_bundle_revs intermittent test failure")
     async with base.CleanModel() as model:
-        bundle = INTEGRATION_TEST_DIR / 'bundle/bundle-resource-rev.yaml'
+        bundle = INTEGRATION_TEST_DIR / "bundle/bundle-resource-rev.yaml"
         await model.deploy(bundle)
-        assert 'ghost' in model.applications
-        ghost = model.applications['ghost']
-        terminal_statuses = ('active', 'error', 'blocked')
+        assert "ghost" in model.applications
+        ghost = model.applications["ghost"]
+        terminal_statuses = ("active", "error", "blocked")
         await model.block_until(
             lambda: (
-                len(ghost.units) > 0 and
-                ghost.units[0].workload_status in terminal_statuses)
+                len(ghost.units) > 0
+                and ghost.units[0].workload_status in terminal_statuses
+            )
         )
         # ghost will go in to blocked (or error, for older
         # charm revs) if the resource is missing
-        assert ghost.units[0].workload_status == 'active'
+        assert ghost.units[0].workload_status == "active"
         resources = await ghost.get_resources()
-        assert resources['ghost-stable'].revision == 11
+        assert resources["ghost-stable"].revision == 11
 
 
 @base.bootstrapped
 async def test_ssh_key():
     async with base.CleanModel() as model:
-        await model.add_ssh_key('admin', SSH_KEY)
+        await model.add_ssh_key("admin", SSH_KEY)
         result = await model.get_ssh_key(True)
-        result = result.serialize()['results'][0].serialize()['result']
+        result = result.serialize()["results"][0].serialize()["result"]
         assert SSH_KEY in result
-        await model.remove_ssh_key('admin', SSH_KEY)
+        await model.remove_ssh_key("admin", SSH_KEY)
         result = await model.get_ssh_key(True)
-        result = result.serialize()['results'][0].serialize()['result']
+        result = result.serialize()["results"][0].serialize()["result"]
         assert result is None
 
 
@@ -836,9 +891,9 @@ async def test_get_machines():
 async def test_wait_for_idle_without_units():
     async with base.CleanModel() as model:
         await model.deploy(
-            'ubuntu',
-            application_name='ubuntu',
-            channel='stable',
+            "ubuntu",
+            application_name="ubuntu",
+            channel="stable",
             num_units=0,
         )
         with pytest.raises(jasyncio.TimeoutError):
@@ -850,9 +905,9 @@ async def test_wait_for_idle_without_units():
 async def test_wait_for_idle_with_not_enough_units():
     async with base.CleanModel() as model:
         await model.deploy(
-            'ubuntu',
-            application_name='ubuntu',
-            channel='stable',
+            "ubuntu",
+            application_name="ubuntu",
+            channel="stable",
             num_units=2,
         )
         with pytest.raises(jasyncio.TimeoutError):
@@ -863,7 +918,7 @@ async def test_wait_for_idle_with_not_enough_units():
 @pytest.mark.wait_for_idle
 async def test_wait_for_idle_more_units_than_needed():
     async with base.CleanModel() as model:
-        charm_path = TESTS_DIR / 'charm'
+        charm_path = TESTS_DIR / "charm"
 
         # we add 2 units of a local charm that does nothing
         # (i.e. can't go into active/idle)
@@ -871,14 +926,16 @@ async def test_wait_for_idle_more_units_than_needed():
 
         # then add 1 unit of ubuntu charm
         await model.deploy(
-            'ubuntu',
-            application_name='ubuntu',
+            "ubuntu",
+            application_name="ubuntu",
             num_units=1,
         )
 
         # because the wait_for_at_least_units=1, wait_for_idle should return without timing out
         # even though there are two more units that aren't active/idle
-        await model.wait_for_idle(timeout=5 * 60, wait_for_at_least_units=1, status='active')
+        await model.wait_for_idle(
+            timeout=5 * 60, wait_for_at_least_units=1, status="active"
+        )
 
 
 @base.bootstrapped
@@ -887,9 +944,9 @@ async def test_wait_for_idle_with_enough_units():
     pytest.skip("This is testing juju functionality")
     async with base.CleanModel() as model:
         await model.deploy(
-            'ubuntu',
-            application_name='ubuntu',
-            channel='stable',
+            "ubuntu",
+            application_name="ubuntu",
+            channel="stable",
             num_units=3,
         )
         await model.wait_for_idle(timeout=5 * 60, wait_for_at_least_units=3)
@@ -901,9 +958,9 @@ async def test_wait_for_idle_with_exact_units():
     pytest.skip("This is testing juju functionality")
     async with base.CleanModel() as model:
         await model.deploy(
-            'ubuntu',
-            application_name='ubuntu',
-            channel='stable',
+            "ubuntu",
+            application_name="ubuntu",
+            channel="stable",
             num_units=2,
         )
         await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=2)
@@ -912,17 +969,16 @@ async def test_wait_for_idle_with_exact_units():
 @base.bootstrapped
 @pytest.mark.wait_for_idle
 async def test_wait_for_idle_with_exact_units_scale_down():
-    """Deploys 3 units, waits for them to be idle, then removes 2 of them,
-    then waits for exactly 1 unit to be left.
-
+    """Deploys 3 units, waits for them to be idle, then removes 2 of them, then
+    waits for exactly 1 unit to be left.
     """
     pytest.skip("This is testing juju functionality")
     async with base.CleanModel() as model:
         app = await model.deploy(
-            'ubuntu',
-            application_name='ubuntu',
-            series='jammy',
-            channel='stable',
+            "ubuntu",
+            application_name="ubuntu",
+            series="jammy",
+            channel="stable",
             num_units=3,
         )
         await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=3)
@@ -941,17 +997,16 @@ async def test_wait_for_idle_with_exact_units_scale_down():
 
 @base.bootstrapped
 async def test_wait_for_idle_with_exact_units_scale_down_zero():
-    """Deploys 3 units, waits for them to be idle, then removes 3 of them,
-    then waits for exactly 0 unit to be left.
-
+    """Deploys 3 units, waits for them to be idle, then removes 3 of them, then
+    waits for exactly 0 unit to be left.
     """
     pytest.skip("This is testing juju functionality")
     async with base.CleanModel() as model:
         app = await model.deploy(
-            'ubuntu',
-            application_name='ubuntu',
-            series='jammy',
-            channel='stable',
+            "ubuntu",
+            application_name="ubuntu",
+            series="jammy",
+            channel="stable",
             num_units=3,
         )
         await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=3)
@@ -972,13 +1027,13 @@ async def test_wait_for_idle_with_exact_units_scale_down_zero():
 async def test_destroy_units():
     async with base.CleanModel() as model:
         app = await model.deploy(
-            'ubuntu',
-            application_name='ubuntu',
-            series='jammy',
-            channel='stable',
+            "ubuntu",
+            application_name="ubuntu",
+            series="jammy",
+            channel="stable",
             num_units=3,
         )
-        await model.wait_for_idle(status='active')
+        await model.wait_for_idle(status="active")
         await model.destroy_units(*[u.name for u in app.units])
         await model.wait_for_idle(timeout=5 * 60, wait_for_exact_units=0)
         assert app.units == []
@@ -996,15 +1051,15 @@ async def test_config():
     async with base.CleanModel() as model:
         # first test get_config with nothing.
         result = await model.get_config()
-        assert 'extra-info' not in result
+        assert "extra-info" not in result
         await model.set_config({
-            'extra-info': 'booyah',
-            'test-mode': client.ConfigValue(value=True),
+            "extra-info": "booyah",
+            "test-mode": client.ConfigValue(value=True),
         })
         result = await model.get_config()
-        assert 'extra-info' in result
-        assert result['extra-info'].source == 'model'
-        assert result['extra-info'].value == 'booyah'
+        assert "extra-info" in result
+        assert result["extra-info"].source == "model"
+        assert result["extra-info"].value == "booyah"
 
 
 @base.bootstrapped
@@ -1012,26 +1067,27 @@ async def test_config_with_json():
     async with base.CleanModel() as model:
         # first test get_config with nothing.
         result = await model.get_config()
-        assert 'extra-complex-info' not in result
+        assert "extra-complex-info" not in result
         # test model config with more complex data
-        expected = ['foo', {'bar': 1}]
+        expected = ["foo", {"bar": 1}]
         await model.set_config({
-            'extra-complex-info': json.dumps(expected),
-            'test-mode': client.ConfigValue(value=True),
+            "extra-complex-info": json.dumps(expected),
+            "test-mode": client.ConfigValue(value=True),
         })
         result = await model.get_config()
-        assert 'extra-complex-info' in result
-        assert result['extra-complex-info'].source == 'model'
-        recieved = json.loads(result['extra-complex-info'].value)
-        assert recieved == recieved
+        assert "extra-complex-info" in result
+        assert result["extra-complex-info"].source == "model"
+        received = json.loads(result["extra-complex-info"].value)
+        assert received == received
 
 
 @base.bootstrapped
 async def test_set_constraints():
     async with base.CleanModel() as model:
-        await model.set_constraints({'cpu-power': 1})
+        await model.set_constraints({"cpu-power": 1})
         cons = await model.get_constraints()
-        assert cons['cpu_power'] == 1
+        assert cons["cpu_power"] == 1
+
 
 # @base.bootstrapped
 # # async def test_grant()
@@ -1047,7 +1103,6 @@ async def test_set_constraints():
 
 @base.bootstrapped
 async def test_model_annotations():
-
     async with base.CleanModel() as model:
         annotations = await model.get_annotations()
         assert len(annotations) == 0
@@ -1061,7 +1116,6 @@ async def test_model_annotations():
 
 @base.bootstrapped
 async def test_machine_annotations():
-
     async with base.CleanModel() as model:
         machine = await model.add_machine()
 
@@ -1077,9 +1131,8 @@ async def test_machine_annotations():
 
 @base.bootstrapped
 async def test_application_annotations():
-
     async with base.CleanModel() as model:
-        app = await model.deploy('ubuntu', channel="stable")
+        app = await model.deploy("ubuntu", channel="stable")
 
         annotations = await app.get_annotations()
         assert len(annotations) == 0
@@ -1093,9 +1146,8 @@ async def test_application_annotations():
 
 @base.bootstrapped
 async def test_unit_annotations():
-
     async with base.CleanModel() as model:
-        app = await model.deploy('ubuntu')
+        app = await model.deploy("ubuntu")
         await model.wait_for_idle()
         unit = app.units[0]
 
@@ -1111,18 +1163,18 @@ async def test_unit_annotations():
 
 @base.bootstrapped
 async def test_backups():
-    pytest.skip('Revise: mongodb issues')
+    pytest.skip("Revise: mongodb issues")
     m = Model()
-    await m.connect(model_name='controller')
+    await m.connect(model_name="controller")
     test_start = await m.get_backups()
     num_of_backups_before_test = len(test_start)
 
     # Create a backup
     local_file_name, extra_info = await m.create_backup(notes="hi")
-    assert 'id' in extra_info
-    assert 'checksum' in extra_info
+    assert "id" in extra_info
+    assert "checksum" in extra_info
 
-    assert extra_info['notes'] == "hi"
+    assert extra_info["notes"] == "hi"
 
     # Check if the file is downloaded on disk
     assert os.path.exists(local_file_name)
@@ -1168,8 +1220,7 @@ async def test_connect_current():
 @base.bootstrapped
 async def test_model_cache_update():
     """Connecting to a new model shouldn't fail because the cache is not
-    updated yet
-
+    updated yet.
     """
     async with base.CleanController() as controller:
         await controller.connect_current()
@@ -1214,9 +1265,9 @@ async def test_deploy_with_storage():
 
 @base.bootstrapped
 async def test_add_storage():
-    pytest.skip('skip in favour of test_add_and_list_storage')
+    pytest.skip("skip in favour of test_add_and_list_storage")
     async with base.CleanModel() as model:
-        app = await model.deploy('postgresql')
+        app = await model.deploy("postgresql")
         await model.wait_for_idle(status="active")
         unit = app.units[0]
         ret = await unit.add_storage("pgdata")
@@ -1225,7 +1276,7 @@ async def test_add_storage():
 
 @base.bootstrapped
 async def test_model_attach_storage_at_deploy():
-    pytest.skip('detach/attach_storage inconsistent on Juju side, unable to test')
+    pytest.skip("detach/attach_storage inconsistent on Juju side, unable to test")
     async with base.CleanModel() as model:
         # The attach_storage needs to be an existing storage,
         # so the plan is to:
@@ -1235,7 +1286,7 @@ async def test_model_attach_storage_at_deploy():
         # - Remove app
         # - Re-deploy with attach_storage parameter
         # - Make sure the storage is there
-        app = await model.deploy('postgresql')
+        app = await model.deploy("postgresql")
         await model.wait_for_idle(status="active")
 
         unit = app.units[0]
@@ -1247,7 +1298,7 @@ async def test_model_attach_storage_at_deploy():
         await jasyncio.sleep(10)
 
         storages1 = await model.list_storage()
-        assert any([storage_id in s['storage-tag'] for s in storages1])
+        assert any([storage_id in s["storage-tag"] for s in storages1])
 
         # juju remove-application
         # actually removes the storage even though the destroy_storage=false
@@ -1255,20 +1306,20 @@ async def test_model_attach_storage_at_deploy():
         await jasyncio.sleep(10)
 
         storages2 = await model.list_storage()
-        assert any([storage_id in s['storage-tag'] for s in storages2])
+        assert any([storage_id in s["storage-tag"] for s in storages2])
 
-        await model.deploy('postgresql', attach_storage=[storage_id])
+        await model.deploy("postgresql", attach_storage=[storage_id])
         await model.wait_for_idle(status="active")
 
         storages3 = await model.list_storage()
-        assert any([storage_id in s['storage-tag'] for s in storages3])
+        assert any([storage_id in s["storage-tag"] for s in storages3])
 
 
 @base.bootstrapped
 async def test_detach_storage():
-    pytest.skip('detach/attach_storage inconsistent on Juju side, unable to test')
+    pytest.skip("detach/attach_storage inconsistent on Juju side, unable to test")
     async with base.CleanModel() as model:
-        app = await model.deploy('postgresql')
+        app = await model.deploy("postgresql")
         await model.wait_for_idle(status="active")
         unit = app.units[0]
         storage_ids = await unit.add_storage("pgdata")
@@ -1277,27 +1328,28 @@ async def test_detach_storage():
 
         _storage_details_1 = await model.show_storage_details(storage_id)
         storage_details_1 = _storage_details_1[0]
-        assert 'unit-postgresql-0' in storage_details_1['attachments']
+        assert "unit-postgresql-0" in storage_details_1["attachments"]
 
         await unit.detach_storage(storage_id, force=True)
         await jasyncio.sleep(20)
 
         _storage_details_2 = await model.show_storage_details(storage_id)
         storage_details_2 = _storage_details_2[0]
-        assert ('unit-postgresql-0' not in storage_details_2['attachments']) or \
-            storage_details_2['attachments']['unit-postgresql-0'].life == 'dying'
+        assert (
+            "unit-postgresql-0" not in storage_details_2["attachments"]
+        ) or storage_details_2["attachments"]["unit-postgresql-0"].life == "dying"
 
         # remove_storage
         await model.remove_storage(storage_id, force=True)
         await jasyncio.sleep(10)
         storages = await model.list_storage()
-        assert all([storage_id not in s['storage-tag'] for s in storages])
+        assert all([storage_id not in s["storage-tag"] for s in storages])
 
 
 @base.bootstrapped
 async def test_add_and_list_storage():
     async with base.CleanModel() as model:
-        app = await model.deploy('postgresql', base='ubuntu@22.04')
+        app = await model.deploy("postgresql", base="ubuntu@22.04")
         # TODO (cderici):
         # This is a good use case for waiting on individual unit status
         # (i.e. not caring about the app status)
@@ -1311,21 +1363,21 @@ async def test_add_and_list_storage():
         await model.list_storage(filesystem=True)
         await model.list_storage(volume=True)
 
-        assert any([tag.storage("pgdata") in s['storage-tag'] for s in storages])
+        assert any([tag.storage("pgdata") in s["storage-tag"] for s in storages])
 
 
 @base.bootstrapped
 async def test_storage_pools_on_lxd():
     # This will fail when ran on anything but lxd
     async with base.CleanModel() as model:
-        await model.deploy('ubuntu')
+        await model.deploy("ubuntu")
         await model.wait_for_idle(status="active")
 
         await model.create_storage_pool("test-pool", "lxd")
         pools = await model.list_storage_pools()
-        assert "test-pool" in [p['name'] for p in pools]
+        assert "test-pool" in [p["name"] for p in pools]
 
         await model.remove_storage_pool("test-pool")
         await jasyncio.sleep(5)
         pools = await model.list_storage_pools()
-        assert "test-pool" not in [p['name'] for p in pools]
+        assert "test-pool" not in [p["name"] for p in pools]

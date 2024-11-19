@@ -1,13 +1,13 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-"""
-This is a very basic example that connects to the currently selected model
+"""This is a very basic example that connects to the currently selected model
 and prints the number of applications deployed to it.
 
 Then attempts to use scp to grab the profile, as a way to show how scp works
 from a pylibjuju perspective.
 """
+
 import logging
 
 from juju import jasyncio
@@ -21,18 +21,18 @@ async def main():
     try:
         # connect to the current model with the current user, per the Juju CLI
         await model.connect()
-        print('There are {} applications'.format(len(model.applications)))
+        print(f"There are {len(model.applications)} applications")
 
-        machine = model.machines['0']
+        machine = model.machines["0"]
         # This roughly expands to the following:
         # scp -i ~/.local/share/juju/ssh/juju_id_rsa -o StrictHostKeyChecking=no -q -B ubuntu@10.132.183.88:/home/ubuntu/.profile /tmp/profile
-        await machine.scp_from("/home/ubuntu/.profile", "/tmp/profile")
+        await machine.scp_from("/home/ubuntu/.profile", "/tmp/profile")  # noqa: S108
     finally:
         if model.is_connected():
-            print('Disconnecting from model')
+            print("Disconnecting from model")
             await model.disconnect()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     jasyncio.run(main())

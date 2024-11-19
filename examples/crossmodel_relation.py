@@ -1,8 +1,7 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-"""
-This example:
+"""This example:
 
 1. Connects to the current controller
 2. Creates two models for consuming and offering
@@ -13,6 +12,7 @@ This example:
 6. Destroys the units and applications
 
 """
+
 import tempfile
 import time
 from logging import getLogger
@@ -29,61 +29,70 @@ async def main():
     await controller.connect()
 
     try:
-        print('Creating models')
-        offering_model = await controller.add_model('test-cmr-1')
-        consuming_model = await controller.add_model('test-cmr-2')
+        print("Creating models")
+        offering_model = await controller.add_model("test-cmr-1")
+        consuming_model = await controller.add_model("test-cmr-2")
 
-        print('Deploying mysql')
+        print("Deploying mysql")
         await offering_model.deploy(
-            'ch:mysql',
-            application_name='mysql',
-            series='jammy',
-            channel='edge',
+            "ch:mysql",
+            application_name="mysql",
+            series="jammy",
+            channel="edge",
         )
 
-        print('Waiting for active')
-        await offering_model.wait_for_idle(status='active')
+        print("Waiting for active")
+        await offering_model.wait_for_idle(status="active")
 
-        print('Adding offer')
+        print("Adding offer")
         await offering_model.create_offer("mysql:db")
 
         offers = await offering_model.list_offers()
         await offering_model.block_until(
-            lambda: all(offer.application_name == 'mysql'
-                        for offer in offers.results))
+            lambda: all(offer.application_name == "mysql" for offer in offers.results)
+        )
 
-        print('Show offers', ', '.join("%s: %s" % item for offer in offers.results for item in vars(offer).items()))
+        print(
+            "Show offers",
+            ", ".join(
+                "%s: %s" % item
+                for offer in offers.results
+                for item in vars(offer).items()
+            ),
+        )
 
         # TODO (cderici): wordpress charm is somewhat problematic in 3.0,
         #  this example needs to be revisited.
-        print('Deploying wordpress')
+        print("Deploying wordpress")
         application_2 = await consuming_model.deploy(
-            'ch:trusty/wordpress',
-            application_name='wordpress',
-            series='xenial',
-            channel='stable',
+            "ch:trusty/wordpress",
+            application_name="wordpress",
+            series="xenial",
+            channel="stable",
         )
 
-        print('Waiting for executing')
+        print("Waiting for executing")
         await consuming_model.block_until(
-            lambda: all(unit.agent_status == 'executing'
-                        for unit in application_2.units))
+            lambda: all(
+                unit.agent_status == "executing" for unit in application_2.units
+            )
+        )
 
-        await consuming_model.relate('wordpress', 'admin/test-cmr-1.mysql')
+        await consuming_model.relate("wordpress", "admin/test-cmr-1.mysql")
 
-        print('Exporting bundle')
+        print("Exporting bundle")
         with tempfile.TemporaryDirectory() as dirpath:
-            await offering_model.export_bundle("{}/bundle.yaml".format(dirpath))
+            await offering_model.export_bundle(f"{dirpath}/bundle.yaml")
 
         time.sleep(10)
 
         print("Remove SAAS")
         await consuming_model.remove_saas("mysql")
 
-        print('Removing offer')
+        print("Removing offer")
         await offering_model.remove_offer("admin/test-cmr-1.mysql", force=True)
 
-        print('Destroying models')
+        print("Destroying models")
         await controller.destroy_model(offering_model.info.uuid)
         await controller.destroy_model(consuming_model.info.uuid)
 
@@ -92,9 +101,9 @@ async def main():
         raise
 
     finally:
-        print('Disconnecting from controller')
+        print("Disconnecting from controller")
         await controller.disconnect()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     jasyncio.run(main())

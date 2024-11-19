@@ -1,9 +1,10 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
+
 class JujuError(Exception):
     def __init__(self, *args, **kwargs):
-        self.message = ''
+        self.message = ""
         self.errors = []
         if args:
             self.message = str(args[0])
@@ -19,11 +20,11 @@ class JujuError(Exception):
 class JujuAPIError(JujuError):
     def __init__(self, result):
         self.result = result
-        self.message = result['error']
-        self.error_code = result.get('error-code')
-        self.response = result['response']
-        self.request_id = result['request-id']
-        self.error_info = result['error-info'] if 'error-info' in result else None
+        self.message = result["error"]
+        self.error_code = result.get("error-code")
+        self.response = result["response"]
+        self.request_id = result["request-id"]
+        self.error_info = result.get("error-info")
         super().__init__(self.message)
 
 
@@ -37,33 +38,37 @@ class JujuAuthError(JujuConnectionError):
 
 class JujuRedirectException(Exception):
     """Exception indicating that a redirection was requested"""
+
     def __init__(self, redirect_info, follow_redirect=True):
         self.redirect_info = redirect_info
         self.follow_redirect = follow_redirect
 
     @property
     def ca_cert(self):
-        return self.redirect_info['ca-cert']
+        return self.redirect_info["ca-cert"]
 
     @property
     def endpoints(self):
         return [
-            ('{value}:{port}'.format(**s), self.ca_cert)
-            for servers in self.redirect_info['servers']
-            for s in servers if s['scope'] == 'public' or not self.follow_redirect
+            ("{value}:{port}".format(**s), self.ca_cert)
+            for servers in self.redirect_info["servers"]
+            for s in servers
+            if s["scope"] == "public" or not self.follow_redirect
         ]
 
 
 class JujuEntityNotFoundError(JujuError):
     """Exception indicating that an entity was not found in the state. It was
-       expected that the entity was found in state and this is a terminal
-       condition.
-       To fix this condition, you should disconnect and reconnect to ensure that
-       any missing entities are correctly picked up."""
+    expected that the entity was found in state and this is a terminal
+    condition.
+    To fix this condition, you should disconnect and reconnect to ensure that
+    any missing entities are correctly picked up.
+    """
+
     def __init__(self, entity_name, entity_types=None):
         self.entity_name = entity_name
         self.entity_types = entity_types
-        super().__init__("Entity not found: {}".format(entity_name))
+        super().__init__(f"Entity not found: {entity_name}")
 
 
 class JujuModelError(JujuError):
@@ -106,18 +111,22 @@ class JujuNotValid(JujuError):
     def __init__(self, entity_type, entity_name):
         self.entity_type = entity_type
         self.entity_name = entity_name
-        super().__init__(f'Invalid {entity_type} : {entity_name}')
+        super().__init__(f"Invalid {entity_type} : {entity_name}")
 
 
 class JujuConfigError(JujuError):
     """Exception raised during processing a configuration key-value pair
     in a config set for an application.
     """
+
     def __init__(self, config, config_pair, message=None):
         self.config = config
         self.config_pair = config_pair
         if message is None:
-            self.message = "Couldn't process the value of a config pair : %s, value of type %s" % (self.config_pair, type(self.config_pair[1]))
+            self.message = (
+                "Couldn't process the value of a config pair : %s, value of type %s"
+                % (self.config_pair, type(self.config_pair[1]))
+            )
         else:
             self.message = message
         super().__init__(self.message)

@@ -19,9 +19,7 @@ target-version = ["py38"]
 line-length = 99
 select = ["E", "W", "F", "C", "N", "D", "I001"]
 extend-ignore = [
-    "D203",
     "D204",
-    "D213",
     "D215",
     "D400",
     "D404",

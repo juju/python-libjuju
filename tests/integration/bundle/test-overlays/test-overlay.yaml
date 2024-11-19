@@ -8,6 +8,6 @@ applications:
   mysql:
     charm: "mysql"
     channel: candidate
-    num_units: 1  
+    num_units: 1
 relations:
   - ["ghost", "mysql"]

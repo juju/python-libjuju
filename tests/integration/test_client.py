@@ -13,7 +13,8 @@ async def test_user_info():
 
         um = client.UserManagerFacade.from_connection(controller_conn)
         result = await um.UserInfo(
-            entities=[client.Entity('user-admin')], include_disabled=True)
+            entities=[client.Entity("user-admin")], include_disabled=True
+        )
         await controller_conn.close()
 
         assert isinstance(result, client.UserInfoResults)

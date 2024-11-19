@@ -1,8 +1,7 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-"""
-This example:
+"""This example:
 
 1. Connects to current model and resets it.
 2. Deploys one ubuntu unit.
@@ -10,17 +9,18 @@ This example:
 4. Waits for the action results to come back, then exits.
 
 """
+
 import logging
 
-from juju.model import Model
 from juju import jasyncio
+from juju.model import Model
 
 
 async def run_command(unit):
-    logging.debug('Running command on unit %s', unit.name)
+    logging.debug("Running command on unit %s", unit.name)
     # unit.run() returns a juju.action.Action instance,
     # it needs to be wait()'ed to get the results
-    action = await unit.run('unit-get public-address')
+    action = await unit.run("unit-get public-address")
     await action.wait()
 
     out1 = f"Action status: {action.status}"
@@ -40,10 +40,10 @@ async def main():
     await model.connect()
 
     app = await model.deploy(
-        'ch:ubuntu',
-        application_name='ubuntu',
-        series='trusty',
-        channel='stable',
+        "ch:ubuntu",
+        application_name="ubuntu",
+        series="trusty",
+        channel="stable",
     )
 
     for unit in app.units:
@@ -54,7 +54,7 @@ async def main():
     await model.disconnect()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Uncomment below to get logging output
 
     # logging.basicConfig(level=logging.DEBUG)

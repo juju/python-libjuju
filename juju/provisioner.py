@@ -1,5 +1,6 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
+from __future__ import annotations
 
 import os
 import re
@@ -19,14 +20,13 @@ arches = [
     [re.compile(r"aarch64"), "arm64"],
     [re.compile(r"ppc64|ppc64el|ppc64le"), "ppc64el"],
     [re.compile(r"s390x?"), "s390x"],
-
 ]
 
 
-def normalize_arch(rawArch):
+def normalize_arch(raw_arch):
     """Normalize the architecture string."""
     for arch in arches:
-        if arch[0].match(rawArch):
+        if arch[0].match(raw_arch):
             return arch[1]
 
 
@@ -61,6 +61,7 @@ fi
 
 class SSHProvisioner:
     """Provision a manually created machine via SSH."""
+
     user = ""
     host = ""
     private_key_path = ""
@@ -70,7 +71,7 @@ class SSHProvisioner:
         self.user = user
         self.private_key_path = private_key_path
 
-    def _get_ssh_client(self, host, user, key):
+    def _get_ssh_client(self, host: str, user: str, key: str) -> paramiko.SSHClient:
         """Return a connected Paramiko ssh object.
 
         :param str host: The host to connect to.
@@ -81,15 +82,15 @@ class SSHProvisioner:
         :raises: :class:`paramiko.ssh_exception.SSHException` if the
             connection failed
         """
-
         ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        # Ruff warns about insecure policy of automatically accepting unknown keys
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # noqa: S507
 
         pkey = None
 
         # Read the private key into a paramiko.RSAKey
         if os.path.exists(key):
-            with open(key, 'r') as f:
+            with open(key) as f:
                 pkey = paramiko.RSAKey.from_private_key(f)
 
         #######################################################################
@@ -108,7 +109,7 @@ class SSHProvisioner:
         try:
             ssh.connect(host, port=22, username=user, pkey=pkey)
         except paramiko.ssh_exception.SSHException as e:
-            if 'Error reading SSH protocol banner' == str(e):
+            if str(e) == "Error reading SSH protocol banner":
                 # Once more, with feeling
                 ssh.connect(host, port=22, username=user, pkey=pkey)
             else:
@@ -117,7 +118,9 @@ class SSHProvisioner:
 
         return ssh
 
-    def _run_command(self, ssh, cmd, pty=True):
+    def _run_command(
+        self, ssh: paramiko.SSHClient, cmd: str | list[str], pty: bool = True
+    ) -> tuple[str, str]:
         """Run a command remotely via SSH.
 
         :param object ssh: The SSHClient
@@ -128,24 +131,23 @@ class SSHProvisioner:
         :return: tuple: The stdout and stderr of the command execution
         :raises: :class:`CalledProcessError` if the command fails
         """
-
         if isinstance(cmd, str):
             cmd = shlex.split(cmd)
 
-        if type(cmd) is not list:
-            cmd = [cmd]
+        if isinstance(cmd, str):
+            cmds = cmd
+        else:
+            cmds = " ".join(cmd)
 
-        cmds = ' '.join(cmd)
-        stdin, stdout, stderr = ssh.exec_command(cmds, get_pty=pty)
+        _stdin, stdout, stderr = ssh.exec_command(cmds, get_pty=pty)
         retcode = stdout.channel.recv_exit_status()
 
         if retcode > 0:
             output = stderr.read().strip()
-            raise CalledProcessError(returncode=retcode, cmd=cmd,
-                                     output=output)
+            raise CalledProcessError(returncode=retcode, cmd=cmd, output=output)
         return (
-            stdout.read().decode('utf-8').strip(),
-            stderr.read().decode('utf-8').strip()
+            stdout.read().decode("utf-8").strip(),
+            stderr.read().decode("utf-8").strip(),
         )
 
     def _init_ubuntu_user(self):
@@ -155,7 +157,6 @@ class SSHProvisioner:
         :raises: :class:`paramiko.ssh_exception.AuthenticationException`
             if the authentication fails
         """
-
         ssh = None
         try:
             # Run w/o allocating a pty, so we fail if sudo prompts for a passwd
@@ -164,7 +165,7 @@ class SSHProvisioner:
                 self.user,
                 self.private_key_path,
             )
-            stdout, stderr = self._run_command(ssh, "sudo -n true", pty=False)
+            _stdout, _stderr = self._run_command(ssh, "sudo -n true", pty=False)
         except paramiko.ssh_exception.AuthenticationException as e:
             raise e
         finally:
@@ -173,14 +174,12 @@ class SSHProvisioner:
 
         # Infer the public key
         public_key = None
-        public_key_path = "{}.pub".format(self.private_key_path)
+        public_key_path = f"{self.private_key_path}.pub"
 
         if not os.path.exists(public_key_path):
-            raise FileNotFoundError(
-                "Public key '{}' doesn't exist.".format(public_key_path)
-            )
+            raise FileNotFoundError(f"Public key '{public_key_path}' doesn't exist.")
 
-        with open(public_key_path, "r") as f:
+        with open(public_key_path) as f:
             public_key = f.readline()
 
         script = INITIALIZE_UBUNTU_SCRIPT.format(public_key)
@@ -193,9 +192,7 @@ class SSHProvisioner:
             )
 
             self._run_command(
-                ssh,
-                ["sudo", "/bin/bash -c " + shlex.quote(script)],
-                pty=True
+                ssh, ["sudo", "/bin/bash -c " + shlex.quote(script)], pty=True
             )
         except paramiko.ssh_exception.AuthenticationException as e:
             raise e
@@ -210,28 +207,27 @@ class SSHProvisioner:
         :param object ssh: The SSHClient
         :return: str: A raw string containing OS and hardware information.
         """
-
         info = {
-            'series': '',
-            'arch': '',
-            'cpu-cores': '',
-            'mem': '',
+            "series": "",
+            "arch": "",
+            "cpu-cores": "",
+            "mem": "",
         }
 
-        stdout, stderr = self._run_command(
+        stdout, _stderr = self._run_command(
             ssh,
             ["sudo", "/bin/bash -c " + shlex.quote(DETECTION_SCRIPT)],
             pty=True,
         )
 
         lines = stdout.split("\n")
-        info['series'] = lines[0].strip()
-        info['arch'] = normalize_arch(lines[1].strip())
+        info["series"] = lines[0].strip()
+        info["arch"] = normalize_arch(lines[1].strip())
 
-        memKb = re.split(r'\s+', lines[2])[1]
+        mem_kb = re.split(r"\s+", lines[2])[1]
 
-        # Convert megabytes -> kilobytes
-        info['mem'] = round(int(memKb) / 1024)
+        # Convert to MB
+        info["mem"] = int(mem_kb) // 1024
 
         # Detect available CPUs
         recorded = {}
@@ -244,8 +240,8 @@ class SSHProvisioner:
             elif line.find("cpu cores") == 0:
                 cores = line.split(":")[1].strip()
 
-                if physical_id not in recorded.keys():
-                    info['cpu-cores'] += cores
+                if physical_id not in recorded:
+                    info["cpu-cores"] += cores
                     recorded[physical_id] = True
 
         return info
@@ -261,30 +257,24 @@ class SSHProvisioner:
 
         if self._init_ubuntu_user():
             try:
-
-                ssh = self._get_ssh_client(
-                    self.host,
-                    self.user,
-                    self.private_key_path
-                )
+                ssh = self._get_ssh_client(self.host, self.user, self.private_key_path)
 
                 hw = self._detect_hardware_and_os(ssh)
-                params.series = hw['series']
-                params.instance_id = "manual:{}".format(self.host)
-                params.nonce = "manual:{}:{}".format(
-                    self.host,
-                    str(uuid.uuid4()),  # a nop for Juju w/manual machines
-                )
+                params.series = hw["series"]
+                params.instance_id = f"manual:{self.host}"
+                params.nonce = f"manual:{self.host}:{uuid.uuid4()}"
                 params.hardware_characteristics = {
-                    'arch': hw['arch'],
-                    'mem': int(hw['mem']),
-                    'cpu-cores': int(hw['cpu-cores']),
+                    "arch": hw["arch"],
+                    "mem": int(hw["mem"]),
+                    "cpu-cores": int(hw["cpu-cores"]),
                 }
-                params.addresses = [{
-                    'value': self.host,
-                    'type': 'ipv4',
-                    'scope': 'public',
-                }]
+                params.addresses = [
+                    {
+                        "value": self.host,
+                        "type": "ipv4",
+                        "scope": "public",
+                    }
+                ]
 
             except paramiko.ssh_exception.AuthenticationException as e:
                 raise e
@@ -294,14 +284,12 @@ class SSHProvisioner:
         return params
 
     async def install_agent(self, connection, nonce, machine_id):
-        """
-        :param object connection: Connection to Juju API
+        """:param object connection: Connection to Juju API
         :param str nonce: The nonce machine specification
         :param str machine_id: The id assigned to the machine
 
         :return: bool: If the initialization was successful
         """
-
         # The path where the Juju agent should be installed.
         data_dir = "/var/lib/juju"
 
@@ -331,12 +319,10 @@ class SSHProvisioner:
         :raises: :class:`paramiko.ssh_exception.AuthenticationException`
             if the upload fails
         """
+        with tempfile.NamedTemporaryFile("w") as tmp_file:
+            tmp_file.write(script)
+            tmp_file.flush()
 
-        _, tmpFile = tempfile.mkstemp()
-        with open(tmpFile, 'w') as f:
-            f.write(script)
-
-        try:
             # get ssh client
             ssh = self._get_ssh_client(
                 self.host,
@@ -344,21 +330,15 @@ class SSHProvisioner:
                 self.private_key_path,
             )
 
-            # copy the local copy of the script to the remote machine
-            sftp = paramiko.SFTPClient.from_transport(ssh.get_transport())
-            sftp.put(
-                tmpFile,
-                tmpFile,
-            )
+            try:
+                # copy the local copy of the script to the remote machine
+                sftp = paramiko.SFTPClient.from_transport(ssh.get_transport())
+                sftp.put(tmp_file.name, tmp_file.name)
 
-            # run the provisioning script
-            stdout, stderr = self._run_command(
-                ssh,
-                "sudo /bin/bash {}".format(tmpFile),
-            )
-
-        except paramiko.ssh_exception.AuthenticationException as e:
-            raise e
-        finally:
-            os.remove(tmpFile)
-            ssh.close()
+                # run the provisioning script
+                _stdout, _stderr = self._run_command(
+                    ssh,
+                    f"sudo /bin/bash {tmp_file.name}",
+                )
+            finally:
+                ssh.close()

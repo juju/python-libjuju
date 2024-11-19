@@ -1,14 +1,14 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-"""
-This example:
+"""This example:
 
 1. Connects to the current controller
 2. Adds a model to the controller
 3. Attempts to deploy a charm with constraints
 
 """
+
 from juju import jasyncio
 from juju.controller import Controller
 
@@ -19,21 +19,20 @@ async def main():
 
     try:
         model = await controller.add_model("test-model")
-        application = await model.deploy("ch:ubuntu",
-                                         constraints={"arch": "amd64"})
+        application = await model.deploy("ch:ubuntu", constraints={"arch": "amd64"})
 
-        print('Waiting for active')
+        print("Waiting for active")
         await model.block_until(
-            lambda: all(unit.workload_status == 'active'
-                        for unit in application.units))
+            lambda: all(unit.workload_status == "active" for unit in application.units)
+        )
         print("Successfully deployed!")
-        print('Removing bundle')
+        print("Removing bundle")
         await application.remove()
     finally:
-        print('Disconnecting from controller')
+        print("Disconnecting from controller")
         await controller.disconnect()
         print("Success")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     jasyncio.run(main())

@@ -1,8 +1,7 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-"""
-This example:
+"""This example:
 
 1. Connects to the current model
 2. Starts an AllWatcher
@@ -10,6 +9,7 @@ This example:
 4. Runs forever (kill with Ctrl-C)
 
 """
+
 import logging
 
 from juju import jasyncio
@@ -28,9 +28,9 @@ async def watch():
             print(delta.deltas)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    ws_logger = logging.getLogger('websockets.protocol')
+    ws_logger = logging.getLogger("websockets.protocol")
     ws_logger.setLevel(logging.INFO)
     # Run loop until the process is manually stopped (watch will loop
     # forever).

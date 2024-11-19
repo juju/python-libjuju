@@ -3,14 +3,14 @@
 
 import asyncio
 import uuid
+
 import hvac
+import pytest
 
 from juju import access, controller
-from juju.client.connection import Connection
 from juju.client import client
+from juju.client.connection import Connection
 from juju.errors import JujuAPIError, JujuError
-
-import pytest
 
 from .. import base
 
@@ -18,7 +18,7 @@ from .. import base
 @base.bootstrapped
 async def test_add_remove_user():
     async with base.CleanController() as controller:
-        username = 'test{}'.format(uuid.uuid4())
+        username = f"test{uuid.uuid4()}"
         user = await controller.get_user(username)
         assert user is None
         user = await controller.add_user(username)
@@ -37,7 +37,7 @@ async def test_add_remove_user():
 @base.bootstrapped
 async def test_disable_enable_user():
     async with base.CleanController() as controller:
-        username = 'test-disable{}'.format(uuid.uuid4())
+        username = f"test-disable{uuid.uuid4()}"
         user = await controller.add_user(username)
 
         await user.disable()
@@ -60,18 +60,18 @@ async def test_disable_enable_user():
 @base.bootstrapped
 async def test_change_user_password():
     async with base.CleanController() as controller:
-        username = 'test-password{}'.format(uuid.uuid4())
+        username = f"test-password{uuid.uuid4()}"
         user = await controller.add_user(username)
-        await user.set_password('password')
+        await user.set_password("password")
         # Check that we can connect with the new password.
         new_connection = None
         try:
             kwargs = controller.connection().connect_params()
-            kwargs['username'] = username
-            kwargs['password'] = 'password'
+            kwargs["username"] = username
+            kwargs["password"] = "password"
             new_connection = await Connection.connect(**kwargs)
         except JujuAPIError:
-            raise AssertionError('Unable to connect with new password')
+            raise AssertionError("Unable to connect with new password")
         finally:
             if new_connection:
                 await new_connection.close()
@@ -80,10 +80,10 @@ async def test_change_user_password():
 @base.bootstrapped
 async def test_reset_user_password():
     async with base.CleanController() as controller:
-        username = 'test{}'.format(uuid.uuid4())
+        username = f"test{uuid.uuid4()}"
         user = await controller.add_user(username)
         origin_secret_key = user.secret_key
-        await user.set_password('password')
+        await user.set_password("password")
         await controller.reset_user_password(username)
         user = await controller.get_user(username)
         new_secret_key = user.secret_key
@@ -93,8 +93,8 @@ async def test_reset_user_password():
         new_connection = None
         try:
             kwargs = controller.connection().connect_params()
-            kwargs['username'] = username
-            kwargs['password'] = 'password'
+            kwargs["username"] = username
+            kwargs["password"] = "password"
             new_connection = await Connection.connect(**kwargs)
         except JujuAPIError:
             pass
@@ -117,7 +117,7 @@ async def test_list_models():
 async def test_get_model():
     async with base.CleanController() as controller:
         by_name, by_uuid = None, None
-        model_name = 'test-{}'.format(uuid.uuid4())
+        model_name = f"test-{uuid.uuid4()}"
         model = await controller.add_model(model_name)
         model_uuid = model.info.uuid
         await model.disconnect()
@@ -149,42 +149,37 @@ async def _wait_for_model_gone(controller, model_name):
 @base.bootstrapped
 async def test_destroy_model_by_name():
     async with base.CleanController() as controller:
-        model_name = 'test-{}'.format(uuid.uuid4())
+        model_name = f"test-{uuid.uuid4()}"
         model = await controller.add_model(model_name)
         await model.disconnect()
-        await asyncio.wait_for(_wait_for_model(controller,
-                                               model_name),
-                               timeout=60)
+        await asyncio.wait_for(_wait_for_model(controller, model_name), timeout=60)
         await controller.destroy_model(model_name)
-        await asyncio.wait_for(_wait_for_model_gone(controller,
-                                                    model_name),
-                               timeout=600)
+        await asyncio.wait_for(
+            _wait_for_model_gone(controller, model_name), timeout=600
+        )
 
 
 @base.bootstrapped
 async def test_add_destroy_model_by_uuid():
     async with base.CleanController() as controller:
-        model_name = 'test-{}'.format(uuid.uuid4())
+        model_name = f"test-{uuid.uuid4()}"
         model = await controller.add_model(model_name)
         model_uuid = model.info.uuid
         await model.disconnect()
-        await asyncio.wait_for(_wait_for_model(controller,
-                                               model_name),
-                               timeout=60)
+        await asyncio.wait_for(_wait_for_model(controller, model_name), timeout=60)
         await controller.destroy_model(model_uuid)
-        await asyncio.wait_for(_wait_for_model_gone(controller,
-                                                    model_name),
-                               timeout=60)
+        await asyncio.wait_for(_wait_for_model_gone(controller, model_name), timeout=60)
 
 
 @base.bootstrapped
 async def test_add_remove_cloud():
     async with base.CleanController() as controller:
-        cloud_name = 'test-{}'.format(uuid.uuid4())
+        cloud_name = f"test-{uuid.uuid4()}"
         cloud = client.Cloud(
             auth_types=["userpass"],
             endpoint="http://localhost:1234",
-            type_="kubernetes")
+            type_="kubernetes",
+        )
         cloud = await controller.add_cloud(cloud_name, cloud)
         try:
             assert cloud.auth_types[0] == "userpass"
@@ -196,16 +191,18 @@ async def test_add_remove_cloud():
 
 @base.bootstrapped
 async def test_secrets_backend_lifecycle():
-    """Testing the add_secret_backends is particularly
-    costly in term of resources. This test sets a vault
-    charm, add it to the controller and plays with the
-    list, removal, and update. """
+    """Testing the add_secret_backends is particularly costly in term of
+    resources.
+
+    This test sets a vault charm, add it to the controller and plays
+    with the list, removal, and update.
+    """
     async with base.CleanModel() as m:
         controller = await m.get_controller()
         # deploy postgresql
-        await m.deploy('postgresql', base='ubuntu@22.04')
+        await m.deploy("postgresql", base="ubuntu@22.04")
         # deploy vault
-        await m.deploy("vault", channel='1.8/stable', base='ubuntu@22.04')
+        await m.deploy("vault", channel="1.8/stable", base="ubuntu@22.04")
         # relate/integrate
         await m.integrate("vault:db", "postgresql:db")
         # wait for the postgresql app
@@ -218,7 +215,7 @@ async def test_secrets_backend_lifecycle():
         # Deploy this entire thing
         status = await m.get_status()
         target = ""
-        for unit in status.applications['vault'].units.values():
+        for unit in status.applications["vault"].units.values():
             target = unit.public_address
 
         vault_url = "http://%s:8200" % target
@@ -228,39 +225,50 @@ async def test_secrets_backend_lifecycle():
         keys = vault_client.sys.initialize(3, 2)
 
         # Unseal vault
-        vault_client.sys.submit_unseal_keys(keys['keys'])
+        vault_client.sys.submit_unseal_keys(keys["keys"])
 
         # authorize charm
-        target_unit = m.applications['vault'].units[0]
-        action = await target_unit.run_action("authorize-charm", token=keys["root_token"])
+        target_unit = m.applications["vault"].units[0]
+        action = await target_unit.run_action(
+            "authorize-charm", token=keys["root_token"]
+        )
         await action.wait()
 
         # Add the secret backend
-        response = await controller.add_secret_backends("1001", "myvault", "vault", {"endpoint": vault_url, "token": keys["root_token"]})
+        response = await controller.add_secret_backends(
+            "1001",
+            "myvault",
+            "vault",
+            {"endpoint": vault_url, "token": keys["root_token"]},
+        )
         assert response["results"] is not None
-        assert response["results"][0]['error'] is None
+        assert response["results"][0]["error"] is None
 
         # List the secrets backend
-        list = await controller.list_secret_backends()
-        assert len(list["results"]) == 2
+        alist = await controller.list_secret_backends()
+        assert len(alist["results"]) == 2
         # consider the internal secrets backend
-        for entry in list["results"]:
-            assert entry["result"].name == "internal" or entry["result"].name == "myvault"
+        for entry in alist["results"]:
+            assert (
+                entry["result"].name == "internal" or entry["result"].name == "myvault"
+            )
 
         # Update it
         # There is an ongoing error if no token_rotate_interval is provided
         resp = await controller.update_secret_backends(
-            "myvault",
-            name_change="changed_name",
-            token_rotate_interval=3600000000000)
+            "myvault", name_change="changed_name", token_rotate_interval=3600000000000
+        )
         assert resp["results"][0]["error"] is None
 
         # List the secrets backend
-        list = await controller.list_secret_backends()
-        assert len(list["results"]) == 2
+        alist = await controller.list_secret_backends()
+        assert len(alist["results"]) == 2
         # consider the internal secrets backend
-        for entry in list["results"]:
-            assert entry["result"].name == "internal" or entry["result"].name == "changed_name"
+        for entry in alist["results"]:
+            assert (
+                entry["result"].name == "internal"
+                or entry["result"].name == "changed_name"
+            )
 
         # Remove it
         await controller.remove_secret_backends("changed_name")
@@ -274,25 +282,25 @@ async def test_secrets_backend_lifecycle():
 @base.bootstrapped
 async def test_grant_revoke_controller_access():
     async with base.CleanController() as controller:
-        username = 'test-grant{}'.format(uuid.uuid4())
+        username = f"test-grant{uuid.uuid4()}"
         user = await controller.add_user(username)
-        await user.grant('superuser')
-        assert user.access == 'superuser'
+        await user.grant("superuser")
+        assert user.access == "superuser"
         fresh = await controller.get_user(username)  # fetch fresh copy
-        assert fresh.access == 'superuser'
-        await user.grant('login')  # already has 'superuser', so no-op
-        assert user.access == 'superuser'
+        assert fresh.access == "superuser"
+        await user.grant("login")  # already has 'superuser', so no-op
+        assert user.access == "superuser"
         fresh = await controller.get_user(username)  # fetch fresh copy
-        assert fresh.access == 'superuser'
+        assert fresh.access == "superuser"
         await user.revoke()
-        assert user.access == ''
+        assert user.access == ""
         fresh = await controller.get_user(username)  # fetch fresh copy
-        assert fresh.access == ''
+        assert fresh.access == ""
         try:
             # try removing the created user
             await controller.remove_user(username)
         except JujuError as e:
-            if 'state changing too quickly' in str(e):
+            if "state changing too quickly" in str(e):
                 pass
             else:
                 raise
@@ -303,13 +311,14 @@ async def test_connection_lazy_jujudata():
     async with base.CleanController() as cont1:
         conn = cont1.connection()
         new_controller = controller.Controller()
-        await new_controller.connect(endpoint=conn.endpoints[0][0],
-                                     cacert=conn.cacert,
-                                     username=conn.usertag,
-                                     password=conn.password,
-                                     )
+        await new_controller.connect(
+            endpoint=conn.endpoints[0][0],
+            cacert=conn.cacert,
+            username=conn.usertag,
+            password=conn.password,
+        )
         assert new_controller._controller_name is None
-        new_controller.controller_name
+        assert new_controller.controller_name
         assert new_controller._controller_name is not None
         await new_controller.disconnect()
 
@@ -317,15 +326,15 @@ async def test_connection_lazy_jujudata():
 @base.bootstrapped
 async def test_grant_revoke_model_access():
     async with base.CleanController() as controller:
-        username = 'test-grant{}'.format(uuid.uuid4())
+        username = f"test-grant{uuid.uuid4()}"
         user = await controller.add_user(username)
 
-        model_name = 'test-{}'.format(uuid.uuid4())
+        model_name = f"test-{uuid.uuid4()}"
         model = await controller.add_model(model_name)
 
         with pytest.raises(JujuError):
             # superuser is a controller access level, i.e. not a valid model acl
-            await user.grant('superuser', model_name=model_name)
+            await user.grant("superuser", model_name=model_name)
 
         models1 = await controller.list_models(username)
         assert models1 == []
@@ -351,7 +360,7 @@ async def test_grant_revoke_model_access():
             # try removing the created user
             await controller.remove_user(username)
         except JujuError as e:
-            if 'state changing too quickly' in str(e):
+            if "state changing too quickly" in str(e):
                 pass
             else:
                 raise

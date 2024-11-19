@@ -16,25 +16,20 @@ clean:
 
 .PHONY: client
 client:
-	tox -r --notest -e lint,py3
+	tox -r --notest -e py3
 	$(PY) -m juju.client.facade -s "juju/client/schemas*" -o juju/client/
+	pre-commit run --files $(shell echo juju/client/_[cd]*.py)
 
 .PHONY: run-unit-tests
-run-unit-tests: .tox lint
+run-unit-tests: .tox
 	tox -e py3
 
 .PHONY: run-integration-tests
-run-integration-tests: .tox lint
+run-integration-tests: .tox
 	tox -e integration
 
 .PHONY: run-all-tests
 test: run-unit-tests run-integration-tests
-
-.PHONY: lint
-lint:
-	@./scripts/copyright.sh
-	@echo "==> Running flake8 linter"
-	tox -e lint
 
 .PHONY: docs
 docs:
@@ -43,20 +38,20 @@ docs:
 .PHONY: build-test
 build-test:
 	rm -rf venv
+	uv build
 	python3 -m venv venv
 	. venv/bin/activate
-	python3 setup.py sdist
-	pip install ./dist/juju-${VERSION}.tar.gz
+	pip install dist/juju-${VERSION}-py3-none-any.whl
 	python3 -c "from juju.controller import Controller"
-	rm ./dist/juju-${VERSION}.tar.gz
+	rm dist/*.tar.gz dist/*.whl
 
 .PHONY: release
 release:
 	git fetch --tags
-	rm dist/*.tar.gz || true
-	$(PY) setup.py sdist
-	$(BIN)/twine check dist/*
-	$(BIN)/twine upload --repository juju dist/*
+	rm dist/*.tar.gz dist/*.whl || true
+	uv build
+	uvx twine check dist/*
+	uvx twine upload --repository juju dist/*
 	git tag ${VERSION}
 	git push --tags
 

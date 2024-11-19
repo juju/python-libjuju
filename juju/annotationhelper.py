@@ -29,7 +29,7 @@ async def _set_annotations(entity_tag, annotations, connection):
     """
     # TODO: ensure annotations is dict with only string keys
     # and values.
-    log.debug('Updating annotations on %s', entity_tag)
+    log.debug("Updating annotations on %s", entity_tag)
     facade = client.AnnotationsFacade.from_connection(connection)
     args = client.EntityAnnotations(
         entity=entity_tag,

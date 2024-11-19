@@ -17,66 +17,50 @@ log = logging.getLogger(__name__)
 class Unit(model.ModelEntity):
     @property
     def agent_status(self):
-        """Returns the current agent status string.
-
-        """
-        return self.safe_data['agent-status']['current']
+        """Returns the current agent status string."""
+        return self.safe_data["agent-status"]["current"]
 
     @property
     def agent_status_since(self):
-        """Get the time when the `agent_status` was last updated.
-
-        """
-        return pyrfc3339.parse(self.safe_data['agent-status']['since'])
+        """Get the time when the `agent_status` was last updated."""
+        return pyrfc3339.parse(self.safe_data["agent-status"]["since"])
 
     @property
     def is_subordinate(self):
-        """True if the unit is subordinate of another unit
-
-        """
-        return self.safe_data['subordinate']
+        """True if the unit is subordinate of another unit"""
+        return self.safe_data["subordinate"]
 
     @property
     def principal_unit(self):
         """Returns the name of the unit of which this unit is a subordinate to.
         Returns '' for principal units themselves.
         """
-        return self.safe_data['principal']
+        return self.safe_data["principal"]
 
     @property
     def agent_status_message(self):
-        """Get the agent status message.
-
-        """
-        return self.safe_data['agent-status']['message']
+        """Get the agent status message."""
+        return self.safe_data["agent-status"]["message"]
 
     @property
     def workload_status(self):
-        """Returns the current workload status string.
-
-        """
-        return self.safe_data['workload-status']['current']
+        """Returns the current workload status string."""
+        return self.safe_data["workload-status"]["current"]
 
     @property
     def workload_status_since(self):
-        """Get the time when the `workload_status` was last updated.
-
-        """
-        return pyrfc3339.parse(self.safe_data['workload-status']['since'])
+        """Get the time when the `workload_status` was last updated."""
+        return pyrfc3339.parse(self.safe_data["workload-status"]["since"])
 
     @property
     def workload_status_message(self):
-        """Get the workload status message.
-
-        """
-        return self.safe_data['workload-status']['message']
+        """Get the workload status message."""
+        return self.safe_data["workload-status"]["message"]
 
     @property
     def machine(self):
-        """Get the machine object for this unit.
-
-        """
-        machine_id = self.safe_data['machine-id']
+        """Get the machine object for this unit."""
+        machine_id = self.safe_data["machine-id"]
         if machine_id:
             return self.model.machines.get(machine_id, None)
         else:
@@ -84,11 +68,11 @@ class Unit(model.ModelEntity):
 
     @property
     def public_address(self):
-        """ Get the public address.
+        """Get the public address.
 
         This property is deprecated, use get_public_address method.
         """
-        return self.safe_data['public-address'] or None
+        return self.safe_data["public-address"] or None
 
     @property
     def tag(self):
@@ -99,24 +83,32 @@ class Unit(model.ModelEntity):
 
         :return [Unit]
         """
-        return [u for u_name, u in self.model.units.items() if u.is_subordinate and
-                u.principal_unit == self.name]
+        return [
+            u
+            for u_name, u in self.model.units.items()
+            if u.is_subordinate and u.principal_unit == self.name
+        ]
 
-    async def destroy(self, destroy_storage=False, dry_run=False, force=False, max_wait=None):
-        """Destroy this unit.
-
-        """
+    async def destroy(
+        self, destroy_storage=False, dry_run=False, force=False, max_wait=None
+    ):
+        """Destroy this unit."""
         app_facade = client.ApplicationFacade.from_connection(self.connection)
 
-        log.debug(
-            'Destroying %s', self.name)
+        log.debug("Destroying %s", self.name)
 
-        return await app_facade.DestroyUnit(units=[{"unit-tag": self.tag,
-                                                    'destroy-storage': destroy_storage,
-                                                    'force': force,
-                                                    'max-wait': max_wait,
-                                                    'dry-run': dry_run,
-                                                    }])
+        return await app_facade.DestroyUnit(
+            units=[
+                {
+                    "unit-tag": self.tag,
+                    "destroy-storage": destroy_storage,
+                    "force": force,
+                    "max-wait": max_wait,
+                    "dry-run": dry_run,
+                }
+            ]
+        )
+
     remove = destroy
 
     async def get_public_address(self):
@@ -124,15 +116,15 @@ class Unit(model.ModelEntity):
 
         :return int public-address
         """
-        addr = self.safe_data['public-address'] or None
+        addr = self.safe_data["public-address"] or None
         if addr is not None:
             return addr
 
         app_facade = client.ApplicationFacade.from_connection(self.connection)
-        defResult = await app_facade.UnitsInfo(entities=[client.Entity(self.tag)])
-        if defResult is not None and len(defResult.results) > 1:
+        def_result = await app_facade.UnitsInfo(entities=[client.Entity(self.tag)])
+        if def_result is not None and len(def_result.results) > 1:
             raise JujuAPIError("expected one result")
-        return defResult.results[0].result.get('public-address', None)
+        return def_result.results[0].result.get("public-address", None)
 
     async def resolved(self, retry=False):
         """Mark unit errors resolved.
@@ -142,13 +134,11 @@ class Unit(model.ModelEntity):
         """
         app_facade = client.ApplicationFacade.from_connection(self.connection)
 
-        log.debug(
-            'Resolving %s', self.name)
+        log.debug("Resolving %s", self.name)
 
         return await app_facade.ResolveUnitErrors(
-            all_=False,
-            retry=retry,
-            tags={'entities': [{'tag': self.tag}]})
+            all_=False, retry=retry, tags={"entities": [{"tag": self.tag}]}
+        )
 
     async def add_storage(self, storage_name, pool=None, count=1, size=1024):
         """Creates a storage and adds it to this unit.
@@ -169,14 +159,18 @@ class Unit(model.ModelEntity):
             constraints = client.StorageConstraints(pool=pool, count=count, size=size)
 
         storage_facade = client.StorageFacade.from_connection(self.connection)
-        res = await storage_facade.AddToUnit(storages=[client.StorageAddParams(
-            name=storage_name,
-            unit=self.tag,
-            storage=constraints,
-        )])
+        res = await storage_facade.AddToUnit(
+            storages=[
+                client.StorageAddParams(
+                    name=storage_name,
+                    unit=self.tag,
+                    storage=constraints,
+                )
+            ]
+        )
         result = res.results[0]
         if result.error is not None:
-            raise JujuError("{}".format(result.error))
+            raise JujuError(f"{result.error}")
         storage_details = result.result
         return storage_details.storage_tags
 
@@ -187,13 +181,18 @@ class Unit(model.ModelEntity):
         :return:
         """
         if not storage_ids:
-            raise JujuError("Expected a storage ID to be attached to unit {}".format(self.name))
+            raise JujuError(f"Expected a storage ID to be attached to unit {self.name}")
 
         storage_facade = client.StorageFacade.from_connection(self.connection)
-        return await storage_facade.Attach(ids=[client.StorageAttachmentId(
-            storage_tag=tag.storage(s_id),
-            unit_tag=self.tag,
-        ) for s_id in storage_ids])
+        return await storage_facade.Attach(
+            ids=[
+                client.StorageAttachmentId(
+                    storage_tag=tag.storage(s_id),
+                    unit_tag=self.tag,
+                )
+                for s_id in storage_ids
+            ]
+        )
 
     async def detach_storage(self, *storage_ids, force=False):
         """Detaches storage from units.
@@ -208,10 +207,15 @@ class Unit(model.ModelEntity):
         storage_facade = client.StorageFacade.from_connection(self.connection)
         ret = await storage_facade.DetachStorage(
             force=force,
-            ids=client.StorageAttachmentIds(ids=[client.StorageAttachmentId(
-                storage_tag=tag.storage(s),
-                unit_tag=self.tag,
-            ) for s in storage_ids])
+            ids=client.StorageAttachmentIds(
+                ids=[
+                    client.StorageAttachmentId(
+                        storage_tag=tag.storage(s),
+                        unit_tag=self.tag,
+                    )
+                    for s in storage_ids
+                ]
+            ),
         )
         if ret.results[0].error:
             raise JujuError(ret.results[0].error.message)
@@ -234,8 +238,7 @@ class Unit(model.ModelEntity):
         """
         action = client.ActionFacade.from_connection(self.connection)
 
-        log.debug(
-            'Running `%s` on %s', command, self.name)
+        log.debug("Running `%s` on %s", command, self.name)
 
         if timeout:
             # Convert seconds to nanoseconds
@@ -264,9 +267,9 @@ class Unit(model.ModelEntity):
 
         error = action_result.error
         if error:
-            raise JujuError("Action error - {} : {}".format(error.code, error.message))
+            raise JujuError(f"Action error - {error.code} : {error.message}")
 
-        action = await self.model._wait_for_new('action', action_id)
+        action = await self.model._wait_for_new("action", action_id)
         if block:
             return await action.wait()
         return action
@@ -284,34 +287,38 @@ class Unit(model.ModelEntity):
 
         """
         action_facade = client.ActionFacade.from_connection(self.connection)
-        log.debug('Starting action `%s` on %s', action_name, self.name)
+        log.debug("Starting action `%s` on %s", action_name, self.name)
 
         old_client = self.connection.is_using_old_client
 
         op = action_facade.Enqueue if old_client else action_facade.EnqueueOperation
-        res = await op(actions=[client.Action(
-            name=action_name,
-            parameters=params,
-            receiver=self.tag,
-        )])
+        res = await op(
+            actions=[
+                client.Action(
+                    name=action_name,
+                    parameters=params,
+                    receiver=self.tag,
+                )
+            ]
+        )
 
         _action = res.results[0] if old_client else res.actions[0]
         action = _action.action
         error = _action.error
 
-        if error and error.code == 'not found':
-            raise ValueError('Action `%s` not found on %s' % (action_name,
-                                                              self.name))
+        if error and error.code == "not found":
+            raise ValueError("Action `%s` not found on %s" % (action_name, self.name))
         elif error:
-            raise Exception('Unknown action error: %s' % error.serialize())
-        action_id = action.tag[len('action-'):]
-        log.debug('Action started as %s', action_id)
+            raise Exception("Unknown action error: %s" % error.serialize())
+        action_id = action.tag[len("action-") :]
+        log.debug("Action started as %s", action_id)
         # we mustn't use wait_for_action because that blocks until the
         # action is complete, rather than just being in the model
-        return await self.model._wait_for_new('action', action_id)
+        return await self.model._wait_for_new("action", action_id)
 
-    async def scp_to(self, source, destination, user='ubuntu', proxy=False,
-                     scp_opts=''):
+    async def scp_to(
+        self, source, destination, user="ubuntu", proxy=False, scp_opts=""
+    ):
         """Transfer files to this unit.
 
         :param str source: Local path of file(s) to transfer
@@ -321,11 +328,13 @@ class Unit(model.ModelEntity):
         :param scp_opts: Additional options to the `scp` command
         :type scp_opts: str or list
         """
-        await self.machine.scp_to(source, destination, user=user, proxy=proxy,
-                                  scp_opts=scp_opts)
+        await self.machine.scp_to(
+            source, destination, user=user, proxy=proxy, scp_opts=scp_opts
+        )
 
-    async def scp_from(self, source, destination, user='ubuntu', proxy=False,
-                       scp_opts=''):
+    async def scp_from(
+        self, source, destination, user="ubuntu", proxy=False, scp_opts=""
+    ):
         """Transfer files from this unit.
 
         :param str source: Remote path of file(s) to transfer
@@ -335,11 +344,11 @@ class Unit(model.ModelEntity):
         :param scp_opts: Additional options to the `scp` command
         :type scp_opts: str or list
         """
-        await self.machine.scp_from(source, destination, user=user,
-                                    proxy=proxy, scp_opts=scp_opts)
+        await self.machine.scp_from(
+            source, destination, user=user, proxy=proxy, scp_opts=scp_opts
+        )
 
-    async def ssh(
-            self, command, user='ubuntu', proxy=False, ssh_opts=None):
+    async def ssh(self, command, user="ubuntu", proxy=False, ssh_opts=None):
         """Execute a command over SSH on this unit.
 
         :param str command: Command to execute
@@ -351,8 +360,7 @@ class Unit(model.ModelEntity):
         return await self.machine.ssh(command, user, proxy, ssh_opts)
 
     async def is_leader_from_status(self):
-        """
-        Check to see if this unit is the leader. Returns True if so, and
+        """Check to see if this unit is the leader. Returns True if so, and
         False if it is not, or if leadership does not make sense
         (e.g., there is no leader in this application.)
 
@@ -403,7 +411,7 @@ class Unit(model.ModelEntity):
             if not is_subordinate:
                 continue
 
-            for key, unit in app_data.units.items():
+            for unit in app_data.units.values():
                 if unit.subordinates and unit.subordinates.get(self.name):
                     is_leader = unit.subordinates[self.name].leader
                     return is_leader if is_leader else False

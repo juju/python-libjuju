@@ -9,20 +9,15 @@ log = logging.getLogger(__name__)
 
 
 class RemoteApplication(model.ModelEntity):
-
     @property
     def status(self):
-        """Get the application status, as set by the charm's leader.
-
-        """
-        return self.safe_data['status']['current']
+        """Get the application status, as set by the charm's leader."""
+        return self.safe_data["status"]["current"]
 
     @property
     def status_message(self):
-        """Get the application status message, as set by the charm's leader.
-
-        """
-        return self.safe_data['status']['message']
+        """Get the application status message, as set by the charm's leader."""
+        return self.safe_data["status"]["message"]
 
     @property
     def tag(self):
@@ -36,8 +31,8 @@ class ApplicationOffer(model.ModelEntity):
 
     @property
     def offer_name(self):
-        return self.safe_data['offer-name']
+        return self.safe_data["offer-name"]
 
     @property
     def application_name(self):
-        return self.safe_data['application-name']
+        return self.safe_data["application-name"]

@@ -130,4 +130,3 @@ Description:
     .
     Pylibjuju releases now track the Juju release cadence. New generated schemas
     will be updated per Juju releases.
-

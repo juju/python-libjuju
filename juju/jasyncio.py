@@ -10,21 +10,82 @@
 # this layer.
 
 import asyncio
-import signal
 import functools
-import websockets
 import logging
+import signal
+from asyncio import (
+    ALL_COMPLETED as ALL_COMPLETED,
+)
+from asyncio import (
+    FIRST_COMPLETED as FIRST_COMPLETED,
+)
+from asyncio import (
+    CancelledError,
+    Task,
+    create_task,
+    wait,
+)
+
+# FIXME: integration tests don't use these, but some are used in this repo
+# Use primitives from asyncio within this repo and remove these re-exports
+from asyncio import (
+    Event as Event,
+)
+from asyncio import (
+    Lock as Lock,
+)
+from asyncio import (
+    Queue as Queue,
+)
+from asyncio import (
+    TimeoutError as TimeoutError,  # noqa: A004
+)
+from asyncio import (
+    all_tasks as all_tasks,
+)
+from asyncio import (
+    as_completed as as_completed,
+)
+from asyncio import (
+    create_subprocess_exec as create_subprocess_exec,
+)
+from asyncio import (
+    current_task as current_task,
+)
+from asyncio import (
+    ensure_future as ensure_future,
+)
+from asyncio import (
+    gather as gather,
+)
+from asyncio import (
+    get_event_loop_policy as get_event_loop_policy,
+)
+from asyncio import (
+    get_running_loop as get_running_loop,
+)
+from asyncio import (
+    new_event_loop as new_event_loop,
+)
+from asyncio import (
+    shield as shield,
+)
+from asyncio import (
+    sleep as sleep,
+)
+from asyncio import (
+    subprocess as subprocess,
+)
+from asyncio import (
+    wait_for as wait_for,
+)
+
+import websockets
 
 ROOT_LOGGER = logging.getLogger()
 
-from asyncio import Event, TimeoutError, Queue, ensure_future, \
-    gather, sleep, wait_for, create_subprocess_exec, subprocess, \
-    wait, FIRST_COMPLETED, Lock, as_completed, new_event_loop, \
-    get_event_loop_policy, CancelledError, get_running_loop, \
-    create_task, ALL_COMPLETED, all_tasks, current_task, shield     # noqa
 
-
-def create_task_with_handler(coro, task_name, logger=ROOT_LOGGER):
+def create_task_with_handler(coro, task_name, logger=ROOT_LOGGER) -> Task:
     """Wrapper around "asyncio.create_task" to make sure the task
     exceptions are handled properly.
 
@@ -36,6 +97,7 @@ def create_task_with_handler(coro, task_name, logger=ROOT_LOGGER):
     This makes sure the exceptions are retrieved and properly
     handled/logged whenever the Task is destroyed.
     """
+
     def _task_result_exp_handler(task, task_name=task_name, logger=logger):
         try:
             task.result()
@@ -53,33 +115,31 @@ def create_task_with_handler(coro, task_name, logger=ROOT_LOGGER):
             logger.exception("Task %s raised an exception: %s" % (task_name, e))
 
     task = create_task(coro)
-    task.add_done_callback(functools.partial(_task_result_exp_handler, task_name=task_name, logger=logger))
+    task.add_done_callback(
+        functools.partial(_task_result_exp_handler, task_name=task_name, logger=logger)
+    )
     return task
 
 
-class SingletonEventLoop(object):
-    """
-    Single instance containing an event loop to be reused.
-    """
+class SingletonEventLoop:
+    """Single instance containing an event loop to be reused."""
 
     loop = None
 
     def __new__(cls):
-        if not hasattr(cls, 'instance'):
-            cls.instance = super(SingletonEventLoop, cls).__new__(cls)
+        if not hasattr(cls, "instance"):
+            cls.instance = super().__new__(cls)
             cls.instance.loop = asyncio.new_event_loop()
 
         return cls.instance
 
 
 def run(*steps):
-    """
-    Helper to run one or more async functions synchronously, with graceful
+    """Helper to run one or more async functions synchronously, with graceful
     handling of SIGINT / Ctrl-C.
 
     Returns the return value of the last function.
     """
-
     if not steps:
         return
 
@@ -98,7 +158,7 @@ def run(*steps):
         added = True
     except (ValueError, OSError, RuntimeError) as e:
         # add_signal_handler doesn't work in a thread
-        if 'main thread' not in str(e):
+        if "main thread" not in str(e):
             raise
     try:
         for step in steps:

@@ -2,9 +2,10 @@
 # Licensed under the Apache V2, see LICENCE file for details.
 
 import os
-from pathlib import Path
 import tempfile
 import unittest
+from pathlib import Path
+
 import pytest
 
 from juju.secrets import create_secret_data, read_secret_data
@@ -18,21 +19,18 @@ class TestCreateSecretData(unittest.TestCase):
             create_secret_data(["=bar"])
 
     def test_good_key_values(self):
-        self.assertDictEqual(create_secret_data(["foo=bar", "hello=world", "goodbye#base64=world"]),
-                             {
-                                 "foo": "YmFy",
-                                 "hello": "d29ybGQ=",
-                                 "goodbye": "world"})
+        self.assertDictEqual(
+            create_secret_data(["foo=bar", "hello=world", "goodbye#base64=world"]),
+            {"foo": "YmFy", "hello": "d29ybGQ=", "goodbye": "world"},
+        )
 
     def test_key_content_too_large(self):
         with pytest.raises(ValueError):
-            create_secret_data(["foo=" + ('a' * 8 * 1024)])
+            create_secret_data(["foo=" + ("a" * 8 * 1024)])
 
     def test_total_content_too_large(self):
-        args = []
-        content = 'a' * 4 * 1024
-        for i in range(20):
-            args.append(f'key{i}={content}')
+        content = "a" * 4 * 1024
+        args = [f"key{i}={content}" for i in range(20)]
         with pytest.raises(ValueError):
             create_secret_data(args)
 
@@ -52,12 +50,15 @@ class TestCreateSecretData(unittest.TestCase):
 
             data = create_secret_data(["key1=value1", f"key2#file={file_path}"])
 
-            self.assertDictEqual(data, {
-                "key1": "dmFsdWUx",
-                "key2": (
-                    'ICAgICAgICAgIC0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLQogICAgICAgICAgTUlJRllqQ0NBMHFnQXdJQkFnSVFLYVBORDlZZ2dJRzYrak9jZ21wazNEQU5CZ2txaGtpRzl3MEJBUXNGQURBegogICAgICAgICAgTVJ3d0dnWURWUVFLRXhOc2FXNTFlR052Ym5SaGFXNWxjbk11YjNKbk1STXdFUVlEVlFRRERBcDBhVzFBWld4MwogICAgICAgICAgLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQ=='
-                ),
-            })
+            self.assertDictEqual(
+                data,
+                {
+                    "key1": "dmFsdWUx",
+                    "key2": (
+                        "ICAgICAgICAgIC0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLQogICAgICAgICAgTUlJRllqQ0NBMHFnQXdJQkFnSVFLYVBORDlZZ2dJRzYrak9jZ21wazNEQU5CZ2txaGtpRzl3MEJBUXNGQURBegogICAgICAgICAgTVJ3d0dnWURWUVFLRXhOc2FXNTFlR052Ym5SaGFXNWxjbk11YjNKbk1STXdFUVlEVlFRRERBcDBhVzFBWld4MwogICAgICAgICAgLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQ=="
+                    ),
+                },
+            )
 
 
 class TestReadSecretData(unittest.TestCase):
@@ -75,33 +76,33 @@ class TestReadSecretData(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             file_path = os.path.join(temp_dir, "secret.yaml")
 
-            with open(file_path, 'w') as file:
+            with open(file_path, "w") as file:
                 file.write(data)
 
             attrs = read_secret_data(file_path)
-            self.assertDictEqual(attrs, {
-                "hello": "d29ybGQ=",
-                "goodbye": "world",
-                "another-key": "YiJHSUY4OWFceDBjXHgwMFx4MGNceDAwXHg4NFx4MDBceDAwXHhmZlx4ZmZceGY3XHhmNVx4ZjVceGVlXHhlOVx4ZTlceGU1ZmZmXHgwMFx4MDBceDAwXHhlN1x4ZTdceGU3Xl5eXHhmM1x4ZjNceGVkXHg4ZVx4OGVceDhlXHhlMFx4ZTBceGUwXHg5Zlx4OWZceDlmXHg5M1x4OTNceDkzXHhhN1x4YTdceGE3XHg5ZVx4OWVceDllaWlpY2NjXHhhM1x4YTNceGEzXHg4NFx4ODRceDg0XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5IVx4ZmVceDBlTWFkZSB3aXRoIEdJTVBceDAwLFx4MDBceDAwXHgwMFx4MDBceDBjXHgwMFx4MGNceDAwXHgwMFx4MDUsICBceDhlXHg4MTBceDllXHhlM0BceDE0XHhlOGlceDEwXHhjNFx4ZDFceDhhXHgwOFx4MWNceGNmXHg4ME0kelx4ZWZceGZmMFx4ODVwXHhiOFx4YjAxZlxyXHgxYlx4Y2VceDAxXHhjM1x4MDFceDFlXHgxMCcgXHg4MlxuXHgwMVx4MDA7Ig=="
-            })
+            self.assertDictEqual(
+                attrs,
+                {
+                    "hello": "d29ybGQ=",
+                    "goodbye": "world",
+                    "another-key": "YiJHSUY4OWFceDBjXHgwMFx4MGNceDAwXHg4NFx4MDBceDAwXHhmZlx4ZmZceGY3XHhmNVx4ZjVceGVlXHhlOVx4ZTlceGU1ZmZmXHgwMFx4MDBceDAwXHhlN1x4ZTdceGU3Xl5eXHhmM1x4ZjNceGVkXHg4ZVx4OGVceDhlXHhlMFx4ZTBceGUwXHg5Zlx4OWZceDlmXHg5M1x4OTNceDkzXHhhN1x4YTdceGE3XHg5ZVx4OWVceDllaWlpY2NjXHhhM1x4YTNceGEzXHg4NFx4ODRceDg0XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5XHhmZlx4ZmVceGY5IVx4ZmVceDBlTWFkZSB3aXRoIEdJTVBceDAwLFx4MDBceDAwXHgwMFx4MDBceDBjXHgwMFx4MGNceDAwXHgwMFx4MDUsICBceDhlXHg4MTBceDllXHhlM0BceDE0XHhlOGlceDEwXHhjNFx4ZDFceDhhXHgwOFx4MWNceGNmXHg4ME0kelx4ZWZceGZmMFx4ODVwXHhiOFx4YjAxZlxyXHgxYlx4Y2VceDAxXHhjM1x4MDFceDFlXHgxMCcgXHg4MlxuXHgwMVx4MDA7Ig==",
+                },
+            )
 
     def test_json_file(self):
-        data = '''
+        data = """
         {
             "hello": "world",
             "goodbye#base64": "world"
         }
-        '''
+        """
 
         with tempfile.TemporaryDirectory() as temp_dir:
             file_path = os.path.join(temp_dir, "secret.json")
 
-            with open(file_path, 'w', encoding='utf-8') as file:
+            with open(file_path, "w", encoding="utf-8") as file:
                 file.write(data)
 
             attrs = read_secret_data(file_path)
 
-            self.assertDictEqual(attrs, {
-                "hello": "d29ybGQ=",
-                "goodbye": "world"
-            })
+            self.assertDictEqual(attrs, {"hello": "d29ybGQ=", "goodbye": "world"})

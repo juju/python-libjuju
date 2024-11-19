@@ -1,33 +1,33 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-"""
-This example:
+"""This example:
 
 1. Connects to the current model
 2. Upgrades previously deployed ubuntu charm
 
 """
+
 from juju import jasyncio
 from juju.model import Model
 
 
 async def main():
     model = Model()
-    print('Connecting to model')
+    print("Connecting to model")
     # connect to current model with current user, per Juju CLI
     await model.connect()
 
     try:
-        print('Get deployed application')
+        print("Get deployed application")
         app = model.applications["ubuntu"]
 
-        print('Refresh/Upgrade Ubuntu charm with local charm')
+        print("Refresh/Upgrade Ubuntu charm with local charm")
         await app.refresh(path="path/to/local/ubuntu.charm")
     finally:
-        print('Disconnecting from model')
+        print("Disconnecting from model")
         await model.disconnect()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     jasyncio.run(main())

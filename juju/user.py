@@ -5,13 +5,13 @@ import logging
 
 import pyrfc3339
 
-from . import tag, errors
+from . import errors, tag
 from .client import client
 
 log = logging.getLogger(__name__)
 
 
-class User(object):
+class User:
     def __init__(self, controller, user_info, secret_key=None):
         self.controller = controller
         self._user_info = user_info
@@ -59,8 +59,7 @@ class User(object):
         return self._secret_key
 
     async def set_password(self, password):
-        """Update this user's password.
-        """
+        """Update this user's password."""
         await self.controller.change_user_password(self.username, password)
         self._user_info.password = password
 
@@ -74,11 +73,14 @@ class User(object):
         :return bool: True if access changed, Error if user already has it
         """
         modelmanager_facade = client.ModelManagerFacade.from_connection(
-            self.controller.connection())
+            self.controller.connection()
+        )
         models = await self.controller.model_uuids()
         if model_name not in models:
-            raise errors.JujuError(f'Unable to find model : {model_name}')
-        changes = client.ModifyModelAccess(acl, action, tag.model(models[model_name]), self.tag)
+            raise errors.JujuError(f"Unable to find model : {model_name}")
+        changes = client.ModifyModelAccess(
+            acl, action, tag.model(models[model_name]), self.tag
+        )
         await modelmanager_facade.ModifyModelAccess(changes=[changes])
         return True
 
@@ -90,13 +92,15 @@ class User(object):
 
         :return bool: True if access changed, Error if user already has it
         """
-        controller_facade = client.ControllerFacade.from_connection(self.controller.connection())
+        controller_facade = client.ControllerFacade.from_connection(
+            self.controller.connection()
+        )
         changes = client.ModifyControllerAccess(acl, action, self.tag)
         await controller_facade.ModifyControllerAccess(changes=[changes])
 
         new_access = acl
-        if action == 'revoke':
-            new_access = ''
+        if action == "revoke":
+            new_access = ""
         self._user_info.access = new_access
         return True
 
@@ -110,7 +114,8 @@ class User(object):
         :return bool: True if access changed, Error if user already has it
         """
         application_offers_facade = client.ApplicationOffersFacade.from_connection(
-            self.controller.connection())
+            self.controller.connection()
+        )
         changes = client.ModifyOfferAccess(acl, action, offer_url, self.tag)
         await application_offers_facade.ModifyOfferAccess(changes=[changes])
         return True
@@ -129,14 +134,14 @@ class User(object):
         :return: True if access changed, False if user already has it
         """
         try:
-            if 'model_name' in kwargs:
-                return await self.modify_model_access(acl, action, kwargs['model_name'])
-            elif 'offer_url' in kwargs:
-                return await self.modify_offer_access(acl, action, kwargs['offer_url'])
+            if "model_name" in kwargs:
+                return await self.modify_model_access(acl, action, kwargs["model_name"])
+            elif "offer_url" in kwargs:
+                return await self.modify_offer_access(acl, action, kwargs["offer_url"])
             else:
                 return await self.modify_controller_access(acl, action)
         except errors.JujuError as e:
-            if 'user already has' in str(e):
+            if "user already has" in str(e):
                 return False
             else:
                 raise
@@ -153,9 +158,9 @@ class User(object):
 
         :return: None or Error
         """
-        return await self.grant_or_revoke(acl, 'grant', **kwargs)
+        return await self.grant_or_revoke(acl, "grant", **kwargs)
 
-    async def revoke(self, acl='login', **kwargs):
+    async def revoke(self, acl="login", **kwargs):
         """The opposite of user.grant(). Revokes the given access level of this user on model,
         offer or controller, depending on the given access level.
 
@@ -165,16 +170,14 @@ class User(object):
         :param str model_name: name of the model if acl is one of model access levels
         :param str offer_url: url for the offer if acl is one of offer access levels
         """
-        return await self.grant_or_revoke(acl, 'revoke', **kwargs)
+        return await self.grant_or_revoke(acl, "revoke", **kwargs)
 
     async def disable(self):
-        """Disable this user.
-        """
+        """Disable this user."""
         await self.controller.disable_user(self.username)
         self._user_info.disabled = True
 
     async def enable(self):
-        """Re-enable this user.
-        """
+        """Re-enable this user."""
         await self.controller.enable_user(self.username)
         self._user_info.disabled = False

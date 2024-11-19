@@ -1,14 +1,13 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-"""
-This example demonstrate how status works
+"""This example demonstrate how status works"""
 
-"""
-from juju import jasyncio
 import logging
 import sys
 from logging import getLogger
+
+from juju import jasyncio
 from juju.model import Model
 from juju.status import formatted_status
 
@@ -21,15 +20,15 @@ async def main():
     await model.connect_current()
 
     application = await model.deploy(
-        'ch:ubuntu',
-        application_name='ubuntu',
-        series='jammy',
-        channel='stable',
+        "ch:ubuntu",
+        application_name="ubuntu",
+        series="jammy",
+        channel="stable",
     )
     await jasyncio.sleep(10)
     # Print the status to observe the evolution
     # during a minute
-    for i in range(12):
+    for _ in range(12):
         try:
             # By setting raw to True, the returned
             # entry contains a FullStatus object with
@@ -41,11 +40,12 @@ async def main():
             print(e)
         await jasyncio.sleep(5)
 
-    print('Removing ubuntu')
+    print("Removing ubuntu")
     await application.remove()
 
-    print('Disconnecting from model')
+    print("Disconnecting from model")
     await model.disconnect()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     jasyncio.run(main())

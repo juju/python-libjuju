@@ -1,12 +1,12 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-"""
-This example:
+"""This example:
 1. Connects to the current model
 2. Deploy a bundle from charmhub and waits until it reports itself active
 3. Destroys the unit and application
 """
+
 from juju import jasyncio
 from juju.model import Model
 

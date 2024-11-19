@@ -1,8 +1,7 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-"""
-This example:
+"""This example:
 
 1. Connects to test and test2 controllers
 2. Creates models on each controllers
@@ -15,6 +14,7 @@ This example:
 9. Removes the offer
 10. Destroys models and disconnects
 """
+
 import tempfile
 from logging import getLogger
 
@@ -34,43 +34,50 @@ async def main():
     await controller2.connect("test2")
 
     try:
-        print('Creating models')
-        offering_model = await controller1.add_model('test-cmr-1')
-        consuming_model = await controller2.add_model('test-cmr-2')
+        print("Creating models")
+        offering_model = await controller1.add_model("test-cmr-1")
+        consuming_model = await controller2.add_model("test-cmr-2")
 
-        print('Deploying mysql')
+        print("Deploying mysql")
         application = await offering_model.deploy(
-            'ch:mysql',
-            application_name='mysql',
-            series='trusty',
-            channel='stable',
+            "ch:mysql",
+            application_name="mysql",
+            series="trusty",
+            channel="stable",
         )
 
-        print('Waiting for active')
+        print("Waiting for active")
         await offering_model.block_until(
-            lambda: all(unit.workload_status == 'active'
-                        for unit in application.units))
+            lambda: all(unit.workload_status == "active" for unit in application.units)
+        )
 
-        print('Adding offer')
+        print("Adding offer")
         await offering_model.create_offer("mysql:db")
 
         offers = await offering_model.list_offers()
-        print('Show offers', ', '.join("%s: %s" % item for offer in offers.results for item in vars(offer).items()))
+        print(
+            "Show offers",
+            ", ".join(
+                "%s: %s" % item
+                for offer in offers.results
+                for item in vars(offer).items()
+            ),
+        )
 
-        print('Consuming offer')
+        print("Consuming offer")
         await consuming_model.consume("admin/test-cmr-1.mysql", controller_name="test")
 
-        print('Exporting bundle')
+        print("Exporting bundle")
         with tempfile.TemporaryDirectory() as dirpath:
-            await offering_model.export_bundle("{}/bundle.yaml".format(dirpath))
+            await offering_model.export_bundle(f"{dirpath}/bundle.yaml")
 
         print("Remove SAAS")
         await consuming_model.remove_saas("mysql")
 
-        print('Removing offer')
+        print("Removing offer")
         await offering_model.remove_offer("admin/test-cmr-1.mysql", force=True)
 
-        print('Destroying models')
+        print("Destroying models")
         await controller1.destroy_model(offering_model.info.uuid)
         await controller2.destroy_model(consuming_model.info.uuid)
 
@@ -79,10 +86,10 @@ async def main():
         raise
 
     finally:
-        print('Disconnecting from controller')
+        print("Disconnecting from controller")
         await controller1.disconnect()
         await controller2.disconnect()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     jasyncio.run(main())

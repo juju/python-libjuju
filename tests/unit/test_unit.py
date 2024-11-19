@@ -1,135 +1,75 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-import mock
+from unittest import mock
 
 from juju.client._definitions import FullStatus
 from juju.model import Model
 from juju.unit import Unit
 
 
-@mock.patch('juju.client.client.ClientFacade')
+@mock.patch("juju.client.client.ClientFacade")
 async def test_unit_is_leader(mock_cf):
     tests = [
         {
-            'applications': {
-                'test': {
-                    'units': {
-                        'test/0': {
-                            'subordinates': {
-                                'test-sub/0': {
-                                    'leader': True
-                                }
-                            }
-                        }
+            "applications": {
+                "test": {
+                    "units": {
+                        "test/0": {"subordinates": {"test-sub/0": {"leader": True}}}
                     }
                 },
-                'test-sub': {
-                    'subordinate-to': [
-                        'test'
-                    ]
-                }
+                "test-sub": {"subordinate-to": ["test"]},
             },
-            'description': "Tests that subordinate units reports is leader correctly",
-            'unit': 'test-sub/0',
-            'rval': True
+            "description": "Tests that subordinate units reports is leader correctly",
+            "unit": "test-sub/0",
+            "rval": True,
         },
         {
-            'applications': {
-                'test': {
-                    'units': {
-                        'test/0': {
-                            'leader': True
-                        }
-                    }
-                }
-            },
-            'description': "Tests that unit reports is leader correctly",
-            'unit': 'test/0',
-            'rval': True
+            "applications": {"test": {"units": {"test/0": {"leader": True}}}},
+            "description": "Tests that unit reports is leader correctly",
+            "unit": "test/0",
+            "rval": True,
         },
         {
-            'applications': {},
-            'description': "Tests that non existent apps return False as leader",
-            'unit': 'test/0',
-            'rval': False
+            "applications": {},
+            "description": "Tests that non existent apps return False as leader",
+            "unit": "test/0",
+            "rval": False,
         },
         {
-            'applications': {
-                'test': {
-                    'units': {}
-                }
-            },
-            'description': "Tests that apps with no units report False as leader",
-            'unit': 'test/0',
-            'rval': False
+            "applications": {"test": {"units": {}}},
+            "description": "Tests that apps with no units report False as leader",
+            "unit": "test/0",
+            "rval": False,
         },
         {
-            'applications': {
-                'test': {
-                    'units': {
-                        'test/0': {
-                            'subordinates': {
-                                'test-sub/0': {}
-                            }
-                        }
+            "applications": {
+                "test": {"units": {"test/0": {"subordinates": {"test-sub/0": {}}}}},
+                "test1": {
+                    "units": {
+                        "test1/0": {"subordinates": {"test-sub/1": {"leader": True}}}
                     }
                 },
-                'test1': {
-                    'units': {
-                        'test1/0': {
-                            'subordinates': {
-                                'test-sub/1': {
-                                    'leader': True
-                                }
-                            }
-                        }
-                    }
-                },
-                'test-sub': {
-                    'subordinate-to': [
-                        'test',
-                        'test1'
-                    ]
-                }
+                "test-sub": {"subordinate-to": ["test", "test1"]},
             },
-            'description': "Tests that subordinate units of multiple applications reports is leader correctly",
-            'unit': 'test-sub/1',
-            'rval': True
+            "description": "Tests that subordinate units of multiple applications reports is leader correctly",
+            "unit": "test-sub/1",
+            "rval": True,
         },
         {
-            'applications': {
-                'test': {
-                    'units': {
-                        'test/0': {
-                            'subordinates': {
-                                'test-sub/0': {
-                                    'leader': True
-                                }
-                            }
-                        }
+            "applications": {
+                "test": {
+                    "units": {
+                        "test/0": {"subordinates": {"test-sub/0": {"leader": True}}}
                     }
                 },
-                'test1': {
-                    'units': {
-                        'test1/0': {
-                            'subordinates': {
-                                'test-sub/1': {}
-                            }
-                        }
-                    }
-                },
-                'test-sub': {
-                    'subordinate-to': [
-                        'test',
-                        'test1'
-                    ]
-                }
+                "test1": {"units": {"test1/0": {"subordinates": {"test-sub/1": {}}}}},
+                "test-sub": {"subordinate-to": ["test", "test1"]},
             },
-            'description': "Tests that subordinate units of multiple applications reports is leader correctly",
-            'unit': 'test-sub/1',
-            'rval': False
-        }
+            "description": "Tests that subordinate units of multiple applications reports is leader correctly",
+            "unit": "test-sub/1",
+            "rval": False,
+        },
     ]
 
     model = Model()
@@ -141,7 +81,7 @@ async def test_unit_is_leader(mock_cf):
         client_facade.FullStatus = mock.AsyncMock(return_value=status)
 
         unit = Unit("test", model)
-        unit.name = test['unit']
+        unit.name = test["unit"]
 
         rval = await unit.is_leader_from_status()
-        assert rval == test['rval']
+        assert rval == test["rval"]

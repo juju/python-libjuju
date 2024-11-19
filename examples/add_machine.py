@@ -3,14 +3,14 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-"""
-This example:
+"""This example:
 
 1. Connects to the current model
 2. Creates two machines and a lxd container
 3. Deploys charm to the lxd container
 
 """
+
 import logging
 
 from juju import jasyncio
@@ -30,31 +30,30 @@ async def main():
         # add a machine with constraints, disks, and series
         machine2 = await model.add_machine(
             constraints={
-                'mem': 256 * MB,
+                "mem": 256 * MB,
             },
-            disks=[{
-                'size': 10 * GB,
-                'count': 1,
-            }],
-            series='jammy',
+            disks=[
+                {
+                    "size": 10 * GB,
+                    "count": 1,
+                }
+            ],
+            series="jammy",
         )
 
         # add a lxd container to machine2
-        machine3 = await model.add_machine(
-            'lxd:{}'.format(machine2.id),
-            series='jammy'
-        )
+        machine3 = await model.add_machine(f"lxd:{machine2.id}", series="jammy")
 
         # deploy charm to the lxd container
         application = await model.deploy(
-            'ch:ubuntu',
-            application_name='ubuntu',
-            series='jammy',
-            channel='stable',
-            to=machine3.id
+            "ch:ubuntu",
+            application_name="ubuntu",
+            series="jammy",
+            channel="stable",
+            to=machine3.id,
         )
 
-        await model.wait_for_idle(status='active')
+        await model.wait_for_idle(status="active")
 
         await application.remove()
 
@@ -65,9 +64,9 @@ async def main():
         await model.disconnect()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    ws_logger = logging.getLogger('websockets.protocol')
+    ws_logger = logging.getLogger("websockets.protocol")
     ws_logger.setLevel(logging.INFO)
 
     jasyncio.run(main())

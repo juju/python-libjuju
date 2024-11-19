@@ -1,30 +1,12 @@
 name: Testing
 
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  lint:
-    name: Linter
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python:
-          - "3.9"
-          - "3.10"
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python }}
-      - name: Install dependencies
-        run: pip install tox
-      - name: Run linter
-        run: |
-          tox -e lint
-          ./scripts/copyright.sh
-
   build-test:
     name: Build test
     runs-on: ubuntu-latest
@@ -33,30 +15,50 @@ jobs:
         python:
           - "3.10"
     steps:
-      - name: Check out code
-        uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-      - name: Run build test target
-        run: |
+      - uses: astral-sh/setup-uv@v3.2.2
+      - run: |
           make build-test
 
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python:
+          - "3.10"
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install dependencies
+        run: pip install tox
+      - name: Run validation tests
+        run: tox -e validate
+
   unit-tests:
-    needs: lint
     name: Unit tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python:
+          - "3.8"
           - "3.9"
           - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
       - name: Install dependencies
@@ -66,24 +68,40 @@ jobs:
 
   integration:
     name: Integration
-    needs: [lint, unit-tests]
+    needs: [unit-tests]
     timeout-minutes: 150
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python:
           # We will reduce the workload to 3.10 to
           # save some resources for now.
           # - "3.9"
           - "3.10"
+        juju:
+          - "3.1/stable"
+          - "3.3/stable"
+          - "3.4/stable"
+          - "3.5/stable"
+          # A bunch of tests fail with juju.errors.JujuError: base: ubuntu@15.04/stable
+          # * test_subordinate_units
+          # * test_destroy_unit
+          # * test_ssh
+          # * ...
+          # - "3.6/beta"
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
       - name: Setup operator environment
         uses: charmed-kubernetes/actions-operator@main
         with:
           provider: lxd
-          juju-channel: 3.4/stable
+          juju-channel: ${{ matrix.juju }}
       # 2023-01-11 Commented until we discover a
       # clear approach for this.
       # - name: Set proxy in controller
@@ -112,12 +130,36 @@ jobs:
       #     # set model defaults
       #     juju model-defaults apt-http-proxy=$PROXY apt-https-proxy=$PROXY  juju-http-proxy=$PROXY juju-https-proxy=$PROXY  snap-http-proxy=$PROXY snap-https-proxy=$PROXY
       #     juju model-defaults
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python }}
-      - name: Install dependencies
-        run: pip install tox
       - name: Run integration
         # Force one single concurrent test
         run: tox -e integration
+
+  integration-quarantine:
+    name: Quarantined Integration Tests
+    needs: [unit-tests]
+    timeout-minutes: 150
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python:
+          - "3.10"
+        juju:
+          - "3.1/stable"
+          - "3.3/stable"
+          - "3.4/stable"
+          - "3.5/stable"
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Setup operator environment
+        uses: charmed-kubernetes/actions-operator@main
+        with:
+          provider: lxd
+          juju-channel: ${{ matrix.juju }}
+      - name: Run integration
+        run: tox -e integration-quarantine

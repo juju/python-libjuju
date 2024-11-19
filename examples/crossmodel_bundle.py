@@ -1,8 +1,7 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-"""
-This example:
+"""This example:
 
 1. Connects to the current controller
 2. Creates two models for consuming and offering
@@ -13,6 +12,7 @@ This example:
 6. Destroys the units and applications
 
 """
+
 import time
 from logging import getLogger
 from pathlib import Path
@@ -29,33 +29,39 @@ async def main():
     await controller.connect()
 
     try:
-        print('Creating models')
-        offering_model = await controller.add_model('test-cmr-1')
-        consuming_model = await controller.add_model('test-cmr-2')
+        print("Creating models")
+        offering_model = await controller.add_model("test-cmr-1")
+        consuming_model = await controller.add_model("test-cmr-2")
 
-        print('Deploying mysql')
+        print("Deploying mysql")
         await offering_model.deploy(
-            'ch:mysql',
-            application_name='mysql',
-            series='jammy',
-            channel='edge',
+            "ch:mysql",
+            application_name="mysql",
+            series="jammy",
+            channel="edge",
         )
 
-        print('Waiting for active')
-        await offering_model.wait_for_idle(status='active')
+        print("Waiting for active")
+        await offering_model.wait_for_idle(status="active")
 
-        print('Adding offer')
+        print("Adding offer")
         await offering_model.create_offer("mysql:db")
 
-        print('Deploying bundle')
-        applications = await consuming_model.deploy(str('local:' / Path(__file__).absolute().parent / "cmr-bundle"))
+        print("Deploying bundle")
+        applications = await consuming_model.deploy(
+            str("local:" / Path(__file__).absolute().parent / "cmr-bundle")
+        )
 
-        print('Waiting for application to start')
+        print("Waiting for application to start")
         await consuming_model.block_until(
-            lambda: all(unit.agent_status == 'executing'
-                        for application in applications for unit in application.units))
+            lambda: all(
+                unit.agent_status == "executing"
+                for application in applications
+                for unit in application.units
+            )
+        )
 
-        print('Exporting bundle')
+        print("Exporting bundle")
         bundle = await consuming_model.export_bundle()
         print(bundle)
 
@@ -64,10 +70,10 @@ async def main():
         print("Remove SAAS")
         await consuming_model.remove_saas("mysql")
 
-        print('Removing offer')
+        print("Removing offer")
         await offering_model.remove_offer("admin/test-cmr-1.mysql", force=True)
 
-        print('Destroying models')
+        print("Destroying models")
         await controller.destroy_model(offering_model.info.uuid)
         await controller.destroy_model(consuming_model.info.uuid)
 
@@ -76,9 +82,9 @@ async def main():
         raise
 
     finally:
-        print('Disconnecting from controller')
+        print("Disconnecting from controller")
         await controller.disconnect()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     jasyncio.run(main())

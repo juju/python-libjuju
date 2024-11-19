@@ -64,7 +64,7 @@ a macaroon.
   bakery_client.cookies = FileCookieJar('cookies.txt')
   model = Model()
   await model.connect(bakery_client=bakery_client)
-  
+
 
 
 Connecting with an Explicit Endpoint

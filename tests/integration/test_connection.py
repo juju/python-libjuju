@@ -8,18 +8,17 @@ import ssl
 from contextlib import closing
 from pathlib import Path
 
+import pytest
+import websockets
+
+from juju import jasyncio
 from juju.client import client
 from juju.client.connection import Connection
 from juju.client.jujudata import FileJujuData
 from juju.controller import Controller
 from juju.utils import run_with_interrupt
-from juju import jasyncio
-
-import pytest
-import websockets
 
 from .. import base
-
 
 logger = logging.getLogger(__name__)
 
@@ -28,19 +27,18 @@ logger = logging.getLogger(__name__)
 async def test_monitor():
     async with base.CleanModel() as model:
         conn = model.connection()
-        assert conn.monitor.status == 'connected'
+        assert conn.monitor.status == "connected"
         await conn.close()
 
-        assert conn.monitor.status == 'disconnecting'
+        assert conn.monitor.status == "disconnecting"
 
 
 @base.bootstrapped
 async def test_monitor_catches_error():
-
     async with base.CleanModel() as model:
         conn = model.connection()
 
-        assert conn.monitor.status == 'connected'
+        assert conn.monitor.status == "connected"
         try:
             # grab the reconnect lock to prevent automatic
             # reconnecting during the test
@@ -49,20 +47,20 @@ async def test_monitor_catches_error():
                 # if auto-reconnect is not disabled by lock, force this
                 # test to fail by deferring to the reconnect task via sleep
                 await jasyncio.sleep(0.1)
-                assert conn.monitor.status == 'error'
+                assert conn.monitor.status == "error"
         finally:
             await conn.close()
 
 
 @base.bootstrapped
-@pytest.mark.skip('Update charm')
+@pytest.mark.skip("Update charm")
 async def test_full_status():
     async with base.CleanModel() as model:
         await model.deploy(
-            'ubuntu',
-            application_name='ubuntu',
-            series='focal',
-            channel='stable',
+            "ubuntu",
+            application_name="ubuntu",
+            series="focal",
+            channel="stable",
         )
 
         c = client.ClientFacade.from_connection(model.connection())
@@ -86,7 +84,7 @@ async def test_reconnect():
 
 
 @base.bootstrapped
-@pytest.mark.skip('tests the websocket protocol, not pylibjuju, needs to be revised')
+@pytest.mark.skip("tests the websocket protocol, not pylibjuju, needs to be revised")
 async def test_redirect():
     controller = Controller()
     await controller.connect()
@@ -98,7 +96,7 @@ async def test_redirect():
     # # websockets.protocol.logger.setLevel(logging.DEBUG)
     # logger.setLevel(logging.DEBUG)
 
-    destination = 'wss://{}/api'.format(kwargs['endpoint'])
+    destination = "wss://{}/api".format(kwargs["endpoint"])
     redirect_statuses = [
         http.HTTPStatus.MOVED_PERMANENTLY,  # 301
         http.HTTPStatus.FOUND,
@@ -106,29 +104,27 @@ async def test_redirect():
         http.HTTPStatus.TEMPORARY_REDIRECT,
         http.HTTPStatus.PERMANENT_REDIRECT,
     ]
-    test_server_cert = Path(__file__).with_name('cert.pem')
-    kwargs['cacert'] += '\n' + test_server_cert.read_text()
+    test_server_cert = Path(__file__).with_name("cert.pem")
+    kwargs["cacert"] += "\n" + test_server_cert.read_text()
     server = RedirectServer(destination)
     try:
         for status in redirect_statuses:
-            logger.debug('test: starting {}'.format(status))
+            logger.debug(f"test: starting {status}")
             server.start(status)
-            await run_with_interrupt(server.running.wait(),
-                                     server.terminated)
+            await run_with_interrupt(server.running.wait(), server.terminated)
             if server.exception:
                 raise server.exception
             assert not server.terminated.is_set()
-            logger.debug('test: started')
-            kwargs_copy = dict(kwargs,
-                               endpoint='localhost:{}'.format(server.port))
-            logger.debug('test: connecting')
+            logger.debug("test: started")
+            kwargs_copy = dict(kwargs, endpoint=f"localhost:{server.port}")
+            logger.debug("test: connecting")
             conn = await Connection.connect(**kwargs_copy)
-            logger.debug('test: connected')
+            logger.debug("test: connected")
             await conn.close()
-            logger.debug('test: stopping')
+            logger.debug("test: stopping")
             server.stop()
             await server.stopped.wait()
-            logger.debug('test: stopped')
+            logger.debug("test: stopped")
     finally:
         server.terminate()
         await server.terminated.wait()
@@ -143,12 +139,12 @@ class RedirectServer:
         self.running = jasyncio.Event()
         self.stopped = jasyncio.Event()
         self.terminated = jasyncio.Event()
-        if hasattr(ssl, 'PROTOCOL_TLS_SERVER'):
+        if hasattr(ssl, "PROTOCOL_TLS_SERVER"):
             # python 3.6+
             protocol = ssl.PROTOCOL_TLS_SERVER
         self.ssl_context = ssl.SSLContext(protocol)
-        crt_file = Path(__file__).with_name('cert.pem')
-        key_file = Path(__file__).with_name('key.pem')
+        crt_file = Path(__file__).with_name("cert.pem")
+        key_file = Path(__file__).with_name("key.pem")
         self.ssl_context.load_cert_chain(str(crt_file), str(key_file))
         self.status = None
         self.port = None
@@ -174,46 +170,45 @@ class RedirectServer:
             return None
 
     async def run(self):
-        logger.debug('server: active')
+        logger.debug("server: active")
 
         async def hello(websocket, path):
-            await websocket.send('hello')
+            await websocket.send("hello")
 
         async def redirect(path, request_headers):
-            return self.status, {'Location': self.destination}, b""
+            return self.status, {"Location": self.destination}, b""
 
         try:
             while not self._terminate.is_set():
-                await run_with_interrupt(self._start.wait(),
-                                         self._terminate)
+                await run_with_interrupt(self._start.wait(), self._terminate)
                 if self._terminate.is_set():
                     break
                 self._start.clear()
-                logger.debug('server: starting {}'.format(self.status))
+                logger.debug(f"server: starting {self.status}")
                 try:
-                    async with websockets.serve(ws_handler=hello,
-                                                process_request=redirect,
-                                                host='localhost',
-                                                port=self.port,
-                                                ssl=self.ssl_context,
-                                                loop=jasyncio.get_running_loop()):
+                    async with websockets.serve(
+                        ws_handler=hello,
+                        process_request=redirect,
+                        host="localhost",
+                        port=self.port,
+                        ssl=self.ssl_context,
+                        loop=jasyncio.get_running_loop(),
+                    ):
                         self.stopped.clear()
                         self.running.set()
-                        logger.debug('server: started')
+                        logger.debug("server: started")
                         while not self._stop.is_set():
-                            await run_with_interrupt(
-                                jasyncio.sleep(1),
-                                self._stop)
-                            logger.debug('server: tick')
-                        logger.debug('server: stopping')
+                            await run_with_interrupt(jasyncio.sleep(1), self._stop)
+                            logger.debug("server: tick")
+                        logger.debug("server: stopping")
                 except jasyncio.CancelledError:
                     break
                 finally:
                     self.stopped.set()
                     self._stop.clear()
                     self.running.clear()
-                    logger.debug('server: stopped')
-            logger.debug('server: terminating')
+                    logger.debug("server: stopped")
+            logger.debug("server: terminating")
         except jasyncio.CancelledError:
             pass
         finally:
@@ -223,12 +218,12 @@ class RedirectServer:
             self.stopped.set()
             self.running.clear()
             self.terminated.set()
-            logger.debug('server: terminated')
+            logger.debug("server: terminated")
 
     def _find_free_port(self):
         with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            s.bind(('', 0))
+            s.bind(("", 0))
             return s.getsockname()[1]
 
 
@@ -236,7 +231,7 @@ class RedirectServer:
 async def test_verify_controller_cert():
     jujudata = FileJujuData()
     controller_name = jujudata.current_controller()
-    endpoint = jujudata.controllers()[controller_name]['api-endpoints'][0]
+    endpoint = jujudata.controllers()[controller_name]["api-endpoints"][0]
     account = jujudata.accounts()[controller_name]
 
     my_random_selfsigned_cert = """-----BEGIN CERTIFICATE-----
@@ -263,8 +258,8 @@ Yq2KJhGKIZiGjJ/tekeLkJKR5NLiRZ5AhxYyZKYqK85wPPreMKxWbnDoLWY27FfB
     try:
         connection = await Connection.connect(
             endpoint=endpoint,
-            username=account['user'],
-            password=account['password'],
+            username=account["user"],
+            password=account["password"],
             cacert=my_random_selfsigned_cert,
         )
         await connection.close()

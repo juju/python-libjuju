@@ -6,7 +6,6 @@ from juju.model import Model
 
 
 async def main():
-
     m = Model()
     await m.connect()
 
@@ -15,5 +14,5 @@ async def main():
     await m.disconnect()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     jasyncio.run(main())

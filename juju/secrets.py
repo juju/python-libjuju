@@ -1,16 +1,15 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-"""
-This module contains utility logic for secrets such as reading secret data from yaml and creating data bag for secrets.
-"""
-
+"""A utility module for secrets such as reading secret data from yaml and creating data bag for secrets."""
 
 import base64
 import json
 import re
-import yaml
 from pathlib import Path
+
+import yaml
+
 from . import errors
 
 file_suffix = "#file"
@@ -29,13 +28,13 @@ def create_secret_data(args):
     data = {}
     for val in args:
         # Remove any base64 padding ("=") before splitting the key=value.
-        stripped = val.rstrip(base64.b64encode(b'=').decode('utf-8'))
+        stripped = val.rstrip(base64.b64encode(b"=").decode("utf-8"))
         idx = stripped.find("=")
         if idx < 1:
             raise ValueError(f"Invalid key value {val}")
 
         key = stripped[0:idx]
-        value = stripped[idx + 1:]
+        value = stripped[idx + 1 :]
 
         # If the key doesn't have the #file suffix, then add it to the bag and continue.
         if not key.endswith(file_suffix):
@@ -47,7 +46,9 @@ def create_secret_data(args):
         try:
             fs = path.stat()
             if fs.st_size > max_value_size_bytes:
-                raise ValueError(f"Secret content in file {path} too large: {fs.st_size} bytes")
+                raise ValueError(
+                    f"Secret content in file {path} too large: {fs.st_size} bytes"
+                )
             content = path.read_text()
             data[key] = content
         except Exception as e:
@@ -69,14 +70,16 @@ def read_secret_data(file):
     try:
         fs = path.stat()
         if fs.st_size > max_content_size_bytes:
-            raise ValueError(f"Secret content in file {path} too large: {fs.st_size} bytes")
+            raise ValueError(
+                f"Secret content in file {path} too large: {fs.st_size} bytes"
+            )
     except FileNotFoundError:
         raise FileNotFoundError(f"The file {path} does not exist.")
     except OSError:
         raise
 
     try:
-        with open(path, 'r', encoding='utf-8') as file:
+        with open(path, encoding="utf-8") as file:
             data = file.read()
     except Exception:
         raise
@@ -101,7 +104,6 @@ def encode_values_base64(data):
 
     If a key has the #base64 suffix, then the value is already base64 encoded,otherwise the value is base64 encoded as it is added to the data bag.
     """
-
     out = {}
     content_size = 0
     for k, v in data.items():

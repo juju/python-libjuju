@@ -19,15 +19,15 @@ from juju.model import Model
 async def _get_password():
     model = Model()
     await model.connect()
-    await model.deploy('zinc-k8s')
+    await model.deploy("zinc-k8s")
     await model.wait_for_idle(status="active")
 
-    unit = model.applications['zinc-k8s'].units[0]
+    unit = model.applications["zinc-k8s"].units[0]
     action1 = await unit.run_action("get-admin-password")
-    assert action1.status == 'pending'
+    assert action1.status == "pending"
 
     action2 = await action1.wait()
-    assert action2.status == 'completed'
+    assert action2.status == "completed"
 
     print(action2.results["admin-password"])
 

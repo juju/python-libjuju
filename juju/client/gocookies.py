@@ -10,12 +10,15 @@ import pyrfc3339
 
 
 class GoCookieJar(cookiejar.FileCookieJar):
-    '''A CookieJar implementation that reads and writes cookies
+    """A CookieJar implementation that reads and writes cookies
     to the cookiejar format as understood by the Go package
-    github.com/juju/persistent-cookiejar.'''
+    github.com/juju/persistent-cookiejar.
+    """
+
     def _really_load(self, f, filename, ignore_discard, ignore_expires):
-        '''Implement the _really_load method called by FileCookieJar
-        to implement the actual cookie loading'''
+        """Implement the _really_load method called by FileCookieJar
+        to implement the actual cookie loading
+        """
         data = json.load(f) or []
         now = time.time()
         for cookie in map(go_to_py_cookie, data):
@@ -24,7 +27,7 @@ class GoCookieJar(cookiejar.FileCookieJar):
             self.set_cookie(cookie)
 
     def save(self, filename=None, ignore_discard=False, ignore_expires=False):
-        '''Implement the FileCookieJar abstract method.'''
+        """Implement the FileCookieJar abstract method."""
         if filename is None:
             if self.filename is not None:
                 filename = self.filename
@@ -46,15 +49,15 @@ class GoCookieJar(cookiejar.FileCookieJar):
 
 
 def go_to_py_cookie(go_cookie):
-    '''Convert a Go-style JSON-unmarshaled cookie into a Python cookie'''
+    """Convert a Go-style JSON-unmarshaled cookie into a Python cookie"""
     expires = None
-    if go_cookie.get('Expires') is not None:
-        t = pyrfc3339.parse(go_cookie['Expires'])
+    if go_cookie.get("Expires") is not None:
+        t = pyrfc3339.parse(go_cookie["Expires"])
         expires = t.timestamp()
     return cookiejar.Cookie(
         version=0,
-        name=go_cookie['Name'],
-        value=go_cookie['Value'],
+        name=go_cookie["Name"],
+        value=go_cookie["Value"],
         port=None,
         port_specified=False,
         # Unfortunately Python cookies don't record the original
@@ -63,12 +66,12 @@ def go_to_py_cookie(go_cookie):
         # even though it probably was not. This means that
         # we won't correctly record the CanonicalHost entry
         # when writing the cookie file after reading it.
-        domain=go_cookie['Domain'],
-        domain_specified=not go_cookie['HostOnly'],
+        domain=go_cookie["Domain"],
+        domain_specified=not go_cookie["HostOnly"],
         domain_initial_dot=False,
-        path=go_cookie['Path'],
+        path=go_cookie["Path"],
         path_specified=True,
-        secure=go_cookie['Secure'],
+        secure=go_cookie["Secure"],
         expires=expires,
         discard=False,
         comment=None,
@@ -79,7 +82,7 @@ def go_to_py_cookie(go_cookie):
 
 
 def py_to_go_cookie(py_cookie):
-    '''Convert a python cookie to the JSON-marshalable Go-style cookie form.'''
+    """Convert a python cookie to the JSON-marshalable Go-style cookie form."""
     # TODO (perhaps):
     #   HttpOnly
     #   Creation
@@ -87,19 +90,19 @@ def py_to_go_cookie(py_cookie):
     #   Updated
     # not done properly: CanonicalHost.
     go_cookie = {
-        'Name': py_cookie.name,
-        'Value': py_cookie.value,
-        'Domain': py_cookie.domain,
-        'HostOnly': not py_cookie.domain_specified,
-        'Persistent': not py_cookie.discard,
-        'Secure': py_cookie.secure,
-        'CanonicalHost': py_cookie.domain,
+        "Name": py_cookie.name,
+        "Value": py_cookie.value,
+        "Domain": py_cookie.domain,
+        "HostOnly": not py_cookie.domain_specified,
+        "Persistent": not py_cookie.discard,
+        "Secure": py_cookie.secure,
+        "CanonicalHost": py_cookie.domain,
     }
     if py_cookie.path_specified:
-        go_cookie['Path'] = py_cookie.path
+        go_cookie["Path"] = py_cookie.path
     if py_cookie.expires is not None:
         unix_time = datetime.datetime.fromtimestamp(py_cookie.expires)
         # Note: fromtimestamp bizarrely produces a time without
         # a time zone, so we need to use accept_naive.
-        go_cookie['Expires'] = pyrfc3339.generate(unix_time, accept_naive=True)
+        go_cookie["Expires"] = pyrfc3339.generate(unix_time, accept_naive=True)
     return go_cookie

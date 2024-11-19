@@ -1,12 +1,13 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
+from __future__ import annotations
 
 import copy
 import logging
-
-from packaging import version
+from typing import Any
 
 import macaroonbakery.httpbakery as httpbakery
+from packaging import version
 
 from juju.client import client
 from juju.client.connection import Connection
@@ -21,24 +22,26 @@ log = logging.getLogger("connector")
 
 class NoConnectionException(Exception):
     """Raised by Connector when the connection method is called
-    and there is no current connection."""
+    and there is no current connection.
+    """
 
     pass
 
 
 class Connector:
-    """This class abstracts out a reconnectable client that can connect
+    """Abstracts out a reconnectable client that can connect
     to controllers and models found in the Juju data files.
     """
 
     def __init__(
         self,
-        max_frame_size=None,
-        bakery_client=None,
-        jujudata=None,
+        max_frame_size: int | None = None,
+        bakery_client: Any | None = None,
+        jujudata: Any | None = None,
     ):
         """Initialize a connector that will use the given parameters
-        by default when making a new connection"""
+        by default when making a new connection
+        """
         self.max_frame_size = max_frame_size
         self.bakery_client = bakery_client
         self._connection = None
@@ -51,9 +54,10 @@ class Connector:
         """Report whether there is a currently connected controller or not"""
         return self._connection is not None
 
-    def connection(self):
+    def connection(self) -> Connection:
         """Return the current connection; raises an exception if there
-        is no current connection."""
+        is no current connection.
+        """
         if not self.is_connected():
             raise NoConnectionException("not connected")
         return self._connection
@@ -86,17 +90,19 @@ class Connector:
             if self._connection:
                 await self._connection.close()
 
-            account = kwargs.pop('account', {})
+            account = kwargs.pop("account", {})
             # Prioritize the username and password that user provided
             # If not enough, try to patch it with info from accounts.yaml
-            if 'username' not in kwargs and account.get('user'):
-                kwargs.update(username=account.get('user'))
-            if 'password' not in kwargs and account.get('password'):
-                kwargs.update(password=account.get('password'))
+            if "username" not in kwargs and account.get("user"):
+                kwargs.update(username=account.get("user"))
+            if "password" not in kwargs and account.get("password"):
+                kwargs.update(password=account.get("password"))
 
-            if not ({'username', 'password'}.issubset(kwargs)):
-                required = {'username', 'password'}.difference(kwargs)
-                raise ValueError(f'Some authentication parameters are required : {",".join(required)}')
+            if not ({"username", "password"}.issubset(kwargs)):
+                required = {"username", "password"}.difference(kwargs)
+                raise ValueError(
+                    f"Some authentication parameters are required : {','.join(required)}"
+                )
             self._connection = await Connection.connect(**kwargs)
 
         # Check if we support the target controller
@@ -106,9 +112,9 @@ class Connector:
         except version.InvalidVersion as err:
             # We're only interested in the major version, so
             # we attempt to clean up versions such as 3.4-rc1.2 as just 3.4
-            if '-' not in server_version:
+            if "-" not in server_version:
                 raise JujuUnknownVersion(err)
-            juju_server_version = version.parse(server_version.split('-')[0])
+            juju_server_version = version.parse(server_version.split("-")[0])
 
         # CLIENT_VERSION statically comes from the VERSION file in the repo
         client_version = version.parse(CLIENT_VERSION)
@@ -129,7 +135,9 @@ class Connector:
             await self._log_connection.close()
             self._log_connection = None
 
-    async def connect_controller(self, controller_name=None, specified_facades=None, **kwargs):
+    async def connect_controller(
+        self, controller_name=None, specified_facades=None, **kwargs
+    ):
         """Connect to a controller by name. If the name is empty, it
         connect to the current controller.
         """
@@ -142,14 +150,15 @@ class Connector:
 
         proxy = proxy_from_config(controller.get("proxy-config", None))
 
-        kwargs.update(endpoint=endpoints,
-                      uuid=None,
-                      account=accounts,
-                      cacert=controller.get('ca-cert'),
-                      bakery_client=self.bakery_client_for_controller(controller_name),
-                      specified_facades=specified_facades,
-                      proxy=proxy,
-                      )
+        kwargs.update(
+            endpoint=endpoints,
+            uuid=None,
+            account=accounts,
+            cacert=controller.get("ca-cert"),
+            bakery_client=self.bakery_client_for_controller(controller_name),
+            specified_facades=specified_facades,
+            proxy=proxy,
+        )
         await self.connect(**kwargs)
         self.controller_name = controller_name
         self.controller_uuid = controller["uuid"]
@@ -161,14 +170,13 @@ class Connector:
 
         :param str model: <controller>:<model>
         """
-
         try:
             controller_name, _model_name = self.jujudata.parse_model(_model_name)
             controller = self.jujudata.controllers().get(controller_name)
         except JujuError as e:
             raise JujuConnectionError(e.message) from e
         if controller is None:
-            raise JujuConnectionError("Controller {} not found".format(controller_name))
+            raise JujuConnectionError(f"Controller {controller_name} not found")
         endpoints = controller[API_ENDPOINTS_KEY]
         account = self.jujudata.accounts().get(controller_name, {})
         models = self.jujudata.models().get(controller_name, {}).get("models", {})
@@ -190,18 +198,20 @@ class Connector:
                     model_uuid = user_model.model.uuid
 
         if model_uuid is None:
-            raise JujuConnectionError("Model not found: {}".format(_model_name))
+            raise JujuConnectionError(f"Model not found: {_model_name}")
 
         proxy = proxy_from_config(controller.get("proxy-config", None))
 
         # TODO remove the need for base.CleanModel to subclass
         # JujuData.
-        kwargs.update(endpoint=endpoints,
-                      uuid=model_uuid,
-                      account=account,
-                      cacert=controller.get('ca-cert'),
-                      bakery_client=self.bakery_client_for_controller(controller_name),
-                      proxy=proxy)
+        kwargs.update(
+            endpoint=endpoints,
+            uuid=model_uuid,
+            account=account,
+            cacert=controller.get("ca-cert"),
+            bakery_client=self.bakery_client_for_controller(controller_name),
+            proxy=proxy,
+        )
         await self.connect(**kwargs)
         # TODO this might be a good spot to trigger refreshing the
         # local cache (the connection to the model might help)

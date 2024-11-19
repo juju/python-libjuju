@@ -1,11 +1,8 @@
-#!/usr/bin/env python3
-
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
 
-"""
-This example:
+"""This example:
 
 1. Connects to the current model
 2. Creates a machine
@@ -14,6 +11,7 @@ This example:
 
 NOTE: this example requires a 2.8.10+ controller.
 """
+
 import logging
 
 from juju import jasyncio
@@ -30,21 +28,20 @@ async def main():
     try:
         # Add a machine and wait until the machine agents starts
         machine1 = await model.add_machine()
-        await model.block_until(
-            lambda: machine1.agent_status == 'started')
+        await model.block_until(lambda: machine1.agent_status == "started")
 
         # At this point we can access the reported hostname via the hostname
         # property of the machine model.
-        print("machine1 hostname: {}".format(machine1.hostname))
+        print(f"machine1 hostname: {machine1.hostname}")
 
         await machine1.destroy(force=True)
     finally:
         await model.disconnect()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    ws_logger = logging.getLogger('websockets.protocol')
+    ws_logger = logging.getLogger("websockets.protocol")
     ws_logger.setLevel(logging.INFO)
 
     jasyncio.run(main())

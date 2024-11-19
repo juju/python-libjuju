@@ -12,11 +12,12 @@ async def status():
     status = await model.get_status()
     await model.disconnect()
 
-    print('Applications:', list(status.applications.keys()))
-    print('Machines:', list(status.machines.keys()))
-    print('Relations:', status.relations)
+    print("Applications:", list(status.applications.keys()))
+    print("Machines:", list(status.machines.keys()))
+    print("Relations:", status.relations)
 
     return status
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     jasyncio.run(status())

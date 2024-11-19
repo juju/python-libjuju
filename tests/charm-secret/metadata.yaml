@@ -4,7 +4,7 @@
 # The charm package name, no spaces (required)
 # See https://juju.is/docs/sdk/naming#heading--naming-charms for guidance.
 name: charm-secret
- 
+
 # The following metadata are human-readable and will be published prominently on Charmhub.
 
 # (Recommended)

@@ -15,8 +15,7 @@ MACHINE_SCOPE = "#"
 
 
 def parse(directive):
-    """
-    Given a string in the format `scope:directive`, or simply `scope`
+    """Given a string in the format `scope:directive`, or simply `scope`
     or `directive`, return a Placement object suitable for passing
     back over the websocket API.
 
@@ -37,7 +36,7 @@ def parse(directive):
         return [directive]
 
     # Juju 2.0 can't handle lxc containers.
-    directive = directive.replace('lxc', 'lxd')
+    directive = directive.replace("lxc", "lxd")
 
     if ":" in directive:
         # Planner has given us a scope and directive in string form

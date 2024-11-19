@@ -14,7 +14,7 @@ Thursday 11th July 2024
 * feat: conventional commits static analysis by @SimonRichardson in https://github.com/juju/python-libjuju/pull/1068
 * fix(series): add noble support by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/1063
 * fix zones constraints list parsing by @luissimas in https://github.com/juju/python-libjuju/pull/1054
-* fix(model): fix wrong instanciation of list-secrets facade by @gboutry in https://github.com/juju/python-libjuju/pull/1065
+* fix(model): fix wrong instantiation of list-secrets facade by @gboutry in https://github.com/juju/python-libjuju/pull/1065
 * fix(makefile): run .tox before lint in makefile target by @cderici in https://github.com/juju/python-libjuju/pull/1069
 
 3.5.0.0
@@ -99,7 +99,7 @@ Thursday 26th Oct 2023
 * Find controller name by endpoint on 3.x track by @cderici in https://github.com/juju/python-libjuju/pull/966
 * Optimize & fix unit removal by @cderici in https://github.com/juju/python-libjuju/pull/967
 * Allow switch kwarg in refresh to switch to local charms by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/971
-* Parse charm URLs consistantly for local charms by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/974
+* Parse charm URLs consistently for local charms by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/974
 * Juju config directory location fix on 3.x by @cderici in https://github.com/juju/python-libjuju/pull/976
 * [JUJU-4779] Ensure valid charm origin for local charm switches by @jack-w-shaw in https://github.com/juju/python-libjuju/pull/978
 * Application refresh with resources on 3.x by @cderici in https://github.com/juju/python-libjuju/pull/973
@@ -167,7 +167,7 @@ This release works with any Juju 3.x controller.
 
 Friday 5th May 2023
 
-This release has been tested with Juju 3.1.2 and contains the new 
+This release has been tested with Juju 3.1.2 and contains the new
 endpoints for secrets backend.
 
 This release works with any Juju 3.x controller.
@@ -212,7 +212,7 @@ This version is only tested using Juju 3.1.0.
 
 Wednesday 26th October
 
-* [JUJU-2027] Local refresh with resoruces by @cderici in https://github.com/juju/python-libjuju/pull/757
+* [JUJU-2027] Local refresh with resources by @cderici in https://github.com/juju/python-libjuju/pull/757
 * [JUJU-2026] Improve resolve charm by @cderici in https://github.com/juju/python-libjuju/pull/761
 * Add owner and data to license file by @arturo-seijas in https://github.com/juju/python-libjuju/pull/760
 
@@ -327,7 +327,7 @@ Monday March 21 2022
 * [JUJU-573] Fix charm resolution for Juju 2.8.11 by @cderici in https://github.com/juju/python-libjuju/pull/633
 * [JUJU-704] Remove non-implemented (stuıb) functions by @cderici in https://github.com/juju/python-libjuju/pull/646
 * [JUJU-676] Avoid defaulting to empty string for charm origin by @cderici in https://github.com/juju/python-libjuju/pull/647
-* Charmstore compatability of deploying bundles by @addyess in https://github.com/juju/python-libjuju/pull/650
+* Charmstore compatibility of deploying bundles by @addyess in https://github.com/juju/python-libjuju/pull/650
 * [JUJU-731] Subordinate charm num unit by @cderici in https://github.com/juju/python-libjuju/pull/648
 * [JUJU-769] Facade schemas for 2.9.27 by @cderici in https://github.com/juju/python-libjuju/pull/652
 * [JUJU-771] Auto switch to scale from add_unit on container based models by @cderici in https://github.com/juju/python-libjuju/pull/653
@@ -540,7 +540,7 @@ Thursday January 9 2020
 Tuesday January 7 2020
 
  * Update facade methods for Juju 2.7.0
- * Fix an issue when querying CMR relations (#366) 
+ * Fix an issue when querying CMR relations (#366)
  * Fix storage support in bundles (#361)
  * Fix reporting of unit leaders (#374)
  * AddCloud API support (#370)

@@ -1,12 +1,14 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-from .client import client
-from .errors import JujuError
-from juju import jasyncio
+import json
 
 import requests
-import json
+
+from juju import jasyncio
+
+from .client import client
+from .errors import JujuError
 
 
 class CharmHub:
@@ -15,49 +17,49 @@ class CharmHub:
 
     async def _charmhub_url(self):
         model_conf = await self.model.get_config()
-        return model_conf['charmhub-url']
+        return model_conf["charmhub-url"]
 
     async def request_charmhub_with_retry(self, url, retries):
-        for attempt in range(retries):
-            _response = requests.get(url)
+        for _ in range(retries):
+            _response = requests.get(url)  # noqa: S113
             if _response.status_code == 200:
                 return _response
             await jasyncio.sleep(5)
-        raise JujuError("Got {} from {}".format(_response.status_code, url))
+        raise JujuError(f"Got {_response.status_code} from {url}")
 
     async def get_charm_id(self, charm_name):
-        conn, headers, path_prefix = self.model.connection().https_connection()
+        _conn, _headers, _path_prefix = self.model.connection().https_connection()
 
         charmhub_url = await self._charmhub_url()
-        url = "{}/v2/charms/info/{}".format(charmhub_url.value, charm_name)
+        url = f"{charmhub_url.value}/v2/charms/info/{charm_name}"
         _response = await self.request_charmhub_with_retry(url, 5)
         response = json.loads(_response.text)
-        return response['id'], response['name']
+        return response["id"], response["name"]
 
     async def is_subordinate(self, charm_name):
-        conn, headers, path_prefix = self.model.connection().https_connection()
+        _conn, _headers, _path_prefix = self.model.connection().https_connection()
 
         charmhub_url = await self._charmhub_url()
-        url = "{}/v2/charms/info/{}?fields=default-release.revision.subordinate".format(charmhub_url.value, charm_name)
+        url = f"{charmhub_url.value}/v2/charms/info/{charm_name}?fields=default-release.revision.subordinate"
         _response = await self.request_charmhub_with_retry(url, 5)
         response = json.loads(_response.text)
-        rev_response = response['default-release']['revision']
-        return 'subordinate' in rev_response and rev_response['subordinate']
+        rev_response = response["default-release"]["revision"]
+        return "subordinate" in rev_response and rev_response["subordinate"]
 
     # TODO (caner) : we should be able to recreate the channel-map through the
     #  api call without needing the CharmHub facade
 
     async def list_resources(self, charm_name):
-        conn, headers, path_prefix = self.model.connection().https_connection()
+        _conn, _headers, __path_prefix = self.model.connection().https_connection()
 
         charmhub_url = await self._charmhub_url()
-        url = "{}/v2/charms/info/{}?fields=default-release.resources".format(charmhub_url.value, charm_name)
+        url = f"{charmhub_url.value}/v2/charms/info/{charm_name}?fields=default-release.resources"
         _response = await self.request_charmhub_with_retry(url, 5)
         response = json.loads(_response.text)
-        return response['default-release']['resources']
+        return response["default-release"]["resources"]
 
     async def info(self, name, channel=None):
-        """info displays detailed information about a CharmHub charm. The charm
+        """Info displays detailed information about a CharmHub charm. The charm
         can be specified by the exact name.
 
         Channel is a hint for providing the metadata for a given channel.
@@ -72,31 +74,29 @@ class CharmHub:
             if channel is None:
                 channel = ""
             facade = self._facade()
-            res = await facade.Info(tag="application-{}".format(name),
-                                    channel=channel)
+            res = await facade.Info(tag=f"application-{name}", channel=channel)
             err_code = res.errors.error_list.code
             if err_code:
-                raise JujuError(f'charmhub.info - {err_code} :'
-                                f' {res.errors.error_list.message}')
+                raise JujuError(
+                    f"charmhub.info - {err_code} : {res.errors.error_list.message}"
+                )
             result = res.result
             result.channel_map = CharmHub._channel_map_to_dict(
-                result.channel_map,
-                name,
-                channel=channel)
+                result.channel_map, name, channel=channel
+            )
             result = result.serialize()
         else:
             charmhub_url = await self._charmhub_url()
-            url = "{}/v2/charms/info/{}?fields=channel-map".format(
-                charmhub_url.value, name)
+            url = f"{charmhub_url.value}/v2/charms/info/{name}?fields=channel-map"
             try:
                 _response = await self.request_charmhub_with_retry(url, 5)
             except JujuError as e:
-                if '404' in e.message:
-                    raise JujuError(f'{name} not found') from e
+                if "404" in e.message:
+                    raise JujuError(f"{name} not found") from e
             result = json.loads(_response.text)
-            result['channel-map'] = CharmHub._channel_list_to_map(result['channel-map'],
-                                                                  name,
-                                                                  channel=channel)
+            result["channel-map"] = CharmHub._channel_list_to_map(
+                result["channel-map"], name, channel=channel
+            )
         return result
 
     @staticmethod
@@ -128,8 +128,7 @@ class CharmHub:
                 break
         # After loop is done, check for non-existent channel
         if channel and channel not in channel_map:
-            raise JujuError(f'Charmhub.info : channel {channel} not found for'
-                            f' {name}')
+            raise JujuError(f"Charmhub.info : channel {channel} not found for {name}")
         return channel_map
 
     @staticmethod
@@ -145,26 +144,38 @@ class CharmHub:
             # No need to worry about filtering channel
             # Charmhub facade will take care of that
             _ch = ch_obj.serialize()
-            _ch['platforms'] = [p.serialize() for p in _ch['platforms']]
+            _ch["platforms"] = [p.serialize() for p in _ch["platforms"]]
             channel_dict[ch_name] = _ch
         if channel and channel not in channel_dict:
-            raise JujuError(f'Charmhub.info : channel {channel} not found for'
-                            f' {name}')
+            raise JujuError(f"Charmhub.info : channel {channel} not found for {name}")
         return channel_dict
 
-    async def find(self, query, category=None, channel=None,
-                   charm_type=None, platforms=None, publisher=None,
-                   relation_requires=None, relation_provides=None):
-        """find queries the CharmHub store for available charms or bundles.
-
-        """
+    async def find(
+        self,
+        query,
+        category=None,
+        channel=None,
+        charm_type=None,
+        platforms=None,
+        publisher=None,
+        relation_requires=None,
+        relation_provides=None,
+    ):
+        """Find queries the CharmHub store for available charms or bundles."""
         if charm_type is not None and charm_type not in ["charm", "bundle"]:
             raise JujuError("expected either charm or bundle for charm_type")
 
         facade = self._facade()
-        return await facade.Find(query=query, category=category, channel=channel,
-                                 type_=charm_type, platforms=platforms, publisher=publisher,
-                                 relation_provides=relation_provides, relation_requires=relation_requires)
+        return await facade.Find(
+            query=query,
+            category=category,
+            channel=channel,
+            type_=charm_type,
+            platforms=platforms,
+            publisher=publisher,
+            relation_provides=relation_provides,
+            relation_requires=relation_requires,
+        )
 
     def _facade(self):
         return client.CharmHubFacade.from_connection(self.model.connection())

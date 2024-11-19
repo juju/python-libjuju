@@ -1,8 +1,7 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-'''Replace auto-generated classes with our own, where necessary.
-'''
+"""Replace auto-generated classes with our own, where necessary."""
 
 from . import _client, _definitions, overrides  # isort:skip
 
@@ -16,8 +15,8 @@ for o in overrides.__all__:
     # We shouldn't be overriding Facades!
     else:
         raise ValueError(
-            "Cannot override a versioned Facade class -- you must patch "
-            "it instead.")
+            "Cannot override a versioned Facade class -- you must patch it instead."
+        )
 
 for o in overrides.__patches__:
     # Patch a versioned Facade.
@@ -30,7 +29,7 @@ for o in overrides.__patches__:
             continue
         o_type = getattr(overrides, o)
         for a in dir(o_type):
-            if not a.startswith('_'):
+            if not a.startswith("_"):
                 setattr(c_type, a, getattr(o_type, a))
 
-from ._client import *  # noqa, isort:skip
+from ._client import *  # noqa: F403,E402, isort:skip

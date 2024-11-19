@@ -2,6 +2,7 @@
 # Licensed under the Apache V2, see LICENCE file for details.
 
 import logging
+
 from . import model
 
 log = logging.getLogger(__name__)

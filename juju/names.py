@@ -11,7 +11,7 @@ class MatchType(Enum):
     SEARCH = 2
 
 
-MODEL = re.compile('^[a-z0-9]+[a-z0-9-]*$')
+MODEL = re.compile("^[a-z0-9]+[a-z0-9-]*$")
 
 
 def match_model(val, match_type=None):
@@ -21,7 +21,7 @@ def match_model(val, match_type=None):
         return re.match(MODEL, val)
 
 
-APPLICATION = re.compile('^(?:[a-z][a-z0-9]*(?:-[a-z0-9]*[a-z][a-z0-9]*)*)$')
+APPLICATION = re.compile("^(?:[a-z][a-z0-9]*(?:-[a-z0-9]*[a-z][a-z0-9]*)*)$")
 
 
 def match_application(val, match_type=None):
@@ -35,7 +35,9 @@ def is_valid_application(val):
     return match_application(val) is not None
 
 
-ENDPOINT = re.compile('/?((?P<model>[^\\.]*)\\.)?(?P<appname>[^:]*)(:(?P<endpoints>.*))?')
+ENDPOINT = re.compile(
+    "/?((?P<model>[^\\.]*)\\.)?(?P<appname>[^:]*)(:(?P<endpoints>.*))?"
+)
 
 
 def match_endpoint(val, match_type=None):
@@ -45,7 +47,7 @@ def match_endpoint(val, match_type=None):
         return re.match(ENDPOINT, val)
 
 
-SOURCE_ENDPOINT = re.compile('^[a-zA-Z0-9]+$')
+SOURCE_ENDPOINT = re.compile("^[a-zA-Z0-9]+$")
 
 
 def match_source_endpoint(val, match_type=None):
@@ -55,7 +57,9 @@ def match_source_endpoint(val, match_type=None):
         return re.match(SOURCE_ENDPOINT, val)
 
 
-MODEL_APPLICATION = re.compile('(/?((?P<user>[^/]+)/)?(?P<model>[^.]*)(.(?P<application>[^:]*(:.*)?))?)?')
+MODEL_APPLICATION = re.compile(
+    "(/?((?P<user>[^/]+)/)?(?P<model>[^.]*)(.(?P<application>[^:]*(:.*)?))?)?"
+)
 
 
 def match_model_application(val, match_type=None):
@@ -66,8 +70,10 @@ def match_model_application(val, match_type=None):
 
 
 valid_user_name_snippet = "[a-zA-Z0-9][a-zA-Z0-9.+-]*[a-zA-Z0-9]"
-valid_user_snippet = "(?:{}(?:@{})?)".format(valid_user_name_snippet, valid_user_name_snippet)
-USER = re.compile("^(?P<name>{})(?:@(?P<domain>{}))?$".format(valid_user_name_snippet, valid_user_name_snippet))
+valid_user_snippet = f"(?:{valid_user_name_snippet}(?:@{valid_user_name_snippet})?)"
+USER = re.compile(
+    f"^(?P<name>{valid_user_name_snippet})(?:@(?P<domain>{valid_user_name_snippet}))?$"
+)
 
 
 def match_user(val, match_type=None):

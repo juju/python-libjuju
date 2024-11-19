@@ -1,8 +1,7 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
 
-"""
-This example:
+"""This example:
 
 1. Connects to the current model
 2. Deploy a local charm with a oci-image resource and waits until it reports
@@ -10,40 +9,41 @@ This example:
 3. Destroys the unit and application
 
 """
+
+from pathlib import Path
+
 from juju import jasyncio
 from juju.model import Model
-from pathlib import Path
 
 
 async def main():
     model = Model()
-    print('Connecting to model')
+    print("Connecting to model")
     # connect to current model with current user, per Juju CLI
     await model.connect()
 
     try:
-        print('Deploying local-charm')
+        print("Deploying local-charm")
         base_dir = Path(__file__).absolute().parent.parent
-        charm_path = '{}/tests/integration/oci-image-charm'.format(base_dir)
+        charm_path = f"{base_dir}/tests/integration/oci-image-charm"
         resources = {"oci-image": "ubuntu/latest"}
         application = await model.deploy(
             charm_path,
             resources=resources,
         )
 
-        print('Waiting for active')
+        print("Waiting for active")
         await model.block_until(
-            lambda: all(unit.workload_status == 'active'
-                        for unit in application.units),
+            lambda: all(unit.workload_status == "active" for unit in application.units),
             timeout=120,
         )
 
-        print('Removing Charm')
+        print("Removing Charm")
         await application.remove()
     finally:
-        print('Disconnecting from model')
+        print("Disconnecting from model")
         await model.disconnect()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     jasyncio.run(main())
