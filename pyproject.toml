@@ -216,3 +216,14 @@ pythonVersion = "3.8"
 typeCheckingMode = "strict"
 useLibraryCodeForTypes = true
 reportGeneralTypeIssues = true
+
+[tool.pytest.ini_options]
+addopts = "-ra -v"
+asyncio_default_fixture_loop_scope = "function"
+asyncio_mode = "auto"
+filterwarnings = "ignore::DeprecationWarning:websockets"
+markers = [
+    "serial: mark a test that must run by itself",
+    "wait_for_idle: mark a test that waits for the model to be idle",
+    "bundle: mark a test that uses a bundle",
+]

@@ -630,16 +630,11 @@ def build_facade(schema):
         (Type,),
         dict(name=schema.name, version=schema.version, schema=schema),
     )
-    source = """
-class {name}Facade(Type):
-    name = '{name}'
-    version = {version}
-    schema = {schema}
-    """.format(
-        name=schema.name,
-        version=schema.version,
-        schema=textwrap.indent(pprint.pformat(schema), "    "),
-    )
+    source = f"""
+class {schema.name}Facade(Type):
+    name = '{schema.name}'
+    version = {schema.version}
+    """
     return cls, source
 
 

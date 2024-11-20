@@ -42,7 +42,7 @@ Thanks for considering to contribute code to our project! We accept and welcome 
 The process is very simple.
 - Fork the project into your account.
 - Clone your fork.
-- Add an upstream remote: `git add upstream git@github.com:juju/python-libjuju.git`
+- Add an upstream remote: `git remote add upstream git@github.com:juju/python-libjuju.git`
 - Check with `git remote -v`, origin should point to your fork, upstream should point to ours.
 - If your changes are going to be on top of a specific branch (e.g., `2.9`), then fetch and switch to that.
 - `git switch -c your-branch-name`
@@ -51,6 +51,12 @@ The process is very simple.
 - `git push -u origin your-branch-name`
 
 And that's it, just follow the link that Git will produce. We kindly ask you to follow our PR template (at least keep the sections there), so it can be faster for us to review and move it forward.
+
+There are a few project specific things you may need to take care of so that your PR passes the automated testing.
+  - Check that all your [commits are signed](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits).
+  - Use [Conventional Commits](https://github.com/juju/juju/blob/main/doc/CONTRIBUTING.md#conventional-commits) for commit messages, following the Juju project's [conventional commit types](https://github.com/juju/juju/blob/main/doc/conventional-commits.md).
+  - Please [sign the CLA](#contributor-licence-agreement) if you haven't already.
+
 
 #### What's next
 
