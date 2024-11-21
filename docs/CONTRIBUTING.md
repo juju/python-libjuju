@@ -5,29 +5,9 @@ Thank you for investing your time in contributing to our project! :confetti_ball
 In this guide, you will get an overview of the contribution workflow from opening an issue,
 creating a PR, reviewing, and merging the PR.
 
-Use the table of contents icon <img src="https://github.com/github/docs/raw/41b5e9addc77f16f945ba3429b90c8f130aac9c2/contributing/images/table-of-contents.png" width="25" height="25" /> in the top right corner of this document to get to a specific section of this guide quickly.
+To get an overview of the project, read the [README](https://github.com/juju/python-libjuju/blob/master/docs/readme.rst).
 
-## New contributor guide
-
-To get an overview of the project, read the [README](https://github.com/juju/python-libjuju/blob/master/docs/readme.rst). If you need a primer on git, check out [Set up Git](https://docs.github.com/en/get-started/quickstart/set-up-git).
-
-Let's get to some specifics:
-
-<!---
-- [Finding ways to contribute to open source on GitHub](https://docs.github.com/en/get-started/exploring-projects-on-github/finding-ways-to-contribute-to-open-source-on-github)
-- [Set up Git](https://docs.github.com/en/get-started/quickstart/set-up-git)
-- [GitHub flow](https://docs.github.com/en/get-started/quickstart/github-flow)
-- [Collaborating with pull requests](https://docs.github.com/en/github/collaborating-with-pull-requests)
-
-
-## Getting started
-
-To navigate our codebase with confidence, see [the introduction to working in the docs repository](/contributing/working-in-docs-repository.md) :confetti_ball:. For more information on how we write our markdown files, see [the GitHub Markdown reference](contributing/content-markup-reference.md).
-
-Check to see what [types of contributions](/contributing/types-of-contributions.md) we accept before making changes. Some of them don't even require writing a single line of code :sparkles:.
-
--->
-
+Discussions are very welcome in our Juju community, join our [public Mattermost channel](https://chat.charmhub.io/charmhub/channels/juju).
 
 ## Tooling
 
@@ -35,50 +15,18 @@ Check to see what [types of contributions](/contributing/types-of-contributions.
 - `pre-commit`, https://pre-commit.com/
 - Python 3.8 ~ 3.13, https://www.python.org/downloads/
 
-## Pull Request
+## Repository Settings
 
-Thanks for considering to contribute code to our project! We accept and welcome all kinds of PRs! :tada:
+- Commit titles must follow [conventional commit format](https://www.conventionalcommits.org/), see [types and scopes](https://github.com/juju/juju/blob/main/doc/conventional-commits.md).
+- Commits have to be signed, see [GitHub advice](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits); you can [use your SSH key](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification#ssh-commit-signature-verification).
+- For Warthogs, CLA is assumed when commits are authored with your `@canonical.com` email.
+- For others, please sign the CLA at https://launchpad.net/ and read [further details](https://ubuntu.com/legal/contributors/faq) here.
 
-The process is very simple.
-- Fork the project into your account.
-- Clone your fork.
-- Add an upstream remote: `git remote add upstream git@github.com:juju/python-libjuju.git`
-- Check with `git remote -v`, origin should point to your fork, upstream should point to ours.
-- If your changes are going to be on top of a specific branch (e.g., `2.9`), then fetch and switch to that.
-- `git switch -c your-branch-name`
-- Make sure that you have run `pre-commit install`
-- Make your changes, create your commits.
-- `git push -u origin your-branch-name`
+## Bot Commands
 
-And that's it, just follow the link that Git will produce. We kindly ask you to follow our PR template (at least keep the sections there), so it can be faster for us to review and move it forward.
+When a pull request has been reviewed, passes basic tests and the branch is up to date, a maintainer will trigger the Jenkins merge flow by adding a comment `/merge`.
 
-There are a few project specific things you may need to take care of so that your PR passes the automated testing.
-  - Check that all your [commits are signed](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits).
-  - Use [Conventional Commits](https://github.com/juju/juju/blob/main/doc/CONTRIBUTING.md#conventional-commits) for commit messages, following the Juju project's [conventional commit types](https://github.com/juju/juju/blob/main/doc/conventional-commits.md).
-  - Please [sign the CLA](#contributor-licence-agreement) if you haven't already.
-
-
-#### What's next
-
-So when you create the PR, a bot might spam some messages there for admins to review the PR. Don't panic, everything's good. Someone from our team needs to push a button to allow for the CI to run.
-
-Some time after we see the tests are passing, someone from our team will review. Whoever reviews
-it might ask for some changes, or some tests to be fixed, etc. Finally, the PR will be approved, and again,
-someone from our team (probably the reviewer) will comment `/merge`, which triggers the Juju bot to start the merging process, which will automagically complete and merge your PR onto the desired branch. :confetti_ball:
-
-#### Some quick notes:
-
-- Don't forget to [link PR any issues](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue) if you are solving any.
-- Enable the checkbox to [allow maintainer edits](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/allowing-changes-to-a-pull-request-branch-created-from-a-fork) so the branch can be updated for a merge.
-- A `/build` comment will trigger a fresh CI run.
-- If you run into any merge issues, checkout this [git tutorial](https://github.com/skills/resolve-merge-conflicts) to help you resolve merge conflicts and other issues.
-
-### Your PR is merged!
-
-Congratulations :tada::tada: The Juju team thanks you :sparkles:.
-
-Now that you are part of the Juju community, hop into our [public Mattermost channel](https://chat.charmhub.io/charmhub/channels/juju) and join the conversation!
-
+Likewise, a `/build` comment can be used to trigger a fresh CI run in Jenkins.
 
 ## Issues
 
@@ -153,7 +101,6 @@ That is, an `X.Y.0` release, for example `3.6.0`?
 
 Note: you should also remove any pre-release schemas, which have the naming format `schemas-juju.X.Y-rcN.json`, where `N` is the release candidate version.
 
-
 ### Subsequent releases
 
 Otherwise, this is an `X.Y.Z` release where `Z` is 1 or more.
@@ -185,6 +132,7 @@ X.Y.Z (identical to $PREV)
 
 Where `$PREV` is either `X.Y.(Z-1)`, or if `X.Y.(Z-1)` was also identical to a previous release, then that release number instead. You can see examples of this in `SCHEMAS.md`.
 
+To analyse the differences in detail, you may use tooling and parsed schemata at https://github.com/dimaqq/juju-schema-analysis.
 
 ### 3. Generate python-libjuju client code from new schema
 
