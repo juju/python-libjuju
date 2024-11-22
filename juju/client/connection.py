@@ -17,6 +17,7 @@ import macaroonbakery.httpbakery as httpbakery
 import websockets
 from dateutil.parser import parse
 from typing_extensions import Self, TypeAlias, overload
+from websockets.protocol import State
 
 from juju import errors, jasyncio, tag, utils
 from juju.client import client
@@ -92,7 +93,7 @@ class Monitor:
                 and connection._receiver_task.cancelled()
             )
 
-        if stopped or not connection._ws.open:
+        if stopped or connection._ws.state is not State.OPEN:
             return self.ERROR
 
         # everything is fine!
@@ -357,8 +358,7 @@ class Connection:
             tasks_need_to_be_gathered.append(self._debug_log_task)
             self._debug_log_task.cancel()
 
-        if self._ws and not self._ws.closed:
-            await self._ws.close()
+        await self._ws.close()
 
         if not to_reconnect:
             try:
