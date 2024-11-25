@@ -359,7 +359,6 @@ class Connection:
             self._debug_log_task.cancel()
 
         if self._ws and not self._ws.closed:
-            raise BaseException("FIXME just testing two")
             await self._ws.close()
 
         if not to_reconnect:
