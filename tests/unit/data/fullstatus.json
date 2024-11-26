@@ -1,0 +1,322 @@
+{
+  "request-id": 7,
+  "response": {
+    "applications": {
+      "grafana-agent-k8s": {
+        "base": {
+          "channel": "22.04/stable",
+          "name": "ubuntu"
+        },
+        "can-upgrade-to": "",
+        "charm": "ch:arm64/jammy/grafana-agent-k8s-75",
+        "charm-channel": "latest/stable",
+        "charm-profile": "",
+        "charm-version": "",
+        "endpoint-bindings": {
+          "": "alpha",
+          "certificates": "alpha",
+          "grafana-cloud-config": "alpha",
+          "grafana-dashboards-consumer": "alpha",
+          "grafana-dashboards-provider": "alpha",
+          "logging-consumer": "alpha",
+          "logging-provider": "alpha",
+          "metrics-endpoint": "alpha",
+          "peers": "alpha",
+          "receive-ca-cert": "alpha",
+          "send-remote-write": "alpha",
+          "tracing": "alpha"
+        },
+        "exposed": false,
+        "int": 1,
+        "life": "",
+        "meter-statuses": null,
+        "provider-id": "4ecc75be-f038-4452-b1af-640d1b46f1c6",
+        "public-address": "10.152.183.55",
+        "relations": {
+          "peers": [
+            "grafana-agent-k8s"
+          ]
+        },
+        "status": {
+          "data": {},
+          "info": "installing agent",
+          "kind": "",
+          "life": "",
+          "since": "2024-09-30T07:44:15.63582531Z",
+          "status": "waiting",
+          "version": ""
+        },
+        "subordinate-to": [],
+        "units": {
+          "grafana-agent-k8s/0": {
+            "address": "10.1.121.164",
+            "agent-status": {
+              "data": {},
+              "info": "",
+              "kind": "",
+              "life": "",
+              "since": "2024-09-30T07:44:15.469295423Z",
+              "status": "idle",
+              "version": "3.5.1"
+            },
+            "charm": "",
+            "leader": true,
+            "machine": "",
+            "opened-ports": [],
+            "provider-id": "grafana-agent-k8s-0",
+            "public-address": "",
+            "subordinates": null,
+            "workload-status": {
+              "data": {},
+              "info": "Missing incoming (\"requires\") relation: metrics-endpoint|logging-provider|grafana-dashboards-consumer",
+              "kind": "",
+              "life": "",
+              "since": "2024-09-30T07:43:41.649319444Z",
+              "status": "blocked",
+              "version": ""
+            },
+            "workload-version": "0.35.2"
+          }
+        },
+        "workload-version": "0.35.2"
+      },
+      "hexanator": {
+        "base": {
+          "channel": "24.04/stable",
+          "name": "ubuntu"
+        },
+        "can-upgrade-to": "",
+        "charm": "local:noble/hexanator-1",
+        "charm-profile": "",
+        "charm-version": "",
+        "endpoint-bindings": {
+          "": "alpha",
+          "ingress": "alpha",
+          "rate-limit": "alpha"
+        },
+        "exposed": false,
+        "int": 1,
+        "life": "",
+        "meter-statuses": null,
+        "provider-id": "b5efccf2-5a15-41a0-af0f-689a8d93a129",
+        "public-address": "10.152.183.113",
+        "relations": {},
+        "status": {
+          "data": {},
+          "info": "",
+          "kind": "",
+          "life": "",
+          "since": "2024-09-30T00:12:47.878239549Z",
+          "status": "active",
+          "version": ""
+        },
+        "subordinate-to": [],
+        "units": {
+          "hexanator/0": {
+            "address": "10.1.121.184",
+            "agent-status": {
+              "data": {},
+              "info": "",
+              "kind": "",
+              "life": "",
+              "since": "2024-09-30T00:13:16.731257044Z",
+              "status": "idle",
+              "version": "3.5.1"
+            },
+            "charm": "",
+            "leader": true,
+            "machine": "",
+            "opened-ports": [],
+            "provider-id": "hexanator-0",
+            "public-address": "",
+            "subordinates": null,
+            "workload-status": {
+              "data": {},
+              "info": "",
+              "kind": "",
+              "life": "",
+              "since": "2024-09-30T00:12:47.878239549Z",
+              "status": "active",
+              "version": ""
+            },
+            "workload-version": ""
+          }
+        },
+        "workload-version": ""
+      },
+      "mysql-test-app": {
+        "base": {
+          "channel": "22.04/stable",
+          "name": "ubuntu"
+        },
+        "can-upgrade-to": "",
+        "charm": "ch:arm64/jammy/mysql-test-app-62",
+        "charm-channel": "latest/edge",
+        "charm-profile": "",
+        "charm-version": "",
+        "endpoint-bindings": {
+          "": "alpha",
+          "application-peers": "alpha",
+          "database": "alpha",
+          "mysql": "alpha"
+        },
+        "exposed": false,
+        "int": 2,
+        "life": "",
+        "meter-statuses": null,
+        "provider-id": "4338786a-a337-4779-820d-679a59ba1665",
+        "public-address": "10.152.183.118",
+        "relations": {
+          "application-peers": [
+            "mysql-test-app"
+          ]
+        },
+        "status": {
+          "data": {},
+          "info": "installing agent",
+          "kind": "",
+          "life": "",
+          "since": "2024-09-30T07:48:25.106109123Z",
+          "status": "waiting",
+          "version": ""
+        },
+        "subordinate-to": [],
+        "units": {
+          "mysql-test-app/0": {
+            "address": "10.1.121.142",
+            "agent-status": {
+              "data": {},
+              "info": "",
+              "kind": "",
+              "life": "",
+              "since": "2024-10-01T00:15:03.216904329Z",
+              "status": "idle",
+              "version": "3.5.1"
+            },
+            "charm": "",
+            "leader": true,
+            "machine": "",
+            "opened-ports": [],
+            "provider-id": "mysql-test-app-0",
+            "public-address": "",
+            "subordinates": null,
+            "workload-status": {
+              "data": {},
+              "info": "",
+              "kind": "",
+              "life": "",
+              "since": "2024-09-30T07:47:54.212959856Z",
+              "status": "waiting",
+              "version": ""
+            },
+            "workload-version": "0.0.2"
+          },
+          "mysql-test-app/1": {
+            "address": "10.1.121.190",
+            "agent-status": {
+              "data": {},
+              "info": "",
+              "kind": "",
+              "life": "",
+              "since": "2024-09-30T23:49:39.923901864Z",
+              "status": "idle",
+              "version": "3.5.1"
+            },
+            "charm": "",
+            "machine": "",
+            "opened-ports": [],
+            "provider-id": "mysql-test-app-1",
+            "public-address": "",
+            "subordinates": null,
+            "workload-status": {
+              "data": {},
+              "info": "",
+              "kind": "",
+              "life": "",
+              "since": "2024-09-30T07:47:54.211414881Z",
+              "status": "waiting",
+              "version": ""
+            },
+            "workload-version": "0.0.2"
+          }
+        },
+        "workload-version": "0.0.2"
+      }
+    },
+    "branches": {},
+    "controller-timestamp": "2024-10-01T07:25:22.51380313Z",
+    "machines": {},
+    "model": {
+      "available-version": "",
+      "cloud-tag": "cloud-microk8s",
+      "meter-status": {
+        "color": "",
+        "message": ""
+      },
+      "model-status": {
+        "data": {},
+        "info": "",
+        "kind": "",
+        "life": "",
+        "since": "2024-09-27T08:21:45.368693216Z",
+        "status": "available",
+        "version": ""
+      },
+      "name": "testm",
+      "region": "localhost",
+      "sla": "unsupported",
+      "type": "caas",
+      "version": "3.5.1"
+    },
+    "offers": {},
+    "relations": [
+      {
+        "endpoints": [
+          {
+            "application": "grafana-agent-k8s",
+            "name": "peers",
+            "role": "peer",
+            "subordinate": false
+          }
+        ],
+        "id": 0,
+        "interface": "grafana_agent_replica",
+        "key": "grafana-agent-k8s:peers",
+        "scope": "global",
+        "status": {
+          "data": {},
+          "info": "",
+          "kind": "",
+          "life": "",
+          "since": "2024-09-30T07:43:31.018463595Z",
+          "status": "joined",
+          "version": ""
+        }
+      },
+      {
+        "endpoints": [
+          {
+            "application": "mysql-test-app",
+            "name": "application-peers",
+            "role": "peer",
+            "subordinate": false
+          }
+        ],
+        "id": 1,
+        "interface": "application-peers",
+        "key": "mysql-test-app:application-peers",
+        "scope": "global",
+        "status": {
+          "data": {},
+          "info": "",
+          "kind": "",
+          "life": "",
+          "since": "2024-09-30T07:47:52.823202648Z",
+          "status": "joined",
+          "version": ""
+        }
+      }
+    ],
+    "remote-applications": {}
+  }
+}

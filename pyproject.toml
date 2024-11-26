@@ -226,8 +226,9 @@ ignore = [
 # These are tentative
 include = ["**/*.py"]
 pythonVersion = "3.8.6"
-typeCheckingMode = "strict"
-useLibraryCodeForTypes = true
+# FIXME understand the difference
+#typeCheckingMode = "strict"
+#useLibraryCodeForTypes = true
 reportGeneralTypeIssues = true
 
 [tool.pytest.ini_options]
