@@ -81,7 +81,7 @@ async def test_unit_is_leader(mock_cf):
         client_facade.FullStatus = mock.AsyncMock(return_value=status)
 
         unit = Unit("test", model)
-        unit.name = test["unit"]
+        unit.entity_id = test["unit"]
 
         rval = await unit.is_leader_from_status()
         assert rval == test["rval"]

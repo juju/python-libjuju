@@ -30,6 +30,7 @@ from .annotationhelper import _get_annotations, _set_annotations
 from .bundle import BundleHandler, get_charm_series, is_local_charm
 from .charmhub import CharmHub
 from .client import client, connection, connector
+from .client._definitions import ApplicationStatus, MachineStatus, UnitStatus
 from .client.overrides import Caveat, Macaroon
 from .constraints import parse as parse_constraints
 from .constraints import parse_storage_constraints
@@ -68,7 +69,16 @@ if TYPE_CHECKING:
     from .remoteapplication import ApplicationOffer, RemoteApplication
     from .unit import Unit
 
-log = logging.getLogger(__name__)
+log = logger = logging.getLogger(__name__)
+
+
+def use_new_wait_for_idle() -> bool:
+    val = os.getenv("JUJU_NEW_WAIT_FOR_IDLE")
+    if not val:
+        return False
+    if val.isdigit():
+        return bool(int(val))
+    return val.title() != "False"
 
 
 class _Observer:
@@ -631,9 +641,9 @@ class Model:
 
     def __init__(
         self,
-        max_frame_size=None,
-        bakery_client=None,
-        jujudata=None,
+        max_frame_size: int | None = None,
+        bakery_client: Any = None,
+        jujudata: Any = None,
     ):
         """Instantiate a new Model.
 
@@ -2663,14 +2673,21 @@ class Model:
             results[tag.untag("action-", a.action.tag)] = a.status
         return results
 
-    async def get_status(self, filters=None, utc=False) -> FullStatus:
+    async def get_status(self, filters=None, utc: bool = False) -> FullStatus:
         """Return the status of the model.
 
         :param str filters: Optional list of applications, units, or machines
             to include, which can use wildcards ('*').
-        :param bool utc: Display time as UTC in RFC3339 format
+        :param bool utc: Deprecated, display time as UTC in RFC3339 format
 
         """
+        if utc:
+            warnings.warn(
+                "Model.get_status() utc= parameter is deprecated",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+
         client_facade = client.ClientFacade.from_connection(self.connection())
         return await client_facade.FullStatus(patterns=filters)
 
@@ -3052,6 +3069,21 @@ class Model:
             going into the idle state. (e.g. useful for scaling down).
             When set, takes precedence over the `wait_for_units` parameter.
         """
+        if use_new_wait_for_idle():
+            await self.new_wait_for_idle(
+                apps=apps,
+                raise_on_error=raise_on_error,
+                raise_on_blocked=raise_on_blocked,
+                wait_for_active=wait_for_active,
+                timeout=timeout,
+                idle_period=idle_period,
+                check_freq=check_freq,
+                status=status,
+                wait_for_at_least_units=wait_for_at_least_units,
+                wait_for_exact_units=wait_for_exact_units,
+            )
+            return
+
         if wait_for_active:
             warnings.warn(
                 "wait_for_active is deprecated; use status",
@@ -3211,6 +3243,207 @@ class Model:
                 log.info("Waiting for model:\n  " + busy)
                 last_log_time = datetime.now()
             await jasyncio.sleep(check_freq)
+
+    async def new_wait_for_idle(
+        self,
+        apps: list[str] | None = None,
+        raise_on_error: bool = True,
+        raise_on_blocked: bool = False,
+        wait_for_active: bool = False,
+        timeout: float | None = 10 * 60,
+        idle_period: float = 15,
+        check_freq: float = 0.5,
+        status: str | None = None,
+        wait_for_at_least_units: int | None = None,
+        wait_for_exact_units: int | None = None,
+    ) -> None:
+        """Wait for applications in the model to settle into an idle state.
+
+        arguments match those of .wait_for_idle exactly.
+        """
+        if not isinstance(wait_for_exact_units, (int, type(None))):
+            raise ValueError(f"Must be an int or None, got {wait_for_exact_units=}")
+
+        if isinstance(wait_for_exact_units, int) and wait_for_exact_units < 0:
+            raise ValueError(f"Must be >=0, got {wait_for_exact_units=}")
+
+        if wait_for_active:
+            warnings.warn(
+                "wait_for_active is deprecated; use status",
+                DeprecationWarning,
+                stacklevel=3,
+            )
+            status = "active"
+
+        _wait_for_units = (
+            wait_for_at_least_units if wait_for_at_least_units is not None else 1
+        )
+        apps = apps or list(self.applications)
+        idle_times: dict[str, datetime] = {}
+        units_ready: set[str] = set()  # The units that are in the desired state
+        last_log_time: list[datetime | None] = [None]
+
+        start_time = datetime.now()
+
+        while True:
+            if await self._check_idle(
+                apps=apps,
+                raise_on_error=raise_on_error,
+                raise_on_blocked=raise_on_blocked,
+                status=status,
+                wait_for_at_least_units=wait_for_at_least_units,
+                wait_for_exact_units=wait_for_exact_units,
+                timeout=timeout,
+                idle_period=idle_period,
+                _wait_for_units=_wait_for_units,
+                idle_times=idle_times,
+                units_ready=units_ready,
+                last_log_time=last_log_time,
+                start_time=start_time,
+            ):
+                break
+
+            await jasyncio.sleep(check_freq)
+
+    async def _check_idle(
+        self,
+        *,
+        apps: list[str],
+        raise_on_error: bool,
+        raise_on_blocked: bool,
+        status: str | None,
+        wait_for_at_least_units: int | None,
+        wait_for_exact_units: int | None,
+        timeout: float | None,
+        idle_period: float,
+        _wait_for_units: int,
+        idle_times: dict[str, datetime],
+        units_ready: set[str],
+        last_log_time: list[datetime | None],
+        start_time: datetime,
+    ) -> bool:
+        now = datetime.now()
+        expected_idle_since = now - timedelta(seconds=idle_period)
+        full_status = await self.get_status()
+        # import pdb; pdb.set_trace()
+
+        # FIXME check this precedence
+        for app_name in apps:
+            if not full_status.applications.get(app_name):
+                logger.info("Waiting for app %r", app_name)
+                return False
+
+        # Order of errors:
+        #
+        # Machine error (any unit of any app from apps)
+        # Agent error (-"-)
+        # Workload error (-"-)
+        # App error (any app from apps)
+        #
+        # Workload blocked (any unit of any app from apps)
+        # App blocked (any app from apps)
+        units: dict[str, UnitStatus] = {}
+
+        for app_name in apps:
+            app = full_status.applications[app_name]
+            assert isinstance(app, ApplicationStatus)
+            for unit_name, unit in app.units.items():
+                assert isinstance(unit, UnitStatus)
+                units[unit_name] = unit
+
+        for unit_name, unit in units.items():
+            if unit.machine:
+                machine = full_status.machines[unit.machine]
+                assert isinstance(machine, MachineStatus)
+                assert machine.instance_status
+                if machine.instance_status.status == "error" and raise_on_error:
+                    raise JujuMachineError(
+                        f"{unit_name!r} machine {unit.machine!r} has errored: {machine.instance_status.info!r}"
+                    )
+
+        for unit_name, unit in units.items():
+            assert unit.agent_status
+            if unit.agent_status.status == "error" and raise_on_error:
+                raise JujuAgentError(
+                    f"{unit_name!r} agent has errored: {unit.agent_status.info!r}"
+                )
+
+        for unit_name, unit in units.items():
+            assert unit.workload_status
+            if unit.workload_status.status == "error" and raise_on_error:
+                raise JujuUnitError(
+                    f"{unit_name!r} workload has errored: {unit.workload_status.info!r}"
+                )
+
+        for app_name in apps:
+            app = full_status.applications[app_name]
+            assert isinstance(app, ApplicationStatus)
+            assert app.status
+            if app.status.status == "error" and raise_on_error:
+                raise JujuAppError(f"{app_name!r} has errored: {app.status.info!r}")
+
+        for unit_name, unit in units.items():
+            assert unit.workload_status
+            if unit.workload_status.status == "blocked" and raise_on_blocked:
+                raise JujuUnitError(
+                    f"{unit_name!r} workload is blocked: {unit.workload_status.info!r}"
+                )
+
+        for app_name in apps:
+            app = full_status.applications[app_name]
+            assert isinstance(app, ApplicationStatus)
+            assert app.status
+            if app.status.status == "blocked" and raise_on_blocked:
+                raise JujuAppError(f"{app_name!r} is blocked: {app.status.info!r}")
+
+        for unit_name, unit in units.items():
+            assert unit.agent_status
+            idle_times.setdefault(unit_name, now)
+            if unit.agent_status.status != "idle":
+                idle_times[unit_name] = now
+
+        for app_name in apps:
+            ready_units = []
+            app = full_status.applications[app_name]
+            assert isinstance(app, ApplicationStatus)
+            for unit in app.units.values():
+                assert isinstance(unit, UnitStatus)
+                assert unit.agent_status
+                assert unit.workload_status
+
+                if unit.agent_status.status != "idle":
+                    continue
+                if status and unit.workload_status.status != status:
+                    continue
+
+                ready_units.append(unit)
+
+            if wait_for_exact_units is None and len(ready_units) < _wait_for_units:
+                logger.info(
+                    "Waiting for app %r units %s/%s",
+                    app_name,
+                    len(ready_units),
+                    _wait_for_units,
+                )
+                return False
+
+            if (
+                wait_for_exact_units is not None
+                and len(ready_units) != wait_for_exact_units
+            ):
+                logger.info(
+                    "Waiting for app %r units %s/%s",
+                    app_name,
+                    len(ready_units),
+                    _wait_for_units,
+                )
+                return False
+
+        if busy := [n for n, t in idle_times.items() if expected_idle_since < t]:
+            logger.info("Waiting for %s to be idle enough", busy)
+            return False
+
+        return True
 
 
 def _create_consume_args(offer, macaroon, controller_info):
