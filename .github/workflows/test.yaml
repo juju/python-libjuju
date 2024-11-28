@@ -78,6 +78,9 @@ jobs:
           - "3.4/stable"
           - "3.5/stable"
           - "3.6/stable"
+        new_wait_for_idle:
+          - "True"
+          - "False"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -117,6 +120,8 @@ jobs:
       #     juju model-defaults apt-http-proxy=$PROXY apt-https-proxy=$PROXY  juju-http-proxy=$PROXY juju-https-proxy=$PROXY  snap-http-proxy=$PROXY snap-https-proxy=$PROXY
       #     juju model-defaults
       - run: uvx -p ${{ matrix.python }} tox -e integration
+        env:
+          JUJU_NEW_WAIT_FOR_IDLE: ${{ matrix.new_wait_for_idle }}
 
   integration-quarantine:
     name: Quarantined Integration Tests
