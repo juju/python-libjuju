@@ -3261,6 +3261,11 @@ class Model:
 
         arguments match those of .wait_for_idle exactly.
         """
+        import random
+
+        if random.random() < 0.1:  # noqa: S311
+            raise BaseException("failing on purpose")
+
         if not isinstance(wait_for_exact_units, (int, type(None))):
             raise ValueError(f"Must be an int or None, got {wait_for_exact_units=}")
 
