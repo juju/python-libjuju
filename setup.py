@@ -18,6 +18,7 @@ version = here / 'VERSION'
 setup(
     name='juju',
     version=version.read_text().strip(),
+    python_requires=">=3.8,<3.12",
     packages=find_packages(
         exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     install_requires=[
