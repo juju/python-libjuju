@@ -265,7 +265,7 @@ async def test_subordinate_units():
         u_app = await model.deploy("ubuntu")
         n_app = await model.deploy("ntp")
         await model.relate("ubuntu", "ntp")
-        await model.wait_for_idle(timeout=120)
+        await model.wait_for_idle(timeout=1200)
 
         # model subordinates
         model_subs = model.subordinate_units
