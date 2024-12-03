@@ -2,15 +2,19 @@
 # Licensed under the Apache V2, see LICENCE file for details.
 
 import inspect
+import signal
 import subprocess
 import uuid
 from contextlib import contextmanager
 from pathlib import Path
 
+import awaitwhat
 import pytest
 
 from juju.client.jujudata import FileJujuData
 from juju.controller import Controller
+
+awaitwhat.helpers.register_signal(signal.SIGALRM)
 
 
 def is_bootstrapped():
@@ -64,6 +68,7 @@ class CleanModel:
         self._bakery_client = bakery_client
 
     async def __aenter__(self):
+        signal.alarm(300)  # FIXME trigger coro graph dump if a test is stuck
         model_nonce = uuid.uuid4().hex[-4:]
         frame = inspect.stack()[1]
         test_name = frame.function.replace("_", "-")

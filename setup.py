@@ -40,6 +40,7 @@ setup(
             "pytest",
             "pytest-asyncio",
             "Twine",
+            "awaitwhat @ https://test-files.pythonhosted.org/packages/3d/07/a78e131d662470ceae429b6326f58a762be96e4c04250612245fd83cbbeb/awaitwhat-24.11rc1.tar.gz",
         ]
     },
     include_package_data=True,
