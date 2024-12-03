@@ -1,9 +1,10 @@
 # Copyright 2023 Canonical Ltd.
 # Licensed under the Apache V2, see LICENCE file for details.
-
+import asyncio
 import inspect
 import signal
 import subprocess
+import sys
 import uuid
 from contextlib import contextmanager
 from pathlib import Path
@@ -14,7 +15,20 @@ import pytest
 from juju.client.jujudata import FileJujuData
 from juju.controller import Controller
 
-awaitwhat.helpers.register_signal(signal.SIGALRM)
+
+def dump_tasks(signal_number, frame):
+    print()
+    print("#" * 300)
+    print()
+    tt = asyncio.all_tasks()
+    print(awaitwhat.dot.dumps(tt))
+    print()
+    print("#" * 300)
+    print("\n" * 20)
+    sys.stdout.flush()
+
+
+signal.signal(signal.SIGALRM, dump_tasks)
 
 
 def is_bootstrapped():
@@ -68,6 +82,8 @@ class CleanModel:
         self._bakery_client = bakery_client
 
     async def __aenter__(self):
+        print()
+        print("Setting alarm for 300s")
         signal.alarm(300)  # FIXME trigger coro graph dump if a test is stuck
         model_nonce = uuid.uuid4().hex[-4:]
         frame = inspect.stack()[1]
