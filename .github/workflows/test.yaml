@@ -118,7 +118,7 @@ jobs:
       #     # set model defaults
       #     juju model-defaults apt-http-proxy=$PROXY apt-https-proxy=$PROXY  juju-http-proxy=$PROXY juju-https-proxy=$PROXY  snap-http-proxy=$PROXY snap-https-proxy=$PROXY
       #     juju model-defaults
-      - run: uvx -p ${{ matrix.python }} tox -e integration
+      - run: uvx -p ${{ matrix.python }} tox -e integration -- -s
         env:
           JUJU_NEW_WAIT_FOR_IDLE: ${{ matrix.new_wait_for_idle }}
 
