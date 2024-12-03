@@ -327,13 +327,10 @@ def kwargs() -> dict[str, Any]:
         status=None,
         wait_for_at_least_units=None,
         wait_for_exact_units=None,
-        timeout=100,
         idle_period=0,
         _wait_for_units=1,
         idle_times={},
         units_ready=set(),
-        last_log_time=[None],
-        start_time=datetime.now(),
     )
 
 

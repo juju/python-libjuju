@@ -12,6 +12,7 @@ import re
 import stat
 import sys
 import tempfile
+import time
 import warnings
 import weakref
 import zipfile
@@ -3281,11 +3282,15 @@ class Model:
         apps = apps or list(self.applications)
         idle_times: dict[str, datetime] = {}
         units_ready: set[str] = set()  # The units that are in the desired state
-        last_log_time: list[datetime | None] = [None]
 
-        start_time = datetime.now()
+        deadline = None if timeout is None else time.monotonic() + timeout
 
         while True:
+            if deadline and time.monotonic() > deadline:
+                raise jasyncio.TimeoutError(
+                    "Timed out waiting for model to become idle"
+                )
+
             if await self._check_idle(
                 apps=apps,
                 raise_on_error=raise_on_error,
@@ -3293,13 +3298,10 @@ class Model:
                 status=status,
                 wait_for_at_least_units=wait_for_at_least_units,
                 wait_for_exact_units=wait_for_exact_units,
-                timeout=timeout,
                 idle_period=idle_period,
                 _wait_for_units=_wait_for_units,
                 idle_times=idle_times,
                 units_ready=units_ready,
-                last_log_time=last_log_time,
-                start_time=start_time,
             ):
                 break
 
@@ -3314,13 +3316,10 @@ class Model:
         status: str | None,
         wait_for_at_least_units: int | None,
         wait_for_exact_units: int | None,
-        timeout: float | None,
         idle_period: float,
         _wait_for_units: int,
         idle_times: dict[str, datetime],
         units_ready: set[str],
-        last_log_time: list[datetime | None],
-        start_time: datetime,
     ) -> bool:
         now = datetime.now()
         expected_idle_since = now - timedelta(seconds=idle_period)
