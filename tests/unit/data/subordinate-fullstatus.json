@@ -1,0 +1,254 @@
+{
+    "request-id": 2618,
+    "response": {
+        "model": {
+            "name": "test-7442-test-subordinate-units-8b20",
+            "type": "iaas",
+            "cloud-tag": "cloud-localhost",
+            "region": "localhost",
+            "version": "3.6.0",
+            "available-version": "",
+            "model-status": {
+                "status": "available",
+                "info": "",
+                "data": {},
+                "since": "2024-12-04T01:41:47.4040454Z",
+                "kind": "",
+                "version": "",
+                "life": ""
+            },
+            "meter-status": {"color": "", "message": ""},
+            "sla": "unsupported"
+        },
+        "machines": {
+            "0": {
+                "agent-status": {
+                    "status": "started",
+                    "info": "",
+                    "data": {},
+                    "since": "2024-12-04T01:43:51.558449988Z",
+                    "kind": "",
+                    "version": "3.6.0",
+                    "life": ""
+                },
+                "instance-status": {
+                    "status": "running",
+                    "info": "Running",
+                    "data": {},
+                    "since": "2024-12-04T01:42:38.710685177Z",
+                    "kind": "",
+                    "version": "",
+                    "life": ""
+                },
+                "modification-status": {
+                    "status": "applied",
+                    "info": "",
+                    "data": {},
+                    "since": "2024-12-04T01:42:26.414748546Z",
+                    "kind": "",
+                    "version": "",
+                    "life": ""
+                },
+                "hostname": "juju-eb2c2c-0",
+                "dns-name": "10.149.76.219",
+                "ip-addresses": ["10.149.76.219"],
+                "instance-id": "juju-eb2c2c-0",
+                "display-name": "",
+                "base": {"name": "ubuntu", "channel": "22.04/stable"},
+                "id": "0",
+                "network-interfaces": {
+                    "eth0": {
+                        "ip-addresses": ["10.149.76.219"],
+                        "mac-address": "00:16:3e:06:13:5f",
+                        "gateway": "10.149.76.1",
+                        "space": "alpha",
+                        "is-up": true
+                    }
+                },
+                "containers": {},
+                "constraints": "arch=amd64",
+                "hardware": "arch=amd64 cores=0 mem=0M virt-type=container",
+                "jobs": ["JobHostUnits"],
+                "has-vote": false,
+                "wants-vote": false
+            }
+        },
+        "applications": {
+            "ntp": {
+                "charm": "ch:amd64/ntp-50",
+                "charm-version": "cs-ntp-team-ntp-4-171-g669ff59",
+                "charm-profile": "",
+                "charm-channel": "latest/stable",
+                "charm-rev": 50,
+                "base": {"name": "ubuntu", "channel": "20.04/stable"},
+                "exposed": false,
+                "life": "",
+                "relations": {"juju-info": ["ubuntu"], "ntp-peers": ["ntp"]},
+                "can-upgrade-to": "",
+                "subordinate-to": ["ubuntu"],
+                "units": null,
+                "meter-statuses": null,
+                "status": {
+                    "status": "active",
+                    "info": "chrony: Ready, Failed to disable Hyper-V host sync",
+                    "data": {},
+                    "since": "2024-12-04T01:44:40.346093963Z",
+                    "kind": "",
+                    "version": "",
+                    "life": ""
+                },
+                "workload-version": "4.2",
+                "endpoint-bindings": {
+                    "": "alpha",
+                    "juju-info": "alpha",
+                    "master": "alpha",
+                    "nrpe-external-master": "alpha",
+                    "ntp-peers": "alpha",
+                    "ntpmaster": "alpha"
+                },
+                "public-address": ""
+            },
+            "ubuntu": {
+                "charm": "ch:amd64/ubuntu-25",
+                "charm-version": "",
+                "charm-profile": "",
+                "charm-channel": "latest/stable",
+                "charm-rev": 25,
+                "base": {"name": "ubuntu", "channel": "22.04/stable"},
+                "exposed": false,
+                "life": "",
+                "relations": {"juju-info": ["ntp"]},
+                "can-upgrade-to": "",
+                "subordinate-to": [],
+                "units": {
+                    "ubuntu/0": {
+                        "agent-status": {
+                            "status": "idle",
+                            "info": "",
+                            "data": {},
+                            "since": "2024-12-04T01:44:44.342778729Z",
+                            "kind": "",
+                            "version": "3.6.0",
+                            "life": ""
+                        },
+                        "workload-status": {
+                            "status": "active",
+                            "info": "",
+                            "data": {},
+                            "since": "2024-12-04T01:43:53.391031729Z",
+                            "kind": "",
+                            "version": "",
+                            "life": ""
+                        },
+                        "workload-version": "22.04",
+                        "machine": "0",
+                        "opened-ports": null,
+                        "public-address": "10.149.76.219",
+                        "charm": "",
+                        "subordinates": {
+                            "ntp/0": {
+                                "agent-status": {
+                                    "status": "idle",
+                                    "info": "",
+                                    "data": {},
+                                    "since": "2024-12-04T01:44:47.418242454Z",
+                                    "kind": "",
+                                    "version": "3.6.0",
+                                    "life": ""
+                                },
+                                "workload-status": {
+                                    "status": "active",
+                                    "info": "chrony: Ready, Failed to disable Hyper-V host sync",
+                                    "data": {},
+                                    "since": "2024-12-04T01:44:40.346093963Z",
+                                    "kind": "",
+                                    "version": "",
+                                    "life": ""
+                                },
+                                "workload-version": "4.2",
+                                "machine": "",
+                                "opened-ports": ["123/udp"],
+                                "public-address": "10.149.76.219",
+                                "charm": "",
+                                "subordinates": null,
+                                "leader": true
+                            }
+                        },
+                        "leader": true
+                    }
+                },
+                "meter-statuses": null,
+                "status": {
+                    "status": "active",
+                    "info": "",
+                    "data": {},
+                    "since": "2024-12-04T01:43:53.391031729Z",
+                    "kind": "",
+                    "version": "",
+                    "life": ""
+                },
+                "workload-version": "22.04",
+                "endpoint-bindings": null,
+                "public-address": ""
+            }
+        },
+        "remote-applications": {},
+        "offers": {},
+        "relations": [
+            {
+                "id": 0,
+                "key": "ntp:ntp-peers",
+                "interface": "ntp",
+                "scope": "global",
+                "endpoints": [
+                    {
+                        "application": "ntp",
+                        "name": "ntp-peers",
+                        "role": "peer",
+                        "subordinate": false
+                    }
+                ],
+                "status": {
+                    "status": "joined",
+                    "info": "",
+                    "data": {},
+                    "since": "2024-12-04T01:44:43.940973679Z",
+                    "kind": "",
+                    "version": "",
+                    "life": ""
+                }
+            },
+            {
+                "id": 1,
+                "key": "ntp:juju-info ubuntu:juju-info",
+                "interface": "juju-info",
+                "scope": "container",
+                "endpoints": [
+                    {
+                        "application": "ubuntu",
+                        "name": "juju-info",
+                        "role": "provider",
+                        "subordinate": false
+                    },
+                    {
+                        "application": "ntp",
+                        "name": "juju-info",
+                        "role": "requirer",
+                        "subordinate": true
+                    }
+                ],
+                "status": {
+                    "status": "joined",
+                    "info": "",
+                    "data": {},
+                    "since": "2024-12-04T01:43:53.72325443Z",
+                    "kind": "",
+                    "version": "",
+                    "life": ""
+                }
+            }
+        ],
+        "controller-timestamp": "2024-12-04T02:01:53.569630593Z",
+        "branches": {}
+    }
+}
