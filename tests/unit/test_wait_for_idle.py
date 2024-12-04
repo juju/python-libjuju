@@ -318,6 +318,16 @@ async def test_nonzero_idle_time(
     assert not idle
 
 
+async def test_subordinate_apps(
+    subordinate_status_response: dict[str, Any], kwargs: dict[str, Any]
+):
+    idle = await model_fake(subordinate_status_response)._check_idle(**{
+        **kwargs,
+        "apps": ["ntp", "ubuntu"],
+    })
+    assert idle
+
+
 @pytest.fixture
 def kwargs() -> dict[str, Any]:
     return dict(
@@ -338,6 +348,15 @@ def kwargs() -> dict[str, Any]:
 def full_status_response(pytestconfig: pytest.Config) -> dict[str, Any]:
     return json.loads(
         (pytestconfig.rootpath / "tests/unit/data/fullstatus.json").read_text()
+    )
+
+
+@pytest.fixture
+def subordinate_status_response(pytestconfig: pytest.Config) -> dict[str, Any]:
+    return json.loads(
+        (
+            pytestconfig.rootpath / "tests/unit/data/subordinate-fullstatus.json"
+        ).read_text()
     )
 
 

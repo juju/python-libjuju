@@ -3324,9 +3324,7 @@ class Model:
         now = datetime.now()
         expected_idle_since = now - timedelta(seconds=idle_period)
         full_status = await self.get_status()
-        # import pdb; pdb.set_trace()
 
-        # FIXME check this precedence
         for app_name in apps:
             if not full_status.applications.get(app_name):
                 logger.info("Waiting for app %r", app_name)
@@ -3344,11 +3342,7 @@ class Model:
         units: dict[str, UnitStatus] = {}
 
         for app_name in apps:
-            app = full_status.applications[app_name]
-            assert isinstance(app, ApplicationStatus)
-            for unit_name, unit in app.units.items():
-                assert isinstance(unit, UnitStatus)
-                units[unit_name] = unit
+            units.update(_app_units(full_status, app_name))
 
         for unit_name, unit in units.items():
             if unit.machine:
@@ -3405,8 +3399,7 @@ class Model:
             ready_units = []
             app = full_status.applications[app_name]
             assert isinstance(app, ApplicationStatus)
-            for unit in app.units.values():
-                assert isinstance(unit, UnitStatus)
+            for unit in _app_units(full_status, app_name).values():
                 assert unit.agent_status
                 assert unit.workload_status
 
@@ -3443,6 +3436,31 @@ class Model:
             return False
 
         return True
+
+
+def _app_units(full_status: FullStatus, app_name: str) -> dict[str, UnitStatus]:
+    """Fish out the app's units' status from a FullStatus response."""
+    rv: dict[str, UnitStatus] = {}
+    app = full_status.applications[app_name]
+    assert isinstance(app, ApplicationStatus)
+
+    if app.subordinate_to:
+        parent_name = app.subordinate_to[0]
+        parent = full_status.applications[parent_name]
+        assert isinstance(parent, ApplicationStatus)
+        for parent_unit in parent.units.values():
+            assert isinstance(parent_unit, UnitStatus)
+            for name, unit in parent_unit.subordinates.items():
+                if not name.startswith(f"{app_name}/"):
+                    continue
+                assert isinstance(unit, UnitStatus)
+                rv[name] = unit
+    else:
+        for name, unit in app.units.items():
+            assert isinstance(unit, UnitStatus)
+            rv[name] = unit
+
+    return rv
 
 
 def _create_consume_args(offer, macaroon, controller_info):
