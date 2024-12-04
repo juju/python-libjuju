@@ -2,6 +2,7 @@
 # Licensed under the Apache V2, see LICENCE file for details.
 import asyncio
 import inspect
+import logging
 import signal
 import subprocess
 import sys
@@ -82,6 +83,8 @@ class CleanModel:
         self._bakery_client = bakery_client
 
     async def __aenter__(self):
+        logging.basicConfig(level="INFO")
+        logging.getLogger("juju.client.connection").setLevel("DEBUG")
         print()
         print("Setting alarm for 300s")
         signal.alarm(300)  # FIXME trigger coro graph dump if a test is stuck
