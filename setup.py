@@ -27,7 +27,7 @@ setup(
         'theblues>=0.5.1,<1.0',
         'websockets>=7.0,<8.0 ; python_version<"3.9"',
         'websockets>=8.0,<9.0 ; python_version=="3.9"',
-        'websockets>=9.0; python_version>"3.9"',
+        'websockets>=9.0,<14.0 ; python_version>"3.9"',
         'paramiko>=2.4.0,<3.0.0',
         'pyasn1>=0.4.4',
         'toposort>=1.5,<2',

@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+2.9.49.1
+^^^^^^^^
+
+Friday, November 29th, 2024
+
+* Set an upper bound on the websockets dependency
+
 2.9.49.0
 ^^^^^^^^
 
