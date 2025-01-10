@@ -684,6 +684,7 @@ class Type:
     def from_json(cls, data: Type | str | dict[str, Any] | list[Any]) -> Self | None:
         def _parse_nested_list_entry(expr, result_dict):
             if isinstance(expr, str):
+                raise Exception(f"Ouch {expr=}")
                 if ">" in expr or ">=" in expr:
                     # something like juju >= 2.9.31
                     i = expr.index(">")
@@ -694,9 +695,11 @@ class Type:
                     # this is a simple entry
                     result_dict[expr] = ""
             elif isinstance(expr, dict):
+                raise Exception(f"Ouch {expr=}")
                 for v in expr.values():
                     _parse_nested_list_entry(v, result_dict)
             elif isinstance(expr, list):
+                raise Exception(f"Ouch {expr=}")
                 for v in expr:
                     _parse_nested_list_entry(v, result_dict)
             else:
