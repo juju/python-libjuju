@@ -683,7 +683,9 @@ class Type:
     @classmethod
     def from_json(cls, data: Type | str | dict[str, Any] | list[Any]) -> Self | None:
         def _parse_nested_list_entry(expr, result_dict):
+            # FIXME if no client uses this data, can we drop this?
             if isinstance(expr, str):
+                # FIXME no top-level use
                 raise Exception(f"Ouch {expr=}")
                 if ">" in expr or ">=" in expr:
                     # something like juju >= 2.9.31
@@ -695,11 +697,15 @@ class Type:
                     # this is a simple entry
                     result_dict[expr] = ""
             elif isinstance(expr, dict):
+                # FIXME no top-level use
                 raise Exception(f"Ouch {expr=}")
                 for v in expr.values():
                     _parse_nested_list_entry(v, result_dict)
             elif isinstance(expr, list):
-                raise Exception(f"Ouch {expr=}")
+                # FIXME test vectors from quarantined integration tests
+                # expr=['juju', {'any-of': [{'all-of': ['juju >= 2.9.49', 'juju < 3']}, {'all-of': ['juju >= 3.4.3', 'juju < 3.5']}, {'all-of': ['juju >= 3.5.1', 'juju < 4']}]}]
+                # expr=['juju', {'any-of': [{'all-of': ['juju >= 2.9.44', 'juju < 3']}, {'all-of': ['juju >= 3.4.3', 'juju < 4']}]}]
+                # expr=['juju', {'any-of': [{'all-of': ['juju >= 2.9.44', 'juju < 3']}, {'all-of': ['juju >= 3.4.3', 'juju < 4']}]}]
                 for v in expr:
                     _parse_nested_list_entry(v, result_dict)
             else:
