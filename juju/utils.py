@@ -325,6 +325,7 @@ KINETIC = "kinetic"
 LUNAR = "lunar"
 MANTIC = "mantic"
 NOBLE = "noble"
+RESOLUTE = "resolute"
 
 UBUNTU_SERIES = {
     PRECISE: "12.04",
@@ -352,6 +353,7 @@ UBUNTU_SERIES = {
     LUNAR: "23.04",
     MANTIC: "23.10",
     NOBLE: "24.04",
+    RESOLUTE: "26.04",
 }
 
 KUBERNETES = "kubernetes"
