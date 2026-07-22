@@ -305,8 +305,10 @@ texinfo_documents = [
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 # texinfo_no_detailmenu = False
 
+
 def setup(app):
     app.add_css_file("custom.css")
+
 
 # Notice prepended to every built page so that visitors arriving on any page
 # (e.g. via a search engine or a deep link) see the deprecation warning.
