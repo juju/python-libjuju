@@ -18,6 +18,8 @@ Supported Python versions: 3.8 through 3.13
 
 Supported Juju versions: 3.1 through 3.6
 
+Supported Ubuntu bases: 12.04 LTS through 24.04 LTS
+
 
 Design Notes
 ------------
