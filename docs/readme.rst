@@ -15,6 +15,7 @@ Bug reports: https://github.com/juju/python-libjuju/issues
 Documentation: https://pythonlibjuju.readthedocs.io/en/latest/
 
 Supported Python versions: 3.8 through 3.13
+
 Supported Juju versions: 3.1 through 3.6
 
 
