@@ -14,6 +14,17 @@ build:
     # Older Shpinx uses imghdr that was removed in Python 3.13
     # See e.g. https://github.com/python/cpython/issues/104818
     python: "3.12"
+  jobs:
+    build:
+      # Override the default HTML build to force a full, non-incremental build.
+      # Read the Docs restores the previous build's cache between builds, so an
+      # incremental build only re-reads sources that changed -- which means our
+      # global deprecation notice (injected at read time) never reaches pages
+      # whose own source is unchanged, leaving them serving stale HTML.
+      # -E rebuilds the environment from scratch (re-read every source); -a
+      # writes all output files. Together they disable incremental builds.
+      html:
+        - python -m sphinx -T -E -a -b html -d docs/_build/doctrees -D language=en docs $READTHEDOCS_OUTPUT/html
 
 sphinx:
   configuration: docs/conf.py
