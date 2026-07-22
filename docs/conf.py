@@ -308,15 +308,3 @@ texinfo_documents = [
 
 def setup(app):
     app.add_css_file("custom.css")
-
-
-# Notice prepended to every built page so that visitors arriving on any page
-# (e.g. via a search engine or a deep link) see the deprecation warning.
-rst_prolog = """
-.. warning::
-
-   **python-libjuju is deprecated.**
-
-   Charms should migrate to `Jubilant <https://github.com/canonical/jubilant>`_, Canonical's recommended library for Juju integration tests.
-   See `How to migrate integration tests from pytest-operator <https://canonical.com/juju/docs/ops/latest/howto/migrate/migrate-integration-tests-from-pytest-operator/>`_.
-"""
