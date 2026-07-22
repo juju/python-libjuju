@@ -308,3 +308,27 @@ texinfo_documents = [
 
 def setup(app):
     app.add_css_file("custom.css")
+    app.connect("source-read", _prepend_deprecation_notice)
+
+
+# Notice prepended to every built page so that visitors arriving on any page
+# (e.g. via a search engine or a deep link) see the deprecation warning.
+# We use a custom source-read hook rather than rst_prolog to avoid showing the
+# notice twice on the landing page, as index.rst includes readme.rst.
+_DEPRECATION_NOTICE = """\
+.. warning::
+
+   **python-libjuju is deprecated.**
+
+   Charms should migrate to `Jubilant <https://github.com/canonical/jubilant>`_, Canonical's recommended library for Juju integration tests.
+   See `How to migrate integration tests from pytest-operator <https://canonical.com/juju/docs/ops/latest/howto/migrate/migrate-integration-tests-from-pytest-operator/>`_.
+
+"""
+
+
+def _prepend_deprecation_notice(app, docname, content):
+    if docname in ("index", "readme"):
+        return
+    # ``content`` is a list containing a single string to make in-place modification possible.
+    # https://www.sphinx-doc.org/en/master/extdev/event_callbacks.html#event-source-read
+    content[0] = _DEPRECATION_NOTICE + content[0]

@@ -1,6 +1,13 @@
 A Python library for Juju
 =========================
 
+.. warning::
+
+   **python-libjuju is deprecated.**
+
+   Charms should migrate to `Jubilant <https://github.com/canonical/jubilant>`_, Canonical's recommended library for Juju integration tests.
+   See `How to migrate integration tests from pytest-operator <https://canonical.com/juju/docs/ops/latest/howto/migrate/migrate-integration-tests-from-pytest-operator/>`_.
+
 Source code: https://github.com/juju/python-libjuju
 
 Bug reports: https://github.com/juju/python-libjuju/issues
